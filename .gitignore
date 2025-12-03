@@ -1,3 +1,15 @@
-node_modules
+.tmp*
+.tmp/*
+*.log
+target*
 .env
-output.txt
+target
+*.env
+work
+*.out
+bin
+botserver-stack
+*logfile*
+*-log*
+docs/book
+*.rdb
