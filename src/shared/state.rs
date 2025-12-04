@@ -1,47 +1,32 @@
 //! Application state management
 //!
 //! This module contains the shared application state that is passed to all
-//! route handlers and provides access to database connections, configuration,
-//! and other shared resources.
+//! route handlers and provides access to the BotServer client.
 
-#![allow(dead_code)] // Prepared for future use
-
+use botlib::http_client::BotServerClient;
 use std::sync::Arc;
-use tokio::sync::RwLock;
-
-/// Database connection pool type
-/// This would typically be a real connection pool in production
-pub type DbPool = Arc<RwLock<()>>;
 
 /// Application state shared across all handlers
 #[derive(Clone)]
 pub struct AppState {
-    /// Database connection pool
-    pub conn: Arc<std::sync::Mutex<()>>,
-    /// Configuration cache
-    pub config: Arc<RwLock<std::collections::HashMap<String, String>>>,
-    /// Session store
-    pub sessions: Arc<RwLock<std::collections::HashMap<String, Session>>>,
-}
-
-/// User session information
-#[derive(Clone, Debug)]
-pub struct Session {
-    pub user_id: String,
-    pub username: String,
-    pub email: String,
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    pub expires_at: chrono::DateTime<chrono::Utc>,
+    /// HTTP client for communicating with BotServer
+    pub client: Arc<BotServerClient>,
 }
 
 impl AppState {
     /// Create a new application state
+    ///
+    /// Uses BOTSERVER_URL environment variable if set, otherwise defaults to localhost:8080
     pub fn new() -> Self {
+        let url = std::env::var("BOTSERVER_URL").ok();
         Self {
-            conn: Arc::new(std::sync::Mutex::new(())),
-            config: Arc::new(RwLock::new(std::collections::HashMap::new())),
-            sessions: Arc::new(RwLock::new(std::collections::HashMap::new())),
+            client: Arc::new(BotServerClient::new(url)),
         }
+    }
+
+    /// Check if the BotServer is healthy
+    pub async fn health_check(&self) -> bool {
+        self.client.health_check().await
     }
 }
 

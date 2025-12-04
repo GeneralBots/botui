@@ -7,7 +7,6 @@ use log::info;
 
 mod shared;
 mod ui_server;
-mod web;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {

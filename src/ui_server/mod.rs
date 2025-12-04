@@ -2,8 +2,6 @@
 //!
 //! Serves the web UI (suite, minimal) and handles API proxying.
 
-#![allow(dead_code)] // Some functions prepared for future use
-
 use axum::{
     extract::State,
     http::StatusCode,
@@ -12,17 +10,16 @@ use axum::{
     Router,
 };
 use log::error;
-use std::{fs, path::PathBuf, sync::Arc};
-use tower_http::services::ServeDir;
+use std::{fs, path::PathBuf};
 
-use botlib::http_client::BotServerClient;
+use crate::shared::AppState;
 
-// Serve minimal UI (default at /)
+/// Serve the index page (minimal UI)
 pub async fn index() -> impl IntoResponse {
     serve_minimal().await
 }
 
-// Handler for minimal UI
+/// Handler for minimal UI
 pub async fn serve_minimal() -> impl IntoResponse {
     match fs::read_to_string("ui/minimal/index.html") {
         Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
@@ -37,7 +34,7 @@ pub async fn serve_minimal() -> impl IntoResponse {
     }
 }
 
-// Handler for suite UI
+/// Handler for suite UI
 pub async fn serve_suite() -> impl IntoResponse {
     match fs::read_to_string("ui/suite/index.html") {
         Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
@@ -52,49 +49,9 @@ pub async fn serve_suite() -> impl IntoResponse {
     }
 }
 
-pub fn configure_router() -> Router {
-    let suite_path = PathBuf::from("./ui/suite");
-    let minimal_path = PathBuf::from("./ui/minimal");
-    let client = Arc::new(BotServerClient::new(None));
-
-    Router::new()
-        // API health check
-        .route("/health", get(health))
-        .route("/api/health", get(api_health))
-        // Default route serves minimal UI
-        .route("/", get(root))
-        .route("/minimal", get(serve_minimal))
-        // Suite UI route
-        .route("/suite", get(serve_suite))
-        // Suite static assets (when accessing /suite/*)
-        .nest_service("/suite/js", ServeDir::new(suite_path.join("js")))
-        .nest_service("/suite/css", ServeDir::new(suite_path.join("css")))
-        .nest_service("/suite/public", ServeDir::new(suite_path.join("public")))
-        .nest_service("/suite/drive", ServeDir::new(suite_path.join("drive")))
-        .nest_service("/suite/chat", ServeDir::new(suite_path.join("chat")))
-        .nest_service("/suite/mail", ServeDir::new(suite_path.join("mail")))
-        .nest_service("/suite/tasks", ServeDir::new(suite_path.join("tasks")))
-        // Legacy paths for backward compatibility (serve suite assets)
-        .nest_service("/js", ServeDir::new(suite_path.join("js")))
-        .nest_service("/css", ServeDir::new(suite_path.join("css")))
-        .nest_service("/public", ServeDir::new(suite_path.join("public")))
-        .nest_service("/drive", ServeDir::new(suite_path.join("drive")))
-        .nest_service("/chat", ServeDir::new(suite_path.join("chat")))
-        .nest_service("/mail", ServeDir::new(suite_path.join("mail")))
-        .nest_service("/tasks", ServeDir::new(suite_path.join("tasks")))
-        // Fallback for other static files
-        .fallback_service(
-            ServeDir::new(minimal_path.clone()).fallback(
-                ServeDir::new(minimal_path.clone()).append_index_html_on_directories(true),
-            ),
-        )
-        .with_state(client)
-}
-
-async fn health(
-    State(client): State<Arc<BotServerClient>>,
-) -> (StatusCode, axum::Json<serde_json::Value>) {
-    match client.health_check().await {
+/// Health check endpoint - checks BotServer connectivity
+async fn health(State(state): State<AppState>) -> (StatusCode, axum::Json<serde_json::Value>) {
+    match state.health_check().await {
         true => (
             StatusCode::OK,
             axum::Json(serde_json::json!({
@@ -114,25 +71,95 @@ async fn health(
     }
 }
 
+/// API health check endpoint
 async fn api_health() -> (StatusCode, axum::Json<serde_json::Value>) {
     (
         StatusCode::OK,
         axum::Json(serde_json::json!({
             "status": "ok",
-            "version": "1.0.0"
+            "version": env!("CARGO_PKG_VERSION")
         })),
     )
 }
 
-async fn root() -> axum::Json<serde_json::Value> {
-    axum::Json(serde_json::json!({
-        "service": "BotUI",
-        "version": "1.0.0",
-        "description": "General Bots User Interface",
-        "endpoints": {
-            "health": "/health",
-            "api": "/api/health",
-            "ui": "/"
-        }
-    }))
+/// Configure and return the main router
+pub fn configure_router() -> Router {
+    let suite_path = PathBuf::from("./ui/suite");
+    let minimal_path = PathBuf::from("./ui/minimal");
+    let state = AppState::new();
+
+    Router::new()
+        // Health check endpoints
+        .route("/health", get(health))
+        .route("/api/health", get(api_health))
+        // UI routes
+        .route("/", get(index))
+        .route("/minimal", get(serve_minimal))
+        .route("/suite", get(serve_suite))
+        // Suite static assets (when accessing /suite/*)
+        .nest_service(
+            "/suite/js",
+            tower_http::services::ServeDir::new(suite_path.join("js")),
+        )
+        .nest_service(
+            "/suite/css",
+            tower_http::services::ServeDir::new(suite_path.join("css")),
+        )
+        .nest_service(
+            "/suite/public",
+            tower_http::services::ServeDir::new(suite_path.join("public")),
+        )
+        .nest_service(
+            "/suite/drive",
+            tower_http::services::ServeDir::new(suite_path.join("drive")),
+        )
+        .nest_service(
+            "/suite/chat",
+            tower_http::services::ServeDir::new(suite_path.join("chat")),
+        )
+        .nest_service(
+            "/suite/mail",
+            tower_http::services::ServeDir::new(suite_path.join("mail")),
+        )
+        .nest_service(
+            "/suite/tasks",
+            tower_http::services::ServeDir::new(suite_path.join("tasks")),
+        )
+        // Legacy paths for backward compatibility (serve suite assets)
+        .nest_service(
+            "/js",
+            tower_http::services::ServeDir::new(suite_path.join("js")),
+        )
+        .nest_service(
+            "/css",
+            tower_http::services::ServeDir::new(suite_path.join("css")),
+        )
+        .nest_service(
+            "/public",
+            tower_http::services::ServeDir::new(suite_path.join("public")),
+        )
+        .nest_service(
+            "/drive",
+            tower_http::services::ServeDir::new(suite_path.join("drive")),
+        )
+        .nest_service(
+            "/chat",
+            tower_http::services::ServeDir::new(suite_path.join("chat")),
+        )
+        .nest_service(
+            "/mail",
+            tower_http::services::ServeDir::new(suite_path.join("mail")),
+        )
+        .nest_service(
+            "/tasks",
+            tower_http::services::ServeDir::new(suite_path.join("tasks")),
+        )
+        // Fallback for other static files
+        .fallback_service(
+            tower_http::services::ServeDir::new(minimal_path.clone()).fallback(
+                tower_http::services::ServeDir::new(minimal_path)
+                    .append_index_html_on_directories(true),
+            ),
+        )
+        .with_state(state)
 }

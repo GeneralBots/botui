@@ -1,10 +1,8 @@
 //! Shared types and state management for BotUI
 //!
-//! This module re-exports common types from botlib and provides
-//! UI-specific shared functionality.
+//! This module provides shared application state and utilities
+//! used across the UI server.
 
 pub mod state;
 
-// Re-export from botlib for convenience
-
-// Local re-exports
+pub use state::AppState;
