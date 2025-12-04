@@ -1,38 +1,20 @@
-#![cfg_attr(feature = "desktop", windows_subsystem = "windows")]
+//! BotUI - General Bots Pure Web UI Server
+//!
+//! This is the entry point for the botui web server.
+//! For desktop/mobile native features, see the `botapp` crate.
 
 use log::info;
 
-#[cfg(feature = "desktop")]
-mod desktop;
-
+mod shared;
 mod ui_server;
-
-#[cfg(not(feature = "desktop"))]
-pub mod http_client;
-
-#[cfg(not(feature = "desktop"))]
 mod web;
 
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
     info!("BotUI starting...");
+    info!("Starting web UI server...");
 
-    #[cfg(feature = "desktop")]
-    {
-        info!("Starting in desktop mode (Tauri)...");
-        return Ok(());
-    }
-
-    #[cfg(not(feature = "desktop"))]
-    {
-        info!("Starting web UI server...");
-        web_main().await
-    }
-}
-
-#[cfg(not(feature = "desktop"))]
-async fn web_main() -> std::io::Result<()> {
     let app = ui_server::configure_router();
 
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], 3000));

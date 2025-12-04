@@ -2,7 +2,7 @@
 name = "botui"
 version = "6.1.0"
 edition = "2021"
-description = "General Bots UI - Desktop, Web and Mobile interface"
+description = "General Bots UI - Pure web interface"
 license = "AGPL-3.0"
 
 [dependencies.botlib]
@@ -10,11 +10,8 @@ path = "../botlib"
 features = ["http-client"]
 
 [features]
-default = ["desktop", "ui-server"]
-desktop = ["dep:tauri", "dep:tauri-plugin-dialog", "dep:tauri-plugin-opener"]
-desktop-tray = ["desktop", "dep:trayicon", "dep:ksni"]
+default = ["ui-server"]
 ui-server = []
-mobile = []
 
 [dependencies]
 anyhow = "1.0"
@@ -32,7 +29,6 @@ futures = "0.3"
 futures-util = "0.3"
 hostname = "0.4"
 jsonwebtoken = "9.3"
-ksni = { version = "0.2", optional = true }
 local-ip-address = "0.6.5"
 log = "0.4"
 mime_guess = "2.0"
@@ -41,9 +37,6 @@ regex = "1.10"
 reqwest = { version = "0.12", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tauri = { version = "2", features = ["unstable"], optional = true }
-tauri-plugin-dialog = { version = "2", optional = true }
-tauri-plugin-opener = { version = "2", optional = true }
 time = "0.3"
 tokio = { version = "1.41", features = ["full"] }
 tokio-stream = "0.1"
@@ -51,18 +44,6 @@ tower = "0.4"
 tower-http = { version = "0.5", features = ["cors", "fs", "trace"] }
 tower-cookies = "0.10"
 tracing = "0.1"
-trayicon = { version = "0.2", optional = true }
 urlencoding = "2.1"
 uuid = { version = "1.11", features = ["serde", "v4"] }
 webbrowser = "0.8"
-
-[target.'cfg(unix)'.dependencies]
-ksni = { version = "0.2", optional = true }
-
-[target.'cfg(windows)'.dependencies]
-trayicon = { version = "0.2", optional = true }
-image = "0.25"
-thiserror = "2.0"
-
-[build-dependencies]
-tauri-build = { version = "2" }

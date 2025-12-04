@@ -1,4 +1,6 @@
-#![cfg(not(feature = "desktop"))]
+//! UI Server module for BotUI
+//!
+//! Serves the web UI (suite, minimal) and handles API proxying.
 
 use axum::{
     extract::State,

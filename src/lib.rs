@@ -1,13 +1,12 @@
-//! BotUI - General Bots Desktop, Web & Mobile UI
+//! BotUI - General Bots Pure Web UI
 //!
-//! This crate provides the UI layer for General Bots including:
-//! - Desktop application (Tauri)
-//! - Web UI server (HTMX backend)
+//! This crate provides the web UI layer for General Bots:
+//! - Serves static HTMX UI files (suite, minimal)
+//! - Proxies API requests to botserver
+//! - WebSocket support for real-time communication
 //!
-//! Most logic lives in botserver; this crate is primarily for:
-//! - Serving static HTMX UI files
-//! - Proxying API requests to botserver
-//! - Desktop-specific functionality (Tauri)
+//! For desktop/mobile native features, see the `botapp` crate which
+//! wraps this pure web UI with Tauri.
 
 // Re-export common types from botlib
 pub use botlib::{
@@ -18,25 +17,16 @@ pub use botlib::{
 // HTTP client is always available via botlib
 pub use botlib::BotServerClient;
 
-#[cfg(feature = "desktop")]
-pub mod desktop;
-
-#[cfg(not(feature = "desktop"))]
-pub mod http_client;
-
 pub mod shared;
 
-#[cfg(not(feature = "desktop"))]
+#[cfg(feature = "ui-server")]
 pub mod ui_server;
 
-#[cfg(not(feature = "desktop"))]
+#[cfg(feature = "ui-server")]
 pub mod web;
 
 // Re-exports
-#[cfg(feature = "desktop")]
-pub use desktop::*;
-
 pub use shared::*;
 
-#[cfg(not(feature = "desktop"))]
+#[cfg(feature = "ui-server")]
 pub use ui_server::*;

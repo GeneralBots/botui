@@ -1,6 +1,6 @@
 //! Web module with basic data structures
-
-#![cfg(not(feature = "desktop"))]
+//!
+//! Contains DTOs and types for the web API layer.
 
 use serde::{Deserialize, Serialize};
 

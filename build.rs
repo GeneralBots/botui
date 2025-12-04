@@ -1,7 +1,9 @@
+//! Build script for botui
+//!
+//! This is a minimal build script since botui is now a pure web project.
+//! Tauri build requirements have been moved to the botapp crate.
+
 fn main() {
-    // Only run tauri_build when the desktop feature is enabled
-    #[cfg(feature = "desktop")]
-    {
-        tauri_build::build()
-    }
+    // No build steps required for pure web UI
+    // Tauri-specific builds are now in botapp
 }
