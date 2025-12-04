@@ -13,14 +13,11 @@
         <!-- Styles -->
         <link rel="stylesheet" href="css/app.css" />
 
-        <!-- External Libraries -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <script
-            defer
-            src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
-        ></script>
+        <!-- Local Libraries (no external CDN dependencies) -->
+        <script src="js/vendor/gsap.min.js"></script>
+        <script src="js/vendor/livekit-client.umd.min.js"></script>
+        <script src="js/vendor/marked.min.js"></script>
+        <script defer src="js/vendor/alpinejs.min.js"></script>
     </head>
 
     <body>

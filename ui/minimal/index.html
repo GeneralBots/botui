@@ -15,11 +15,12 @@
                 CONTEXT_CHANGE: 5,
             };
         </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <!-- Local Libraries (no external CDN dependencies) -->
+        <script src="js/vendor/gsap.min.js"></script>
+        <script src="js/vendor/livekit-client.umd.min.js"></script>
+        <script src="js/vendor/marked.min.js"></script>
         <style>
-            @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap");
+            /* Using system fonts - no external font loading */
             :root {
                 --bg: #ffffff;
                 --fg: #000000;
