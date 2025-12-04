@@ -4,6 +4,8 @@
 //! route handlers and provides access to database connections, configuration,
 //! and other shared resources.
 
+#![allow(dead_code)] // Prepared for future use
+
 use std::sync::Arc;
 use tokio::sync::RwLock;
 

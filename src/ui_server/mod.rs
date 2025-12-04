@@ -2,6 +2,8 @@
 //!
 //! Serves the web UI (suite, minimal) and handles API proxying.
 
+#![allow(dead_code)] // Some functions prepared for future use
+
 use axum::{
     extract::State,
     http::StatusCode,

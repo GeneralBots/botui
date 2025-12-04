@@ -2,6 +2,8 @@
 //!
 //! Contains DTOs and types for the web API layer.
 
+#![allow(dead_code)] // DTOs prepared for future use
+
 use serde::{Deserialize, Serialize};
 
 /// Request/Response DTOs for web API
