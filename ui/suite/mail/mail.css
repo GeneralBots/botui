@@ -184,6 +184,182 @@
     color: #9aa0a6;
 }
 
+/* Email Read Status Indicator */
+.mail-item-status {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.mail-read-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.625rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.mail-read-indicator.read {
+    background: #e6f4ea;
+    color: #137333;
+}
+
+[data-theme="dark"] .mail-read-indicator.read {
+    background: #1e3a2f;
+    color: #81c995;
+}
+
+.mail-read-indicator.unread {
+    background: #fce8e6;
+    color: #c5221f;
+}
+
+[data-theme="dark"] .mail-read-indicator.unread {
+    background: #3c2020;
+    color: #f28b82;
+}
+
+.mail-read-indicator.pending {
+    background: #fef7e0;
+    color: #b06000;
+}
+
+[data-theme="dark"] .mail-read-indicator.pending {
+    background: #3c3020;
+    color: #fdd663;
+}
+
+.mail-read-indicator .icon {
+    font-size: 0.75rem;
+}
+
+/* Read count badge */
+.mail-read-count {
+    font-size: 0.625rem;
+    color: #5f6368;
+    margin-left: 0.25rem;
+}
+
+[data-theme="dark"] .mail-read-count {
+    color: #9aa0a6;
+}
+
+/* Sent folder specific styling */
+.mail-item.sent .mail-item-status {
+    justify-content: flex-start;
+}
+
+/* Tracking stats panel */
+.tracking-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+[data-theme="dark"] .tracking-stats {
+    background: #292a2d;
+}
+
+.tracking-stat {
+    text-align: center;
+    padding: 0.75rem;
+}
+
+.tracking-stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a73e8;
+}
+
+[data-theme="dark"] .tracking-stat-value {
+    color: #8ab4f8;
+}
+
+.tracking-stat-label {
+    font-size: 0.75rem;
+    color: #5f6368;
+    margin-top: 0.25rem;
+}
+
+[data-theme="dark"] .tracking-stat-label {
+    color: #9aa0a6;
+}
+
+/* Read status tooltip */
+.mail-item[data-read-at]:hover::after {
+    content: attr(data-read-at);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.5rem 0.75rem;
+    background: #202124;
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+}
+
+[data-theme="dark"] .mail-item[data-read-at]:hover::after {
+    background: #e8eaed;
+    color: #202124;
+}
+
+/* Double check mark icon for read emails */
+.checkmark-double {
+    position: relative;
+    display: inline-block;
+    width: 1rem;
+    height: 0.75rem;
+}
+
+.checkmark-double::before,
+.checkmark-double::after {
+    content: "✓";
+    position: absolute;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+
+.checkmark-double::before {
+    left: 0;
+}
+
+.checkmark-double::after {
+    left: 0.25rem;
+}
+
+.checkmark-double.read::before,
+.checkmark-double.read::after {
+    color: #137333;
+}
+
+[data-theme="dark"] .checkmark-double.read::before,
+[data-theme="dark"] .checkmark-double.read::after {
+    color: #81c995;
+}
+
+.checkmark-double.sent::before,
+.checkmark-double.sent::after {
+    color: #5f6368;
+}
+
+[data-theme="dark"] .checkmark-double.sent::before,
+[data-theme="dark"] .checkmark-double.sent::after {
+    color: #9aa0a6;
+}
+
 /* Mail Content View */
 .mail-content-view {
     padding: 2rem;

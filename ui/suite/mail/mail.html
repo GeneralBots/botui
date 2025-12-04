@@ -1,9 +1,18 @@
 <div class="mail-layout">
     <!-- Sidebar -->
     <div class="panel mail-sidebar">
-        <div style="padding: 1rem; border-bottom: 1px solid #334155;">
+        <div style="padding: 1rem; border-bottom: 1px solid #334155">
             <button
-                style="width: 100%; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 600;"
+                style="
+                    width: 100%;
+                    padding: 0.75rem;
+                    background: #3b82f6;
+                    color: white;
+                    border: none;
+                    border-radius: 0.5rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                "
                 hx-get="/api/email/compose"
                 hx-target="#mail-content"
                 hx-swap="innerHTML"
@@ -13,33 +22,60 @@
         </div>
 
         <!-- Folder List -->
-        <div id="mail-folders"
-             hx-get="/api/email/folders"
-             hx-trigger="load"
-             hx-swap="innerHTML">
-            <div class="nav-item active"
-                 hx-get="/api/email/list?folder=inbox"
-                 hx-target="#mail-list"
-                 hx-swap="innerHTML">
+        <div
+            id="mail-folders"
+            hx-get="/api/email/folders"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
+            <div
+                class="nav-item active"
+                hx-get="/api/email/list?folder=inbox"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
                 <span>📥</span> Inbox
-                <span style="margin-left: auto; font-size: 0.875rem; color: #64748b;">0</span>
+                <span
+                    style="
+                        margin-left: auto;
+                        font-size: 0.875rem;
+                        color: #64748b;
+                    "
+                    >0</span
+                >
             </div>
-            <div class="nav-item"
-                 hx-get="/api/email/list?folder=sent"
-                 hx-target="#mail-list"
-                 hx-swap="innerHTML">
+            <div
+                class="nav-item"
+                hx-get="/api/email/list?folder=sent"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+                onclick="window.currentFolder='sent'"
+            >
                 <span>📤</span> Sent
             </div>
-            <div class="nav-item"
-                 hx-get="/api/email/list?folder=drafts"
-                 hx-target="#mail-list"
-                 hx-swap="innerHTML">
+            <div
+                class="nav-item"
+                hx-get="/api/email/tracking/list"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+                onclick="window.currentFolder='tracking'"
+            >
+                <span>📊</span> Tracking
+            </div>
+            <div
+                class="nav-item"
+                hx-get="/api/email/list?folder=drafts"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
                 <span>📝</span> Drafts
             </div>
-            <div class="nav-item"
-                 hx-get="/api/email/list?folder=trash"
-                 hx-target="#mail-list"
-                 hx-swap="innerHTML">
+            <div
+                class="nav-item"
+                hx-get="/api/email/list?folder=trash"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
                 <span>🗑️</span> Trash
             </div>
         </div>
@@ -47,15 +83,17 @@
 
     <!-- Mail List -->
     <div class="panel mail-list">
-        <div style="padding: 1rem; border-bottom: 1px solid #334155;">
+        <div style="padding: 1rem; border-bottom: 1px solid #334155">
             <h3 id="folder-title">Inbox</h3>
         </div>
-        <div id="mail-list"
-             hx-get="/api/email/list?folder=inbox"
-             hx-trigger="load"
-             hx-swap="innerHTML">
+        <div
+            id="mail-list"
+            hx-get="/api/email/list?folder=inbox"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
             <!-- Loading state -->
-            <div style="padding: 2rem; text-align: center; color: #64748b;">
+            <div style="padding: 2rem; text-align: center; color: #64748b">
                 Loading emails...
             </div>
         </div>
@@ -64,376 +102,593 @@
     <!-- Mail Content -->
     <div class="panel mail-content">
         <div id="mail-content">
-            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #64748b;">
-                <div style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">📧</div>
+            <div
+                style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100%;
+                    color: #64748b;
+                "
+            >
+                <div style="text-align: center">
+                    <div style="font-size: 3rem; margin-bottom: 1rem">📧</div>
                     <h3>Select an email to read</h3>
                 </div>
             </div>
         </div>
-    </div</h3>>
+    </div>
 </div>
 
+<!-- Tracking Stats Template (loaded when viewing tracking folder) -->
+<template id="tracking-stats-template">
+    <div class="tracking-stats">
+        <div class="tracking-stat">
+            <div class="tracking-stat-value" id="stat-total-sent">0</div>
+            <div class="tracking-stat-label">Total Sent</div>
+        </div>
+        <div class="tracking-stat">
+            <div class="tracking-stat-value" id="stat-total-read">0</div>
+            <div class="tracking-stat-label">Opened</div>
+        </div>
+        <div class="tracking-stat">
+            <div class="tracking-stat-value" id="stat-read-rate">0%</div>
+            <div class="tracking-stat-label">Open Rate</div>
+        </div>
+        <div class="tracking-stat">
+            <div class="tracking-stat-value" id="stat-avg-time">-</div>
+            <div class="tracking-stat-label">Avg. Time to Open</div>
+        </div>
+    </div>
+</template>
+
+<!-- Sent Mail Item Template with Read Status -->
+<template id="sent-mail-item-template">
+    <div class="mail-item sent" data-tracking-id="" data-read-at="">
+        <div class="mail-header">
+            <span class="mail-to"></span>
+            <span class="mail-time"></span>
+        </div>
+        <div class="mail-subject"></div>
+        <div class="mail-item-status">
+            <span class="mail-read-indicator">
+                <span class="checkmark-double"></span>
+                <span class="status-text"></span>
+            </span>
+            <span class="mail-read-count"></span>
+        </div>
+    </div>
+</template>
+
 <style>
-.mail-layout {
-    display: grid;
-    grid-template-columns: 250px 350px 1fr;
-    height: calc(100vh - 64px);
-    gap: 1px;
-    background: #1e293b;
-}
-
-.panel {
-    background: #0f172a;
-    overflow-y: auto;
-}
-
-.mail-sidebar {
-    border-right: 1px solid #334155;
-}
-
-.mail-list {
-    border-right: 1px solid #334155;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    color: #e2e8f0;
-    gap: 0.75rem;
-}
-
-.nav-item:hover {
-    background: #1e293b;
-}
-
-.nav-item.active {
-    background: #1e293b;
-    color: #3b82f6;
-}
-
-.mail-item {
-    padding: 1rem;
-    border-bottom: 1px solid #334155;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.mail-item:hover {
-    background: #1e293b;
-}
-
-.mail-item.unread {
-    background: rgba(59, 130, 246, 0.1);
-}
-
-.mail-item.selected {
-    background: #1e293b;
-    border-left: 3px solid #3b82f6;
-}
-
-.mail-header {
-    font-weight: 600;
-    color: #f1f5f9;
-    margin-bottom: 0.25rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.mail-from {
-    color: #94a3b8;
-    font-size: 0.875rem;
-    margin-bottom: 0.25rem;
-}
-
-.mail-subject {
-    color: #e2e8f0;
-    margin-bottom: 0.5rem;
-}
-
-.mail-preview {
-    color: #64748b;
-    font-size: 0.875rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.mail-content-view {
-    padding: 2rem;
-}
-
-.mail-content-view h2 {
-    color: #f1f5f9;
-    margin-bottom: 1rem;
-}
-
-.mail-actions {
-    display: flex;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-bottom: 1px solid #334155;
-}
-
-.mail-actions button {
-    padding: 0.5rem 1rem;
-    background: #1e293b;
-    color: #e2e8f0;
-    border: 1px solid #334155;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.mail-actions button:hover {
-    background: #334155;
-}
-
-.mail-body {
-    padding: 1.5rem;
-    color: #e2e8f0;
-    line-height: 1.6;
-    white-space: pre-wrap;
-}
-
-.text-sm {
-    font-size: 0.875rem;
-}
-
-.text-gray {
-    color: #64748b;
-}
-
-.compose-form {
-    padding: 1.5rem;
-}
-
-.compose-form .form-group {
-    margin-bottom: 1rem;
-}
-
-.compose-form label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #94a3b8;
-    font-size: 0.875rem;
-}
-
-.compose-form input,
-.compose-form textarea {
-    width: 100%;
-    padding: 0.5rem;
-    background: #1e293b;
-    color: #e2e8f0;
-    border: 1px solid #334155;
-    border-radius: 0.375rem;
-}
-
-.compose-form textarea {
-    min-height: 300px;
-    resize: vertical;
-}
-
-.compose-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.compose-actions button {
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-primary {
-    background: #3b82f6;
-    color: white;
-    border: none;
-}
-
-.btn-primary:hover {
-    background: #2563eb;
-}
-
-.btn-secondary {
-    background: #1e293b;
-    color: #e2e8f0;
-    border: 1px solid #334155;
-}
-
-.btn-secondary:hover {
-    background: #334155;
-}
-
-/* Empty state */
-.empty-state {
-    padding: 3rem;
-    text-align: center;
-    color: #64748b;
-}
-
-.empty-state h3 {
-    margin: 1rem 0;
-    color: #94a3b8;
-}
-
-/* Loading spinner */
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.spinner {
-    display: inline-block;
-    width: 1.5rem;
-    height: 1.5rem;
-    border: 2px solid #334155;
-    border-top-color: #3b82f6;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
-}
-
-/* HTMX loading states */
-.htmx-request .spinner {
-    display: inline-block;
-}
-
-.htmx-request.mail-item {
-    opacity: 0.6;
-}
-
-/* Folder badges */
-.folder-badge {
-    display: inline-block;
-    padding: 0.125rem 0.5rem;
-    background: #1e293b;
-    color: #94a3b8;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.folder-badge.unread {
-    background: #3b82f6;
-    color: white;
-}
-
-/* Responsive design */
-@media (max-width: 1024px) {
     .mail-layout {
-        grid-template-columns: 200px 300px 1fr;
+        display: grid;
+        grid-template-columns: 250px 350px 1fr;
+        height: calc(100vh - 64px);
+        gap: 1px;
+        background: #1e293b;
     }
-}
 
-@media (max-width: 768px) {
-    .mail-layout {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+    .panel {
+        background: #0f172a;
+        overflow-y: auto;
     }
 
     .mail-sidebar {
-        display: none;
+        border-right: 1px solid #334155;
     }
 
     .mail-list {
-        border-right: none;
+        border-right: 1px solid #334155;
     }
 
-    .mail-content {
-        display: none;
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        color: #e2e8f0;
+        gap: 0.75rem;
     }
 
-    .mail-content.active {
+    .nav-item:hover {
+        background: #1e293b;
+    }
+
+    .nav-item.active {
+        background: #1e293b;
+        color: #3b82f6;
+    }
+
+    .mail-item {
+        padding: 1rem;
+        border-bottom: 1px solid #334155;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .mail-item:hover {
+        background: #1e293b;
+    }
+
+    .mail-item.unread {
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    .mail-item.selected {
+        background: #1e293b;
+        border-left: 3px solid #3b82f6;
+    }
+
+    .mail-header {
+        font-weight: 600;
+        color: #f1f5f9;
+        margin-bottom: 0.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .mail-from {
+        color: #94a3b8;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .mail-subject {
+        color: #e2e8f0;
+        margin-bottom: 0.5rem;
+    }
+
+    .mail-preview {
+        color: #64748b;
+        font-size: 0.875rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .mail-content-view {
+        padding: 2rem;
+    }
+
+    .mail-content-view h2 {
+        color: #f1f5f9;
+        margin-bottom: 1rem;
+    }
+
+    .mail-actions {
+        display: flex;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-bottom: 1px solid #334155;
+    }
+
+    .mail-actions button {
+        padding: 0.5rem 1rem;
+        background: #1e293b;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .mail-actions button:hover {
+        background: #334155;
+    }
+
+    .mail-body {
+        padding: 1.5rem;
+        color: #e2e8f0;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .text-sm {
+        font-size: 0.875rem;
+    }
+
+    .text-gray {
+        color: #64748b;
+    }
+
+    .compose-form {
+        padding: 1.5rem;
+    }
+
+    .compose-form .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .compose-form label {
         display: block;
-        position: fixed;
-        top: 64px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 100;
+        margin-bottom: 0.5rem;
+        color: #94a3b8;
+        font-size: 0.875rem;
     }
-}
+
+    .compose-form input,
+    .compose-form textarea {
+        width: 100%;
+        padding: 0.5rem;
+        background: #1e293b;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 0.375rem;
+    }
+
+    .compose-form textarea {
+        min-height: 300px;
+        resize: vertical;
+    }
+
+    .compose-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .compose-actions button {
+        padding: 0.5rem 1.5rem;
+        border-radius: 0.375rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+    .btn-secondary {
+        background: #1e293b;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+    }
+
+    .btn-secondary:hover {
+        background: #334155;
+    }
+
+    /* Empty state */
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .empty-state h3 {
+        margin: 1rem 0;
+        color: #94a3b8;
+    }
+
+    /* Loading spinner */
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 2px solid #334155;
+        border-top-color: #3b82f6;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+
+    /* HTMX loading states */
+    .htmx-request .spinner {
+        display: inline-block;
+    }
+
+    .htmx-request.mail-item {
+        opacity: 0.6;
+    }
+
+    /* Folder badges */
+    .folder-badge {
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        background: #1e293b;
+        color: #94a3b8;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .folder-badge.unread {
+        background: #3b82f6;
+        color: white;
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+        .mail-layout {
+            grid-template-columns: 200px 300px 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .mail-layout {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+        }
+
+        .mail-sidebar {
+            display: none;
+        }
+
+        .mail-list {
+            border-right: none;
+        }
+
+        .mail-content {
+            display: none;
+        }
+
+        .mail-content.active {
+            display: block;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+    }
 </style>
 
 <script>
-// Handle folder selection
-document.addEventListener('click', function(e) {
-    if (e.target.closest('.nav-item')) {
-        // Update active state
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        e.target.closest('.nav-item').classList.add('active');
+    // Handle folder selection
+    document.addEventListener("click", function (e) {
+        if (e.target.closest(".nav-item")) {
+            // Update active state
+            document.querySelectorAll(".nav-item").forEach((item) => {
+                item.classList.remove("active");
+            });
+            e.target.closest(".nav-item").classList.add("active");
 
-        // Update folder title
-        const folderName = e.target.closest('.nav-item').textContent.trim().split(' ')[1];
-        const titleEl = document.getElementById('folder-title');
-        if (titleEl) {
-            titleEl.textContent = folderName;
+            // Update folder title
+            const folderName = e.target
+                .closest(".nav-item")
+                .textContent.trim()
+                .split(" ")[1];
+            const titleEl = document.getElementById("folder-title");
+            if (titleEl) {
+                titleEl.textContent = folderName;
+            }
+        }
+
+        // Handle mail selection
+        if (e.target.closest(".mail-item")) {
+            document.querySelectorAll(".mail-item").forEach((item) => {
+                item.classList.remove("selected");
+            });
+            e.target.closest(".mail-item").classList.add("selected");
+
+            // Mark as read
+            e.target.closest(".mail-item").classList.remove("unread");
+        }
+    });
+
+    // Handle HTMX events for better UX
+    document.body.addEventListener("htmx:beforeRequest", function (evt) {
+        // Add loading state
+        if (evt.detail.target.id === "mail-list") {
+            evt.detail.target.innerHTML =
+                '<div style="padding: 2rem; text-align: center;"><div class="spinner"></div></div>';
+        }
+    });
+
+    document.body.addEventListener("htmx:afterSwap", function (evt) {
+        // Scroll to top after loading new emails
+        if (evt.detail.target.id === "mail-list") {
+            evt.detail.target.scrollTop = 0;
+        }
+    });
+
+    // Handle compose form submission
+    document.body.addEventListener("htmx:beforeRequest", function (evt) {
+        if (evt.detail.elt.matches(".compose-form")) {
+            // Validate form
+            const form = evt.detail.elt;
+            const to = form.querySelector('[name="to"]').value;
+            const subject = form.querySelector('[name="subject"]').value;
+            const body = form.querySelector('[name="body"]').value;
+
+            if (!to || !subject || !body) {
+                evt.preventDefault();
+                alert("Please fill in all required fields");
+            }
+        }
+    });
+
+    // Handle keyboard shortcuts
+    document.addEventListener("keydown", function (e) {
+        // Ctrl/Cmd + N for new email
+        if ((e.ctrlKey || e.metaKey) && e.key === "n") {
+            e.preventDefault();
+            document.querySelector(".mail-sidebar button").click();
+        }
+
+        // Delete key for delete email
+        if (
+            e.key === "Delete" &&
+            document.querySelector(".mail-item.selected")
+        ) {
+            const selected = document.querySelector(".mail-item.selected");
+            const deleteBtn = selected.querySelector('[data-action="delete"]');
+            if (deleteBtn) deleteBtn.click();
+        }
+    });
+
+    // Track current folder
+    window.currentFolder = "inbox";
+
+    // Load tracking stats when viewing tracking folder
+    async function loadTrackingStats() {
+        try {
+            const response = await fetch("/api/email/tracking/stats");
+            const data = await response.json();
+            if (data.success && data.data) {
+                document.getElementById("stat-total-sent").textContent =
+                    data.data.total_sent;
+                document.getElementById("stat-total-read").textContent =
+                    data.data.total_read;
+                document.getElementById("stat-read-rate").textContent =
+                    data.data.read_rate.toFixed(1) + "%";
+                if (data.data.avg_time_to_read_hours) {
+                    const hours = data.data.avg_time_to_read_hours;
+                    if (hours < 1) {
+                        document.getElementById("stat-avg-time").textContent =
+                            Math.round(hours * 60) + "m";
+                    } else if (hours < 24) {
+                        document.getElementById("stat-avg-time").textContent =
+                            hours.toFixed(1) + "h";
+                    } else {
+                        document.getElementById("stat-avg-time").textContent =
+                            (hours / 24).toFixed(1) + "d";
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Failed to load tracking stats:", e);
         }
     }
 
-    // Handle mail selection
-    if (e.target.closest('.mail-item')) {
-        document.querySelectorAll('.mail-item').forEach(item => {
-            item.classList.remove('selected');
-        });
-        e.target.closest('.mail-item').classList.add('selected');
-
-        // Mark as read
-        e.target.closest('.mail-item').classList.remove('unread');
-    }
-});
-
-// Handle HTMX events for better UX
-document.body.addEventListener('htmx:beforeRequest', function(evt) {
-    // Add loading state
-    if (evt.detail.target.id === 'mail-list') {
-        evt.detail.target.innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="spinner"></div></div>';
-    }
-});
-
-document.body.addEventListener('htmx:afterSwap', function(evt) {
-    // Scroll to top after loading new emails
-    if (evt.detail.target.id === 'mail-list') {
-        evt.detail.target.scrollTop = 0;
-    }
-});
-
-// Handle compose form submission
-document.body.addEventListener('htmx:beforeRequest', function(evt) {
-    if (evt.detail.elt.matches('.compose-form')) {
-        // Validate form
-        const form = evt.detail.elt;
-        const to = form.querySelector('[name="to"]').value;
-        const subject = form.querySelector('[name="subject"]').value;
-        const body = form.querySelector('[name="body"]').value;
-
-        if (!to || !subject || !body) {
-            evt.preventDefault();
-            alert('Please fill in all required fields');
+    // Render tracking list item
+    function renderTrackingItem(item) {
+        const div = document.createElement("div");
+        div.className = "mail-item sent";
+        div.setAttribute("data-tracking-id", item.tracking_id);
+        if (item.read_at) {
+            div.setAttribute(
+                "data-read-at",
+                "Opened: " + new Date(item.read_at).toLocaleString(),
+            );
         }
-    }
-});
 
-// Handle keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-    // Ctrl/Cmd + N for new email
-    if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-        e.preventDefault();
-        document.querySelector('.mail-sidebar button').click();
+        const statusClass = item.is_read ? "read" : "pending";
+        const statusText = item.is_read ? "Opened" : "Not opened";
+        const checkmarkClass = item.is_read ? "read" : "sent";
+        const readCount = item.read_count > 1 ? `(${item.read_count}x)` : "";
+
+        div.innerHTML = `
+        <div class="mail-header">
+            <span class="mail-to">To: ${item.to_email}</span>
+            <span class="mail-time">${new Date(item.sent_at).toLocaleDateString()}</span>
+        </div>
+        <div class="mail-subject">${item.subject}</div>
+        <div class="mail-item-status">
+            <span class="mail-read-indicator ${statusClass}">
+                <span class="checkmark-double ${checkmarkClass}"></span>
+                <span class="status-text">${statusText}</span>
+            </span>
+            <span class="mail-read-count">${readCount}</span>
+        </div>
+    `;
+
+        div.addEventListener("click", () => showTrackingDetails(item));
+        return div;
     }
 
-    // Delete key for delete email
-    if (e.key === 'Delete' && document.querySelector('.mail-item.selected')) {
-        const selected = document.querySelector('.mail-item.selected');
-        const deleteBtn = selected.querySelector('[data-action="delete"]');
-        if (deleteBtn) deleteBtn.click();
+    // Show tracking details in content panel
+    function showTrackingDetails(item) {
+        const content = document.getElementById("mail-content");
+        const readStatus = item.is_read
+            ? `<span class="mail-read-indicator read"><span class="checkmark-double read"></span> Opened</span>`
+            : `<span class="mail-read-indicator pending"><span class="checkmark-double sent"></span> Not opened yet</span>`;
+
+        const readInfo = item.is_read
+            ? `
+        <div style="margin-top: 1rem; padding: 1rem; background: #e6f4ea; border-radius: 8px;">
+            <h4 style="margin: 0 0 0.5rem 0; color: #137333;">📬 Email Opened</h4>
+            <p style="margin: 0; color: #137333;">
+                First opened: ${new Date(item.read_at).toLocaleString()}<br>
+                Times opened: ${item.read_count}
+            </p>
+        </div>
+    `
+            : `
+        <div style="margin-top: 1rem; padding: 1rem; background: #fef7e0; border-radius: 8px;">
+            <h4 style="margin: 0 0 0.5rem 0; color: #b06000;">⏳ Awaiting Read</h4>
+            <p style="margin: 0; color: #b06000;">
+                This email has not been opened yet.
+            </p>
+        </div>
+    `;
+
+        content.innerHTML = `
+        <div class="mail-content-view">
+            <div class="mail-header">
+                <h2 class="mail-subject">${item.subject}</h2>
+                <div class="mail-meta">
+                    <span>To: <strong>${item.to_email}</strong></span>
+                    <span class="mail-date">Sent: ${new Date(item.sent_at).toLocaleString()}</span>
+                </div>
+                <div style="margin-top: 0.5rem;">
+                    ${readStatus}
+                </div>
+            </div>
+            ${readInfo}
+            <div style="margin-top: 1.5rem;">
+                <h4>Tracking ID</h4>
+                <code style="font-size: 0.75rem; color: #5f6368;">${item.tracking_id}</code>
+            </div>
+        </div>
+    `;
     }
-});
+
+    // Handle HTMX response for tracking list
+    document.body.addEventListener("htmx:afterSwap", function (evt) {
+        if (
+            evt.detail.target.id === "mail-list" &&
+            window.currentFolder === "tracking"
+        ) {
+            loadTrackingStats();
+
+            // Parse and render tracking items
+            try {
+                const response = JSON.parse(evt.detail.xhr.responseText);
+                if (response.success && response.data) {
+                    const container = evt.detail.target;
+                    container.innerHTML = "";
+
+                    // Add stats panel
+                    const statsTemplate = document.getElementById(
+                        "tracking-stats-template",
+                    );
+                    if (statsTemplate) {
+                        container.appendChild(
+                            statsTemplate.content.cloneNode(true),
+                        );
+                    }
+
+                    // Add tracking items
+                    response.data.forEach((item) => {
+                        container.appendChild(renderTrackingItem(item));
+                    });
+
+                    if (response.data.length === 0) {
+                        container.innerHTML +=
+                            '<div class="empty-state"><h3>No tracked emails</h3><p>Sent emails will appear here when tracking is enabled.</p></div>';
+                    }
+
+                    loadTrackingStats();
+                }
+            } catch (e) {
+                // Not a tracking response, ignore
+            }
+        }
+    });
 </script>

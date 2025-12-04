@@ -5,6 +5,56 @@
 
 ---
 
+## Official Icons - MANDATORY
+
+**NEVER generate icons with LLM. ALWAYS use official SVG icons from:**
+
+```
+ui/suite/assets/icons/
+├── gb-logo.svg        # Main GB logo
+├── gb-bot.svg         # Bot/assistant
+├── gb-analytics.svg   # Analytics app
+├── gb-calendar.svg    # Calendar app
+├── gb-chat.svg        # Chat app
+├── gb-compliance.svg  # Compliance/security
+├── gb-designer.svg    # Workflow designer
+├── gb-drive.svg       # File storage
+├── gb-mail.svg        # Email
+├── gb-meet.svg        # Video meetings
+├── gb-paper.svg       # Documents
+├── gb-research.svg    # Research/search
+├── gb-sources.svg     # Knowledge sources
+└── gb-tasks.svg       # Task management
+```
+
+### Usage in HTML
+
+```html
+<!-- Inline SVG (preferred for styling) -->
+<img src="/assets/icons/gb-chat.svg" alt="Chat" class="icon">
+
+<!-- With CSS currentColor -->
+<svg class="icon" style="color: var(--primary);">
+  <use href="/assets/icons/gb-chat.svg#icon"></use>
+</svg>
+```
+
+### Icon Style Guidelines
+
+- All icons use `stroke="currentColor"` for theming
+- ViewBox: `0 0 24 24`
+- Stroke width: `1.5`
+- Rounded caps and joins
+- Consistent with GB brand identity
+
+**DO NOT:**
+- Generate new icons with AI/LLM
+- Use emoji or unicode symbols as icons
+- Use external icon libraries (FontAwesome, etc.)
+- Create inline SVG content in templates
+
+---
+
 ## Project Overview
 
 BotUI is a **dual-mode UI application** built in Rust that runs as either a desktop app (Tauri) or web server (Axum). All business logic is in **botserver** - BotUI is purely presentation + HTTP bridge.
