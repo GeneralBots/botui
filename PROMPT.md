@@ -19,27 +19,100 @@ botapp/        # Desktop wrapper (consumes botui)
 botbook/       # Documentation
 ```
 
-### What BotUI Provides
+---
 
-- **Web Mode**: Axum server serving HTML/CSS/JS UI on port 3000
-- **Desktop Mode**: Tauri native application with same UI
-- **HTTP Bridge**: Proxies all requests to botserver
-- **Local Assets**: All JS/CSS bundled locally (no CDN)
+## LLM Workflow Strategy
+
+### Two Types of LLM Work
+
+1. **Execution Mode (Fazer)**
+   - Pre-annotate phrases and send for execution
+   - Focus on automation freedom
+   - Less concerned with code details
+   - Primary concern: Is the LLM destroying something?
+   - Trust but verify output doesn't break existing functionality
+
+2. **Review Mode (Conferir)**
+   - Read generated code with full attention
+   - Line-by-line verification
+   - Check for correctness, security, performance
+   - Validate against requirements
+
+### LLM Fallback Strategy (After 3 attempts / 10 minutes)
+
+1. DeepSeek-V3-0324 (good architect, reliable)
+2. gpt-5-chat (slower but thorough)
+3. gpt-oss-120b (final validation)
+4. Claude Web (for complex debugging, unit tests, UI)
 
 ---
 
-## Quick Start
+## Code Generation Rules
 
-```bash
-# Terminal 1: Start BotServer
-cd ../botserver && cargo run
+### CRITICAL REQUIREMENTS
 
-# Terminal 2: Start BotUI (Web Mode)
-cd ../botui && cargo run
-# Visit http://localhost:3000
+```
+- BotUI = Presentation + HTTP bridge ONLY
+- All business logic goes in botserver
+- No code duplication between layers
+- Feature gates eliminate unused code paths
+- Zero warnings - feature gating prevents dead code
+- NO DEAD CODE - implement real functionality, never use _ for unused
+- All JS/CSS must be local (no CDN)
+```
 
-# OR Desktop Mode
-cargo tauri dev
+### HTMX-First Frontend
+
+```
+- Use HTMX to minimize JavaScript at maximum
+- Delegate ALL logic to Rust server
+- Server returns HTML fragments, not JSON
+- Use hx-get, hx-post, hx-target, hx-swap attributes
+- WebSocket via htmx-ws extension for real-time
+- NO custom JavaScript where HTMX can handle it
+```
+
+### Local Assets Only
+
+All external libraries are bundled locally - NEVER use CDN:
+
+```
+ui/suite/js/vendor/
+├── htmx.min.js           # HTMX core
+├── htmx-ws.js            # WebSocket extension
+├── htmx-json-enc.js      # JSON encoding
+├── marked.min.js         # Markdown parser
+├── gsap.min.js           # Animation (minimal use)
+├── alpinejs.min.js       # Alpine.js (minimal use)
+└── livekit-client.umd.min.js  # LiveKit video
+
+ui/minimal/js/vendor/
+└── (same structure)
+```
+
+```html
+<!-- CORRECT -->
+<script src="js/vendor/htmx.min.js"></script>
+
+<!-- WRONG - NEVER DO THIS -->
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+```
+
+### Dependency Management
+
+```
+- Use diesel for any local database needs
+- After adding to Cargo.toml: cargo audit must show 0 warnings
+- If audit fails, find alternative library
+- Minimize redundancy - check existing libs before adding new ones
+```
+
+### Documentation Rules
+
+```
+- Rust code examples ONLY allowed in architecture/gbapp documentation
+- Scan for ALL_CAPS.md files created at wrong places - delete or integrate
+- Keep only README.md and PROMPT.md at project root level
 ```
 
 ---
@@ -72,93 +145,80 @@ src/
 
 ui/
 ├── suite/            # Main UI (HTML/CSS/JS)
-│   ├── js/vendor/    # Local JS libraries (htmx, marked, etc.)
+│   ├── js/vendor/    # Local JS libraries
 │   └── css/          # Stylesheets
 └── minimal/          # Minimal chat UI
     └── js/vendor/    # Local JS libraries
 ```
 
----
-
-## Feature Gating
+### Feature Gating
 
 ```rust
-#[cfg(feature = "desktop")]     // Desktop build only
+#[cfg(feature = "desktop")]
 pub mod desktop;
 
-#[cfg(not(feature = "desktop"))] // Web build only
+#[cfg(not(feature = "desktop"))]
 pub mod http_client;
 ```
 
-Build commands:
-```bash
-cargo build                    # Web mode (default)
-cargo build --features desktop # Desktop mode
-cargo tauri build              # Optimized desktop build
-```
-
 ---
 
-## Code Generation Rules
+## HTMX Patterns
 
-### CRITICAL REQUIREMENTS
+### Server-Side Rendering
 
-```
-- BotUI = Presentation + HTTP bridge ONLY
-- All business logic goes in botserver
-- No code duplication between layers
-- Feature gates eliminate unused code paths
-- Zero warnings - feature gating prevents dead code
-- All JS/CSS must be local (no CDN)
-```
-
-### Key Principles
-
-1. **Minimize Code** - Only presentation and HTTP bridging
-2. **Feature Gating** - Desktop code doesn't compile in web mode
-3. **HTTP Communication** - All botserver calls through BotServerClient
-4. **Local Assets** - All vendor JS in ui/*/js/vendor/
-
----
-
-## Local JS/CSS Vendor Files
-
-All external libraries are bundled locally:
-
-```
-ui/suite/js/vendor/
-├── htmx.min.js           # HTMX 1.9.10
-├── htmx-ws.js            # HTMX WebSocket extension
-├── htmx-json-enc.js      # HTMX JSON encoding
-├── marked.min.js         # Markdown parser
-├── gsap.min.js           # Animation library
-├── alpinejs.min.js       # Alpine.js reactivity
-└── livekit-client.umd.min.js  # LiveKit video
-```
-
-**NEVER use CDN URLs** - always reference local vendor files:
 ```html
-<!-- CORRECT -->
-<script src="js/vendor/htmx.min.js"></script>
+<!-- Button triggers server request, response swaps into target -->
+<button hx-get="/api/items" 
+        hx-target="#items-list" 
+        hx-swap="innerHTML">
+    Load Items
+</button>
 
-<!-- WRONG - DO NOT USE -->
-<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<div id="items-list">
+    <!-- Server returns HTML fragment here -->
+</div>
 ```
 
----
+### Form Submission
 
-## HTTP Client
+```html
+<form hx-post="/api/items" 
+      hx-target="#items-list" 
+      hx-swap="beforeend">
+    <input name="title" type="text" required>
+    <button type="submit">Add</button>
+</form>
+```
+
+### WebSocket Real-time
+
+```html
+<div hx-ext="ws" ws-connect="/ws/chat">
+    <div id="messages"></div>
+    <form ws-send>
+        <input name="message" type="text">
+        <button type="submit">Send</button>
+    </form>
+</div>
+```
+
+### Server Response (Rust/Askama)
 
 ```rust
-pub struct BotServerClient {
-    client: Arc<Client>,
-    base_url: String,
+#[derive(Template)]
+#[template(path = "partials/item.html")]
+struct ItemTemplate {
+    item: Item,
 }
 
-impl BotServerClient {
-    pub async fn get<T: Deserialize>(&self, endpoint: &str) -> Result<T, String>
-    pub async fn post<T, R>(&self, endpoint: &str, body: &T) -> Result<R, String>
-    pub async fn health_check(&self) -> bool
+async fn create_item(
+    State(state): State<Arc<AppState>>,
+    Form(input): Form<CreateItem>,
+) -> Html<String> {
+    let item = save_item(&state, input).await;
+    let template = ItemTemplate { item };
+    Html(template.render().unwrap())
 }
 ```
 
@@ -169,9 +229,9 @@ impl BotServerClient {
 ### Process
 
 1. Add business logic to **botserver** first
-2. Create REST API endpoint in botserver
-3. Add HTTP wrapper in BotUI
-4. Add UI in `ui/suite/`
+2. Create REST API endpoint in botserver (returns HTML for HTMX)
+3. Add HTTP wrapper in BotUI if needed
+4. Add UI in `ui/suite/` using HTMX attributes
 5. For desktop-specific: Add Tauri command in `src/desktop/`
 
 ### Desktop Tauri Command
@@ -179,17 +239,55 @@ impl BotServerClient {
 ```rust
 #[tauri::command]
 pub fn list_files(path: &str) -> Result<Vec<FileItem>, String> {
-    // Implementation
+    let entries = std::fs::read_dir(path)
+        .map_err(|e| e.to_string())?;
+    
+    let items: Vec<FileItem> = entries
+        .filter_map(|e| e.ok())
+        .map(|e| FileItem {
+            name: e.file_name().to_string_lossy().to_string(),
+            is_dir: e.path().is_dir(),
+        })
+        .collect();
+    
+    Ok(items)
 }
 ```
 
 ---
 
-## Environment Variables
+## Final Steps Before Commit
 
 ```bash
-BOTSERVER_URL=http://localhost:8081  # BotServer location
-RUST_LOG=debug                        # Logging level
+# Check for warnings
+cargo check 2>&1 | grep warning
+
+# Audit dependencies (must be 0 warnings)
+cargo audit
+
+# Build both modes
+cargo build
+cargo build --features desktop
+
+# Verify no dead code with _ prefixes
+grep -r "let _" src/ --include="*.rs"
+
+# Verify no CDN references
+grep -r "unpkg.com\|cdnjs\|jsdelivr" ui/
+```
+
+---
+
+## Key Files Reference
+
+```
+src/main.rs           # Entry point, mode detection
+src/lib.rs            # Feature-gated exports
+src/http_client.rs    # BotServerClient wrapper
+src/ui_server/mod.rs  # Axum router, static files
+ui/suite/index.html   # Main UI entry
+ui/suite/base.html    # Base template
+ui/minimal/index.html # Minimal chat UI
 ```
 
 ---
@@ -201,27 +299,18 @@ RUST_LOG=debug                        # Logging level
 | axum | 0.7.5 | Web framework |
 | reqwest | 0.12 | HTTP client |
 | tokio | 1.41 | Async runtime |
-| askama | 0.12 | Templates |
+| askama | 0.12 | HTML Templates |
 | diesel | 2.1 | Database (sqlite) |
 
 ---
 
-## Testing
+## Remember
 
-```bash
-cargo build                    # Web mode
-cargo build --features desktop # Desktop mode
-cargo test
-cargo run                      # Start web server
-cargo tauri dev                # Start desktop app
-```
-
----
-
-## Rules
-
-- **No business logic** - only presentation
-- **No CDN** - all assets local
-- **Feature gate** - unused code never compiles
-- **Zero warnings** - clean compilation
-- **HTTP bridge** - all data from botserver
+- **Two LLM modes**: Execution (fazer) vs Review (conferir)
+- **HTMX first**: Minimize JS, delegate to server
+- **Local assets**: No CDN, all vendor files local
+- **Dead code**: Never use _ prefix, implement real code
+- **cargo audit**: Must pass with 0 warnings
+- **No business logic**: All logic in botserver
+- **Feature gates**: Unused code never compiles
+- **HTML responses**: Server returns fragments, not JSON
