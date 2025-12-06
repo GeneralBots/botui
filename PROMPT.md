@@ -5,6 +5,19 @@
 
 ---
 
+## Version Management - CRITICAL
+
+**Current version is 6.1.0 - DO NOT CHANGE without explicit approval!**
+
+### Rules
+
+1. **Version is 6.1.0 across ALL workspace crates**
+2. **NEVER change version without explicit user approval**
+3. **BotUI does not have migrations - all migrations are in botserver/**
+4. **All workspace crates share version 6.1.0**
+
+---
+
 ## Official Icons - MANDATORY
 
 **NEVER generate icons with LLM. ALWAYS use official SVG icons from:**
@@ -364,3 +377,5 @@ ui/minimal/index.html # Minimal chat UI
 - **No business logic**: All logic in botserver
 - **Feature gates**: Unused code never compiles
 - **HTML responses**: Server returns fragments, not JSON
+- **Version**: Always 6.1.0 - do not change without approval
+- **Theme system**: Use data-theme attribute on body, 6 themes available

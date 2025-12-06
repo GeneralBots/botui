@@ -1,100 +1,221 @@
 <div class="mail-layout">
     <!-- Sidebar -->
     <div class="panel mail-sidebar">
-        <div style="padding: 1rem; border-bottom: 1px solid #334155">
-            <button
-                style="
-                    width: 100%;
-                    padding: 0.75rem;
-                    background: #3b82f6;
-                    color: white;
-                    border: none;
-                    border-radius: 0.5rem;
-                    cursor: pointer;
-                    font-weight: 600;
-                "
-                hx-get="/api/email/compose"
-                hx-target="#mail-content"
-                hx-swap="innerHTML"
-            >
-                ✏ Compose
+        <div class="compose-section">
+            <button class="compose-btn" onclick="openCompose()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"/>
+                </svg>
+                Compose
             </button>
         </div>
 
         <!-- Folder List -->
-        <div
-            id="mail-folders"
-            hx-get="/api/email/folders"
-            hx-trigger="load"
-            hx-swap="innerHTML"
-        >
-            <div
-                class="nav-item active"
-                hx-get="/api/email/list?folder=inbox"
-                hx-target="#mail-list"
-                hx-swap="innerHTML"
-            >
-                <span>📥</span> Inbox
-                <span
-                    style="
-                        margin-left: auto;
-                        font-size: 0.875rem;
-                        color: #64748b;
-                    "
-                    >0</span
-                >
+        <div class="folders-section">
+            <div class="nav-item active" data-folder="inbox" hx-get="/api/email/list?folder=inbox" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+                </svg>
+                <span>Inbox</span>
+                <span class="folder-badge unread" id="inbox-count">0</span>
             </div>
-            <div
-                class="nav-item"
-                hx-get="/api/email/list?folder=sent"
-                hx-target="#mail-list"
-                hx-swap="innerHTML"
-                onclick="window.currentFolder='sent'"
-            >
-                <span>📤</span> Sent
+            <div class="nav-item" data-folder="starred" hx-get="/api/email/list?folder=starred" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+                <span>Starred</span>
             </div>
-            <div
-                class="nav-item"
-                hx-get="/api/email/tracking/list"
-                hx-target="#mail-list"
-                hx-swap="innerHTML"
-                onclick="window.currentFolder='tracking'"
-            >
-                <span>📊</span> Tracking
+            <div class="nav-item" data-folder="sent" hx-get="/api/email/list?folder=sent" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+                <span>Sent</span>
             </div>
-            <div
-                class="nav-item"
-                hx-get="/api/email/list?folder=drafts"
-                hx-target="#mail-list"
-                hx-swap="innerHTML"
-            >
-                <span>📝</span> Drafts
+            <div class="nav-item" data-folder="scheduled" hx-get="/api/email/list?folder=scheduled" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Scheduled</span>
+                <span class="folder-badge" id="scheduled-count">0</span>
             </div>
-            <div
-                class="nav-item"
-                hx-get="/api/email/list?folder=trash"
-                hx-target="#mail-list"
-                hx-swap="innerHTML"
-            >
-                <span>🗑️</span> Trash
+            <div class="nav-item" data-folder="drafts" hx-get="/api/email/list?folder=drafts" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+                <span>Drafts</span>
+                <span class="folder-badge" id="drafts-count">0</span>
             </div>
+            <div class="nav-item" data-folder="tracking" hx-get="/api/email/tracking/list" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>Tracking</span>
+            </div>
+            <div class="nav-item" data-folder="spam" hx-get="/api/email/list?folder=spam" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>Spam</span>
+            </div>
+            <div class="nav-item" data-folder="trash" hx-get="/api/email/list?folder=trash" hx-target="#mail-list" hx-swap="innerHTML">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                <span>Trash</span>
+            </div>
+        </div>
+
+        <!-- Accounts Section -->
+        <div class="labels-section">
+            <div class="section-header">
+                <span>Accounts</span>
+                <button class="icon-btn" onclick="document.getElementById('add-account-modal').showModal()" title="Add account">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="accounts-list"
+                 hx-get="/api/email/accounts"
+                 hx-trigger="load"
+                 hx-swap="innerHTML">
+                <!-- Accounts loaded here -->
+            </div>
+        </div>
+
+        <!-- Labels Section -->
+        <div class="labels-section">
+            <div class="section-header">
+                <span>Labels</span>
+                <button class="icon-btn" onclick="openLabelManager()" title="Manage labels">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="labels-list" hx-get="/api/email/labels" hx-trigger="load" hx-swap="innerHTML">
+                <div class="label-item" style="--label-color: #ef4444;">
+                    <span class="label-dot"></span>
+                    <span>Important</span>
+                </div>
+                <div class="label-item" style="--label-color: #f59e0b;">
+                    <span class="label-dot"></span>
+                    <span>Work</span>
+                </div>
+                <div class="label-item" style="--label-color: #22c55e;">
+                    <span class="label-dot"></span>
+                    <span>Personal</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="quick-action-btn" onclick="openTemplates()" title="Email Templates">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="9" y1="21" x2="9" y2="9"/>
+                </svg>
+                <span>Templates</span>
+            </button>
+            <button class="quick-action-btn" onclick="openSignatures()" title="Signatures">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                </svg>
+                <span>Signatures</span>
+            </button>
+            <button class="quick-action-btn" onclick="openRules()" title="Email Rules">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                <span>Rules</span>
+            </button>
+            <button class="quick-action-btn" onclick="openAutoResponder()" title="Out of Office">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+                    <line x1="9" y1="9" x2="9.01" y2="9"/>
+                    <line x1="15" y1="9" x2="15.01" y2="9"/>
+                </svg>
+                <span>Auto-reply</span>
+            </button>
         </div>
     </div>
 
     <!-- Mail List -->
     <div class="panel mail-list">
-        <div style="padding: 1rem; border-bottom: 1px solid #334155">
-            <h3 id="folder-title">Inbox</h3>
+        <div class="list-header">
+            <div class="list-header-left">
+                <input type="checkbox" class="select-all" onchange="toggleSelectAll(this)" title="Select all"/>
+                <h3 id="folder-title">Inbox</h3>
+            </div>
+            <div class="list-header-right">
+                <div class="search-box">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    </svg>
+                    <input type="text" placeholder="Search emails..." id="email-search"
+                           hx-get="/api/email/search" hx-trigger="keyup changed delay:300ms"
+                           hx-target="#mail-list" hx-include="this" name="q"/>
+                </div>
+                <button class="icon-btn" onclick="refreshMailList()" title="Refresh">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <polyline points="1 20 1 14 7 14"/>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div
-            id="mail-list"
-            hx-get="/api/email/list?folder=inbox"
-            hx-trigger="load"
-            hx-swap="innerHTML"
-        >
-            <!-- Loading state -->
-            <div style="padding: 2rem; text-align: center; color: #64748b">
-                Loading emails...
+
+        <!-- Bulk Actions Bar (hidden by default) -->
+        <div class="bulk-actions" id="bulk-actions" style="display: none;">
+            <span class="selected-count">0 selected</span>
+            <button class="bulk-btn" onclick="archiveSelected()" title="Archive">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="21 8 21 21 3 21 3 8"/>
+                    <rect x="1" y="3" width="22" height="5"/>
+                    <line x1="10" y1="12" x2="14" y2="12"/>
+                </svg>
+            </button>
+            <button class="bulk-btn" onclick="markAsRead()" title="Mark as read">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+            </button>
+            <button class="bulk-btn" onclick="addLabelToSelected()" title="Add label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                    <line x1="7" y1="7" x2="7.01" y2="7"/>
+                </svg>
+            </button>
+            <button class="bulk-btn danger" onclick="deleteSelected()" title="Delete">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+            </button>
+        </div>
+
+        <div id="mail-list" hx-get="/api/email/list?folder=inbox" hx-trigger="load" hx-swap="innerHTML">
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading emails...</p>
             </div>
         </div>
     </div>
@@ -102,593 +223,1458 @@
     <!-- Mail Content -->
     <div class="panel mail-content">
         <div id="mail-content">
-            <div
-                style="
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    height: 100%;
-                    color: #64748b;
-                "
-            >
-                <div style="text-align: center">
-                    <div style="font-size: 3rem; margin-bottom: 1rem">📧</div>
-                    <h3>Select an email to read</h3>
-                </div>
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <h3>Select an email to read</h3>
+                <p>Choose an email from the list to view its contents</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Tracking Stats Template (loaded when viewing tracking folder) -->
-<template id="tracking-stats-template">
-    <div class="tracking-stats">
-        <div class="tracking-stat">
-            <div class="tracking-stat-value" id="stat-total-sent">0</div>
-            <div class="tracking-stat-label">Total Sent</div>
+<!-- Compose Modal -->
+<dialog id="compose-modal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2>New Message</h2>
+            <div class="compose-actions-top">
+                <button class="icon-btn" onclick="minimizeCompose()" title="Minimize">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </button>
+                <button class="icon-btn" onclick="closeCompose()" title="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div class="tracking-stat">
-            <div class="tracking-stat-value" id="stat-total-read">0</div>
-            <div class="tracking-stat-label">Opened</div>
-        </div>
-        <div class="tracking-stat">
-            <div class="tracking-stat-value" id="stat-read-rate">0%</div>
-            <div class="tracking-stat-label">Open Rate</div>
-        </div>
-        <div class="tracking-stat">
-            <div class="tracking-stat-value" id="stat-avg-time">-</div>
-            <div class="tracking-stat-label">Avg. Time to Open</div>
-        </div>
+        <form id="compose-form" hx-post="/api/email/send" hx-target="#mail-content" hx-swap="innerHTML">
+            <div class="compose-fields">
+                <div class="field-row">
+                    <label>To:</label>
+                    <input type="text" name="to" id="compose-to" placeholder="Recipients" required autocomplete="email"/>
+                    <button type="button" class="field-toggle" onclick="toggleCcBcc()">Cc/Bcc</button>
+                </div>
+                <div class="field-row cc-bcc" style="display: none;">
+                    <label>Cc:</label>
+                    <input type="text" name="cc" id="compose-cc" placeholder="Carbon copy"/>
+                </div>
+                <div class="field-row cc-bcc" style="display: none;">
+                    <label>Bcc:</label>
+                    <input type="text" name="bcc" id="compose-bcc" placeholder="Blind carbon copy"/>
+                </div>
+                <div class="field-row">
+                    <label>Subject:</label>
+                    <input type="text" name="subject" id="compose-subject" placeholder="Subject"/>
+                </div>
+            </div>
+            <div class="compose-toolbar">
+                <button type="button" class="toolbar-btn" title="Bold" onclick="formatText('bold')"><b>B</b></button>
+                <button type="button" class="toolbar-btn" title="Italic" onclick="formatText('italic')"><i>I</i></button>
+                <button type="button" class="toolbar-btn" title="Underline" onclick="formatText('underline')"><u>U</u></button>
+                <span class="toolbar-divider"></span>
+                <button type="button" class="toolbar-btn" title="Bullet list" onclick="formatText('insertUnorderedList')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                </button>
+                <button type="button" class="toolbar-btn" title="Numbered list" onclick="formatText('insertOrderedList')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/>
+                        <path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>
+                    </svg>
+                </button>
+                <span class="toolbar-divider"></span>
+                <button type="button" class="toolbar-btn" title="Attach file" onclick="attachFile()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                </button>
+                <button type="button" class="toolbar-btn" title="Insert link" onclick="insertLink()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                </button>
+                <button type="button" class="toolbar-btn" title="Insert image" onclick="insertImage()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                </button>
+                <span class="toolbar-divider"></span>
+                <button type="button" class="toolbar-btn" title="Insert template" onclick="showTemplateSelector()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="3" y1="9" x2="21" y2="9"/>
+                        <line x1="9" y1="21" x2="9" y2="9"/>
+                    </svg>
+                </button>
+                <button type="button" class="toolbar-btn" title="Insert signature" onclick="insertSignature()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="compose-body" contenteditable="true" id="compose-body" placeholder="Write your message..."></div>
+            <input type="hidden" name="body" id="compose-body-hidden"/>
+            <div class="compose-attachments" id="compose-attachments"></div>
+            <div class="compose-footer">
+                <div class="compose-options">
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="track_opens" checked/>
+                        <span>Track opens</span>
+                    </label>
+                    <label class="option-checkbox">
+                        <input type="checkbox" name="request_receipt"/>
+                        <span>Request read receipt</span>
+                    </label>
+                    <select name="priority" class="priority-select">
+                        <option value="normal">Normal priority</option>
+                        <option value="high">High priority</option>
+                        <option value="low">Low priority</option>
+                    </select>
+                </div>
+                <div class="compose-actions">
+                    <button type="button" class="btn-secondary"
+                            hx-post="/api/email/draft"
+                            hx-include="#compose-form"
+                            hx-swap="none"
+                            onclick="prepareSubmit()">Save Draft</button>
+                    <div class="send-group">
+                        <button type="submit" class="btn-primary" onclick="prepareSubmit()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"/>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                            </svg>
+                            Send
+                        </button>
+                        <button type="button" class="btn-primary dropdown-toggle" onclick="toggleScheduleMenu()">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </button>
+                        <div class="schedule-menu" id="schedule-menu">
+                            <div class="schedule-option" onclick="scheduleSend('tomorrow-morning')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="5"/>
+                                    <line x1="12" y1="1" x2="12" y2="3"/>
+                                    <line x1="12" y1="21" x2="12" y2="23"/>
+                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                                    <line x1="1" y1="12" x2="3" y2="12"/>
+                                    <line x1="21" y1="12" x2="23" y2="12"/>
+                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                                </svg>
+                                <span>Tomorrow morning (8:00 AM)</span>
+                            </div>
+                            <div class="schedule-option" onclick="scheduleSend('tomorrow-afternoon')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>Tomorrow afternoon (1:00 PM)</span>
+                            </div>
+                            <div class="schedule-option" onclick="scheduleSend('monday')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                    <line x1="16" y1="2" x2="16" y2="6"/>
+                                    <line x1="8" y1="2" x2="8" y2="6"/>
+                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                                </svg>
+                                <span>Monday morning (8:00 AM)</span>
+                            </div>
+                            <div class="schedule-divider"></div>
+                            <div class="schedule-option" onclick="openCustomSchedule()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="3"/>
+                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                                </svg>
+                                <span>Pick date & time...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-</template>
+</dialog>
 
-<!-- Sent Mail Item Template with Read Status -->
-<template id="sent-mail-item-template">
-    <div class="mail-item sent" data-tracking-id="" data-read-at="">
-        <div class="mail-header">
-            <span class="mail-to"></span>
-            <span class="mail-time"></span>
+<!-- Templates Modal -->
+<dialog id="templates-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Email Templates</h2>
+            <button class="icon-btn" onclick="closeTemplates()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
         </div>
-        <div class="mail-subject"></div>
-        <div class="mail-item-status">
-            <span class="mail-read-indicator">
-                <span class="checkmark-double"></span>
-                <span class="status-text"></span>
-            </span>
-            <span class="mail-read-count"></span>
+        <div class="templates-list" id="templates-list" hx-get="/api/email/templates" hx-trigger="load" hx-swap="innerHTML">
+            <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeTemplates()">Cancel</button>
+            <button class="btn-primary" onclick="createNewTemplate()">+ New Template</button>
         </div>
     </div>
-</template>
+</dialog>
+
+<!-- Signatures Modal -->
+<dialog id="signatures-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Email Signatures</h2>
+            <button class="icon-btn" onclick="closeSignatures()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="signatures-list" id="signatures-list" hx-get="/api/email/signatures" hx-trigger="load" hx-swap="innerHTML">
+            <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeSignatures()">Cancel</button>
+            <button class="btn-primary" onclick="createNewSignature()">+ New Signature</button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Rules Modal -->
+<dialog id="rules-modal" class="modal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h2>Email Rules</h2>
+            <button class="icon-btn" onclick="closeRules()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="rules-list" id="rules-list" hx-get="/api/email/rules" hx-trigger="load" hx-swap="innerHTML">
+            <div class="loading-state"><div class="spinner"></div></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeRules()">Cancel</button>
+            <button class="btn-primary" onclick="createNewRule()">+ New Rule</button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Auto-Responder Modal -->
+<dialog id="autoresponder-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Automatic Replies</h2>
+            <button class="icon-btn" onclick="closeAutoResponder()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <form id="autoresponder-form" hx-post="/api/email/auto-responder" hx-swap="none">
+            <div class="form-group">
+                <label class="toggle-label">
+                    <input type="checkbox" name="enabled" id="autoresponder-enabled"/>
+                    <span class="toggle-switch"></span>
+                    <span>Send automatic replies</span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Start date</label>
+                <input type="datetime-local" name="start_date" id="autoresponder-start"/>
+            </div>
+            <div class="form-group">
+                <label>End date</label>
+                <input type="datetime-local" name="end_date" id="autoresponder-end"/>
+            </div>
+            <div class="form-group">
+                <label>Subject</label>
+                <input type="text" name="subject" value="Out of Office" placeholder="Reply subject"/>
+            </div>
+            <div class="form-group">
+                <label>Message</label>
+                <textarea name="body" rows="6" placeholder="Your automatic reply message..."></textarea>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="internal_only"/>
+                    <span>Send only to people in my organization</span>
+                </label>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeAutoResponder()">Cancel</button>
+            <button class="btn-primary" onclick="saveAutoResponder()">Save</button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Schedule Picker Modal -->
+<!-- Add Account Modal -->
+<dialog id="add-account-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add Email Account</h2>
+            <button class="icon-btn" onclick="document.getElementById('add-account-modal').close()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/api/email/accounts/add"
+              hx-target="#accounts-list"
+              hx-swap="innerHTML"
+              hx-on::after-request="if(event.detail.successful) document.getElementById('add-account-modal').close()">
+            <div class="form-group">
+                <label>Account Name</label>
+                <input type="text" name="name" placeholder="Work, Personal, etc." required>
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label>IMAP Server</label>
+                <input type="text" name="imap_server" placeholder="imap.example.com" required>
+            </div>
+            <div class="form-group">
+                <label>IMAP Port</label>
+                <input type="number" name="imap_port" value="993" required>
+            </div>
+            <div class="form-group">
+                <label>SMTP Server</label>
+                <input type="text" name="smtp_server" placeholder="smtp.example.com" required>
+            </div>
+            <div class="form-group">
+                <label>SMTP Port</label>
+                <input type="number" name="smtp_port" value="587" required>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="username or email" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="use_ssl" checked>
+                    <span>Use SSL/TLS</span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('add-account-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Add Account</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<dialog id="schedule-modal" class="modal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h2>Schedule Send</h2>
+            <button class="icon-btn" onclick="closeScheduleModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="schedule-form">
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="schedule-date" min=""/>
+            </div>
+            <div class="form-group">
+                <label>Time</label>
+                <input type="time" id="schedule-time" value="09:00"/>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+            <button class="btn-primary" onclick="confirmSchedule()">Schedule</button>
+        </div>
+    </div>
+</dialog>
 
 <style>
     .mail-layout {
         display: grid;
-        grid-template-columns: 250px 350px 1fr;
+        grid-template-columns: 260px 380px 1fr;
         height: calc(100vh - 64px);
-        gap: 1px;
-        background: #1e293b;
+        background: var(--bg);
     }
 
     .panel {
-        background: #0f172a;
+        background: var(--surface);
         overflow-y: auto;
+        border-right: 1px solid var(--border);
     }
 
+    .panel:last-child {
+        border-right: none;
+    }
+
+    /* Sidebar */
     .mail-sidebar {
-        border-right: 1px solid #334155;
+        display: flex;
+        flex-direction: column;
     }
 
-    .mail-list {
-        border-right: 1px solid #334155;
+    .compose-section {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .compose-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .compose-btn:hover {
+        background: var(--primary-hover);
+    }
+
+    .folders-section {
+        padding: 0.5rem 0;
+        flex: 1;
     }
 
     .nav-item {
         display: flex;
         align-items: center;
-        padding: 0.75rem 1rem;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        color: #e2e8f0;
         gap: 0.75rem;
+        padding: 0.625rem 1rem;
+        color: var(--text);
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 0.875rem;
     }
 
     .nav-item:hover {
-        background: #1e293b;
+        background: var(--surface-hover);
     }
 
     .nav-item.active {
-        background: #1e293b;
-        color: #3b82f6;
+        background: var(--primary-light);
+        color: var(--primary);
     }
 
-    .mail-item {
-        padding: 1rem;
-        border-bottom: 1px solid #334155;
-        cursor: pointer;
-        transition: background-color 0.2s;
+    .nav-item svg {
+        flex-shrink: 0;
     }
 
-    .mail-item:hover {
-        background: #1e293b;
+    .folder-badge {
+        margin-left: auto;
+        background: var(--surface-hover);
+        color: var(--text-secondary);
+        padding: 0.125rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 500;
     }
 
-    .mail-item.unread {
-        background: rgba(59, 130, 246, 0.1);
+    .folder-badge.unread {
+        background: var(--primary);
+        color: white;
     }
 
-    .mail-item.selected {
-        background: #1e293b;
-        border-left: 3px solid #3b82f6;
+    .labels-section {
+        padding: 0.75rem 0;
+        border-top: 1px solid var(--border);
     }
 
-    .mail-header {
-        font-weight: 600;
-        color: #f1f5f9;
-        margin-bottom: 0.25rem;
+    .section-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-    }
-
-    .mail-from {
-        color: #94a3b8;
-        font-size: 0.875rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .mail-subject {
-        color: #e2e8f0;
-        margin-bottom: 0.5rem;
-    }
-
-    .mail-preview {
-        color: #64748b;
-        font-size: 0.875rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .mail-content-view {
-        padding: 2rem;
-    }
-
-    .mail-content-view h2 {
-        color: #f1f5f9;
-        margin-bottom: 1rem;
-    }
-
-    .mail-actions {
-        display: flex;
-        gap: 0.5rem;
-        padding: 1rem;
-        border-bottom: 1px solid #334155;
-    }
-
-    .mail-actions button {
+        justify-content: space-between;
         padding: 0.5rem 1rem;
-        background: #1e293b;
-        color: #e2e8f0;
-        border: 1px solid #334155;
-        border-radius: 0.375rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+    }
+
+    .icon-btn {
+        padding: 0.375rem;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-btn:hover {
+        background: var(--surface-hover);
+        color: var(--text);
+    }
+
+    .label-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .label-item:hover {
+        background: var(--surface-hover);
+    }
+
+    .label-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--label-color);
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .quick-action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-secondary);
+        font-size: 0.7rem;
         cursor: pointer;
         transition: all 0.2s;
     }
 
-    .mail-actions button:hover {
-        background: #334155;
+    .quick-action-btn:hover {
+        background: var(--surface-hover);
+        color: var(--text);
+        border-color: var(--text-secondary);
     }
 
-    .mail-body {
-        padding: 1.5rem;
-        color: #e2e8f0;
-        line-height: 1.6;
-        white-space: pre-wrap;
+    /* Mail List */
+    .list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid var(--border);
+        gap: 0.75rem;
     }
 
-    .text-sm {
+    .list-header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .list-header-left h3 {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .list-header-right {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+    }
+
+    .search-box input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
         font-size: 0.875rem;
+        width: 140px;
     }
 
-    .text-gray {
-        color: #64748b;
+    .search-box input::placeholder {
+        color: var(--text-secondary);
     }
 
-    .compose-form {
-        padding: 1.5rem;
+    .bulk-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--primary-light);
+        border-bottom: 1px solid var(--border);
     }
 
-    .compose-form .form-group {
+    .selected-count {
+        font-size: 0.875rem;
+        color: var(--primary);
+        font-weight: 500;
+        margin-right: auto;
+    }
+
+    .bulk-btn {
+        padding: 0.375rem 0.5rem;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .bulk-btn:hover {
+        background: var(--surface-hover);
+        color: var(--text);
+    }
+
+    .bulk-btn.danger:hover {
+        color: var(--error);
+    }
+
+    .mail-item {
+        display: flex;
+        flex-direction: column;
+        padding: 0.875rem 1rem;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .mail-item:hover {
+        background: var(--surface-hover);
+    }
+
+    .mail-item.unread {
+        background: var(--primary-light);
+    }
+
+    .mail-item.unread .mail-from {
+        font-weight: 600;
+    }
+
+    .mail-item.selected {
+        background: var(--primary-light);
+        border-left: 3px solid var(--primary);
+    }
+
+    .mail-item-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .mail-item-header input[type="checkbox"] {
+        margin-right: 0.25rem;
+    }
+
+    .mail-from {
+        flex: 1;
+        font-size: 0.875rem;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mail-time {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .mail-subject {
+        font-size: 0.875rem;
+        color: var(--text);
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mail-preview {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .mail-labels {
+        display: flex;
+        gap: 0.25rem;
+        margin-top: 0.375rem;
+    }
+
+    .mail-label {
+        padding: 0.125rem 0.375rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 500;
+    }
+
+    /* Mail Content */
+    .mail-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-secondary);
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .empty-state svg {
         margin-bottom: 1rem;
+        opacity: 0.5;
     }
 
-    .compose-form label {
-        display: block;
+    .empty-state h3 {
+        font-size: 1.125rem;
         margin-bottom: 0.5rem;
-        color: #94a3b8;
+        color: var(--text);
+    }
+
+    .empty-state p {
         font-size: 0.875rem;
     }
 
-    .compose-form input,
-    .compose-form textarea {
-        width: 100%;
-        padding: 0.5rem;
-        background: #1e293b;
-        color: #e2e8f0;
-        border: 1px solid #334155;
-        border-radius: 0.375rem;
+    .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        color: var(--text-secondary);
     }
 
-    .compose-form textarea {
-        min-height: 300px;
-        resize: vertical;
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 0.5rem;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Modals */
+    .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+    }
+
+    .modal::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background: var(--surface);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-large {
+        max-width: 700px;
+    }
+
+    .modal-small {
+        max-width: 320px;
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+        border-top: 1px solid var(--border);
+    }
+
+    /* Compose */
+    .compose-fields {
+        padding: 0.75rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .field-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .field-row:last-child {
+        border-bottom: none;
+    }
+
+    .field-row label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        width: 60px;
+        flex-shrink: 0;
+    }
+
+    .field-row input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text);
+        font-size: 0.875rem;
+    }
+
+    .field-toggle {
+        padding: 0.25rem 0.5rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        cursor: pointer;
+    }
+
+    .field-toggle:hover {
+        background: var(--surface-hover);
+    }
+
+    .compose-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.5rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+    }
+
+    .toolbar-btn {
+        padding: 0.375rem 0.5rem;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+    }
+
+    .toolbar-btn:hover {
+        background: var(--surface-hover);
+        color: var(--text);
+    }
+
+    .toolbar-divider {
+        width: 1px;
+        height: 20px;
+        background: var(--border);
+        margin: 0 0.25rem;
+    }
+
+    .compose-body {
+        flex: 1;
+        min-height: 200px;
+        padding: 1rem 1.25rem;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: var(--text);
+        outline: none;
+        overflow-y: auto;
+    }
+
+    .compose-body:empty::before {
+        content: attr(placeholder);
+        color: var(--text-secondary);
+    }
+
+    .compose-attachments {
+        padding: 0 1.25rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .compose-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1.25rem;
+        border-top: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .compose-options {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .option-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+    }
+
+    .priority-select {
+        padding: 0.25rem 0.5rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
     }
 
     .compose-actions {
         display: flex;
+        align-items: center;
         gap: 0.5rem;
-        margin-top: 1rem;
     }
 
-    .compose-actions button {
-        padding: 0.5rem 1.5rem;
-        border-radius: 0.375rem;
+    .send-group {
+        display: flex;
+        position: relative;
+    }
+
+    .send-group .btn-primary:first-child {
+        border-radius: 6px 0 0 6px;
+    }
+
+    .send-group .dropdown-toggle {
+        padding: 0.625rem 0.5rem;
+        border-radius: 0 6px 6px 0;
+        border-left: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .schedule-menu {
+        position: absolute;
+        bottom: 100%;
+        right: 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.5rem 0;
+        min-width: 240px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        display: none;
+        z-index: 10;
+        margin-bottom: 0.5rem;
+    }
+
+    .schedule-menu.show {
+        display: block;
+    }
+
+    .schedule-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.625rem 1rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-size: 0.875rem;
+    }
+
+    .schedule-option:hover {
+        background: var(--surface-hover);
+    }
+
+    .schedule-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 0.5rem 0;
+    }
+
+    .btn-primary {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+        padding: 0.625rem 1rem;
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+        border-radius: 6px;
+        font-weight: 500;
         cursor: pointer;
         transition: all 0.2s;
     }
 
-    .btn-primary {
-        background: #3b82f6;
-        color: white;
-        border: none;
-    }
-
-    .btn-primary:hover {
-        background: #2563eb;
-    }
-
-    .btn-secondary {
-        background: #1e293b;
-        color: #e2e8f0;
-        border: 1px solid #334155;
-    }
-
     .btn-secondary:hover {
-        background: #334155;
+        background: var(--surface-hover);
     }
 
-    /* Empty state */
-    .empty-state {
-        padding: 3rem;
-        text-align: center;
-        color: #64748b;
+    .form-group {
+        margin-bottom: 1rem;
+        padding: 0 1.25rem;
     }
 
-    .empty-state h3 {
-        margin: 1rem 0;
-        color: #94a3b8;
+    .form-group:first-child {
+        padding-top: 1rem;
     }
 
-    /* Loading spinner */
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
+    .form-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.375rem;
+        color: var(--text);
     }
 
-    .spinner {
-        display: inline-block;
-        width: 1.5rem;
-        height: 1.5rem;
-        border: 2px solid #334155;
-        border-top-color: #3b82f6;
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="time"],
+    .form-group input[type="datetime-local"],
+    .form-group textarea {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        font-size: 0.875rem;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+
+    .toggle-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background: var(--border);
+        border-radius: 12px;
+        transition: background 0.2s;
+    }
+
+    .toggle-switch::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background: white;
         border-radius: 50%;
-        animation: spin 0.6s linear infinite;
+        transition: transform 0.2s;
     }
 
-    /* HTMX loading states */
-    .htmx-request .spinner {
-        display: inline-block;
+    input:checked + .toggle-switch {
+        background: var(--primary);
     }
 
-    .htmx-request.mail-item {
-        opacity: 0.6;
+    input:checked + .toggle-switch::after {
+        transform: translateX(20px);
     }
 
-    /* Folder badges */
-    .folder-badge {
-        display: inline-block;
-        padding: 0.125rem 0.5rem;
-        background: #1e293b;
-        color: #94a3b8;
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 600;
+    .compose-actions-top {
+        display: flex;
+        gap: 0.25rem;
     }
 
-    .folder-badge.unread {
-        background: #3b82f6;
-        color: white;
-    }
-
-    /* Responsive design */
+    /* Responsive */
     @media (max-width: 1024px) {
         .mail-layout {
-            grid-template-columns: 200px 300px 1fr;
+            grid-template-columns: 220px 1fr;
+        }
+        .mail-content {
+            display: none;
+        }
+        .mail-content.active {
+            display: flex;
+            position: fixed;
+            inset: 64px 0 0 0;
+            z-index: 100;
         }
     }
 
     @media (max-width: 768px) {
         .mail-layout {
             grid-template-columns: 1fr;
-            grid-template-rows: auto 1fr;
         }
-
         .mail-sidebar {
             display: none;
         }
-
-        .mail-list {
-            border-right: none;
-        }
-
-        .mail-content {
-            display: none;
-        }
-
-        .mail-content.active {
-            display: block;
+        .mail-sidebar.active {
+            display: flex;
             position: fixed;
-            top: 64px;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 64px 0 0 0;
             z-index: 100;
+            width: 280px;
+        }
+        .modal-content {
+            max-height: 90vh;
+        }
+        .compose-toolbar {
+            display: none;
         }
     }
 </style>
 
 <script>
-    // Handle folder selection
-    document.addEventListener("click", function (e) {
-        if (e.target.closest(".nav-item")) {
-            // Update active state
-            document.querySelectorAll(".nav-item").forEach((item) => {
-                item.classList.remove("active");
-            });
-            e.target.closest(".nav-item").classList.add("active");
+    let selectedEmails = new Set();
+    let currentFolder = 'inbox';
 
-            // Update folder title
-            const folderName = e.target
-                .closest(".nav-item")
-                .textContent.trim()
-                .split(" ")[1];
-            const titleEl = document.getElementById("folder-title");
-            if (titleEl) {
-                titleEl.textContent = folderName;
+    function openCompose() {
+        document.getElementById('compose-modal').showModal();
+    }
+
+    function closeCompose() {
+        document.getElementById('compose-modal').close();
+    }
+
+    function minimizeCompose() {
+        closeCompose();
+    }
+
+    function toggleCcBcc() {
+        document.querySelectorAll('.cc-bcc').forEach(el => {
+            el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+        });
+    }
+
+    function toggleScheduleMenu() {
+        document.getElementById('schedule-menu').classList.toggle('show');
+    }
+
+    function scheduleSend(option) {
+        let date = new Date();
+        switch(option) {
+            case 'tomorrow-morning':
+                date.setDate(date.getDate() + 1);
+                date.setHours(8, 0, 0, 0);
+                break;
+            case 'tomorrow-afternoon':
+                date.setDate(date.getDate() + 1);
+                date.setHours(13, 0, 0, 0);
+                break;
+            case 'monday':
+                const daysUntilMonday = (8 - date.getDay()) % 7 || 7;
+                date.setDate(date.getDate() + daysUntilMonday);
+                date.setHours(8, 0, 0, 0);
+                break;
+        }
+        confirmScheduleSend(date);
+        toggleScheduleMenu();
+    }
+
+    function openCustomSchedule() {
+        toggleScheduleMenu();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('schedule-date').min = today;
+        document.getElementById('schedule-date').value = today;
+        document.getElementById('schedule-modal').showModal();
+    }
+
+    function closeScheduleModal() {
+        document.getElementById('schedule-modal').close();
+    }
+
+    function confirmSchedule() {
+        const date = document.getElementById('schedule-date').value;
+        const time = document.getElementById('schedule-time').value;
+        const scheduledDate = new Date(`${date}T${time}`);
+        confirmScheduleSend(scheduledDate);
+        closeScheduleModal();
+    }
+
+    function confirmScheduleSend(date) {
+        const form = document.getElementById('compose-form');
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'scheduled_at';
+        input.value = date.toISOString();
+        form.appendChild(input);
+        prepareSubmit();
+        form.requestSubmit();
+    }
+
+    function prepareSubmit() {
+        const body = document.getElementById('compose-body').innerHTML;
+        document.getElementById('compose-body-hidden').value = body;
+    }
+
+    function formatText(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('compose-body').focus();
+    }
+
+    function openTemplates() {
+        document.getElementById('templates-modal').showModal();
+    }
+
+    function closeTemplates() {
+        document.getElementById('templates-modal').close();
+    }
+
+    function openSignatures() {
+        document.getElementById('signatures-modal').showModal();
+    }
+
+    function closeSignatures() {
+        document.getElementById('signatures-modal').close();
+    }
+
+    function openRules() {
+        document.getElementById('rules-modal').showModal();
+    }
+
+    function closeRules() {
+        document.getElementById('rules-modal').close();
+    }
+
+    function openAutoResponder() {
+        document.getElementById('autoresponder-modal').showModal();
+    }
+
+    function closeAutoResponder() {
+        document.getElementById('autoresponder-modal').close();
+    }
+
+    function saveAutoResponder() {
+        htmx.trigger('#autoresponder-form', 'submit');
+        closeAutoResponder();
+        window.showNotification('Auto-reply settings saved', 'success');
+    }
+
+    function openLabelManager() {
+        window.showNotification('Label manager coming soon', 'info');
+    }
+
+    function toggleSelectAll(checkbox) {
+        const items = document.querySelectorAll('.mail-item input[type="checkbox"]');
+        items.forEach(item => {
+            item.checked = checkbox.checked;
+            if (checkbox.checked) {
+                selectedEmails.add(item.dataset.id);
+            } else {
+                selectedEmails.delete(item.dataset.id);
             }
+        });
+        updateBulkActions();
+    }
+
+    function updateBulkActions() {
+        const bulkBar = document.getElementById('bulk-actions');
+        if (selectedEmails.size > 0) {
+            bulkBar.style.display = 'flex';
+            bulkBar.querySelector('.selected-count').textContent = `${selectedEmails.size} selected`;
+        } else {
+            bulkBar.style.display = 'none';
         }
+    }
 
-        // Handle mail selection
-        if (e.target.closest(".mail-item")) {
-            document.querySelectorAll(".mail-item").forEach((item) => {
-                item.classList.remove("selected");
-            });
-            e.target.closest(".mail-item").classList.add("selected");
+    function refreshMailList() {
+        htmx.trigger(`[data-folder="${currentFolder}"]`, 'click');
+    }
 
-            // Mark as read
-            e.target.closest(".mail-item").classList.remove("unread");
-        }
-    });
-
-    // Handle HTMX events for better UX
-    document.body.addEventListener("htmx:beforeRequest", function (evt) {
-        // Add loading state
-        if (evt.detail.target.id === "mail-list") {
-            evt.detail.target.innerHTML =
-                '<div style="padding: 2rem; text-align: center;"><div class="spinner"></div></div>';
-        }
-    });
-
-    document.body.addEventListener("htmx:afterSwap", function (evt) {
-        // Scroll to top after loading new emails
-        if (evt.detail.target.id === "mail-list") {
-            evt.detail.target.scrollTop = 0;
-        }
-    });
-
-    // Handle compose form submission
-    document.body.addEventListener("htmx:beforeRequest", function (evt) {
-        if (evt.detail.elt.matches(".compose-form")) {
-            // Validate form
-            const form = evt.detail.elt;
-            const to = form.querySelector('[name="to"]').value;
-            const subject = form.querySelector('[name="subject"]').value;
-            const body = form.querySelector('[name="body"]').value;
-
-            if (!to || !subject || !body) {
-                evt.preventDefault();
-                alert("Please fill in all required fields");
-            }
-        }
-    });
-
-    // Handle keyboard shortcuts
-    document.addEventListener("keydown", function (e) {
-        // Ctrl/Cmd + N for new email
-        if ((e.ctrlKey || e.metaKey) && e.key === "n") {
-            e.preventDefault();
-            document.querySelector(".mail-sidebar button").click();
-        }
-
-        // Delete key for delete email
-        if (
-            e.key === "Delete" &&
-            document.querySelector(".mail-item.selected")
-        ) {
-            const selected = document.querySelector(".mail-item.selected");
-            const deleteBtn = selected.querySelector('[data-action="delete"]');
-            if (deleteBtn) deleteBtn.click();
-        }
-    });
-
-    // Track current folder
-    window.currentFolder = "inbox";
-
-    // Load tracking stats when viewing tracking folder
-    async function loadTrackingStats() {
-        try {
-            const response = await fetch("/api/email/tracking/stats");
-            const data = await response.json();
-            if (data.success && data.data) {
-                document.getElementById("stat-total-sent").textContent =
-                    data.data.total_sent;
-                document.getElementById("stat-total-read").textContent =
-                    data.data.total_read;
-                document.getElementById("stat-read-rate").textContent =
-                    data.data.read_rate.toFixed(1) + "%";
-                if (data.data.avg_time_to_read_hours) {
-                    const hours = data.data.avg_time_to_read_hours;
-                    if (hours < 1) {
-                        document.getElementById("stat-avg-time").textContent =
-                            Math.round(hours * 60) + "m";
-                    } else if (hours < 24) {
-                        document.getElementById("stat-avg-time").textContent =
-                            hours.toFixed(1) + "h";
-                    } else {
-                        document.getElementById("stat-avg-time").textContent =
-                            (hours / 24).toFixed(1) + "d";
-                    }
+    function insertSignature() {
+        fetch('/api/email/signatures/default')
+            .then(r => r.json())
+            .then(sig => {
+                if (sig.content_html) {
+                    const body = document.getElementById('compose-body');
+                    body.innerHTML += '<br><br>' + sig.content_html;
                 }
-            }
-        } catch (e) {
-            console.error("Failed to load tracking stats:", e);
+            });
+    }
+
+    function showTemplateSelector() {
+        openTemplates();
+    }
+
+    function attachFile() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        input.onchange = (e) => {
+            Array.from(e.target.files).forEach(file => {
+                const container = document.getElementById('compose-attachments');
+                const chip = document.createElement('div');
+                chip.className = 'attachment-chip';
+                chip.innerHTML = `
+                    <span>${file.name}</span>
+                    <button type="button" onclick="this.parentElement.remove()">×</button>
+                `;
+                container.appendChild(chip);
+            });
+        };
+        input.click();
+    }
+
+    function insertLink() {
+        const url = prompt('Enter URL:');
+        if (url) {
+            document.execCommand('createLink', false, url);
         }
     }
 
-    // Render tracking list item
-    function renderTrackingItem(item) {
-        const div = document.createElement("div");
-        div.className = "mail-item sent";
-        div.setAttribute("data-tracking-id", item.tracking_id);
-        if (item.read_at) {
-            div.setAttribute(
-                "data-read-at",
-                "Opened: " + new Date(item.read_at).toLocaleString(),
-            );
+    function insertImage() {
+        const url = prompt('Enter image URL:');
+        if (url) {
+            document.execCommand('insertImage', false, url);
         }
-
-        const statusClass = item.is_read ? "read" : "pending";
-        const statusText = item.is_read ? "Opened" : "Not opened";
-        const checkmarkClass = item.is_read ? "read" : "sent";
-        const readCount = item.read_count > 1 ? `(${item.read_count}x)` : "";
-
-        div.innerHTML = `
-        <div class="mail-header">
-            <span class="mail-to">To: ${item.to_email}</span>
-            <span class="mail-time">${new Date(item.sent_at).toLocaleDateString()}</span>
-        </div>
-        <div class="mail-subject">${item.subject}</div>
-        <div class="mail-item-status">
-            <span class="mail-read-indicator ${statusClass}">
-                <span class="checkmark-double ${checkmarkClass}"></span>
-                <span class="status-text">${statusText}</span>
-            </span>
-            <span class="mail-read-count">${readCount}</span>
-        </div>
-    `;
-
-        div.addEventListener("click", () => showTrackingDetails(item));
-        return div;
     }
 
-    // Show tracking details in content panel
-    function showTrackingDetails(item) {
-        const content = document.getElementById("mail-content");
-        const readStatus = item.is_read
-            ? `<span class="mail-read-indicator read"><span class="checkmark-double read"></span> Opened</span>`
-            : `<span class="mail-read-indicator pending"><span class="checkmark-double sent"></span> Not opened yet</span>`;
-
-        const readInfo = item.is_read
-            ? `
-        <div style="margin-top: 1rem; padding: 1rem; background: #e6f4ea; border-radius: 8px;">
-            <h4 style="margin: 0 0 0.5rem 0; color: #137333;">📬 Email Opened</h4>
-            <p style="margin: 0; color: #137333;">
-                First opened: ${new Date(item.read_at).toLocaleString()}<br>
-                Times opened: ${item.read_count}
-            </p>
-        </div>
-    `
-            : `
-        <div style="margin-top: 1rem; padding: 1rem; background: #fef7e0; border-radius: 8px;">
-            <h4 style="margin: 0 0 0.5rem 0; color: #b06000;">⏳ Awaiting Read</h4>
-            <p style="margin: 0; color: #b06000;">
-                This email has not been opened yet.
-            </p>
-        </div>
-    `;
-
-        content.innerHTML = `
-        <div class="mail-content-view">
-            <div class="mail-header">
-                <h2 class="mail-subject">${item.subject}</h2>
-                <div class="mail-meta">
-                    <span>To: <strong>${item.to_email}</strong></span>
-                    <span class="mail-date">Sent: ${new Date(item.sent_at).toLocaleString()}</span>
-                </div>
-                <div style="margin-top: 0.5rem;">
-                    ${readStatus}
-                </div>
-            </div>
-            ${readInfo}
-            <div style="margin-top: 1.5rem;">
-                <h4>Tracking ID</h4>
-                <code style="font-size: 0.75rem; color: #5f6368;">${item.tracking_id}</code>
-            </div>
-        </div>
-    `;
+    function saveDraft() {
+        prepareSubmit();
+        const form = document.getElementById('compose-form');
+        const formData = new FormData(form);
+        fetch('/api/email/draft', {
+            method: 'POST',
+            body: formData
+        }).then(() => {
+            window.showNotification('Draft saved', 'success');
+        });
     }
 
-    // Handle HTMX response for tracking list
-    document.body.addEventListener("htmx:afterSwap", function (evt) {
-        if (
-            evt.detail.target.id === "mail-list" &&
-            window.currentFolder === "tracking"
-        ) {
-            loadTrackingStats();
+    function createNewTemplate() {
+        window.showNotification('Template editor coming soon', 'info');
+    }
 
-            // Parse and render tracking items
-            try {
-                const response = JSON.parse(evt.detail.xhr.responseText);
-                if (response.success && response.data) {
-                    const container = evt.detail.target;
-                    container.innerHTML = "";
+    function createNewSignature() {
+        window.showNotification('Signature editor coming soon', 'info');
+    }
 
-                    // Add stats panel
-                    const statsTemplate = document.getElementById(
-                        "tracking-stats-template",
-                    );
-                    if (statsTemplate) {
-                        container.appendChild(
-                            statsTemplate.content.cloneNode(true),
-                        );
-                    }
+    function createNewRule() {
+        window.showNotification('Rule editor coming soon', 'info');
+    }
 
-                    // Add tracking items
-                    response.data.forEach((item) => {
-                        container.appendChild(renderTrackingItem(item));
-                    });
+    function archiveSelected() {
+        window.showNotification(`${selectedEmails.size} emails archived`, 'success');
+        selectedEmails.clear();
+        updateBulkActions();
+        refreshMailList();
+    }
 
-                    if (response.data.length === 0) {
-                        container.innerHTML +=
-                            '<div class="empty-state"><h3>No tracked emails</h3><p>Sent emails will appear here when tracking is enabled.</p></div>';
-                    }
+    function markAsRead() {
+        window.showNotification(`${selectedEmails.size} emails marked as read`, 'success');
+        selectedEmails.clear();
+        updateBulkActions();
+        refreshMailList();
+    }
 
-                    loadTrackingStats();
-                }
-            } catch (e) {
-                // Not a tracking response, ignore
-            }
-        }
-    });
-</script>
+    function addLabelToSelected() {
+        window.showNotification('Label picker coming soon', 'info');
+    }
+
+    function deleteSelected() {
+        if (confirm(`Delete ${selectedEmails.size} emails?`)) {
+            window.showNotification(`${selectedEmails.size} emails deleted`, 'success');
+            selectedEmails.clear();
+            updateBulkActions();
+            refreshMailList

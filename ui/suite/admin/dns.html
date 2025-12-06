@@ -1,0 +1,791 @@
+<div class="dns-view">
+    <div class="page-header">
+        <div class="header-left">
+            <h1>DNS Management</h1>
+            <p class="subtitle">Register and manage DNS hostnames for your bots</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="document.getElementById('register-dns-modal').showModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+                Register Hostname
+            </button>
+        </div>
+    </div>
+
+    <!-- DNS Records Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <h2>Registered Hostnames</h2>
+            <div class="table-actions">
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text"
+                           placeholder="Search hostnames..."
+                           name="q"
+                           hx-get="/api/dns/search"
+                           hx-trigger="keyup changed delay:300ms"
+                           hx-target="#dns-table-body"
+                           hx-swap="innerHTML">
+                </div>
+                <button class="btn-secondary"
+                        hx-get="/api/dns/list"
+                        hx-target="#dns-table-body"
+                        hx-swap="innerHTML">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+        </div>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Hostname</th>
+                    <th>Type</th>
+                    <th>Target/IP</th>
+                    <th>TTL</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="dns-table-body"
+                   hx-get="/api/dns/list"
+                   hx-trigger="load"
+                   hx-swap="innerHTML">
+                <tr>
+                    <td colspan="7" class="loading-cell">
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <p>Loading DNS records...</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- DNS Info Cards -->
+    <div class="info-section">
+        <h2>DNS Configuration Help</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <div class="info-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <h3>A Record</h3>
+                <p>Maps a domain name to an IPv4 address. Use this to point your hostname directly to a server IP.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                </div>
+                <h3>AAAA Record</h3>
+                <p>Maps a domain name to an IPv6 address. Similar to A record but for IPv6 connectivity.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                </div>
+                <h3>CNAME Record</h3>
+                <p>Creates an alias from one domain to another. Useful for pointing subdomains to your main domain.</p>
+            </div>
+            <div class="info-card">
+                <div class="info-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <h3>SSL/TLS</h3>
+                <p>SSL certificates are automatically provisioned for registered hostnames using Let's Encrypt.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Register DNS Modal -->
+<dialog id="register-dns-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Register Hostname</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('register-dns-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/api/dns/register"
+              hx-target="#dns-result"
+              hx-swap="innerHTML"
+              hx-on::after-request="if(event.detail.successful) { setTimeout(() => { document.getElementById('register-dns-modal').close(); htmx.trigger('#dns-table-body', 'load'); }, 1500); }">
+            <div class="form-group">
+                <label></label>Hostname <span class="required">*</span></label>
+                <input type="text" name="hostname" required placeholder="mybot.example.com">
+                <p class="help-text">Enter the full domain name you want to register</p>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Record Type</label>
+                    <select name="record_type" id="record-type" onchange="updateTargetPlaceholder()">
+                        <option value="A">A (IPv4)</option>
+                        <option value="AAAA">AAAA (IPv6)</option>
+                        <option value="CNAME">CNAME</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>TTL (seconds)</label>
+                    <select name="ttl">
+                        <option value="300">5 minutes (300)</option>
+                        <option value="3600" selected>1 hour (3600)</option>
+                        <option value="86400">1 day (86400)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Target/IP Address <span class="required">*</span></label>
+                <input type="text" name="target" id="target-input" required placeholder="192.168.1.1">
+                <p class="help-text" id="target-help">Enter the IPv4 address to point to</p>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="auto_ssl" checked>
+                    <span>Automatically provision SSL certificate</span>
+                </label>
+            </div>
+            <div id="dns-result"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('register-dns-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Register Hostname</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Remove DNS Modal -->
+<dialog id="remove-dns-modal" class="modal modal-small">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Remove Hostname</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('remove-dns-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="warning-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+            </div>
+            <p>Are you sure you want to remove <strong id="remove-hostname-name"></strong>?</p>
+            <p class="warning-text">This will delete the DNS record and any associated SSL certificates. The hostname will no longer resolve.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('remove-dns-modal').close()">Cancel</button>
+            <button type="button" class="btn-danger" id="confirm-remove-btn"
+                    hx-post="/api/dns/remove"
+                    hx-target="#dns-table-body"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="document.getElementById('remove-dns-modal').close(); showToast('Hostname removed');">
+                Remove Hostname
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Edit DNS Modal -->
+<dialog id="edit-dns-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit DNS Record</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('edit-dns-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div id="edit-dns-form-container">
+            <!-- Form loaded via HTMX -->
+        </div>
+    </div>
+</dialog>
+
+<style>
+/* DNS View */
+.dns-view {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.header-left h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.header-left .subtitle {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Table Container */
+.table-container {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.table-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.table-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.search-box svg {
+    color: var(--text-secondary);
+}
+
+.search-box input {
+    border: none;
+    background: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+    width: 200px;
+}
+
+/* Data Table */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+    background: var(--surface-hover);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr:hover {
+    background: var(--surface-hover);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.loading-cell {
+    text-align: center;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.pending {
+    background: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+}
+
+.status-badge.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* Record Type Badge */
+.type-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: monospace;
+    background: var(--surface-hover);
+    color: var(--text);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+}
+
+.action-btn.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+/* Info Section */
+.info-section {
+    margin-top: 32px;
+}
+
+.info-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+}
+
+.info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.info-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+.info-card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.info-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Modal */
+.modal {
+    padding: 0;
+    border: none;
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 520px;
+    width: 90%;
+}
+
+.modal.modal-small {
+    max-width: 400px;
+}
+
+.modal::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-body {
+    padding: 24px;
+    text-align: center;
+}
+
+.warning-icon {
+    color: #f59e0b;
+    margin-bottom: 16px;
+}
+
+.warning-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.modal form {
+    padding: 24px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.form-group label .required {
+    color: #ef4444;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.checkbox-label input {
+    width: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-hover);
+    border-radius: 0 0 16px 16px;
+}
+
+/* Buttons */
+.close-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: 8px;
+}
+
+.close-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: var(--surface-hover);
+}
+
+.btn-danger {
+    padding: 10px 20px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* Loading */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success/Error Messages */
+.result-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.result-message.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.result-message.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .table-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .table-actions {
+        flex-direction: column;
+    }
+
+    .search-box input {
+        width: 100%;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .data-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script></script>
+    function updateTargetPlaceholder() {
+        const recordType = document.getElementById('record-type').value;
+        const targetInput = document.getElementById('target-input');
+        const targetHelp = document.getElementById('target-help');
+
+        switch (recordType) {
+            case 'A':
+                targetInput.placeholder = '192.168.1.1';
+                targetHelp.textContent = 'Enter the IPv4 address to point to';
+                break;
+            case 'AAAA':
+                targetInput.placeholder = '2001:0db8:85a3:0000:0000:8a2e:0370:7334';
+                targetHelp.textContent = 'Enter the IPv6 address to point to';
+                break;
+            case 'CNAME':
+                targetInput.placeholder = 'target.example.com';
+                targetHelp.textContent = 'Enter the target domain name (without trailing dot)';
+                break;
+        }
+    }
+
+    function confirmRemoveHostname(hostname) {
+        document.getElementById('remove-hostname-name').textContent = hostname;
+        const removeBtn = document.getElementById('confirm-remove-btn');
+        removeBtn.setAttribute('hx-vals', JSON.stringify({ hostname: hostname }));
+        htmx.process(removeBtn);
+        document.getElementById('remove-dns-modal').showModal();
+    }
+
+    function editDnsRecord(hostname) {
+        htmx.ajax('GET', `/api/dns/edit?hostname=${encodeURIComponent(hostname)}`, {
+            target: '#edit-dns-form-container'
+        });
+        document.getElementById('edit-dns-modal').showModal();
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+</script>

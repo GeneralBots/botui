@@ -29,15 +29,53 @@
                 --info: #3b82f6;
             }
 
-            @media (prefers-color-scheme: light) {
-                :root {
-                    --bg: #f8fafc;
-                    --surface: #ffffff;
-                    --surface-hover: #f1f5f9;
-                    --border: #e2e8f0;
-                    --text: #1e293b;
-                    --text-secondary: #64748b;
-                }
+            [data-theme="light"] {
+                --bg: #f8fafc;
+                --surface: #ffffff;
+                --surface-hover: #f1f5f9;
+                --border: #e2e8f0;
+                --text: #1e293b;
+                --text-secondary: #64748b;
+            }
+
+            [data-theme="blue"] {
+                --primary: #0ea5e9;
+                --primary-hover: #0284c7;
+                --primary-light: rgba(14, 165, 233, 0.1);
+                --bg: #0c1929;
+                --surface: #1a2f47;
+                --surface-hover: #254063;
+                --border: #2d4a6f;
+            }
+
+            [data-theme="purple"] {
+                --primary: #a855f7;
+                --primary-hover: #9333ea;
+                --primary-light: rgba(168, 85, 247, 0.1);
+                --bg: #1a0a2e;
+                --surface: #2d1b4e;
+                --surface-hover: #3d2566;
+                --border: #4c2f7e;
+            }
+
+            [data-theme="green"] {
+                --primary: #22c55e;
+                --primary-hover: #16a34a;
+                --primary-light: rgba(34, 197, 94, 0.1);
+                --bg: #0a1f15;
+                --surface: #14332a;
+                --surface-hover: #1e4a3d;
+                --border: #28604f;
+            }
+
+            [data-theme="orange"] {
+                --primary: #f97316;
+                --primary-hover: #ea580c;
+                --primary-light: rgba(249, 115, 22, 0.1);
+                --bg: #1a1008;
+                --surface: #2d1c0f;
+                --surface-hover: #442a16;
+                --border: #5c3a1e;
             }
 
             * {
@@ -57,7 +95,6 @@
                 flex-direction: column;
             }
 
-            /* Header */
             .app-header {
                 display: flex;
                 align-items: center;
@@ -138,12 +175,13 @@
                 cursor: pointer;
             }
 
-            /* Apps Menu */
-            .apps-menu {
+            .apps-menu,
+            .settings-menu {
                 position: relative;
             }
 
-            .apps-dropdown {
+            .apps-dropdown,
+            .settings-panel {
                 position: absolute;
                 top: 100%;
                 right: 0;
@@ -158,11 +196,13 @@
                 z-index: 1001;
             }
 
-            .apps-dropdown.show {
+            .apps-dropdown.show,
+            .settings-panel.show {
                 display: block;
             }
 
-            .apps-dropdown-title {
+            .apps-dropdown-title,
+            .settings-panel-title {
                 font-size: 0.75rem;
                 font-weight: 600;
                 color: var(--text-secondary);
@@ -213,7 +253,281 @@
                 font-weight: 500;
             }
 
-            /* Main Content */
+            /* Settings Panel - Outlook Style */
+            .settings-panel {
+                width: 320px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .settings-section {
+                margin-bottom: 1.25rem;
+            }
+
+            .settings-section-title {
+                font-size: 0.7rem;
+                font-weight: 600;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 0.5rem;
+                padding: 0 0.25rem;
+            }
+
+            .theme-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 0.5rem;
+            }
+
+            .theme-option {
+                position: relative;
+                aspect-ratio: 1;
+                border-radius: 10px;
+                cursor: pointer;
+                border: 2px solid transparent;
+                transition: all 0.2s;
+                overflow: hidden;
+            }
+
+            .theme-option:hover {
+                transform: scale(1.05);
+            }
+
+            .theme-option.active {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 2px var(--primary-light);
+            }
+
+            .theme-option-inner {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .theme-option-header {
+                height: 30%;
+                display: flex;
+                align-items: center;
+                padding: 0.25rem;
+            }
+
+            .theme-option-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                margin-right: 2px;
+            }
+
+            .theme-option-body {
+                flex: 1;
+                padding: 0.25rem;
+            }
+
+            .theme-option-line {
+                height: 4px;
+                border-radius: 2px;
+                margin-bottom: 3px;
+            }
+
+            .theme-option-name {
+                position: absolute;
+                bottom: 2px;
+                left: 0;
+                right: 0;
+                font-size: 0.6rem;
+                text-align: center;
+                color: inherit;
+            }
+
+            /* Theme previews */
+            .theme-dark .theme-option-inner {
+                background: #0f172a;
+                color: #f8fafc;
+            }
+            .theme-dark .theme-option-header {
+                background: #1e293b;
+            }
+            .theme-dark .theme-option-dot {
+                background: #3b82f6;
+            }
+            .theme-dark .theme-option-line {
+                background: #334155;
+            }
+
+            .theme-light .theme-option-inner {
+                background: #f8fafc;
+                color: #1e293b;
+            }
+            .theme-light .theme-option-header {
+                background: #ffffff;
+            }
+            .theme-light .theme-option-dot {
+                background: #3b82f6;
+            }
+            .theme-light .theme-option-line {
+                background: #e2e8f0;
+            }
+
+            .theme-blue .theme-option-inner {
+                background: #0c1929;
+                color: #f8fafc;
+            }
+            .theme-blue .theme-option-header {
+                background: #1a2f47;
+            }
+            .theme-blue .theme-option-dot {
+                background: #0ea5e9;
+            }
+            .theme-blue .theme-option-line {
+                background: #2d4a6f;
+            }
+
+            .theme-purple .theme-option-inner {
+                background: #1a0a2e;
+                color: #f8fafc;
+            }
+            .theme-purple .theme-option-header {
+                background: #2d1b4e;
+            }
+            .theme-purple .theme-option-dot {
+                background: #a855f7;
+            }
+            .theme-purple .theme-option-line {
+                background: #4c2f7e;
+            }
+
+            .theme-green .theme-option-inner {
+                background: #0a1f15;
+                color: #f8fafc;
+            }
+            .theme-green .theme-option-header {
+                background: #14332a;
+            }
+            .theme-green .theme-option-dot {
+                background: #22c55e;
+            }
+            .theme-green .theme-option-line {
+                background: #28604f;
+            }
+
+            .theme-orange .theme-option-inner {
+                background: #1a1008;
+                color: #f8fafc;
+            }
+            .theme-orange .theme-option-header {
+                background: #2d1c0f;
+            }
+            .theme-orange .theme-option-dot {
+                background: #f97316;
+            }
+            .theme-orange .theme-option-line {
+                background: #5c3a1e;
+            }
+
+            .settings-shortcut {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.625rem 0.75rem;
+                border-radius: 8px;
+                text-decoration: none;
+                color: var(--text);
+                transition: background 0.2s;
+            }
+
+            .settings-shortcut:hover {
+                background: var(--surface-hover);
+            }
+
+            .settings-shortcut-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                background: var(--primary-light);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--primary);
+            }
+
+            .settings-shortcut-text {
+                flex: 1;
+            }
+
+            .settings-shortcut-title {
+                font-size: 0.875rem;
+                font-weight: 500;
+            }
+
+            .settings-shortcut-desc {
+                font-size: 0.7rem;
+                color: var(--text-secondary);
+            }
+
+            .settings-shortcut-arrow {
+                color: var(--text-secondary);
+            }
+
+            .settings-divider {
+                height: 1px;
+                background: var(--border);
+                margin: 0.75rem 0;
+            }
+
+            .quick-toggles {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .quick-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.5rem 0.75rem;
+                border-radius: 8px;
+            }
+
+            .quick-toggle:hover {
+                background: var(--surface-hover);
+            }
+
+            .quick-toggle-label {
+                font-size: 0.875rem;
+            }
+
+            .toggle-switch {
+                position: relative;
+                width: 40px;
+                height: 22px;
+                background: var(--border);
+                border-radius: 11px;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+
+            .toggle-switch.active {
+                background: var(--primary);
+            }
+
+            .toggle-switch::after {
+                content: "";
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 18px;
+                height: 18px;
+                background: white;
+                border-radius: 50%;
+                transition: transform 0.2s;
+            }
+
+            .toggle-switch.active::after {
+                transform: translateX(18px);
+            }
+
             .app-main {
                 flex: 1;
                 display: flex;
@@ -226,21 +540,17 @@
                 overflow: auto;
             }
 
-            /* HTMX Indicators */
             .htmx-indicator {
                 display: none;
             }
-
             .htmx-request .htmx-indicator {
-                display: inline-flex;
+                display: inline-block;
             }
-
             .htmx-request.htmx-indicator {
-                display: inline-flex;
+                display: inline-block;
             }
-
-            /* Spinner */
             .spinner {
+                display: inline-block;
                 width: 20px;
                 height: 20px;
                 border: 2px solid var(--border);
@@ -249,13 +559,139 @@
                 animation: spin 0.8s linear infinite;
             }
 
+            /* Loading overlay for HTMX requests */
+            .loading-overlay {
+                position: absolute;
+                inset: 0;
+                background: rgba(var(--bg-rgb, 0, 0, 0), 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 50;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s;
+            }
+
+            .htmx-request .loading-overlay {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .loading-spinner-large {
+                width: 40px;
+                height: 40px;
+                border: 3px solid var(--border);
+                border-top-color: var(--primary);
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+            }
+
+            /* Error state styles */
+            .error-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 48px 24px;
+                text-align: center;
+                color: var(--text-secondary);
+            }
+
+            .error-state-icon {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 16px;
+                color: var(--danger);
+            }
+
+            .error-state-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--text);
+                margin-bottom: 8px;
+            }
+
+            .error-state-message {
+                margin-bottom: 20px;
+                max-width: 400px;
+            }
+
+            .error-state-actions {
+                display: flex;
+                gap: 12px;
+            }
+
+            .btn-retry {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 20px;
+                background: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .btn-retry:hover {
+                filter: brightness(1.1);
+            }
+
+            .btn-retry:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+
+            .btn-retry .spinner {
+                width: 16px;
+                height: 16px;
+            }
+
+            /* Skeleton loading states */
+            .skeleton {
+                background: linear-gradient(
+                    90deg,
+                    var(--border) 25%,
+                    var(--hover) 50%,
+                    var(--border) 75%
+                );
+                background-size: 200% 100%;
+                animation: skeleton-loading 1.5s infinite;
+                border-radius: 4px;
+            }
+
+            .skeleton-text {
+                height: 1em;
+                margin-bottom: 0.5em;
+            }
+
+            .skeleton-text:last-child {
+                width: 60%;
+            }
+
+            .skeleton-card {
+                height: 120px;
+                border-radius: 8px;
+            }
+
+            @keyframes skeleton-loading {
+                0% {
+                    background-position: 200% 0;
+                }
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
             @keyframes spin {
                 to {
                     transform: rotate(360deg);
                 }
             }
 
-            /* Notifications */
             .notifications-container {
                 position: fixed;
                 bottom: 1rem;
@@ -263,33 +699,33 @@
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
-                z-index: 2000;
+                z-index: 9999;
                 max-width: 400px;
             }
 
             .notification {
-                display: flex;
-                align-items: flex-start;
-                gap: 0.75rem;
-                padding: 1rem;
                 background: var(--surface);
                 border: 1px solid var(--border);
                 border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                animation: slideIn 0.3s ease-out;
+                padding: 1rem;
+                display: flex;
+                align-items: flex-start;
+                gap: 0.75rem;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                animation: slideIn 0.3s ease;
             }
 
             .notification.success {
-                border-left: 4px solid var(--success);
+                border-left: 3px solid var(--success);
             }
             .notification.error {
-                border-left: 4px solid var(--error);
+                border-left: 3px solid var(--error);
             }
             .notification.warning {
-                border-left: 4px solid var(--warning);
+                border-left: 3px solid var(--warning);
             }
             .notification.info {
-                border-left: 4px solid var(--info);
+                border-left: 3px solid var(--info);
             }
 
             @keyframes slideIn {
@@ -303,7 +739,6 @@
                 }
             }
 
-            /* Utility Classes */
             .sr-only {
                 position: absolute;
                 width: 1px;
@@ -316,24 +751,68 @@
                 border: 0;
             }
 
-            /* Responsive */
             @media (max-width: 768px) {
                 .logo span {
                     display: none;
                 }
-
-                .apps-dropdown {
-                    right: -1rem;
-                    min-width: 280px;
+                .apps-dropdown,
+                .settings-panel {
+                    width: calc(100vw - 2rem);
+                    right: -0.5rem;
+                }
+                .theme-grid {
+                    grid-template-columns: repeat(3, 1fr);
                 }
             }
-        </style>
+            /* Skip link styles */
+            .skip-link {
+                position: absolute;
+                top: -40px;
+                left: 0;
+                background: var(--primary);
+                color: white;
+                padding: 8px 16px;
+                z-index: 1000;
+                text-decoration: none;
+                border-radius: 0 0 8px 0;
+                transition: top 0.3s;
+            }
 
-        {% block head %}{% endblock %}
+            .skip-link:focus {
+                top: 0;
+            }
+
+            /* Focus visible styles */
+            *:focus-visible {
+                outline: 2px solid var(--primary);
+                outline-offset: 2px;
+            }
+
+            button:focus-visible,
+            a:focus-visible {
+                outline: 2px solid var(--primary);
+                outline-offset: 2px;
+            }
+
+            /* HTMX loading state for accessibility */
+            .htmx-request [aria-busy] {
+                opacity: 0.7;
+            }
+        </style>
     </head>
     <body>
-        <!-- Header -->
-        <header class="app-header">
+        <!-- Skip navigation link for accessibility -->
+        <a href="#main-content" class="skip-link">Skip to main content</a>
+
+        <!-- ARIA live region for dynamic updates -->
+        <div
+            id="aria-live"
+            class="sr-only"
+            aria-live="polite"
+            aria-atomic="true"
+        ></div>
+
+        <header class="app-header" role="banner">
             <div class="header-left">
                 <a href="/" class="logo">
                     <div class="logo-icon">🤖</div>
@@ -547,6 +1026,28 @@
                                 <span>Research</span>
                             </a>
                             <a
+                                href="#sources"
+                                class="app-item"
+                                role="menuitem"
+                                hx-get="/sources/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="true"
+                            >
+                                <div
+                                    class="app-item-icon"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #14b8a6,
+                                            #0d9488
+                                        );
+                                    "
+                                >
+                                    📚
+                                </div>
+                                <span>Sources</span>
+                            </a>
+                            <a
                                 href="#analytics"
                                 class="app-item"
                                 role="menuitem"
@@ -568,29 +1069,440 @@
                                 </div>
                                 <span>Analytics</span>
                             </a>
+                            <a
+                                href="#admin"
+                                class="app-item"
+                                role="menuitem"
+                                hx-get="/admin/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="true"
+                            >
+                                <div
+                                    class="app-item-icon"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #f43f5e,
+                                            #e11d48
+                                        );
+                                    "
+                                >
+                                    ⚙️
+                                </div>
+                                <span>Admin</span>
+                            </a>
+                            <a
+                                href="#monitoring"
+                                class="app-item"
+                                role="menuitem"
+                                hx-get="/monitoring/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="true"
+                            >
+                                <div
+                                    class="app-item-icon"
+                                    style="
+                                        background: linear-gradient(
+                                            135deg,
+                                            #84cc16,
+                                            #65a30d
+                                        );
+                                    "
+                                >
+                                    📈
+                                </div>
+                                <span>Monitoring</span>
+                            </a>
                         </div>
                     </nav>
                 </div>
 
-                <!-- Theme Toggle -->
-                <button
-                    class="header-btn"
-                    id="theme-btn"
-                    aria-label="Toggle theme"
-                >
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
+                <!-- Settings Panel (Gear Icon) -->
+                <div class="settings-menu">
+                    <button
+                        class="header-btn"
+                        id="settings-btn"
+                        aria-label="Settings"
+                        aria-expanded="false"
                     >
-                        <path
-                            d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-                        ></path>
-                    </svg>
-                </button>
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                            />
+                        </svg>
+                    </button>
+                    <div class="settings-panel" id="settings-panel" role="menu">
+                        <div class="settings-panel-title">Quick Settings</div>
+
+                        <!-- Theme Selection -->
+                        <div class="settings-section">
+                            <div class="settings-section-title">Theme</div>
+                            <div class="theme-grid">
+                                <div
+                                    class="theme-option theme-dark"
+                                    data-theme="dark"
+                                    title="Dark"
+                                >
+                                    <div class="theme-option-inner">
+                                        <div class="theme-option-header">
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                        </div>
+                                        <div class="theme-option-body">
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 80%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 60%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 70%"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <span class="theme-option-name">Dark</span>
+                                </div>
+                                <div
+                                    class="theme-option theme-light"
+                                    data-theme="light"
+                                    title="Light"
+                                >
+                                    <div class="theme-option-inner">
+                                        <div class="theme-option-header">
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                        </div>
+                                        <div class="theme-option-body">
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 80%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 60%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 70%"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <span class="theme-option-name">Light</span>
+                                </div>
+                                <div
+                                    class="theme-option theme-blue"
+                                    data-theme="blue"
+                                    title="Ocean"
+                                >
+                                    <div class="theme-option-inner">
+                                        <div class="theme-option-header">
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                        </div>
+                                        <div class="theme-option-body">
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 80%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 60%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 70%"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <span class="theme-option-name">Ocean</span>
+                                </div>
+                                <div
+                                    class="theme-option theme-purple"
+                                    data-theme="purple"
+                                    title="Violet"
+                                >
+                                    <div class="theme-option-inner">
+                                        <div class="theme-option-header">
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                        </div>
+                                        <div class="theme-option-body">
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 80%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 60%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 70%"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <span class="theme-option-name"
+                                        >Violet</span
+                                    >
+                                </div>
+                                <div
+                                    class="theme-option theme-green"
+                                    data-theme="green"
+                                    title="Forest"
+                                >
+                                    <div class="theme-option-inner">
+                                        <div class="theme-option-header">
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                        </div>
+                                        <div class="theme-option-body">
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 80%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 60%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 70%"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <span class="theme-option-name"
+                                        >Forest</span
+                                    >
+                                </div>
+                                <div
+                                    class="theme-option theme-orange"
+                                    data-theme="orange"
+                                    title="Sunset"
+                                >
+                                    <div class="theme-option-inner">
+                                        <div class="theme-option-header">
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                            <div class="theme-option-dot"></div>
+                                        </div>
+                                        <div class="theme-option-body">
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 80%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 60%"
+                                            ></div>
+                                            <div
+                                                class="theme-option-line"
+                                                style="width: 70%"
+                                            ></div>
+                                        </div>
+                                    </div>
+                                    <span class="theme-option-name"
+                                        >Sunset</span
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-divider"></div>
+
+                        <!-- Quick Toggles -->
+                        <div class="settings-section">
+                            <div class="settings-section-title">
+                                Quick Toggles
+                            </div>
+                            <div class="quick-toggles">
+                                <div class="quick-toggle">
+                                    <span class="quick-toggle-label"
+                                        >Desktop Notifications</span
+                                    >
+                                    <div
+                                        class="toggle-switch active"
+                                        id="toggle-notifications"
+                                        onclick="toggleQuickSetting(this)"
+                                    ></div>
+                                </div>
+                                <div class="quick-toggle">
+                                    <span class="quick-toggle-label"
+                                        >Sound Effects</span
+                                    >
+                                    <div
+                                        class="toggle-switch active"
+                                        id="toggle-sound"
+                                        onclick="toggleQuickSetting(this)"
+                                    ></div>
+                                </div>
+                                <div class="quick-toggle">
+                                    <span class="quick-toggle-label"
+                                        >Compact Mode</span
+                                    >
+                                    <div
+                                        class="toggle-switch"
+                                        id="toggle-compact"
+                                        onclick="toggleQuickSetting(this)"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-divider"></div>
+
+                        <!-- Shortcuts -->
+                        <div class="settings-section">
+                            <div class="settings-section-title">
+                                Configuration
+                            </div>
+                            <a
+                                href="#settings"
+                                class="settings-shortcut"
+                                hx-get="/settings/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="true"
+                            >
+                                <div class="settings-shortcut-icon">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <circle cx="12" cy="12" r="3" />
+                                        <path
+                                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+                                        />
+                                    </svg>
+                                </div>
+                                <div class="settings-shortcut-text">
+                                    <div class="settings-shortcut-title">
+                                        All Settings
+                                    </div>
+                                    <div class="settings-shortcut-desc">
+                                        Account, sync, appearance & more
+                                    </div>
+                                </div>
+                                <span class="settings-shortcut-arrow">→</span>
+                            </a>
+                            <a
+                                href="#admin"
+                                class="settings-shortcut"
+                                hx-get="/admin/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="true"
+                            >
+                                <div class="settings-shortcut-icon">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </div>
+                                <div class="settings-shortcut-text">
+                                    <div class="settings-shortcut-title">
+                                        Admin Console
+                                    </div>
+                                    <div class="settings-shortcut-desc">
+                                        Bot management & configuration
+                                    </div>
+                                </div>
+                                <span class="settings-shortcut-arrow">→</span>
+                            </a>
+                            <a
+                                href="#monitoring"
+                                class="settings-shortcut"
+                                hx-get="/monitoring/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="true"
+                            >
+                                <div class="settings-shortcut-icon">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M3 3v18h18" />
+                                        <path d="M18 9l-5 5-4-4-3 3" />
+                                    </svg>
+                                </div>
+                                <div class="settings-shortcut-text">
+                                    <div class="settings-shortcut-title">
+                                        Monitoring
+                                    </div>
+                                    <div class="settings-shortcut-desc">
+                                        System health & performance
+                                    </div>
+                                </div>
+                                <span class="settings-shortcut-arrow">→</span>
+                            </a>
+                            <a
+                                href="/keyboard-shortcuts"
+                                class="settings-shortcut"
+                                onclick="showKeyboardShortcuts(); return false;"
+                            >
+                                <div class="settings-shortcut-icon">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <rect
+                                            x="2"
+                                            y="4"
+                                            width="20"
+                                            height="16"
+                                            rx="2"
+                                        />
+                                        <path
+                                            d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M8 16h8"
+                                        />
+                                    </svg>
+                                </div>
+                                <div class="settings-shortcut-text">
+                                    <div class="settings-shortcut-title">
+                                        Keyboard Shortcuts
+                                    </div>
+                                    <div class="settings-shortcut-desc">
+                                        View all available shortcuts
+                                    </div>
+                                </div>
+                                <span class="settings-shortcut-arrow">→</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- User Avatar -->
                 <button class="user-avatar" aria-label="User menu">
@@ -599,23 +1511,32 @@
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="app-main">
-            <div id="main-content">{% block content %}{% endblock %}</div>
+        <main class="app-main" role="main">
+            <div id="main-content" aria-busy="false" tabindex="-1">
+                {% block content %}{% endblock %}
+            </div>
         </main>
 
-        <!-- Notifications Container -->
         <div class="notifications-container" id="notifications"></div>
 
         <script>
-            // Apps menu toggle
             const appsBtn = document.getElementById("apps-btn");
             const appsDropdown = document.getElementById("apps-dropdown");
+            const settingsBtn = document.getElementById("settings-btn");
+            const settingsPanel = document.getElementById("settings-panel");
 
             appsBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 const isOpen = appsDropdown.classList.toggle("show");
                 appsBtn.setAttribute("aria-expanded", isOpen);
+                settingsPanel.classList.remove("show");
+            });
+
+            settingsBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const isOpen = settingsPanel.classList.toggle("show");
+                settingsBtn.setAttribute("aria-expanded", isOpen);
+                appsDropdown.classList.remove("show");
             });
 
             document.addEventListener("click", (e) => {
@@ -626,17 +1547,24 @@
                     appsDropdown.classList.remove("show");
                     appsBtn.setAttribute("aria-expanded", "false");
                 }
-            });
-
-            // Close on escape
-            document.addEventListener("keydown", (e) => {
-                if (e.key === "Escape") {
-                    appsDropdown.classList.remove("show");
-                    appsBtn.setAttribute("aria-expanded", "false");
+                if (
+                    !settingsPanel.contains(e.target) &&
+                    !settingsBtn.contains(e.target)
+                ) {
+                    settingsPanel.classList.remove("show");
+                    settingsBtn.setAttribute("aria-expanded", "false");
                 }
             });
 
-            // Keyboard shortcuts for apps
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") {
+                    appsDropdown.classList.remove("show");
+                    settingsPanel.classList.remove("show");
+                    appsBtn.setAttribute("aria-expanded", "false");
+                    settingsBtn.setAttribute("aria-expanded", "false");
+                }
+            });
+
             document.addEventListener("keydown", (e) => {
                 if (e.altKey && !e.ctrlKey && !e.shiftKey) {
                     const shortcuts = {
@@ -646,6 +1574,12 @@
                         4: "mail",
                         5: "calendar",
                         6: "meet",
+                        7: "paper",
+                        8: "research",
+                        9: "sources",
+                        0: "analytics",
+                        a: "admin",
+                        m: "monitoring",
                     };
                     if (shortcuts[e.key]) {
                         e.preventDefault();
@@ -655,10 +1589,19 @@
                         if (link) link.click();
                         appsDropdown.classList.remove("show");
                     }
+                    if (e.key === ",") {
+                        e.preventDefault();
+                        settingsPanel.classList.toggle("show");
+                    }
+                    if (e.key === "s") {
+                        e.preventDefault();
+                        const settingsLink =
+                            document.querySelector(`a[href="#settings"]`);
+                        if (settingsLink) settingsLink.click();
+                    }
                 }
             });
 
-            // Update active app in menu
             document.body.addEventListener("htmx:afterSwap", (e) => {
                 if (e.detail.target.id === "main-content") {
                     const hash = window.location.hash || "#chat";
@@ -668,27 +1611,144 @@
                             item.getAttribute("href") === hash,
                         );
                     });
+                    settingsPanel.classList.remove("show");
                 }
             });
 
-            // Theme toggle
-            const themeBtn = document.getElementById("theme-btn");
-            themeBtn.addEventListener("click", () => {
-                document.body.classList.toggle("light-theme");
+            // Theme handling
+            const themeOptions = document.querySelectorAll(".theme-option");
+            const savedTheme = localStorage.getItem("gb-theme") || "dark";
+            document.body.setAttribute("data-theme", savedTheme);
+            document
+                .querySelector(`.theme-option[data-theme="${savedTheme}"]`)
+                ?.classList.add("active");
+
+            themeOptions.forEach((option) => {
+                option.addEventListener("click", () => {
+                    const theme = option.getAttribute("data-theme");
+                    document.body.setAttribute("data-theme", theme);
+                    localStorage.setItem("gb-theme", theme);
+                    themeOptions.forEach((o) => o.classList.remove("active"));
+                    option.classList.add("active");
+                });
+            });
+
+            function toggleQuickSetting(el) {
+                el.classList.toggle("active");
+                const setting = el.id.replace("toggle-", "");
                 localStorage.setItem(
-                    "theme",
-                    document.body.classList.contains("light-theme")
-                        ? "light"
-                        : "dark",
+                    `gb-${setting}`,
+                    el.classList.contains("active"),
+                );
+            }
+
+            // Load quick toggle states
+            ["notifications", "sound", "compact"].forEach((setting) => {
+                const saved = localStorage.getItem(`gb-${setting}`);
+                const toggle = document.getElementById(`toggle-${setting}`);
+                if (toggle && saved !== null) {
+                    toggle.classList.toggle("active", saved === "true");
+                }
+            });
+
+            function showKeyboardShortcuts() {
+                window.showNotification(
+                    "Alt+1-9,0 for apps, Alt+A Admin, Alt+M Monitoring, Alt+S Settings, Alt+, quick settings",
+                    "info",
+                    8000,
+                );
+            }
+
+            // Accessibility: Announce page changes to screen readers
+            function announceToScreenReader(message) {
+                const liveRegion = document.getElementById("aria-live");
+                if (liveRegion) {
+                    liveRegion.textContent = message;
+                    // Clear after announcement
+                    setTimeout(() => {
+                        liveRegion.textContent = "";
+                    }, 1000);
+                }
+            }
+
+            // HTMX accessibility hooks
+            document.body.addEventListener("htmx:beforeRequest", function (e) {
+                const target = e.detail.target;
+                if (target && target.id === "main-content") {
+                    target.setAttribute("aria-busy", "true");
+                    announceToScreenReader("Loading content...");
+                }
+            });
+
+            document.body.addEventListener("htmx:afterSwap", function (e) {
+                const target = e.detail.target;
+                if (target && target.id === "main-content") {
+                    target.setAttribute("aria-busy", "false");
+                    // Focus management: move focus to main content after navigation
+                    target.focus();
+                    announceToScreenReader("Content loaded");
+                }
+            });
+
+            document.body.addEventListener("htmx:responseError", function (e) {
+                const target = e.detail.target;
+                if (target) {
+                    target.setAttribute("aria-busy", "false");
+                }
+                announceToScreenReader(
+                    "Error loading content. Please try again.",
                 );
             });
 
-            // Restore theme
-            if (localStorage.getItem("theme") === "light") {
-                document.body.classList.add("light-theme");
-            }
+            // Keyboard navigation for apps grid
+            document.addEventListener("keydown", function (e) {
+                const appsGrid = document.querySelector(".apps-grid");
+                if (!appsGrid || !appsGrid.closest(".show")) return;
 
-            // Notification helper
+                const items = Array.from(
+                    appsGrid.querySelectorAll(".app-item"),
+                );
+                const currentIndex = items.findIndex(
+                    (item) => item === document.activeElement,
+                );
+
+                if (currentIndex === -1) return;
+
+                let newIndex = currentIndex;
+                const columns = 3; // Grid has 3 columns on desktop
+
+                switch (e.key) {
+                    case "ArrowRight":
+                        newIndex = Math.min(currentIndex + 1, items.length - 1);
+                        break;
+                    case "ArrowLeft":
+                        newIndex = Math.max(currentIndex - 1, 0);
+                        break;
+                    case "ArrowDown":
+                        newIndex = Math.min(
+                            currentIndex + columns,
+                            items.length - 1,
+                        );
+                        break;
+                    case "ArrowUp":
+                        newIndex = Math.max(currentIndex - columns, 0);
+                        break;
+                    case "Home":
+                        newIndex = 0;
+                        break;
+                    case "End":
+                        newIndex = items.length - 1;
+                        break;
+                    default:
+                        return;
+                }
+
+                if (newIndex !== currentIndex) {
+                    e.preventDefault();
+                    items[newIndex].focus();
+                }
+            });
+
             window.showNotification = function (
                 message,
                 type = "info",
@@ -698,17 +1758,174 @@
                 const notification = document.createElement("div");
                 notification.className = `notification ${type}`;
                 notification.innerHTML = `
-                <div class="notification-content">
-                    <div class="notification-message">${message}</div>
-                </div>
-                <button class="notification-close" onclick="this.parentElement.remove()">×</button>
-            `;
+                    <div class="notification-content">
+                        <div class="notification-message">${message}</div>
+                    </div>
+                    <button class="notification-close" onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:1.25rem;">×</button>
+                `;
                 container.appendChild(notification);
-
                 if (duration > 0) {
                     setTimeout(() => notification.remove(), duration);
                 }
             };
+
+            // Global HTMX error handling with retry mechanism
+            const htmxRetryConfig = {
+                maxRetries: 3,
+                retryDelay: 1000,
+                retryCount: new Map(),
+            };
+
+            function getRetryKey(elt) {
+                return (
+                    elt.getAttribute("hx-get") ||
+                    elt.getAttribute("hx-post") ||
+                    elt.getAttribute("hx-put") ||
+                    elt.getAttribute("hx-delete") ||
+                    elt.id ||
+                    Math.random().toString(36)
+                );
+            }
+
+            function showErrorState(target, errorMessage, retryCallback) {
+                const errorHtml = `
+                    <div class="error-state">
+                        <svg class="error-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <div class="error-state-title">Something went wrong</div>
+                        <div class="error-state-message">${errorMessage}</div>
+                        <div class="error-state-actions">
+                            <button class="btn-retry" onclick="window.retryLastRequest(this)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M23 4v6h-6"></path>
+                                    <path d="M1 20v-6h6"></path>
+                                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path>
+                                    <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"></path>
+                                </svg>
+                                Try Again
+                            </button>
+                        </div>
+                    </div>
+                `;
+                target.innerHTML = errorHtml;
+                target.dataset.retryCallback = retryCallback;
+            }
+
+            window.retryLastRequest = function (btn) {
+                const target = btn.closest(".error-state").parentElement;
+                const retryCallback = target.dataset.retryCallback;
+
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner"></span> Retrying...';
+
+                if (retryCallback && window[retryCallback]) {
+                    window[retryCallback]();
+                } else {
+                    // Try to re-trigger HTMX request
+                    const triggers = target.querySelectorAll(
+                        "[hx-get], [hx-post]",
+                    );
+                    if (triggers.length > 0) {
+                        htmx.trigger(triggers[0], "htmx:trigger");
+                    } else {
+                        // Reload the current app
+                        const activeApp =
+                            document.querySelector(".app-item.active");
+                        if (activeApp) {
+                            activeApp.click();
+                        }
+                    }
+                }
+            };
+
+            // Handle HTMX errors globally
+            document.body.addEventListener("htmx:responseError", function (e) {
+                const target = e.detail.target;
+                const xhr = e.detail.xhr;
+                const retryKey = getRetryKey(e.detail.elt);
+
+                let currentRetries =
+                    htmxRetryConfig.retryCount.get(retryKey) || 0;
+
+                // Auto-retry for network errors (status 0) or server errors (5xx)
+                if (
+                    (xhr.status === 0 || xhr.status >= 500) &&
+                    currentRetries < htmxRetryConfig.maxRetries
+                ) {
+                    htmxRetryConfig.retryCount.set(
+                        retryKey,
+                        currentRetries + 1,
+                    );
+                    const delay =
+                        htmxRetryConfig.retryDelay *
+                        Math.pow(2, currentRetries);
+
+                    window.showNotification(
+                        `Request failed. Retrying in ${delay / 1000}s... (${currentRetries + 1}/${htmxRetryConfig.maxRetries})`,
+                        "warning",
+                        delay,
+                    );
+
+                    setTimeout(() => {
+                        htmx.trigger(e.detail.elt, "htmx:trigger");
+                    }, delay);
+                } else {
+                    // Max retries reached or client error - show error state
+                    htmxRetryConfig.retryCount.delete(retryKey);
+
+                    let errorMessage = "We couldn't load the content.";
+                    if (xhr.status === 401) {
+                        errorMessage =
+                            "Your session has expired. Please log in again.";
+                    } else if (xhr.status === 403) {
+                        errorMessage =
+                            "You don't have permission to access this resource.";
+                    } else if (xhr.status === 404) {
+                        errorMessage = "The requested content was not found.";
+                    } else if (xhr.status >= 500) {
+                        errorMessage =
+                            "The server is experiencing issues. Please try again later.";
+                    } else if (xhr.status === 0) {
+                        errorMessage =
+                            "Unable to connect. Please check your internet connection.";
+                    }
+
+                    if (target && target.id === "main-content") {
+                        showErrorState(target, errorMessage);
+                    } else {
+                        window.showNotification(errorMessage, "error", 8000);
+                    }
+                }
+            });
+
+            // Clear retry count on successful request
+            document.body.addEventListener("htmx:afterRequest", function (e) {
+                if (e.detail.successful) {
+                    const retryKey = getRetryKey(e.detail.elt);
+                    htmxRetryConfig.retryCount.delete(retryKey);
+                }
+            });
+
+            // Handle timeout errors
+            document.body.addEventListener("htmx:timeout", function (e) {
+                window.showNotification(
+                    "Request timed out. Please try again.",
+                    "warning",
+                    5000,
+                );
+            });
+
+            // Handle send errors (network issues before request sent)
+            document.body.addEventListener("htmx:sendError", function (e) {
+                window.showNotification(
+                    "Network error. Please check your connection.",
+                    "error",
+                    5000,
+                );
+            });
         </script>
 
         {% block scripts %}{% endblock %}

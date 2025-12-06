@@ -1,0 +1,934 @@
+<div class="admin-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+        <div class="admin-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 17l10 5 10-5"></path>
+                <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            <span>Admin Panel</span>
+        </div>
+
+        <nav class="admin-nav">
+            <a href="#dashboard" class="nav-item active"
+               hx-get="/api</span>/admin/dashboard"
+               hx-target="#admin-content"
+               hx-swap="innerHTML"
+               hx-push-url="false"
+               onclick="setActiveNav(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="9"></rect>
+                    <rect x="14" y="3" width="7" height="5"></rect>
+                    <rect x="14" y="12" width="7" height="9"></rect>
+                    <rect x="3" y="16" width="7" height="5"></rect>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="#users" class="nav-item"
+               hx-get="/api/admin/users"
+               hx-target="#admin-content"
+               hx-swap="innerHTML"
+               hx-push-url="false"
+               onclick="setActiveNav(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span>Users</span>
+            </a>
+            <a href="#groups" class="nav-item"
+               hx-get="/api/admin/groups"
+               hx-target="#admin-content"
+               hx-swap="innerHTML"
+               hx-push-url="false"
+               onclick="setActiveNav(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <circle cx="19" cy="11" r="2"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-2-3.46"></path>
+                </svg>
+                <span>Groups</span>
+            </a>
+            <a href="#bots" class="nav-item"
+               hx-get="/api/admin/bots"
+               hx-target="#admin-content"
+               hx-swap="innerHTML"
+               hx-push-url="false"
+               onclick="setActiveNav(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <path d="M12 7v4"></path>
+                    <line x1="8" y1="16" x2="8" y2="16"></line>
+                    <line x1="16" y1="16" x2="16" y2="16"></line>
+                </svg>
+                <span>Bots</span>
+            </a>
+            <a href="#dns" class="nav-item"
+               hx-get="/api/admin/dns"
+               hx-target="#admin-content"
+               hx-swap="innerHTML"
+               hx-push-url="false"
+               onclick="setActiveNav(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span>DNS</span>
+            </a>
+            <a href="#audit" class="nav-item"
+               hx-get="/api/admin/audit"
+               hx-target="#admin-content"
+               hx-swap="innerHTML"
+               hx-push-url="false"
+               onclick="setActiveNav(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>Audit Log</span>
+            </a>
+            <a href="#billing" class="nav-item"
+               hx-get="/api/admin/billing"
+               hx-target="#admin-content"
+               hx-swap="innerHTML"
+               hx-push-url="false"
+               onclick="setActiveNav(this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                <span>Billing</span>
+            </a>
+        </nav>
+
+        <div class="admin-footer">
+            <a href="/suite" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Suite
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+        <div id="admin-content"
+             hx-get="/api/admin/dashboard"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+            <!-- Dashboard content loaded here -->
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading dashboard...</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Dashboard Template (inline for initial load fallback) -->
+<template id="dashboard-template">
+    <div class="dashboard-view">
+        <div class="page-header">
+            <h1>Dashboard</h1>
+            <p class="subtitle">System overview and quick statistics</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card"
+                 hx-get="/api/admin/stats/users"
+                 hx-trigger="load, every 30s"
+                 hx-swap="innerHTML">
+                <div class="stat-icon users">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">--</span>
+                    <span class="stat-label">Total Users</span>
+                </div>
+            </div>
+            <div class="stat-card"
+                 hx-get="/api/admin/stats/groups"
+                 hx-trigger="load, every 30s"
+                 hx-swap="innerHTML">
+                <div class="stat-icon groups">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <circle cx="19" cy="11" r="2"></circle>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">--</span>
+                    <span class="stat-label">Active Groups</span>
+                </div>
+            </div>
+            <div class="stat-card"
+                 hx-get="/api/admin/stats/bots"
+                 hx-trigger="load, every 30s"
+                 hx-swap="innerHTML">
+                <div class="stat-icon bots">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                        <circle cx="12" cy="5" r="2"></circle>
+                        <path d="M12 7v4"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">--</span>
+                    <span class="stat-label">Running Bots</span>
+                </div>
+            </div>
+            <div class="stat-card"
+                 hx-get="/api/admin/stats/storage"
+                 hx-trigger="load, every 30s"
+                 hx-swap="innerHTML">
+                <div class="stat-icon storage">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">--</span>
+                    <span class="stat-label">Storage Used</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section">
+            <h2>Quick Actions</h2>
+            <div class="quick-actions-grid">
+                <button class="action-card" onclick="document.getElementById('create-user-modal').showModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    <span>Create User</span>
+                </button>
+                <button class="action-card" onclick="document.getElementById('create-group-modal').showModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <line x1="19" y1="8" x2="19" y2="14"></line>
+                        <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
+                    <span>Create Group</span>
+                </button>
+                <button class="action-card" onclick="document.getElementById('register-dns-modal').showModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>Register DNS</span>
+                </button>
+                <button class="action-card"
+                        hx-get="/api/admin/audit?limit=100"
+                        hx-target="#admin-content"
+                        hx-swap="innerHTML">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>View Audit Log</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="section">
+            <h2>Recent Activity</h2>
+            <div class="activity-list"
+                 hx-get="/api/admin/activity/recent"
+                 hx-trigger="load, every 60s"
+                 hx-swap="innerHTML">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="section">
+            <h2>System Health</h2>
+            <div class="health-grid"
+                 hx-get="/api/admin/health"
+                 hx-trigger="load, every 30s"
+                 hx-swap="innerHTML">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Create User Modal -->
+<dialog id="create-user-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Create User</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('create-user-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/users/create"
+              hx-target="#admin-content"
+              hx-swap="innerHTML"
+              hx-on::after-request="if(event.detail.successful) document.getElementById('create-user-modal').close()">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required placeholder="user@example.com">
+            </div>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" name="display_name" placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="moderator">Moderator</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('create-user-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Create User</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Create Group Modal -->
+<dialog id="create-group-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Create Group</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('create-group-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/groups/create"
+              hx-target="#admin-content"
+              hx-swap="innerHTML"
+              hx-on::after-request="if(event.detail.successful) document.getElementById('create-group-modal').close()">
+            <div class="form-group">
+                <label>Group Name</label>
+                <input type="text" name="name" required placeholder="Engineering Team">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" placeholder="Group description..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Visibility</label>
+                <select name="visibility">
+                    <option value="private">Private</option>
+                    <option value="public">Public</option>
+                    <option value="hidden">Hidden</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="allow_join_requests" checked>
+                    <span>Allow join requests</span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('create-group-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Create Group</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Register DNS Modal -->
+<dialog id="register-dns-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Register DNS Hostname</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('register-dns-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/api/dns/register"
+              hx-target="#dns-result"
+              hx-swap="innerHTML">
+            <div class="form-group">
+                <label>Hostname</label>
+                <input type="text" name="hostname" required placeholder="mybot.example.com">
+            </div>
+            <div class="form-group">
+                <label>Record Type</label>
+                <select name="record_type">
+                    <option value="A">A (IPv4)</option>
+                    <option value="AAAA">AAAA (IPv6)</option>
+                    <option value="CNAME">CNAME</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Target/IP</label>
+                <input type="text" name="target" placeholder="192.168.1.1 or target.domain.com">
+            </div>
+            <div id="dns-result"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('register-dns-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Register</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<style>
+/* Admin Layout */
+.admin-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 56px);
+    background: var(--bg);
+}
+
+/* Sidebar */
+.admin-sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+}
+
+.admin-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.admin-header svg {
+    color: var(--primary);
+}
+
+.admin-nav {
+    flex: 1;
+    padding: 12px 8px;
+    overflow-y: auto;
+}
+
+.admin-nav .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+}
+
+.admin-nav .nav-item:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+}
+
+.admin-nav .nav-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.admin-nav .nav-item svg {
+    flex-shrink: 0;
+}
+
+.admin-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+
+/* Main Content */
+.admin-main {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+/* Dashboard View */
+.dashboard-view {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.page-header {
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.page-header .subtitle {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon.users { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.stat-icon.groups { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.stat-icon.bots { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+.stat-icon.storage { background: rgba(249, 115, 22, 0.1); color: #f97316; }
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* Sections */
+.section {
+    margin-bottom: 32px;
+}
+
+.section h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+}
+
+/* Quick Actions Grid */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.action-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.action-card:hover {
+    border-color: var(--primary);
+    background: var(--surface-hover);
+}
+
+.action-card svg {
+    color: var(--primary);
+}
+
+.action-card span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Activity List */
+.activity-list {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-size: 14px;
+}
+
+.activity-text strong {
+    font-weight: 600;
+}
+
+.activity-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Health Grid */
+.health-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.health-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.health-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.health-card-title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.health-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.health-status.healthy { background: #10b981; }
+.health-status.warning { background: #f59e0b; }
+.health-status.error { background: #ef4444; }
+
+.health-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.health-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Modal Styles */
+.modal {
+    padding: 0;
+    border: none;
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 480px;
+    width: 90%;
+}
+
+.modal::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    padding: 0;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+}
+
+.modal form {
+    padding: 24px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-hover);
+    border-radius: 0 0 16px 16px;
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    padding: 10px 20px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: var(--surface-hover);
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+        position: fixed;
+        left: -260px;
+        top: 56px;
+        z-index: 100;
+        transition: left 0.3s;
+    }
+
+    .admin-sidebar.open {
+        left: 0;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
+<script>
+    function setActiveNav(el) {
+        document.querySelectorAll('.admin-nav .nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        el.classList.add('active');
+    }
+
+    // Load dashboard template as fallback
+    document.addEventListener('htmx:responseError', function(e) {
+        if (e.detail.target.id === 'admin-content') {
+            const</script> template = document.getElementById('dashboard-template');
+            if (template) {
+                e.detail.target.innerHTML = template.innerHTML;
+            }
+        }
+    });
+</script>

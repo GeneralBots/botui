@@ -94,6 +94,42 @@
                 <span id="storage-detail">Calculating...</span>
             </div>
         </div>
+
+        <!-- Sync Status Panel -->
+        <div class="sync-panel">
+            <div class="storage-header">
+                <span class="storage-label">Sync Status</span>
+                <span class="storage-value" id="sync-status"
+                      hx-get="/files/sync/status"
+                      hx-trigger="load, every 10s"
+                      hx-swap="innerHTML">
+                    Checking...
+                </span>
+            </div>
+            <div class="sync-actions" style="display: flex; gap: 8px; margin-top: 8px;">
+                <button class="btn-secondary" style="flex: 1; padding: 6px 12px; font-size: 12px;"
+                        hx-post="/files/sync/start"
+                        hx-swap="none"
+                        hx-on::after-request="htmx.trigger('#sync-status', 'load')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <polyline points="1 20 1 14 7 14"></polyline>
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                    </svg>
+                    Start
+                </button>
+                <button class="btn-secondary" style="flex: 1; padding: 6px 12px; font-size: 12px;"
+                        hx-post="/files/sync/stop"
+                        hx-swap="none"
+                        hx-on::after-request="htmx.trigger('#sync-status', 'load')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                    </svg>
+                    Stop
+                </button>
+            </div>
+        </div>
     </aside>
 
     <!-- Main Content -->
@@ -161,6 +197,15 @@
                     <option value="type">Type</option>
                 </select>
 
+                <button class="icon-btn" title="Document Tools" onclick="document.getElementById('docs-modal').showModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                </button>
+
                 <button class="icon-btn" title="Info" onclick="toggleInfoPanel()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -214,8 +259,16 @@
                     </svg>
                     Download
                 </button>
+                <button class="action-btn" title="Copy"
+                        onclick="document.getElementById('copy-modal').showModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy
+                </button>
                 <button class="action-btn" title="Move"
-                        onclick="showMoveModal()">
+                        onclick="document.getElementById('move-modal').showModal()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                     </svg>
@@ -375,6 +428,300 @@
     </div>
 </dialog>
 
+<!-- Copy Modal -->
+<dialog class="modal" id="copy-modal">
+    <form class="modal-content"
+          hx-post="/files/copy"
+          hx-target="#file-grid"
+          hx-swap="innerHTML"
+          hx-on::after-request="document.getElementById('copy-modal').close()">
+        <div class="modal-header">
+            <h2>Copy to</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('copy-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" name="source" id="copy-source" value="">
+            <div class="form-group">
+                <label for="copy-destination">Destination folder</label>
+                <select id="copy-destination" name="destination" class="sort-dropdown" style="width: 100%;"
+                        hx-get="/api/drive/folders"
+                        hx-trigger="load"
+                        hx-swap="innerHTML">
+                    <option value="/">/ (Root)</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('copy-modal').close()">Cancel</button>
+            <button type="submit" class="btn-primary">Copy</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Move Modal -->
+<dialog class="modal" id="move-modal">
+    <form class="modal-content"
+          hx-post="/files/move"
+          hx-target="#file-grid"
+          hx-swap="innerHTML"
+          hx-on::after-request="document.getElementById('move-modal').close()">
+        <div class="modal-header">
+            <h2>Move to</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('move-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" name="source" id="move-source" value="">
+            <div class="form-group">
+                <label for="move-destination">Destination folder</label>
+                <select id="move-destination" name="destination" class="sort-dropdown" style="width: 100%;"
+                        hx-get="/api/drive/folders"
+                        hx-trigger="load"
+                        hx-swap="innerHTML">
+                    <option value="/">/ (Root)</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('move-modal').close()">Cancel</button>
+            <button type="submit" class="btn-primary">Move</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Permissions Modal -->
+<dialog class="modal" id="permissions-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Permissions</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('permissions-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" name="path" id="permissions-path" value="">
+            <div id="permissions-content"
+                 hx-get="/files/permissions"
+                 hx-trigger="load"
+                 hx-vals="js:{path: document.getElementById('permissions-path').value}"
+                 hx-swap="innerHTML">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading permissions...</p>
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 16px;">
+                <label>Share with</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="email" id="share-email" placeholder="Enter email address" style="flex: 1;">
+                    <select id="share-permission" class="sort-dropdown">
+                        <option value="read">Can view</option>
+                        <option value="write">Can edit</option>
+                        <option value="admin">Full access</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('permissions-modal').close()">Close</button>
+            <button type="button" class="btn-primary"
+                    hx-post="/files/shareFolder"
+                    hx-include="#permissions-path, #share-email, #share-permission"
+                    hx-swap="none"
+                    hx-on::after-request="htmx.trigger('#permissions-content', 'load')">
+                Share
+            </button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Document Processing Modal -->
+<dialog class="modal modal-large" id="docs-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Document Tools</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('docs-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="docs-tools-grid">
+                <!-- Merge Documents -->
+                <div class="docs-tool-card">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M8 6h13"></path>
+                            <path d="M8 12h13"></path>
+                            <path d="M8 18h13"></path>
+                            <path d="M3 6h.01"></path>
+                            <path d="M3 12h.01"></path>
+                            <path d="M3 18h.01"></path>
+                        </svg>
+                        Merge Documents
+                    </h3>
+                    <p>Combine multiple documents into one</p>
+                    <form hx-post="/docs/merge"
+                          hx-target="#docs-result"
+                          hx-swap="innerHTML"
+                          hx-encoding="multipart/form-data">
+                        <input type="file" name="files" multiple accept=".pdf,.docx,.doc,.txt" class="form-group" style="margin-bottom: 8px;">
+                        <input type="text" name="output_name" placeholder="Output filename" class="form-group" style="width: 100%; margin-bottom: 8px;">
+                        <button type="submit" class="btn-primary" style="width: 100%;">Merge</button>
+                    </form>
+                </div>
+
+                <!-- Convert Document -->
+                <div class="docs-tool-card">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="17 1 21 5 17 9"></polyline>
+                            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                            <polyline points="7 23 3 19 7 15"></polyline>
+                            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                        </svg>
+                        Convert Format
+                    </h3>
+                    <p>Convert between document formats</p>
+                    <form hx-post="/docs/convert"
+                          hx-target="#docs-result"
+                          hx-swap="innerHTML"
+                          hx-encoding="multipart/form-data">
+                        <input type="file" name="file" accept=".pdf,.docx,.doc,.txt,.md,.html" class="form-group" style="margin-bottom: 8px;">
+                        <select name="format" class="sort-dropdown" style="width: 100%; margin-bottom: 8px;">
+                            <option value="pdf">PDF</option>
+                            <option value="docx">Word (DOCX)</option>
+                            <option value="txt">Plain Text</option>
+                            <option value="md">Markdown</option>
+                            <option value="html">HTML</option>
+                        </select>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Convert</button>
+                    </form>
+                </div>
+
+                <!-- Fill Template -->
+                <div class="docs-tool-card">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        Fill Template
+                    </h3>
+                    <p>Populate template with data</p>
+                    <form hx-post="/docs/fill"
+                          hx-target="#docs-result"
+                          hx-swap="innerHTML"
+                          hx-encoding="multipart/form-data">
+                        <input type="file" name="template" accept=".docx,.doc" class="form-group" style="margin-bottom: 8px;">
+                        <input type="file" name="data" accept=".json,.csv" class="form-group" style="margin-bottom: 8px;">
+                        <button type="submit" class="btn-primary" style="width: 100%;">Fill</button>
+                    </form>
+                </div>
+
+                <!-- Export Document -->
+                <div class="docs-tool-card">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export
+                    </h3>
+                    <p>Export document in specified format</p>
+                    <form hx-post="/docs/export"
+                          hx-target="#docs-result"
+                          hx-swap="innerHTML">
+                        <input type="text" name="path" placeholder="File path (e.g., /documents/report.docx)" class="form-group" style="width: 100%; margin-bottom: 8px;">
+                        <select name="format" class="sort-dropdown" style="width: 100%; margin-bottom: 8px;">
+                            <option value="pdf">PDF</option>
+                            <option value="docx">Word (DOCX)</option>
+                            <option value="txt">Plain Text</option>
+                        </select>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Export</button>
+                    </form>
+                </div>
+
+                <!-- Import Document -->
+                <div class="docs-tool-card">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        Import
+                    </h3>
+                    <p>Import document from URL or upload</p>
+                    <form hx-post="/docs/import"
+                          hx-target="#docs-result"
+                          hx-swap="innerHTML"
+                          hx-encoding="multipart/form-data">
+                        <input type="url" name="url" placeholder="Document URL (optional)" class="form-group" style="width: 100%; margin-bottom: 8px;">
+                        <input type="file" name="file" class="form-group" style="margin-bottom: 8px;">
+                        <input type="text" name="destination" placeholder="Destination folder" value="/" class="form-group" style="width: 100%; margin-bottom: 8px;">
+                        <button type="submit" class="btn-primary" style="width: 100%;">Import</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Result area -->
+            <div id="docs-result" style="margin-top: 16px;"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('docs-modal').close()">Close</button>
+        </div>
+    </div>
+</dialog>
+
+<!-- Versions Modal -->
+<dialog class="modal" id="versions-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Version History</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('versions-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" name="path" id="versions-path" value="">
+            <div id="versions-list"
+                 hx-get="/files/versions"
+                 hx-trigger="load"
+                 hx-vals="js:{path: document.getElementById('versions-path').value}"
+                 hx-swap="innerHTML">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading versions...</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="document.getElementById('versions-modal').close()">Close</button>
+        </div>
+    </div>
+</dialog>
+
 <!-- Context Menu -->
 <div class="context-menu" id="context-menu" style="display: none;">
     <button class="context-item" data-action="open">
@@ -401,7 +748,8 @@
         </svg>
         Download
     </button>
-    <button class="context-item" data-action="share">
+    <button class="context-item" data-action="share"
+            onclick="document.getElementById('context-menu').style.display='none'; document.getElementById('permissions-modal').showModal();">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="18" cy="5" r="3"></circle>
             <circle cx="6" cy="12" r="3"></circle>
@@ -419,7 +767,16 @@
         </svg>
         Rename
     </button>
-    <button class="context-item" data-action="move">
+    <button class="context-item" data-action="copy"
+            onclick="document.getElementById('context-menu').style.display='none'; document.getElementById('copy-modal').showModal();">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        Copy to
+    </button>
+    <button class="context-item" data-action="move"
+            onclick="document.getElementById('context-menu').style.display='none'; document.getElementById('move-modal').showModal();">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
         </svg>
@@ -430,6 +787,14 @@
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
         </svg>
         Add to starred
+    </button>
+    <button class="context-item" data-action="versions"
+            onclick="document.getElementById('context-menu').style.display='none'; document.getElementById('versions-modal').showModal(); htmx.trigger('#versions-list', 'load');">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        Version history
     </button>
     <div class="context-divider"></div>
     <button class="context-item danger" data-action="delete">
@@ -568,6 +933,91 @@
     .storage-details {
         font-size: 12px;
         color: var(--text-secondary);
+    }
+
+    /* Document Tools Grid */
+    .docs-tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+    }
+
+    .docs-tool-card {
+        background: var(--surface-hover);
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid var(--border);
+    }
+
+    .docs-tool-card h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0 0 8px 0;
+    }
+
+    .docs-tool-card h3 svg {
+        color: var(--primary);
+    }
+
+    .docs-tool-card p {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin: 0 0 12px 0;
+    }
+
+    .docs-tool-card input[type="file"] {
+        font-size: 12px;
+        padding: 8px;
+        border: 1px dashed var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .docs-tool-card input[type="text"],
+    .docs-tool-card input[type="url"] {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--text);
+        font-size: 13px;
+    }
+
+    .docs-tool-card input[type="text"]:focus,
+    .docs-tool-card input[type="url"]:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    /* Sync Panel */
+    .sync-panel {
+        padding: 16px;
+        background: var(--surface-hover);
+        border-radius: 12px;
+        margin-top: 12px;
+    }
+
+    .sync-panel .storage-header {
+        margin-bottom: 8px;
+    }
+
+    .sync-actions button {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .sync-actions button:hover {
+        background: var(--surface-hover);
+        border-color: var(--primary);
     }
 
     /* Main Content */
@@ -1362,4 +1812,121 @@
     }
 </style>
 
-<script
+<script>
+    // View toggle
+    function setView(view) {
+        const grid = document.getElementById('file-grid');
+        const gridBtn = document.getElementById('grid-view-btn');
+        const listBtn = document.getElementById('list-view-btn');
+
+        if (view === 'list') {
+            grid.classList.add('list-view');
+            listBtn.classList.add('active');
+            gridBtn.classList.remove('active');
+        } else {
+            grid.classList.remove('list-view');
+            gridBtn.classList.add('active');
+            listBtn.classList.remove('active');
+        }
+    }
+
+    // Navigation active state
+    function setActiveNav(el) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    // Info panel toggle
+    function toggleInfoPanel() {
+        const panel = document.getElementById('info-panel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Selection handling
+    function updateSelection() {
+        const checked = document.querySelectorAll('.file-checkbox:checked');
+        const count = checked.length;
+        const bar = document.getElementById('selection-bar');
+        const countEl = document.getElementById('selected-count');
+
+        countEl.textContent = count;
+        bar.style.display = count > 0 ? 'flex' : 'none';
+
+        // Update hidden inputs for copy/move modals
+        const paths = Array.from(checked).map(cb => cb.value).join(',');
+        document.getElementById('copy-source').value = paths;
+        document.getElementById('move-source').value = paths;
+    }
+
+    function clearSelection() {
+        document.querySelectorAll('.file-checkbox:checked').forEach(cb => {
+            cb.checked = false;
+        });
+        updateSelection();
+    }
+
+    // File upload handling
+    function triggerUpload() {
+        document.getElementById('file-input').click();
+    }
+
+    // Context menu handling
+    let contextTarget = null;
+
+    document.addEventListener('contextmenu', function(e) {
+        const fileCard = e.target.closest('.file-card');
+        if (fileCard) {
+            e.preventDefault();
+            contextTarget = fileCard;
+            const menu = document.getElementById('context-menu');
+            menu.style.display = 'block';
+            menu.style.left = e.pageX + 'px';
+            menu.style.top = e.pageY + 'px';
+
+            // Update copy/move/permissions/versions source for single file
+            const filePath = fileCard.dataset.path || '';
+            document.getElementById('copy-source').value = filePath;
+            document.getElementById('move-source').value = filePath;
+            document.getElementById('permissions-path').value = filePath;
+            document.getElementById('versions-path').value = filePath;
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('context-menu');
+        if (!menu.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    });
+
+    // Drag and drop
+    const dropOverlay = document.getElementById('drop-overlay');
+
+    document.addEventListener('dragenter', function(e) {
+        e.preventDefault();
+        dropOverlay.classList.add('visible');
+    });
+
+    dropOverlay.addEventListener('dragleave', function(e) {
+        if (e.target === dropOverlay) {
+            dropOverlay.classList.remove('visible');
+        }
+    });
+
+    dropOverlay.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropOverlay.classList.remove('visible');
+        // Handle file drop via HTMX
+    });
+
+    dropOverlay.addEventListener('dragover', function(e) {
+        e.preventDefault();
+    });
+
+    // Listen for checkbox changes
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('file-checkbox')) {
+            updateSelection();
+        }
+    });
+</script>
