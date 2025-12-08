@@ -5,6 +5,14 @@
         <title>General Bots</title>
         <meta name="viewport" content="width=device-width,initial-scale=1.0" />
         <script>
+            // BotServer URL - configurable via window.BOTSERVER_URL or defaults to same origin port 8088
+            const BOTSERVER_URL =
+                window.BOTSERVER_URL || "http://localhost:8088";
+            const BOTSERVER_WS_URL = BOTSERVER_URL.replace(
+                "https://",
+                "wss://",
+            ).replace("http://", "ws://");
+
             // Message Type Constants inline since we don't have a /shared route
             const MessageType = {
                 EXTERNAL: 0,
@@ -891,10 +899,9 @@
             }
 
             function getWebSocketUrl() {
-                const p = "ws:",
-                    s = currentSessionId || crypto.randomUUID(),
+                const s = currentSessionId || crypto.randomUUID(),
                     u = currentUserId || crypto.randomUUID();
-                return `${p}//localhost:8080/ws?session_id=${s}&user_id=${u}`;
+                return `${BOTSERVER_WS_URL}/ws?session_id=${s}&user_id=${u}`;
             }
 
             async function initializeAuth() {
@@ -907,7 +914,7 @@
                         b = p.length > 0 ? p[0] : "default";
                     console.log("Bot name:", b);
                     const r = await fetch(
-                            `/api/auth?bot_name=${encodeURIComponent(b)}`,
+                            `${BOTSERVER_URL}/api/auth?bot_name=${encodeURIComponent(b)}`,
                         ),
                         a = await r.json();
                     console.log("Auth response:", a);
@@ -933,7 +940,7 @@
 
             async function loadSessions() {
                 try {
-                    const r = await fetch("http://localhost:8080/api/sessions"),
+                    const r = await fetch(`${BOTSERVER_URL}/api/sessions`),
                         s = await r.json(),
                         h = document.getElementById("history");
                     h.innerHTML = "";
@@ -953,10 +960,9 @@
 
             async function createNewSession() {
                 try {
-                    const r = await fetch(
-                            "http://localhost:8080/api/sessions",
-                            { method: "POST" },
-                        ),
+                    const r = await fetch(`${BOTSERVER_URL}/api/sessions`, {
+                            method: "POST",
+                        }),
                         s = await r.json();
                     currentSessionId = s.session_id;
                     hasReceivedInitialMessage = false;
@@ -990,9 +996,7 @@
 
             async function loadSessionHistory(s) {
                 try {
-                    const r = await fetch(
-                            "http://localhost:8080/api/sessions/" + s,
-                        ),
+                    const r = await fetch(`${BOTSERVER_URL}/api/sessions/${s}`),
                         h = await r.json(),
                         m = document.getElementById("messages");
                     m.innerHTML = "";
@@ -1523,17 +1527,14 @@
             async function startVoiceSession() {
                 if (!currentSessionId) return;
                 try {
-                    const r = await fetch(
-                            "http://localhost:8080/api/voice/start",
-                            {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    session_id: currentSessionId,
-                                    user_id: currentUserId,
-                                }),
-                            },
-                        ),
+                    const r = await fetch(`${BOTSERVER_URL}/api/voice/start`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                session_id: currentSessionId,
+                                user_id: currentUserId,
+                            }),
+                        }),
                         d = await r.json();
                     if (d.token) {
                         await connectToVoiceRoom(d.token);
@@ -1548,7 +1549,7 @@
             async function stopVoiceSession() {
                 if (!currentSessionId) return;
                 try {
-                    await fetch("http://localhost:8080/api/voice/stop", {
+                    await fetch(`${BOTSERVER_URL}/api/voice/stop`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ session_id: currentSessionId }),
@@ -1568,8 +1569,7 @@
             async function connectToVoiceRoom(t) {
                 try {
                     const r = new LiveKitClient.Room(),
-                        p = "ws:",
-                        u = `${p}//localhost:8080/voice`;
+                        u = `${BOTSERVER_WS_URL}/voice`;
                     await r.connect(u, t);
 
                     voiceRoom = r;

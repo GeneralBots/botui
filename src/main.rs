@@ -16,7 +16,11 @@ async fn main() -> std::io::Result<()> {
 
     let app = ui_server::configure_router();
 
-    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], 3000));
+    let port: u16 = std::env::var("BOTUI_PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(3001);
+    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(addr).await?;
     info!("UI server listening on {}", addr);
 
