@@ -402,6 +402,63 @@ pub fn configure_router() -> Router {
             "/tasks",
             tower_http::services::ServeDir::new(suite_path.join("tasks")),
         )
+        // Additional app routes
+        .nest_service(
+            "/paper",
+            tower_http::services::ServeDir::new(suite_path.join("paper")),
+        )
+        .nest_service(
+            "/calendar",
+            tower_http::services::ServeDir::new(suite_path.join("calendar")),
+        )
+        .nest_service(
+            "/research",
+            tower_http::services::ServeDir::new(suite_path.join("research")),
+        )
+        .nest_service(
+            "/meet",
+            tower_http::services::ServeDir::new(suite_path.join("meet")),
+        )
+        .nest_service(
+            "/analytics",
+            tower_http::services::ServeDir::new(suite_path.join("analytics")),
+        )
+        .nest_service(
+            "/monitoring",
+            tower_http::services::ServeDir::new(suite_path.join("monitoring")),
+        )
+        .nest_service(
+            "/admin",
+            tower_http::services::ServeDir::new(suite_path.join("admin")),
+        )
+        .nest_service(
+            "/auth",
+            tower_http::services::ServeDir::new(suite_path.join("auth")),
+        )
+        .nest_service(
+            "/settings",
+            tower_http::services::ServeDir::new(suite_path.join("settings")),
+        )
+        .nest_service(
+            "/sources",
+            tower_http::services::ServeDir::new(suite_path.join("sources")),
+        )
+        .nest_service(
+            "/tools",
+            tower_http::services::ServeDir::new(suite_path.join("tools")),
+        )
+        .nest_service(
+            "/assets",
+            tower_http::services::ServeDir::new(suite_path.join("assets")),
+        )
+        .nest_service(
+            "/partials",
+            tower_http::services::ServeDir::new(suite_path.join("partials")),
+        )
+        .nest_service(
+            "/attendant",
+            tower_http::services::ServeDir::new(suite_path.join("attendant")),
+        )
         // Fallback for other static files (serve suite by default)
         .fallback_service(
             tower_http::services::ServeDir::new(suite_path.clone()).fallback(
