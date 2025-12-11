@@ -14,9 +14,9 @@ use std::{fs, path::PathBuf};
 
 use crate::shared::AppState;
 
-/// Serve the index page (minimal UI)
+/// Serve the index page (suite UI)
 pub async fn index() -> impl IntoResponse {
-    serve_minimal().await
+    serve_suite().await
 }
 
 /// Handler for minimal UI
@@ -85,7 +85,7 @@ async fn api_health() -> (StatusCode, axum::Json<serde_json::Value>) {
 /// Configure and return the main router
 pub fn configure_router() -> Router {
     let suite_path = PathBuf::from("./ui/suite");
-    let minimal_path = PathBuf::from("./ui/minimal");
+    let _minimal_path = PathBuf::from("./ui/minimal");
     let state = AppState::new();
 
     Router::new()
@@ -154,10 +154,10 @@ pub fn configure_router() -> Router {
             "/tasks",
             tower_http::services::ServeDir::new(suite_path.join("tasks")),
         )
-        // Fallback for other static files
+        // Fallback for other static files (serve suite by default)
         .fallback_service(
-            tower_http::services::ServeDir::new(minimal_path.clone()).fallback(
-                tower_http::services::ServeDir::new(minimal_path)
+            tower_http::services::ServeDir::new(suite_path.clone()).fallback(
+                tower_http::services::ServeDir::new(suite_path)
                     .append_index_html_on_directories(true),
             ),
         )
