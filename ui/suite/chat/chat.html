@@ -1,47 +1,209 @@
-<div class="chat-layout" id="chat-app" hx-ext="ws" ws-connect="/ws">
+<link rel="stylesheet" href="/chat/chat.css" />
+<script>
+    // WebSocket URL - use relative path to go through botui proxy
+    const WS_BASE_URL = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const WS_URL = `${WS_BASE_URL}${window.location.host}`;
+    
+    // Message Type Constants
+    const MessageType = { EXTERNAL: 0, USER: 1, BOT_RESPONSE: 2, CONTINUE: 3, SUGGESTION: 4, CONTEXT_CHANGE: 5 };
+    
+    // State
+    let ws = null, currentSessionId = null, currentUserId = null, currentBotId = "default";
+    let isStreaming = false, streamingMessageId = null, currentStreamingContent = "";
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+    
+    // Initialize auth and WebSocket
+    async function initChat() {
+        try {
+            updateConnectionStatus('connecting');
+            const botName = 'default';
+            // Use the botui proxy for auth (handles SSL cert issues)
+            const response = await fetch(`/api/auth?bot_name=${encodeURIComponent(botName)}`);
+            const auth = await response.json();
+            currentUserId = auth.user_id;
+            currentSessionId = auth.session_id;
+            currentBotId = auth.bot_id || "default";
+            console.log("Auth:", { currentUserId, currentSessionId, currentBotId });
+            connectWebSocket();
+        } catch (e) {
+            console.error("Auth failed:", e);
+            updateConnectionStatus('disconnected');
+            setTimeout(initChat, 3000);
+        }
+    }
+    
+    function connectWebSocket() {
+        if (ws) ws.close();
+        // Use the botui proxy for WebSocket (handles SSL cert issues)
+        const url = `${WS_URL}/ws?session_id=${currentSessionId}&user_id=${currentUserId}`;
+        ws = new WebSocket(url);
+        
+        ws.onopen = () => {
+            console.log("WebSocket connected");
+            updateConnectionStatus('connected');
+            reconnectAttempts = 0;
+        };
+        
+        ws.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.type === 'connected') return;
+                if (data.message_type === MessageType.BOT_RESPONSE) {
+                    processMessage(data);
+                }
+            } catch (e) {
+                console.error("WS message error:", e);
+            }
+        };
+        
+        ws.onclose = () => {
+            updateConnectionStatus('disconnected');
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                setTimeout(connectWebSocket, 1000 * reconnectAttempts);
+            }
+        };
+        
+        ws.onerror = (e) => console.error("WebSocket error:", e);
+    }
+    
+    function processMessage(data) {
+        if (data.is_complete) {
+            if (isStreaming) {
+                finalizeStreaming();
+            } else {
+                addMessage('bot', data.content);
+            }
+            isStreaming = false;
+        } else {
+            if (!isStreaming) {
+                isStreaming = true;
+                streamingMessageId = 'streaming-' + Date.now();
+                currentStreamingContent = data.content || '';
+                addMessage('bot', currentStreamingContent, streamingMessageId);
+            } else {
+                currentStreamingContent += data.content || '';
+                updateStreaming(currentStreamingContent);
+            }
+        }
+    }
+    
+    function addMessage(sender, content, msgId = null) {
+        const messages = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = `message ${sender}`;
+        if (msgId) div.id = msgId;
+        
+        if (sender === 'user') {
+            div.innerHTML = `<div class="message-content user-message">${escapeHtml(content)}</div>`;
+        } else {
+            div.innerHTML = `<div class="message-content bot-message">${marked.parse(content)}</div>`;
+        }
+        messages.appendChild(div);
+        messages.scrollTop = messages.scrollHeight;
+    }
+    
+    function updateStreaming(content) {
+        const el = document.getElementById(streamingMessageId);
+        if (el) el.querySelector('.message-content').innerHTML = marked.parse(content);
+    }
+    
+    function finalizeStreaming() {
+        const el = document.getElementById(streamingMessageId);
+        if (el) {
+            el.querySelector('.message-content').innerHTML = marked.parse(currentStreamingContent);
+            el.removeAttribute('id');
+        }
+        streamingMessageId = null;
+        currentStreamingContent = '';
+    }
+    
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const content = input.value.trim();
+        if (!content || !ws || ws.readyState !== WebSocket.OPEN) return;
+        
+        addMessage('user', content);
+        
+        ws.send(JSON.stringify({
+            bot_id: currentBotId,
+            user_id: currentUserId,
+            session_id: currentSessionId,
+            channel: 'web',
+            content: content,
+            message_type: MessageType.USER,
+            timestamp: new Date().toISOString()
+        }));
+        
+        input.value = '';
+        input.focus();
+    }
+    
+    function updateConnectionStatus(status) {
+        const el = document.getElementById('connectionStatus');
+        if (el) el.className = `connection-status ${status}`;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Initialize chat - runs immediately when script is executed
+    // (works both on full page load and HTMX partial load)
+    function setupChat() {
+        const input = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        if (sendBtn) sendBtn.onclick = sendMessage;
+        if (input) {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
+        }
+        
+        initChat();
+    }
+    
+    // Initialize after a micro-delay to ensure DOM is ready
+    // This works for both full page loads and HTMX partial loads
+    setTimeout(() => {
+        if (document.getElementById('messageInput') && !window.chatInitialized) {
+            window.chatInitialized = true;
+            setupChat();
+        }
+    }, 0);
+    
+    // Fallback for full page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.chatInitialized) {
+                window.chatInitialized = true;
+                setupChat();
+            }
+        });
+    }
+</script>
+
+<div class="chat-layout" id="chat-app">
     <div id="connectionStatus" class="connection-status disconnected"></div>
-    <main
-        id="messages"
-        hx-get="/api/sessions/current/history"
-        hx-trigger="load"
-        hx-swap="innerHTML"
-    ></main>
+    <main id="messages"></main>
 
     <footer>
-        <div
-            class="suggestions-container"
-            id="suggestions"
-            hx-get="/api/suggestions"
-            hx-trigger="load"
-            hx-swap="innerHTML"
-        ></div>
-        <form
-            class="input-container"
-            hx-post="/api/sessions/current/message"
-            hx-target="#messages"
-            hx-swap="beforeend"
-            hx-on::after-request="this.reset()"
-        >
+        <div class="suggestions-container" id="suggestions"></div>
+        <div class="input-container">
             <input
                 name="content"
                 id="messageInput"
                 type="text"
                 placeholder="Message..."
                 autofocus
-                required
             />
-            <button
-                type="button"
-                id="voiceBtn"
-                title="Voice"
-                hx-post="/api/voice/start"
-                hx-swap="none"
-            >
-                🎤
-            </button>
-            <button type="submit" id="sendBtn" title="Send">↑</button>
-        </form>
+            <button type="button" id="voiceBtn" title="Voice">🎤</button>
+            <button type="button" id="sendBtn" title="Send">↑</button>
+        </div>
     </footer>
     <button class="scroll-to-bottom" id="scrollToBottom">↓</button>
-    <div class="flash-overlay" id="flashOverlay"></div>
 </div>
