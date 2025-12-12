@@ -19,7 +19,7 @@ use serde::Deserialize;
 use std::{fs, path::PathBuf};
 use tokio_tungstenite::{
     connect_async_tls_with_config,
-    tungstenite::{self, protocol::Message as TungsteniteMessage},
+    tungstenite::protocol::Message as TungsteniteMessage,
 };
 
 use crate::shared::AppState;
@@ -102,17 +102,17 @@ async fn proxy_api(
     let query = original_uri.query().map(|q| format!("?{}", q)).unwrap_or_default();
     let method = req.method().clone();
     let headers = req.headers().clone();
-    
+
     let target_url = format!("{}{}{}", state.client.base_url(), path, query);
     debug!("Proxying {} {} to {}", method, path, target_url);
-    
+
     // Build the proxied request with self-signed cert support
     let client = reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
         .build()
         .unwrap_or_else(|_| reqwest::Client::new());
     let mut proxy_req = client.request(method.clone(), &target_url);
-    
+
     // Copy headers (excluding host)
     for (name, value) in headers.iter() {
         if name != "host" {
@@ -121,7 +121,7 @@ async fn proxy_api(
             }
         }
     }
-    
+
     // Copy body for non-GET requests
     let body_bytes = match axum::body::to_bytes(req.into_body(), usize::MAX).await {
         Ok(bytes) => bytes,
@@ -133,26 +133,26 @@ async fn proxy_api(
                 .unwrap();
         }
     };
-    
+
     if !body_bytes.is_empty() {
         proxy_req = proxy_req.body(body_bytes.to_vec());
     }
-    
+
     // Execute the request
     match proxy_req.send().await {
         Ok(resp) => {
             let status = resp.status();
             let headers = resp.headers().clone();
-            
+
             match resp.bytes().await {
                 Ok(body) => {
                     let mut response = Response::builder().status(status);
-                    
+
                     // Copy response headers
                     for (name, value) in headers.iter() {
                         response = response.header(name, value);
                     }
-                    
+
                     response.body(Body::from(body)).unwrap_or_else(|_| {
                         Response::builder()
                             .status(StatusCode::INTERNAL_SERVER_ERROR)
@@ -221,18 +221,18 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         params.session_id,
         params.user_id
     );
-    
+
     info!("Proxying WebSocket to: {}", backend_url);
-    
+
     // Create TLS connector that accepts self-signed certs
     let tls_connector = native_tls::TlsConnector::builder()
         .danger_accept_invalid_certs(true)
         .danger_accept_invalid_hostnames(true)
         .build()
         .expect("Failed to build TLS connector");
-    
+
     let connector = tokio_tungstenite::Connector::NativeTls(tls_connector);
-    
+
     // Connect to backend WebSocket
     let backend_result = connect_async_tls_with_config(
         &backend_url,
@@ -240,7 +240,7 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         false,
         Some(connector),
     ).await;
-    
+
     let backend_socket = match backend_result {
         Ok((socket, _)) => socket,
         Err(e) => {
@@ -248,13 +248,13 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
             return;
         }
     };
-    
+
     info!("Connected to backend WebSocket");
-    
+
     // Split both sockets
     let (mut client_tx, mut client_rx) = client_socket.split();
     let (mut backend_tx, mut backend_rx) = backend_socket.split();
-    
+
     // Forward messages from client to backend
     let client_to_backend = async {
         while let Some(msg) = client_rx.next().await {
@@ -283,7 +283,7 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
             }
         }
     };
-    
+
     // Forward messages from backend to client
     let backend_to_client = async {
         while let Some(msg) = backend_rx.next().await {
@@ -313,7 +313,7 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
             }
         }
     };
-    
+
     // Run both forwarding tasks concurrently
     tokio::select! {
         _ = client_to_backend => info!("Client connection closed"),
@@ -321,7 +321,7 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
     }
 }
 
-/// Create WebSocket proxy router  
+/// Create WebSocket proxy router
 fn create_ws_router() -> Router<AppState> {
     Router::new()
         .fallback(get(ws_proxy))
