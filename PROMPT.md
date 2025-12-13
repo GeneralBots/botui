@@ -135,6 +135,35 @@ botbook/       # Documentation
 - NO custom JavaScript where HTMX can handle it
 ```
 
+### JavaScript Usage Guidelines
+
+**JS is ONLY acceptable when HTMX cannot handle the requirement:**
+
+| Use Case | Solution |
+|----------|----------|
+| Data fetching | HTMX `hx-get`, `hx-post` |
+| Form submission | HTMX `hx-post`, `hx-put` |
+| Real-time updates | HTMX WebSocket extension `hx-ext="ws"` |
+| Content swapping | HTMX `hx-target`, `hx-swap` |
+| Polling | HTMX `hx-trigger="every 5s"` |
+| Loading states | HTMX `hx-indicator` |
+| **Modal show/hide** | **JS required** - DOM manipulation |
+| **Toast notifications** | **JS required** - dynamic element creation |
+| **Clipboard operations** | **JS required** - `navigator.clipboard` API |
+| **Keyboard shortcuts** | **JS required** - `keydown` event handling |
+| **WebSocket state mgmt** | **JS required** - connection lifecycle |
+| **Complex animations** | **JS required** - GSAP or custom |
+| **Client-side validation** | **JS required** - before submission UX |
+
+**When writing JS:**
+```
+- Keep it minimal - one function per concern
+- No frameworks (React, Vue, etc.) - vanilla JS only
+- Use vendor libs sparingly (htmx, marked, gsap, alpine)
+- All JS must work with HTMX lifecycle (htmx:afterSwap, etc.)
+- Prefer CSS for animations when possible
+```
+
 ### Local Assets Only
 
 All external libraries are bundled locally - NEVER use CDN:
@@ -346,7 +375,7 @@ grep -r "unpkg.com\|cdnjs\|jsdelivr" ui/
 ```
 src/main.rs           # Entry point, mode detection
 src/lib.rs            # Feature-gated exports
-src/http_client.rs    # BotServerClient wrapper
+src/http_client.rs    # botserverClient wrapper
 src/ui_server/mod.rs  # Axum router, static files
 ui/suite/index.html   # Main UI entry
 ui/suite/base.html    # Base template
