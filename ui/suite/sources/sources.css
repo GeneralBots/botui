@@ -525,7 +525,9 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Empty State */
@@ -651,7 +653,402 @@
     color: var(--text-secondary);
 }
 
+/* Repository Card */
+.repo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.repo-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.repo-card.connected {
+    border-color: var(--success);
+}
+
+.repo-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.repo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.repo-icon svg {
+    width: 20px;
+    height: 20px;
+    color: white;
+}
+
+.repo-icon.github {
+    background: linear-gradient(135deg, #24292e, #40464e);
+}
+
+.repo-icon.gitlab {
+    background: linear-gradient(135deg, #fc6d26, #e24329);
+}
+
+.repo-icon.bitbucket {
+    background: linear-gradient(135deg, #0052cc, #2684ff);
+}
+
+.repo-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.repo-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.repo-name .mention-tag {
+    font-size: 12px;
+    color: var(--primary);
+    background: var(--primary-bg);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.repo-owner {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.repo-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.repo-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.repo-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.repo-meta-item svg {
+    width: 14px;
+    height: 14px;
+}
+
+.repo-language {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.repo-language-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.repo-language-dot.rust {
+    background: #dea584;
+}
+.repo-language-dot.typescript {
+    background: #3178c6;
+}
+.repo-language-dot.javascript {
+    background: #f7df1e;
+}
+.repo-language-dot.python {
+    background: #3776ab;
+}
+.repo-language-dot.html {
+    background: #e34f26;
+}
+.repo-language-dot.css {
+    background: #1572b6;
+}
+
+.repo-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.repo-status.connected {
+    background: var(--success-bg);
+    color: var(--success);
+}
+
+.repo-status.disconnected {
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+}
+
+.repo-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.repo-action-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.repo-action-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+}
+
+.repo-action-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.repo-action-btn.primary:hover {
+    background: var(--primary-hover);
+}
+
+/* App Card */
+.app-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.app-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.app-preview {
+    height: 140px;
+    background: linear-gradient(135deg, var(--surface-hover), var(--surface));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.app-preview-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+
+.app-preview-placeholder svg {
+    width: 40px;
+    height: 40px;
+}
+
+.app-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.app-content {
+    padding: 16px;
+}
+
+.app-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.app-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.app-name .mention-tag {
+    font-size: 11px;
+    color: var(--primary);
+    background: var(--primary-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.app-type {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    background: var(--surface-hover);
+    color: var(--text-secondary);
+}
+
+.app-type.htmx {
+    background: #e8f4fd;
+    color: #0284c7;
+}
+.app-type.site {
+    background: #fef3c7;
+    color: #d97706;
+}
+.app-type.dashboard {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.app-description {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.app-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.app-created {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.app-url {
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+.app-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.app-action-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.app-action-btn:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary);
+}
+
+.app-action-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Add Repository Modal */
+.add-repo-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.repo-url-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--text);
+}
+
+.repo-url-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-bg);
+}
+
 /* Grids for different content types */
+.repos-grid,
+.apps-grid,
 .templates-grid,
 .servers-grid,
 .models-grid,
@@ -661,6 +1058,8 @@
     gap: 16px;
 }
 
+.repos-grid.list-view,
+.apps-grid.list-view,
 .templates-grid.list-view,
 .servers-grid.list-view,
 .models-grid.list-view,
@@ -703,10 +1102,88 @@
     }
 
     .prompts-grid,
+    .repos-grid,
+    .apps-grid,
     .templates-grid,
     .servers-grid,
     .models-grid,
     .news-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* Mention autocomplete in chat */
+.mention-suggestion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mention-suggestion:hover,
+.mention-suggestion.active {
+    background: var(--surface-hover);
+}
+
+.mention-suggestion-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.mention-suggestion-icon.repo {
+    background: linear-gradient(135deg, #24292e, #40464e);
+    color: white;
+}
+
+.mention-suggestion-icon.app {
+    background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+    color: white;
+}
+
+.mention-suggestion-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mention-suggestion-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.mention-suggestion-type {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Inline mention tag in chat */
+.chat-mention {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: var(--primary-bg);
+    color: var(--primary);
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.chat-mention:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.chat-mention svg {
+    width: 14px;
+    height: 14px;
 }
