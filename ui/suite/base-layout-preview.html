@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BotUI Suite - Base Layout Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* =============================================================================
+   SENTIENT THEME VARIABLES
+   ============================================================================= */
+
+:root {
+    --sentient-bg-primary: #0a0a0a;
+    --sentient-bg-secondary: #111111;
+    --sentient-bg-tertiary: #1a1a1a;
+    --sentient-bg-card: #141414;
+    --sentient-bg-hover: #1f1f1f;
+    --sentient-accent: #c5f82a;
+    --sentient-accent-dim: rgba(197, 248, 42, 0.15);
+    --sentient-accent-glow: rgba(197, 248, 42, 0.3);
+    --sentient-success: #22c55e;
+    --sentient-warning: #f59e0b;
+    --sentient-error: #ef4444;
+    --sentient-info: #3b82f6;
+    --sentient-text-primary: #ffffff;
+    --sentient-text-secondary: #a1a1a1;
+    --sentient-text-muted: #6b6b6b;
+    --sentient-border: #2a2a2a;
+    --sentient-border-hover: #3a3a3a;
+    --sentient-radius-sm: 6px;
+    --sentient-radius-md: 10px;
+    --sentient-radius-lg: 16px;
+    --sentient-font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--sentient-font-family);
+    background: var(--sentient-bg-primary);
+    color: var(--sentient-text-primary);
+}
+
+/* =============================================================================
+   LAYOUT
+   ============================================================================= */
+
+.suite-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.suite-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--sentient-bg-primary);
+    border-bottom: 1px solid var(--sentient-border);
+    height: 52px;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.topbar-tabs {
+    display: flex;
+    gap: 2px;
+}
+
+.topbar-tab {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-sm);
+    color: var(--sentient-text-secondary);
+    font-family: var(--sentient-font-family);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topbar-tab:first-child {
+    border-radius: var(--sentient-radius-sm) 0 0 var(--sentient-radius-sm);
+}
+
+.topbar-tab:last-child {
+    border-radius: 0 var(--sentient-radius-sm) var(--sentient-radius-sm) 0;
+    border-left: none;
+}
+
+.topbar-tab:hover {
+    background: var(--sentient-bg-tertiary);
+    color: var(--sentient-text-primary);
+}
+
+.topbar-tab.active {
+    background: var(--sentient-bg-tertiary);
+    border-color: var(--sentient-accent);
+    color: var(--sentient-accent);
+}
+
+.topbar-app-launcher {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: var(--sentient-bg-secondary);
+    border-radius: var(--sentient-radius-lg);
+    margin-left: 16px;
+}
+
+.app-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sentient-bg-tertiary);
+    border: none;
+    border-radius: var(--sentient-radius-md);
+    color: var(--sentient-text-primary);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.app-icon:hover {
+    background: var(--sentient-bg-hover);
+    transform: scale(1.05);
+}
+
+.app-icon.active {
+    background: var(--sentient-accent-dim);
+    color: var(--sentient-accent);
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.topbar-btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--sentient-accent);
+    border: none;
+    border-radius: var(--sentient-radius-sm);
+    color: #000;
+    font-family: var(--sentient-font-family);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topbar-btn-primary:hover {
+    background: #d4ff4a;
+    box-shadow: 0 0 20px var(--sentient-accent-glow);
+}
+
+.topbar-btn-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-sm);
+    color: var(--sentient-text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.topbar-btn-icon:hover {
+    background: var(--sentient-bg-tertiary);
+    color: var(--sentient-text-primary);
+}
+
+.suite-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.suite-content-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding: 20px 24px;
+}
+
+/* =============================================================================
+   AI PANEL
+   ============================================================================= */
+
+.suite-ai-panel {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    background: var(--sentient-bg-secondary);
+    border-left: 1px solid var(--sentient-border);
+}
+
+.ai-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--sentient-border);
+}
+
+.ai-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-avatar {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sentient-accent-dim);
+    border-radius: var(--sentient-radius-md);
+    font-size: 18px;
+}
+
+.ai-panel-title h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.ai-panel-title .ai-status {
+    font-size: 11px;
+    color: var(--sentient-text-muted);
+    margin: 2px 0 0 0;
+}
+
+.ai-panel-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--sentient-radius-sm);
+    color: var(--sentient-text-muted);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.ai-panel-close:hover {
+    background: var(--sentient-bg-tertiary);
+    color: var(--sentient-text-primary);
+}
+
+.ai-panel-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ai-message {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ai-message.user { align-items: flex-end; }
+.ai-message.assistant { align-items: flex-start; }
+
+.ai-message-bubble {
+    max-width: 90%;
+    padding: 12px 14px;
+    border-radius: var(--sentient-radius-md);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.ai-message.user .ai-message-bubble {
+    background: var(--sentient-accent);
+    color: #000;
+    border-bottom-right-radius: 4px;
+}
+
+.ai-message.assistant .ai-message-bubble {
+    background: var(--sentient-bg-tertiary);
+    color: var(--sentient-text-primary);
+    border-bottom-left-radius: 4px;
+}
+
+.ai-message-action {
+    display: inline-block;
+    padding: 8px 12px;
+    background: var(--sentient-accent);
+    color: #000;
+    border-radius: var(--sentient-radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.ai-typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 14px;
+    background: var(--sentient-bg-tertiary);
+    border-radius: var(--sentient-radius-md);
+    width: fit-content;
+}
+
+.ai-typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: var(--sentient-text-muted);
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.ai-typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.ai-quick-actions {
+    padding: 12px 16px;
+    border-top: 1px solid var(--sentient-border);
+}
+
+.quick-actions-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--sentient-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.quick-actions-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.quick-action-btn {
+    padding: 6px 10px;
+    background: var(--sentient-bg-tertiary);
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-sm);
+    color: var(--sentient-text-secondary);
+    font-family: var(--sentient-font-family);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-action-btn:hover {
+    background: var(--sentient-bg-hover);
+    border-color: var(--sentient-accent);
+    color: var(--sentient-accent);
+}
+
+.ai-panel-input {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--sentient-border);
+}
+
+.ai-input {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--sentient-bg-tertiary);
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-md);
+    color: var(--sentient-text-primary);
+    font-family: var(--sentient-font-family);
+    font-size: 13px;
+}
+
+.ai-input::placeholder { color: var(--sentient-text-muted); }
+.ai-input:focus { outline: none; border-color: var(--sentient-accent); }
+
+.ai-send-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sentient-accent);
+    border: none;
+    border-radius: var(--sentient-radius-md);
+    color: #000;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.ai-send-btn:hover { background: #d4ff4a; }
+
+/* =============================================================================
+   STAT CARDS
+   ============================================================================= */
+
+.stat-cards {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--sentient-bg-card);
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-md);
+}
+
+.stat-card-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sentient-bg-tertiary);
+    border-radius: var(--sentient-radius-sm);
+    font-size: 18px;
+}
+
+.stat-card-content { flex: 1; }
+
+.stat-card-label {
+    font-size: 11px;
+    color: var(--sentient-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+}
+
+.stat-card-value {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.stat-card.highlight {
+    border-color: var(--sentient-accent);
+}
+
+.stat-card.highlight .stat-card-value {
+    color: var(--sentient-accent);
+}
+
+/* =============================================================================
+   APP HEADER
+   ============================================================================= */
+
+.app-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.app-title-section h1 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+}
+
+.app-title-section p {
+    font-size: 13px;
+    color: var(--sentient-text-muted);
+    margin: 0;
+}
+
+.app-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.app-btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: var(--sentient-accent);
+    border: none;
+    border-radius: var(--sentient-radius-sm);
+    color: #000;
+    font-family: var(--sentient-font-family);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.app-btn-primary:hover { background: #d4ff4a; }
+
+.app-btn-secondary {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--sentient-bg-tertiary);
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-sm);
+    color: var(--sentient-text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.app-btn-secondary:hover {
+    background: var(--sentient-bg-hover);
+    color: var(--sentient-text-primary);
+}
+
+/* =============================================================================
+   DATA TABLE
+   ============================================================================= */
+
+.data-table-container {
+    flex: 1;
+    background: var(--sentient-bg-card);
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-lg);
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: var(--sentient-bg-tertiary);
+}
+
+.data-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--sentient-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--sentient-border);
+}
+
+.data-table td {
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--sentient-text-primary);
+    border-bottom: 1px solid var(--sentient-border);
+}
+
+.data-table tbody tr:hover {
+    background: var(--sentient-bg-tertiary);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-badge.active {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--sentient-success);
+}
+
+.status-badge.pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--sentient-warning);
+}
+
+.status-badge.inactive {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--sentient-error);
+}
+
+.table-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.table-action-btn {
+    padding: 6px 12px;
+    background: var(--sentient-bg-tertiary);
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-sm);
+    color: var(--sentient-text-secondary);
+    font-family: var(--sentient-font-family);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.table-action-btn:hover {
+    background: var(--sentient-bg-hover);
+    color: var(--sentient-text-primary);
+}
+
+.table-action-btn.delete {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: var(--sentient-error);
+}
+
+.table-action-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.data-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--sentient-bg-tertiary);
+    border-top: 1px solid var(--sentient-border);
+}
+
+.pagination-info {
+    font-size: 12px;
+    color: var(--sentient-text-muted);
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pagination-btn {
+    padding: 6px 12px;
+    background: var(--sentient-bg-card);
+    border: 1px solid var(--sentient-border);
+    border-radius: var(--sentient-radius-sm);
+    color: var(--sentient-text-secondary);
+    font-family: var(--sentient-font-family);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.pagination-btn:hover {
+    background: var(--sentient-bg-hover);
+    color: var(--sentient-text-primary);
+}
+
+.pagination-btn.active {
+    background: var(--sentient-accent);
+    border-color: var(--sentient-accent);
+    color: #000;
+}
+
+/* =============================================================================
+   SCROLLBAR
+   ============================================================================= */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--sentient-bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--sentient-bg-tertiary); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sentient-border-hover); }
+
+    </style>
+</head>
+<body>
+    <div class="suite-app">
+        <!-- Top Header Bar -->
+        <header class="suite-topbar">
+            <div class="topbar-left">
+                <nav class="topbar-tabs">
+                    <button class="topbar-tab active">Dashboard</button>
+                    <button class="topbar-tab">Analytics</button>
+                </nav>
+                
+                <div class="topbar-app-launcher">
+                    <button class="app-icon" data-app="chat" title="Chat">💬</button>
+                    <button class="app-icon active" data-app="files" title="Files">📁</button>
+                    <button class="app-icon" data-app="terminal" title="Terminal">⌨️</button>
+                    <button class="app-icon" data-app="tasks" title="Tasks">✓</button>
+                    <button class="app-icon" data-app="calendar" title="Calendar">📅</button>
+                    <button class="app-icon" data-app="docs" title="Docs">📄</button>
+                    <button class="app-icon" data-app="settings" title="Settings">⚙️</button>
+                </div>
+            </div>
+            
+            <div class="topbar-right">
+                <button class="topbar-btn-primary">✨ New Intent</button>
+                <button class="topbar-btn-icon" title="Settings">⚙️</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="suite-main">
+            <!-- Left: Content Panel -->
+            <section class="suite-content-panel">
+                <!-- Stat Cards -->
+                <div class="stat-cards">
+                    <div class="stat-card highlight">
+                        <div class="stat-card-icon">📊</div>
+                        <div class="stat-card-content">
+                            <div class="stat-card-label">Total Records</div>
+                            <div class="stat-card-value">12,847</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">✅</div>
+                        <div class="stat-card-content">
+                            <div class="stat-card-label">Active</div>
+                            <div class="stat-card-value">8,234</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">⏳</div>
+                        <div class="stat-card-content">
+                            <div class="stat-card-label">Pending</div>
+                            <div class="stat-card-value">2,156</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">📈</div>
+                        <div class="stat-card-content">
+                            <div class="stat-card-label">Growth</div>
+                            <div class="stat-card-value">+24%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Header -->
+                <div class="app-header">
+                    <div class="app-title-section">
+                        <h1>Files Manager</h1>
+                        <p>Manage your documents and media files</p>
+                    </div>
+                    <div class="app-actions">
+                        <button class="app-btn-primary">+ Upload File</button>
+                        <button class="app-btn-secondary">🔍</button>
+                        <button class="app-btn-secondary">⋯</button>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Size</th>
+                                <th>Modified</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>project-report.pdf</td>
+                                <td>PDF Document</td>
+                                <td>2.4 MB</td>
+                                <td>Dec 13, 2025</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn">View</button>
+                                        <button class="table-action-btn">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>dashboard-mockup.fig</td>
+                                <td>Figma File</td>
+                                <td>8.1 MB</td>
+                                <td>Dec 12, 2025</td>
+                                <td><span class="status-badge pending">Pending</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn">View</button>
+                                        <button class="table-action-btn">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>api-documentation.md</td>
+                                <td>Markdown</td>
+                                <td>156 KB</td>
+                                <td>Dec 11, 2025</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn">View</button>
+                                        <button class="table-action-btn">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>backup-2025-12.zip</td>
+                                <td>Archive</td>
+                                <td>45.2 MB</td>
+                                <td>Dec 10, 2025</td>
+                                <td><span class="status-badge inactive">Archived</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn">View</button>
+                                        <button class="table-action-btn">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>user-analytics.csv</td>
+                                <td>Spreadsheet</td>
+                                <td>890 KB</td>
+                                <td>Dec 9, 2025</td>
+                                <td><span class="status-badge active">Active</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn">View</button>
+                                        <button class="table-action-btn">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="data-table-footer">
+                        <span class="pagination-info">Showing 1-5 of 847 files</span>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn">←</button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn">2</button>
+                            <button class="pagination-btn">3</button>
+                            <button class="pagination-btn">...</button>
+                            <button class="pagination-btn">170</button>
+                            <button class="pagination-btn">→</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right: AI Assistant Panel -->
+            <aside class="suite-ai-panel">
+                <div class="ai-panel-header">
+                    <div class="ai-panel-title">
+                        <span class="ai-avatar">🤖</span>
+                        <div>
+                            <h3>AI Developer</h3>
+                            <p class="ai-status">Desenvolvendo: CRM Deloitte</p>
+                        </div>
+                    </div>
+                    <button class="ai-panel-close">✕</button>
+                </div>
+
+                <div class="ai-panel-messages" id="ai-messages">
+                    <div class="ai-message assistant">
+                        <div class="ai-message-bubble">Olá! Sou o AI Developer. Como posso ajudar você hoje?</div>
+                    </div>
+                    <div class="ai-message assistant">
+                        <div class="ai-message-bubble">Você pode me pedir para modificar campos, alterar cores, adicionar validações ou qualquer outra mudança no sistema.</div>
+                    </div>
+                    <div class="ai-message user">
+                        <div class="ai-message-bubble">Adicione um campo de telefone no formulário de cadastro</div>
+                    </div>
+                    <div class="ai-message assistant">
+                        <div class="ai-message-bubble">Perfeito! Adicionei o campo de telefone com máscara automática e validação de formato brasileiro.</div>
+                        <span class="ai-message-action">Ver alterações</span>
+                    </div>
+                </div>
+
+                <div class="ai-quick-actions">
+                    <span class="quick-actions-label">AÇÕES RÁPIDAS</span>
+                    <div class="quick-actions-grid">
+                        <button class="quick-action-btn">Adicionar campo</button>
+                        <button class="quick-action-btn">Mudar cor</button>
+                        <button class="quick-action-btn">Adicionar validação</button>
+                        <button class="quick-action-btn">Exportar dados</button>
+                    </div>
+                </div>
+
+                <div class="ai-panel-input">
+                    <input type="text" class="ai-input" placeholder="Digite suas modificações..." id="ai-input">
+                    <button class="ai-send-btn">➤</button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.topbar-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.topbar-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // App icon switching
+        document.querySelectorAll('.app-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                document.querySelectorAll('.app-icon').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Quick actions
+        document.querySelectorAll('.quick-action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.textContent;
+                addMessage('user', action);
+                setTimeout(() => {
+                    addMessage('assistant', `Ação "${action}" executada com sucesso!`);
+                }, 1000);
+            });
+        });
+
+        // Send message
+        document.querySelector('.ai-send-btn').addEventListener('click', sendMessage);
+        document.getElementById('ai-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('ai-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            setTimeout(() => {
+                addMessage('assistant', `Entendido! Processando: "${message}"`);
+            }, 1500);
+        }
+
+        function addMessage(type, content) {
+            const container = document.getElementById('ai-messages');
+            const div = document.createElement('div');
+            div.className = `ai-message ${type}`;
+            div.innerHTML = `<div class="ai-message-bubble">${content}</div>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>

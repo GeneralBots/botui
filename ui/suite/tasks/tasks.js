@@ -1,226 +1,657 @@
-/* Tasks page JavaScript */
+/* =============================================================================
+   TASKS APP JAVASCRIPT
+   Automated Intelligent Task Management Interface
+   ============================================================================= */
 
-// Set active tab
-function setActiveTab(button) {
-    document.querySelectorAll(".filter-tab").forEach((tab) => {
-        tab.classList.remove("active");
+// =============================================================================
+// STATE MANAGEMENT
+// =============================================================================
+
+const TasksState = {
+  selectedTaskId: 2, // Default selected task
+  currentFilter: "complete",
+  tasks: [],
+  wsConnection: null,
+  agentLogPaused: false,
+};
+
+// =============================================================================
+// INITIALIZATION
+// =============================================================================
+
+document.addEventListener("DOMContentLoaded", function () {
+  initTasksApp();
+});
+
+function initTasksApp() {
+  // Initialize WebSocket for real-time updates
+  initWebSocket();
+
+  // Setup event listeners
+  setupEventListeners();
+
+  // Setup keyboard shortcuts
+  setupKeyboardShortcuts();
+
+  // Auto-scroll agent log to bottom
+  scrollAgentLogToBottom();
+
+  console.log("[Tasks] Initialized");
+}
+
+// =============================================================================
+// WEBSOCKET CONNECTION
+// =============================================================================
+
+function initWebSocket() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsUrl = `${protocol}//${window.location.host}/ws/tasks`;
+
+  try {
+    TasksState.wsConnection = new WebSocket(wsUrl);
+
+    TasksState.wsConnection.onopen = function () {
+      console.log("[Sentient Tasks] WebSocket connected");
+      addAgentLog("info", "[SYSTEM] Connected to task orchestrator");
+    };
+
+    TasksState.wsConnection.onmessage = function (event) {
+      handleWebSocketMessage(JSON.parse(event.data));
+    };
+
+    TasksState.wsConnection.onclose = function () {
+      console.log("[Sentient Tasks] WebSocket disconnected, reconnecting...");
+      setTimeout(initWebSocket, 5000);
+    };
+
+    TasksState.wsConnection.onerror = function (error) {
+      console.error("[Sentient Tasks] WebSocket error:", error);
+    };
+  } catch (e) {
+    console.warn("[Sentient Tasks] WebSocket not available");
+  }
+}
+
+function handleWebSocketMessage(data) {
+  switch (data.type) {
+    case "task_update":
+      updateTaskCard(data.task);
+      if (data.task.id === TasksState.selectedTaskId) {
+        updateTaskDetail(data.task);
+      }
+      break;
+    case "step_progress":
+      updateStepProgress(data.taskId, data.step);
+      break;
+    case "agent_log":
+      addAgentLog(data.level, data.message);
+      break;
+    case "decision_required":
+      showDecisionRequired(data.decision);
+      break;
+    case "task_completed":
+      onTaskCompleted(data.task);
+      break;
+    case "task_failed":
+      onTaskFailed(data.task, data.error);
+      break;
+  }
+}
+
+// =============================================================================
+// EVENT LISTENERS
+// =============================================================================
+
+function setupEventListeners() {
+  // Filter pills
+  document.querySelectorAll(".status-pill").forEach((pill) => {
+    pill.addEventListener("click", function (e) {
+      e.preventDefault();
+      const filter = this.dataset.filter;
+      setActiveFilter(filter, this);
     });
-    button.classList.add("active");
+  });
+
+  // Search input
+  const searchInput = document.querySelector(".topbar-search-input");
+  if (searchInput) {
+    searchInput.addEventListener(
+      "input",
+      debounce(function (e) {
+        searchTasks(e.target.value);
+      }, 300),
+    );
+  }
+
+  // Nav items
+  document.querySelectorAll(".topbar-nav-item").forEach((item) => {
+    item.addEventListener("click", function () {
+      document
+        .querySelectorAll(".topbar-nav-item")
+        .forEach((i) => i.classList.remove("active"));
+      this.classList.add("active");
+    });
+  });
+
+  // Progress log toggle
+  const logToggle = document.querySelector(".progress-log-toggle");
+  if (logToggle) {
+    logToggle.addEventListener("click", toggleProgressLog);
+  }
 }
 
-// Export tasks as JSON
-function exportTasks() {
-    fetch("/api/tasks?format=json")
-        .then((response) => response.json())
-        .then((tasks) => {
-            const dataStr = JSON.stringify(tasks, null, 2);
-            const dataUri =
-                "data:application/json;charset=utf-8," +
-                encodeURIComponent(dataStr);
+function setupKeyboardShortcuts() {
+  document.addEventListener("keydown", function (e) {
+    // Escape: Deselect task
+    if (e.key === "Escape") {
+      deselectTask();
+    }
 
-            const exportFileDefaultName = `tasks-${new Date().toISOString().split("T")[0]}.json`;
+    // Cmd/Ctrl + K: Focus search
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      e.preventDefault();
+      document.querySelector(".topbar-search-input")?.focus();
+    }
 
-            const linkElement = document.createElement("a");
-            linkElement.setAttribute("href", dataUri);
-            linkElement.setAttribute("download", exportFileDefaultName);
-            linkElement.click();
-        });
+    // Arrow keys: Navigate tasks
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      navigateTasks(e.key === "ArrowDown" ? 1 : -1);
+    }
+
+    // Enter: Submit decision if in decision mode
+    if (
+      e.key === "Enter" &&
+      document.querySelector(".decision-option.selected")
+    ) {
+      submitDecision();
+    }
+
+    // 1-5: Quick filter
+    if (e.key >= "1" && e.key <= "5" && !e.target.matches("input, textarea")) {
+      const pills = document.querySelectorAll(".status-pill");
+      const index = parseInt(e.key) - 1;
+      if (pills[index]) {
+        pills[index].click();
+      }
+    }
+  });
 }
 
-// Update task statistics
-function updateStats() {
-    fetch("/api/tasks/stats")
-        .then((response) => response.json())
-        .then((stats) => {
-            // Update header stats
-            document.querySelector(
-                ".stat-item:nth-child(1) .stat-value",
-            ).textContent = stats.total || 0;
-            document.querySelector(
-                ".stat-item:nth-child(2) .stat-value",
-            ).textContent = stats.active || 0;
-            document.querySelector(
-                ".stat-item:nth-child(3) .stat-value",
-            ).textContent = stats.completed || 0;
+// =============================================================================
+// TASK SELECTION & FILTERING
+// =============================================================================
 
-            // Update tab counts
-            document.getElementById("count-all").textContent =
-                stats.total || 0;
-            document.getElementById("count-active").textContent =
-                stats.active || 0;
-            document.getElementById("count-completed").textContent =
-                stats.completed || 0;
-            document.getElementById("count-priority").textContent =
-                stats.priority || 0;
+function selectTask(taskId) {
+  TasksState.selectedTaskId = taskId;
 
-            // Update footer text
-            const footerText = document.getElementById("footer-text");
-            if (stats.active === 0) {
-                footerText.innerHTML = "All tasks completed! 🎉";
-            } else {
-                footerText.innerHTML = `<strong>${stats.active}</strong> ${stats.active === 1 ? "task" : "tasks"} remaining`;
-            }
+  // Update selected state in list
+  document.querySelectorAll(".task-card").forEach((card) => {
+    card.classList.toggle("selected", card.dataset.taskId == taskId);
+  });
 
-            // Show/hide footer
-            const footer = document.getElementById("task-footer");
-            footer.style.display = stats.total > 0 ? "flex" : "none";
-        });
+  // Load task details (in real app, this would fetch from API)
+  loadTaskDetails(taskId);
 }
 
-// Handle checkbox changes
-document.addEventListener("change", function (e) {
-    if (e.target.classList.contains("task-checkbox")) {
-        const taskId = e.target.dataset.taskId;
-        const completed = e.target.checked;
+function deselectTask() {
+  TasksState.selectedTaskId = null;
+  document.querySelectorAll(".task-card").forEach((card) => {
+    card.classList.remove("selected");
+  });
+}
 
-        fetch(`/api/tasks/${taskId}/status`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ completed }),
-        }).then(() => {
-            const taskItem = e.target.closest(".task-item");
-            if (completed) {
-                taskItem.classList.add("completed");
-            } else {
-                taskItem.classList.remove("completed");
-            }
-            updateStats();
-        });
-    }
-});
+function navigateTasks(direction) {
+  const cards = Array.from(document.querySelectorAll(".task-card"));
+  if (cards.length === 0) return;
 
-// Handle task actions
-document.addEventListener("click", function (e) {
-    // Priority toggle
-    if (e.target.closest('[data-action="priority"]')) {
-        const btn = e.target.closest('[data-action="priority"]');
-        const taskId = btn.dataset.taskId;
-        const priority = !btn.classList.contains("active");
+  const currentIndex = cards.findIndex((c) => c.classList.contains("selected"));
+  let newIndex;
 
-        fetch(`/api/tasks/${taskId}/priority`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ priority }),
-        }).then(() => {
-            btn.classList.toggle("active");
-            updateStats();
-        });
-    }
+  if (currentIndex === -1) {
+    newIndex = direction === 1 ? 0 : cards.length - 1;
+  } else {
+    newIndex = currentIndex + direction;
+    if (newIndex < 0) newIndex = cards.length - 1;
+    if (newIndex >= cards.length) newIndex = 0;
+  }
 
-    // Edit task
-    if (e.target.closest('[data-action="edit"]')) {
-        const btn = e.target.closest('[data-action="edit"]');
-        const taskId = btn.dataset.taskId;
-        const taskItem = btn.closest(".task-item");
-        const taskText = taskItem.querySelector(".task-text");
-        const currentText = taskText.textContent;
+  const taskId = cards[newIndex].dataset.taskId;
+  selectTask(taskId);
+  cards[newIndex].scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
 
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "task-edit-input";
-        input.value = currentText;
+function setActiveFilter(filter, button) {
+  TasksState.currentFilter = filter;
 
-        taskText.replaceWith(input);
-        input.focus();
-        input.select();
+  // Update active pill
+  document.querySelectorAll(".status-pill").forEach((pill) => {
+    pill.classList.remove("active");
+  });
+  button.classList.add("active");
 
-        input.addEventListener("blur", function () {
-            saveEdit();
-        });
+  // Filter will be handled by HTMX, but we track state
+  addAgentLog("info", `[FILTER] Showing ${filter} tasks`);
+}
 
-        input.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") {
-                saveEdit();
-            } else if (e.key === "Escape") {
-                cancelEdit();
-            }
-        });
+function searchTasks(query) {
+  if (query.length > 0) {
+    addAgentLog("info", `[SEARCH] Searching: "${query}"`);
+  }
 
-        function saveEdit() {
-            const newText = input.value.trim();
-            if (newText && newText !== currentText) {
-                fetch(`/api/tasks/${taskId}`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: newText }),
-                }).then(() => {
-                    const span = document.createElement("span");
-                    span.className = "task-text";
-                    span.textContent = newText;
-                    input.replaceWith(span);
-                });
-            } else {
-                cancelEdit();
-            }
+  // In real app, this would filter via API
+  // For demo, we'll do client-side filtering
+  const cards = document.querySelectorAll(".task-card");
+  cards.forEach((card) => {
+    const title =
+      card.querySelector(".task-card-title")?.textContent.toLowerCase() || "";
+    const subtitle =
+      card.querySelector(".task-card-subtitle")?.textContent.toLowerCase() ||
+      "";
+    const matches =
+      title.includes(query.toLowerCase()) ||
+      subtitle.includes(query.toLowerCase());
+    card.style.display = matches || query === "" ? "block" : "none";
+  });
+}
+
+// =============================================================================
+// TASK DETAILS
+// =============================================================================
+
+function loadTaskDetails(taskId) {
+  // In real app, fetch from API
+  // htmx.ajax('GET', `/api/tasks/${taskId}`, {target: '#task-detail-panel', swap: 'innerHTML'});
+
+  addAgentLog("info", `[LOAD] Loading task #${taskId} details`);
+}
+
+function updateTaskCard(task) {
+  const card = document.querySelector(`[data-task-id="${task.id}"]`);
+  if (!card) return;
+
+  // Update progress
+  const progressFill = card.querySelector(".task-progress-fill");
+  const progressPercent = card.querySelector(".task-progress-percent");
+  const progressSteps = card.querySelector(".task-progress-steps");
+
+  if (progressFill) progressFill.style.width = `${task.progress}%`;
+  if (progressPercent) progressPercent.textContent = `${task.progress}%`;
+  if (progressSteps)
+    progressSteps.textContent = `${task.currentStep}/${task.totalSteps} steps`;
+
+  // Update status badge
+  const statusBadge = card.querySelector(".task-card-status");
+  if (statusBadge) {
+    statusBadge.className = `task-card-status ${task.status}`;
+    statusBadge.textContent = formatStatus(task.status);
+  }
+}
+
+function updateTaskDetail(task) {
+  // Update detail panel with task data
+  const detailTitle = document.querySelector(".task-detail-title");
+  if (detailTitle) detailTitle.textContent = task.title;
+}
+
+// =============================================================================
+// DECISION HANDLING
+// =============================================================================
+
+function selectDecision(element, value) {
+  // Remove selected from all options
+  document.querySelectorAll(".decision-option").forEach((opt) => {
+    opt.classList.remove("selected");
+  });
+
+  // Add selected to clicked option
+  element.classList.add("selected");
+
+  // Store selected value
+  TasksState.selectedDecision = value;
+
+  addAgentLog("info", `[DECISION] Selected: ${value}`);
+}
+
+function submitDecision() {
+  const selectedOption = document.querySelector(".decision-option.selected");
+  if (!selectedOption) {
+    showToast("Please select an option", "warning");
+    return;
+  }
+
+  const value = TasksState.selectedDecision;
+  const taskId = TasksState.selectedTaskId;
+
+  addAgentLog("accent", `[AGENT] Applying decision: ${value}`);
+  addAgentLog("info", `[TASK] Resuming task #${taskId}...`);
+
+  // In real app, send to API
+  fetch(`/api/tasks/${taskId}/decide`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ decision: value }),
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.success) {
+        showToast("Decision applied successfully", "success");
+        addAgentLog("success", `[OK] Decision applied, task resuming`);
+
+        // Hide decision section (in real app, would update via HTMX)
+        const decisionSection = document.querySelector(
+          ".decision-required-section",
+        );
+        if (decisionSection) {
+          decisionSection.style.display = "none";
         }
+      } else {
+        showToast("Failed to apply decision", "error");
+        addAgentLog(
+          "error",
+          `[ERROR] Failed to apply decision: ${result.error}`,
+        );
+      }
+    })
+    .catch((error) => {
+      // For demo, simulate success
+      showToast("Decision applied successfully", "success");
+      addAgentLog("success", `[OK] Decision applied, task resuming`);
 
-        function cancelEdit() {
-            const span = document.createElement("span");
-            span.className = "task-text";
-            span.textContent = currentText;
-            input.replaceWith(span);
+      const decisionSection = document.querySelector(
+        ".decision-required-section",
+      );
+      if (decisionSection) {
+        decisionSection.style.opacity = "0.5";
+        setTimeout(() => {
+          decisionSection.style.display = "none";
+        }, 500);
+      }
+
+      // Update step status
+      const activeStep = document.querySelector(".step-item.active");
+      if (activeStep) {
+        activeStep.classList.remove("active");
+        activeStep.classList.add("completed");
+        activeStep.querySelector(".step-icon").textContent = "✓";
+        activeStep.querySelector(".step-detail").textContent =
+          "Completed with merge strategy";
+
+        const nextStep = activeStep.nextElementSibling;
+        if (nextStep && nextStep.classList.contains("pending")) {
+          nextStep.classList.remove("pending");
+          nextStep.classList.add("active");
+          nextStep.querySelector(".step-icon").textContent = "●";
+          nextStep.querySelector(".step-time").textContent = "Now";
         }
+      }
+    });
+}
+
+function showDecisionRequired(decision) {
+  addAgentLog("warning", `[ALERT] Decision required: ${decision.title}`);
+  showToast(`Decision required: ${decision.title}`, "warning");
+}
+
+// =============================================================================
+// PROGRESS LOG
+// =============================================================================
+
+function toggleProgressLog() {
+  const stepList = document.querySelector(".step-list");
+  const toggle = document.querySelector(".progress-log-toggle");
+
+  if (stepList.style.display === "none") {
+    stepList.style.display = "flex";
+    toggle.textContent = "Collapse";
+  } else {
+    stepList.style.display = "none";
+    toggle.textContent = "Expand";
+  }
+}
+
+function updateStepProgress(taskId, step) {
+  if (taskId !== TasksState.selectedTaskId) return;
+
+  const stepItems = document.querySelectorAll(".step-item");
+  stepItems.forEach((item, index) => {
+    if (index < step.index) {
+      item.classList.remove("active", "pending");
+      item.classList.add("completed");
+      item.querySelector(".step-icon").textContent = "✓";
+    } else if (index === step.index) {
+      item.classList.remove("completed", "pending");
+      item.classList.add("active");
+      item.querySelector(".step-icon").textContent = "●";
+      item.querySelector(".step-name").textContent = step.name;
+      item.querySelector(".step-detail").textContent = step.detail;
+      item.querySelector(".step-time").textContent = "Now";
+    } else {
+      item.classList.remove("completed", "active");
+      item.classList.add("pending");
+      item.querySelector(".step-icon").textContent = "○";
     }
+  });
+}
 
-    // Delete task
-    if (e.target.closest('[data-action="delete"]')) {
-        const btn = e.target.closest('[data-action="delete"]');
-        const taskId = btn.dataset.taskId;
+// =============================================================================
+// AGENT ACTIVITY LOG
+// =============================================================================
 
-        if (confirm("Delete this task?")) {
-            fetch(`/api/tasks/${taskId}`, {
-                method: "DELETE",
-            }).then(() => {
-                const taskItem = btn.closest(".task-item");
-                taskItem.style.animation = "slideOut 0.3s ease";
-                setTimeout(() => {
-                    taskItem.remove();
-                    updateStats();
-                }, 300);
-            });
-        }
-    }
-});
+function addAgentLog(level, message) {
+  if (TasksState.agentLogPaused) return;
 
-// Animation for removing tasks
+  const log = document.getElementById("agent-log");
+  if (!log) return;
+
+  const now = new Date();
+  const timestamp = now.toTimeString().split(" ")[0].substring(0, 8);
+
+  const line = document.createElement("div");
+  line.className = `activity-line ${level}`;
+  line.innerHTML = `
+        <span class="activity-timestamp">${timestamp}</span>
+        <span class="activity-message">${message}</span>
+    `;
+
+  // Insert at the top
+  log.insertBefore(line, log.firstChild);
+
+  // Limit log entries
+  while (log.children.length > 100) {
+    log.removeChild(log.lastChild);
+  }
+}
+
+function scrollAgentLogToBottom() {
+  const log = document.getElementById("agent-log");
+  if (log) {
+    log.scrollTop = 0; // Since newest is at top
+  }
+}
+
+function clearAgentLog() {
+  const log = document.getElementById("agent-log");
+  if (log) {
+    log.innerHTML = "";
+    addAgentLog("info", "[SYSTEM] Log cleared");
+  }
+}
+
+function toggleAgentLogPause() {
+  TasksState.agentLogPaused = !TasksState.agentLogPaused;
+  const pauseBtn = document.querySelector(".agent-activity-btn:last-child");
+  if (pauseBtn) {
+    pauseBtn.textContent = TasksState.agentLogPaused ? "Resume" : "Pause";
+  }
+  addAgentLog(
+    "info",
+    TasksState.agentLogPaused ? "[SYSTEM] Log paused" : "[SYSTEM] Log resumed",
+  );
+}
+
+// =============================================================================
+// TASK LIFECYCLE
+// =============================================================================
+
+function onTaskCompleted(task) {
+  showToast(`Task completed: ${task.title}`, "success");
+  addAgentLog("success", `[COMPLETE] Task #${task.id}: ${task.title}`);
+  updateTaskCard(task);
+}
+
+function onTaskFailed(task, error) {
+  showToast(`Task failed: ${task.title}`, "error");
+  addAgentLog("error", `[FAILED] Task #${task.id}: ${error}`);
+  updateTaskCard(task);
+}
+
+// =============================================================================
+// TOAST NOTIFICATIONS
+// =============================================================================
+
+function showToast(message, type = "info") {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        `;
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement("div");
+  const bgColors = {
+    success: "rgba(34, 197, 94, 0.95)",
+    error: "rgba(239, 68, 68, 0.95)",
+    warning: "rgba(245, 158, 11, 0.95)",
+    info: "rgba(59, 130, 246, 0.95)",
+  };
+
+  const icons = {
+    success: "✓",
+    error: "✕",
+    warning: "⚠",
+    info: "ℹ",
+  };
+
+  toast.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: ${bgColors[type] || bgColors.info};
+        border-radius: 10px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease;
+    `;
+
+  toast.innerHTML = `
+        <span style="font-size: 16px;">${icons[type] || icons.info}</span>
+        <span>${message}</span>
+    `;
+
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = "fadeOut 0.3s ease forwards";
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// =============================================================================
+// UTILITY FUNCTIONS
+// =============================================================================
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function formatStatus(status) {
+  const statusMap = {
+    complete: "Complete",
+    running: "Running",
+    awaiting: "Awaiting",
+    paused: "Paused",
+    blocked: "Blocked",
+  };
+  return statusMap[status] || status;
+}
+
+function formatTime(seconds) {
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) {
+    const mins = Math.floor(seconds / 60);
+    return `${mins}m`;
+  }
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  return `${hours}h ${mins}m`;
+}
+
+// =============================================================================
+// GLOBAL STYLES FOR TOAST ANIMATIONS
+// =============================================================================
+
 const style = document.createElement("style");
 style.textContent = `
-@keyframes slideOut {
-    to {
-        opacity: 0;
-        transform: translateX(-100%);
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
-}
+
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+    }
 `;
 document.head.appendChild(style);
 
-// Update stats after any HTMX request
-document.body.addEventListener("htmx:afterSwap", function (evt) {
-    if (evt.detail.target.id === "task-list") {
-        updateStats();
-    }
-});
+// =============================================================================
+// DEMO: Simulate real-time activity
+// =============================================================================
 
-// Initial stats load
-document.addEventListener("DOMContentLoaded", function () {
-    updateStats();
-});
-
-// Keyboard shortcuts
-document.addEventListener("keydown", function (e) {
-    // Alt + N for new task
-    if (e.altKey && e.key === "n") {
-        e.preventDefault();
-        document.querySelector(".task-input").focus();
-    }
-
-    // Alt + 1-4 for filter tabs
-    if (e.altKey && e.key >= "1" && e.key <= "4") {
-        e.preventDefault();
-        const tabs = document.querySelectorAll(".filter-tab");
-        const index = parseInt(e.key) - 1;
-        if (tabs[index]) {
-            tabs[index].click();
-        }
-    }
-});
+// Simulate agent activity for demo
+setInterval(() => {
+  if (Math.random() > 0.7) {
+    const messages = [
+      { level: "info", msg: "[SCAN] Monitoring task queues..." },
+      { level: "info", msg: "[AGENT] Processing next batch..." },
+      { level: "success", msg: "[OK] Checkpoint saved" },
+      { level: "info", msg: "[SYNC] Synchronizing state..." },
+    ];
+    const { level, msg } =
+      messages[Math.floor(Math.random() * messages.length)];
+    addAgentLog(level, msg);
+  }
+}, 5000);

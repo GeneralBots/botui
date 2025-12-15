@@ -1,0 +1,98 @@
+<!-- =============================================================================
+     BOTUI SUITE - BASE LAYOUT
+     Sentient Theme with AI Assistant Panel
+     ============================================================================= -->
+
+<link rel="stylesheet" href="/themes/sentient/sentient.css">
+<link rel="stylesheet" href="/suite/base-layout.css">
+
+<div class="suite-app sentient-theme">
+    <!-- Top Header Bar -->
+    <header class="suite-topbar">
+        <!-- Left: Navigation Tabs -->
+        <div class="topbar-left">
+            <nav class="topbar-tabs">
+                <button class="topbar-tab active">Dashboard</button>
+                <button class="topbar-tab">Analytics</button>
+            </nav>
+            
+            <!-- App Launcher -->
+            <div class="topbar-app-launcher">
+                <button class="app-icon" data-app="chat" title="Chat">
+                    <span>💬</span>
+                </button>
+                <button class="app-icon" data-app="files" title="Files">
+                    <span>📁</span>
+                </button>
+                <button class="app-icon" data-app="terminal" title="Terminal">
+                    <span>⌨️</span>
+                </button>
+                <button class="app-icon" data-app="tasks" title="Tasks">
+                    <span>✓</span>
+                </button>
+                <button class="app-icon" data-app="calendar" title="Calendar">
+                    <span>📅</span>
+                </button>
+                <button class="app-icon" data-app="docs" title="Docs">
+                    <span>📄</span>
+                </button>
+                <button class="app-icon" data-app="settings" title="Settings">
+                    <span>⚙️</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Right: Actions -->
+        <div class="topbar-right">
+            <button class="topbar-btn-primary">
+                <span>✨</span> New Intent
+            </button>
+            <button class="topbar-btn-icon" title="Settings">⚙️</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="suite-main">
+        <!-- Left: Content Panel -->
+        <section class="suite-content-panel" id="suite-content">
+            <!-- App content goes here -->
+        </section>
+
+        <!-- Right: AI Assistant Panel -->
+        <aside class="suite-ai-panel" id="ai-panel">
+            <div class="ai-panel-header">
+                <div class="ai-panel-title">
+                    <span class="ai-avatar">🤖</span>
+                    <div>
+                        <h3>AI Developer</h3>
+                        <p class="ai-status">Desenvolvendo: CRM Deloitte</p>
+                    </div>
+                </div>
+                <button class="ai-panel-close" onclick="toggleAIPanel()">✕</button>
+            </div>
+
+            <div class="ai-panel-messages" id="ai-messages">
+                <!-- Messages will be inserted here -->
+            </div>
+
+            <div class="ai-quick-actions">
+                <span class="quick-actions-label">AÇÕES RÁPIDAS</span>
+                <div class="quick-actions-grid">
+                    <button class="quick-action-btn">Adicionar campo</button>
+                    <button class="quick-action-btn">Mudar cor</button>
+                    <button class="quick-action-btn">Adicionar validação</button>
+                    <button class="quick-action-btn">Exportar dados</button>
+                </div>
+            </div>
+
+            <div class="ai-panel-input">
+                <input type="text" class="ai-input" placeholder="Digite suas modificações..." id="ai-input">
+                <button class="ai-send-btn" onclick="sendAIMessage()">
+                    <span>➤</span>
+                </button>
+            </div>
+        </aside>
+    </main>
+</div>
+
+<script src="/suite/base-layout.js"></script>

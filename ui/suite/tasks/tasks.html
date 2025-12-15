@@ -1,878 +1,549 @@
-<div class="tasks-container">
-    <!-- Header -->
-    <div class="tasks-header">
-        <div class="header-content">
-            <h1 class="tasks-title">
-                <span class="tasks-icon">✓</span>
-                Tasks
-            </h1>
-            <div class="header-stats" id="task-stats">
-                <span class="stat-item">
-                    <span class="stat-value">0</span>
-                    <span class="stat-label">Total</span>
-                </span>
-                <span class="stat-item">
-                    <span class="stat-value">0</span>
-                    <span class="stat-label">Active</span>
-                </span>
-                <span class="stat-item">
-                    <span class="stat-value">0</span>
-                    <span class="stat-label">Completed</span>
-                </span>
+<!-- =============================================================================
+     TASKS APP
+     Automated Intelligent Task Management Interface
+     ============================================================================= -->
+
+<link rel="stylesheet" href="/themes/sentient/sentient.css" />
+<link rel="stylesheet" href="/suite/tasks/tasks.css" />
+
+<div class="tasks-app sentient-theme">
+    <!-- Top Header Bar -->
+    <header class="tasks-topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo">
+                <div class="topbar-logo-icon">⚡</div>
+                <span>Sentient</span>
+            </div>
+            <nav class="topbar-nav">
+                <button class="topbar-nav-item active">Dashboard</button>
+                <button class="topbar-nav-item">Analytics</button>
+            </nav>
+        </div>
+
+        <div class="topbar-center">
+            <div class="topbar-search">
+                <span class="topbar-search-icon">🔍</span>
+                <input
+                    type="text"
+                    class="topbar-search-input"
+                    placeholder="Search tasks, intents, logs..."
+                />
             </div>
         </div>
-    </div>
 
-    <!-- Add Task Form -->
-    <div class="add-task-section">
-        <form
-            class="add-task-form"
-            hx-post="/api/tasks"
-            hx-target="#task-list"
-            hx-swap="afterbegin"
-            hx-on::after-request="this.reset()"
-        >
-            <input
-                type="text"
-                name="text"
-                class="task-input"
-                placeholder="What needs to be done?"
-                required
-                autofocus
-            />
-            <select name="category" class="task-category-select">
-                <option value="">No Category</option>
-                <option value="work">Work</option>
-                <option value="personal">Personal</option>
-                <option value="shopping">Shopping</option>
-                <option value="health">Health</option>
-            </select>
-            <input
-                type="date"
-                name="dueDate"
-                class="task-date-input"
-                placeholder="Due date"
-            />
-            <button type="submit" class="button-primary add-task-btn">
-                <span class="plus-icon">+</span>
-                Add Task
+        <div class="topbar-right">
+            <button class="topbar-icon-btn" title="Notifications">
+                🔔
+                <span class="notification-dot"></span>
             </button>
-        </form>
-    </div>
-
-    <!-- Filter Tabs -->
-    <div class="filter-tabs">
-        <button
-            class="filter-tab active"
-            hx-get="/api/tasks?filter=all"
-            hx-target="#task-list"
-            hx-swap="innerHTML"
-            onclick="setActiveTab(this)"
-        >
-            <span class="tab-icon">📋</span>
-            <span>All</span>
-            <span class="tab-count" id="count-all">0</span>
-        </button>
-        <button
-            class="filter-tab"
-            hx-get="/api/tasks?filter=active"
-            hx-target="#task-list"
-            hx-swap="innerHTML"
-            onclick="setActiveTab(this)"
-        >
-            <span class="tab-icon">⏳</span>
-            <span>Active</span>
-            <span class="tab-count" id="count-active">0</span>
-        </button>
-        <button
-            class="filter-tab"
-            hx-get="/api/tasks?filter=completed"
-            hx-target="#task-list"
-            hx-swap="innerHTML"
-            onclick="setActiveTab(this)"
-        >
-            <span class="tab-icon">✓</span>
-            <span>Completed</span>
-            <span class="tab-count" id="count-completed">0</span>
-        </button>
-        <button
-            class="filter-tab priority-tab"
-            hx-get="/api/tasks?filter=priority"
-            hx-target="#task-list"
-            hx-swap="innerHTML"
-            onclick="setActiveTab(this)"
-        >
-            <span class="tab-icon">⭐</span>
-            <span>Priority</span>
-            <span class="tab-count" id="count-priority">0</span>
-        </button>
-    </div>
-
-    <!-- Task List Container -->
-    <div class="task-list-container">
-        <div
-            class="task-list"
-            id="task-list"
-            hx-get="/api/tasks"
-            hx-trigger="load"
-            hx-swap="innerHTML"
-        >
-            <!-- Loading state -->
-            <div class="loading-state">
-                <div class="spinner"></div>
-                <p>Loading tasks...</p>
+            <button class="topbar-icon-btn" title="Settings">⚙️</button>
+            <div class="topbar-profile">
+                <div class="topbar-avatar">JD</div>
+                <span class="topbar-profile-name">John Doe</span>
+                <span class="topbar-profile-arrow">▼</span>
             </div>
         </div>
-    </div>
+    </header>
 
-    <!-- Footer Actions -->
-    <div class="tasks-footer" id="task-footer">
-        <div class="footer-info">
-            <span class="info-text" id="footer-text">
-                <strong>0</strong> tasks remaining
-            </span>
-        </div>
-        <div class="footer-actions">
-            <button
-                class="button-secondary"
-                hx-delete="/api/tasks/completed"
-                hx-target="#task-list"
+    <!-- Main Content Area -->
+    <main class="tasks-main">
+        <!-- Task List Panel (Left) -->
+        <section class="tasks-list-panel">
+            <div class="tasks-list-header">
+                <div class="tasks-list-title">
+                    <h1>Automated Tasks</h1>
+                    <span class="tasks-count" id="tasks-total-count"
+                        >24 tasks</span
+                    >
+                </div>
+
+                <!-- Status Filter Pills -->
+                <div class="status-filters" id="status-filters">
+                    <button
+                        class="status-pill complete active"
+                        data-filter="complete"
+                        hx-get="/api/tasks?status=complete"
+                        hx-target="#task-list"
+                        hx-swap="innerHTML"
+                    >
+                        Complete <span class="pill-count">12</span>
+                    </button>
+                    <button
+                        class="status-pill active-intents"
+                        data-filter="active"
+                        hx-get="/api/tasks?status=active"
+                        hx-target="#task-list"
+                        hx-swap="innerHTML"
+                    >
+                        Active Intents <span class="pill-count">5</span>
+                    </button>
+                    <button
+                        class="status-pill awaiting"
+                        data-filter="awaiting"
+                        hx-get="/api/tasks?status=awaiting"
+                        hx-target="#task-list"
+                        hx-swap="innerHTML"
+                    >
+                        Awaiting Decision <span class="pill-count">3</span>
+                    </button>
+                    <button
+                        class="status-pill paused"
+                        data-filter="paused"
+                        hx-get="/api/tasks?status=paused"
+                        hx-target="#task-list"
+                        hx-swap="innerHTML"
+                    >
+                        Paused <span class="pill-count">2</span>
+                    </button>
+                    <button
+                        class="status-pill blocked"
+                        data-filter="blocked"
+                        hx-get="/api/tasks?status=blocked"
+                        hx-target="#task-list"
+                        hx-swap="innerHTML"
+                    >
+                        Blocked/Issues <span class="pill-count">2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div
+                class="tasks-list-scroll"
+                id="task-list"
+                hx-get="/api/tasks"
+                hx-trigger="load"
                 hx-swap="innerHTML"
-                hx-confirm="Are you sure you want to clear all completed tasks?"
             >
-                Clear Completed
-            </button>
-            <button
-                class="button-secondary"
-                onclick="exportTasks()"
-                title="Export as JSON"
-            >
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
+                <!-- Task Card - Complete -->
+                <article
+                    class="task-card"
+                    data-task-id="1"
+                    onclick="selectTask(1)"
                 >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Export
-            </button>
-        </div>
-    </div>
+                    <div class="task-card-header">
+                        <div>
+                            <h3 class="task-card-title">
+                                Generate Q4 Financial Report
+                            </h3>
+                            <p class="task-card-subtitle">
+                                Automated data aggregation and formatting
+                            </p>
+                        </div>
+                        <span class="task-card-status complete">Complete</span>
+                    </div>
+                    <div class="task-card-progress">
+                        <div class="task-progress-bar">
+                            <div
+                                class="task-progress-fill success"
+                                style="width: 100%"
+                            ></div>
+                        </div>
+                        <div class="task-progress-info">
+                            <span class="task-progress-percent">100%</span>
+                            <span class="task-progress-steps">8/8 steps</span>
+                        </div>
+                    </div>
+                    <div class="task-card-meta">
+                        <span class="task-card-meta-item">⏱️ 2h 34m</span>
+                        <span class="task-card-meta-item"
+                            >📅 Completed today</span
+                        >
+                    </div>
+                </article>
+
+                <!-- Task Card - Active with Decision -->
+                <article
+                    class="task-card selected"
+                    data-task-id="2"
+                    onclick="selectTask(2)"
+                >
+                    <div class="task-card-header">
+                        <div>
+                            <h3 class="task-card-title">
+                                Customer Data Migration
+                            </h3>
+                            <p class="task-card-subtitle">
+                                Migrating 50,000 customer records
+                            </p>
+                        </div>
+                        <span class="task-card-status awaiting">Awaiting</span>
+                    </div>
+                    <div class="task-card-progress">
+                        <div class="task-progress-bar">
+                            <div
+                                class="task-progress-fill"
+                                style="width: 67%"
+                            ></div>
+                        </div>
+                        <div class="task-progress-info">
+                            <span class="task-progress-percent">67%</span>
+                            <span class="task-progress-steps">4/6 steps</span>
+                        </div>
+                    </div>
+                    <div class="task-card-meta">
+                        <span class="task-card-meta-item"
+                            >⚠️ Decision required</span
+                        >
+                        <span class="task-card-meta-item">⏱️ Running 45m</span>
+                    </div>
+                </article>
+
+                <!-- Task Card - Active Running -->
+                <article
+                    class="task-card"
+                    data-task-id="3"
+                    onclick="selectTask(3)"
+                >
+                    <div class="task-card-header">
+                        <div>
+                            <h3 class="task-card-title">
+                                API Integration Testing
+                            </h3>
+                            <p class="task-card-subtitle">
+                                Running automated test suite
+                            </p>
+                        </div>
+                        <span class="task-card-status running">Running</span>
+                    </div>
+                    <div class="task-card-progress">
+                        <div class="task-progress-bar">
+                            <div
+                                class="task-progress-fill"
+                                style="width: 45%"
+                            ></div>
+                        </div>
+                        <div class="task-progress-info">
+                            <span class="task-progress-percent">45%</span>
+                            <span class="task-progress-steps">9/20 tests</span>
+                        </div>
+                    </div>
+                    <div class="task-card-meta">
+                        <span class="task-card-meta-item">⏱️ Running 12m</span>
+                        <span class="task-card-meta-item"
+                            >🔄 Auto-retry enabled</span
+                        >
+                    </div>
+                </article>
+
+                <!-- Task Card - Paused -->
+                <article
+                    class="task-card"
+                    data-task-id="4"
+                    onclick="selectTask(4)"
+                >
+                    <div class="task-card-header">
+                        <div>
+                            <h3 class="task-card-title">
+                                Email Campaign Deployment
+                            </h3>
+                            <p class="task-card-subtitle">
+                                Scheduled marketing campaign
+                            </p>
+                        </div>
+                        <span class="task-card-status paused">Paused</span>
+                    </div>
+                    <div class="task-card-progress">
+                        <div class="task-progress-bar">
+                            <div
+                                class="task-progress-fill"
+                                style="width: 30%"
+                            ></div>
+                        </div>
+                        <div class="task-progress-info">
+                            <span class="task-progress-percent">30%</span>
+                            <span class="task-progress-steps">3/10 steps</span>
+                        </div>
+                    </div>
+                    <div class="task-card-meta">
+                        <span class="task-card-meta-item"
+                            >⏸️ Paused by user</span
+                        >
+                        <span class="task-card-meta-item"
+                            >📅 Resume: Tomorrow 9am</span
+                        >
+                    </div>
+                </article>
+
+                <!-- Task Card - Blocked -->
+                <article
+                    class="task-card"
+                    data-task-id="5"
+                    onclick="selectTask(5)"
+                >
+                    <div class="task-card-header">
+                        <div>
+                            <h3 class="task-card-title">Database Backup</h3>
+                            <p class="task-card-subtitle">
+                                Automated nightly backup
+                            </p>
+                        </div>
+                        <span class="task-card-status blocked">Blocked</span>
+                    </div>
+                    <div class="task-card-progress">
+                        <div class="task-progress-bar">
+                            <div
+                                class="task-progress-fill"
+                                style="width: 15%"
+                            ></div>
+                        </div>
+                        <div class="task-progress-info">
+                            <span class="task-progress-percent">15%</span>
+                            <span class="task-progress-steps">1/7 steps</span>
+                        </div>
+                    </div>
+                    <div class="task-card-meta">
+                        <span class="task-card-meta-item"
+                            >❌ Storage quota exceeded</span
+                        >
+                        <span class="task-card-meta-item"
+                            >🔧 Action required</span
+                        >
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Task Detail Panel (Right) -->
+        <aside class="task-detail-panel" id="task-detail-panel">
+            <div class="task-detail-header">
+                <div class="task-detail-title-row">
+                    <h2 class="task-detail-title">Customer Data Migration</h2>
+                    <div class="task-detail-actions">
+                        <button class="task-detail-action-btn" title="Pause">
+                            ⏸️
+                        </button>
+                        <button class="task-detail-action-btn" title="Cancel">
+                            ✖️
+                        </button>
+                        <button class="task-detail-action-btn" title="More">
+                            ⋯
+                        </button>
+                    </div>
+                </div>
+                <div class="task-detail-meta">
+                    <span class="task-detail-meta-item"
+                        ><span class="icon">📊</span> 67% complete</span
+                    >
+                    <span class="task-detail-meta-item"
+                        ><span class="icon">⏱️</span> 45m elapsed</span
+                    >
+                    <span class="task-detail-meta-item"
+                        ><span class="icon">📅</span> Started 2:15 PM</span
+                    >
+                </div>
+            </div>
+
+            <div class="task-detail-scroll">
+                <!-- Decision Required Section -->
+                <section class="decision-required-section">
+                    <div class="decision-required-header">
+                        <div class="decision-required-icon">⚠️</div>
+                        <span class="decision-required-title"
+                            >Decision Required</span
+                        >
+                    </div>
+                    <p class="decision-required-description">
+                        Found 234 duplicate customer records. How would you like
+                        to proceed with the migration?
+                    </p>
+                    <div class="decision-options">
+                        <div
+                            class="decision-option selected"
+                            onclick="selectDecision(this, 'merge')"
+                        >
+                            <div class="decision-option-radio"></div>
+                            <div class="decision-option-content">
+                                <div class="decision-option-label">
+                                    Merge duplicates
+                                </div>
+                                <div class="decision-option-desc">
+                                    Combine records, keeping most recent data
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="decision-option"
+                            onclick="selectDecision(this, 'skip')"
+                        >
+                            <div class="decision-option-radio"></div>
+                            <div class="decision-option-content">
+                                <div class="decision-option-label">
+                                    Skip duplicates
+                                </div>
+                                <div class="decision-option-desc">
+                                    Only migrate unique records
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="decision-option"
+                            onclick="selectDecision(this, 'keep-all')"
+                        >
+                            <div class="decision-option-radio"></div>
+                            <div class="decision-option-content">
+                                <div class="decision-option-label">
+                                    Keep all records
+                                </div>
+                                <div class="decision-option-desc">
+                                    Migrate everything, handle duplicates later
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="decision-actions">
+                        <button class="decision-btn decision-btn-secondary">
+                            Skip for now
+                        </button>
+                        <button
+                            class="decision-btn decision-btn-primary"
+                            onclick="submitDecision()"
+                        >
+                            Apply Decision
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Progress Log Section -->
+                <section class="progress-log-section">
+                    <div class="progress-log-header">
+                        <span class="progress-log-title">Progress Log</span>
+                        <button class="progress-log-toggle">Collapse</button>
+                    </div>
+                    <div class="step-list">
+                        <div class="step-item completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-content">
+                                <div class="step-name">
+                                    Initialize connection
+                                </div>
+                                <div class="step-detail">
+                                    Connected to source database
+                                </div>
+                            </div>
+                            <span class="step-time">2:15 PM</span>
+                        </div>
+                        <div class="step-item completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-content">
+                                <div class="step-name">Validate schema</div>
+                                <div class="step-detail">
+                                    Schema compatibility verified
+                                </div>
+                            </div>
+                            <span class="step-time">2:16 PM</span>
+                        </div>
+                        <div class="step-item completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-content">
+                                <div class="step-name">
+                                    Export customer records
+                                </div>
+                                <div class="step-detail">
+                                    50,000 records exported successfully
+                                </div>
+                            </div>
+                            <span class="step-time">2:32 PM</span>
+                        </div>
+                        <div class="step-item active">
+                            <div class="step-icon">●</div>
+                            <div class="step-content">
+                                <div class="step-name">
+                                    Process and transform
+                                </div>
+                                <div class="step-detail">
+                                    Awaiting decision on duplicates...
+                                </div>
+                            </div>
+                            <span class="step-time">Now</span>
+                        </div>
+                        <div class="step-item pending">
+                            <div class="step-icon">○</div>
+                            <div class="step-content">
+                                <div class="step-name">
+                                    Import to destination
+                                </div>
+                                <div class="step-detail">Pending</div>
+                            </div>
+                            <span class="step-time">—</span>
+                        </div>
+                        <div class="step-item pending">
+                            <div class="step-icon">○</div>
+                            <div class="step-content">
+                                <div class="step-name">Verify and finalize</div>
+                                <div class="step-detail">Pending</div>
+                            </div>
+                            <span class="step-time">—</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Live Agent Activity -->
+            <section class="agent-activity-section">
+                <div class="agent-activity-header">
+                    <div class="agent-activity-title">
+                        <span class="agent-status-dot"></span>
+                        Live Agent Activity
+                    </div>
+                    <div class="agent-activity-actions">
+                        <button class="agent-activity-btn">Clear</button>
+                        <button class="agent-activity-btn">Pause</button>
+                    </div>
+                </div>
+                <div class="agent-activity-log" id="agent-log">
+                    <div class="activity-line accent">
+                        <span class="activity-timestamp">15:00:23</span>
+                        <span class="activity-message"
+                            >[AGENT] Analyzing duplicate records...</span
+                        >
+                    </div>
+                    <div class="activity-line">
+                        <span class="activity-timestamp">15:00:21</span>
+                        <span class="activity-message"
+                            >[SCAN] Found 234 potential duplicates</span
+                        >
+                    </div>
+                    <div class="activity-line warning">
+                        <span class="activity-timestamp">15:00:20</span>
+                        <span class="activity-message"
+                            >[ALERT] User decision required for duplicates</span
+                        >
+                    </div>
+                    <div class="activity-line success">
+                        <span class="activity-timestamp">14:58:45</span>
+                        <span class="activity-message"
+                            >[OK] Export completed: 50,000 records</span
+                        >
+                    </div>
+                    <div class="activity-line">
+                        <span class="activity-timestamp">14:45:12</span>
+                        <span class="activity-message"
+                            >[EXPORT] Processing batch 500/500...</span
+                        >
+                    </div>
+                    <div class="activity-line">
+                        <span class="activity-timestamp">14:32:08</span>
+                        <span class="activity-message"
+                            >[EXPORT] Processing batch 250/500...</span
+                        >
+                    </div>
+                    <div class="activity-line success">
+                        <span class="activity-timestamp">14:16:33</span>
+                        <span class="activity-message"
+                            >[OK] Schema validation passed</span
+                        >
+                    </div>
+                    <div class="activity-line info">
+                        <span class="activity-timestamp">14:15:01</span>
+                        <span class="activity-message"
+                            >[INIT] Connected to source: prod-db-main</span
+                        >
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </main>
 </div>
 
-<style>
-    /* Container */
-    .tasks-container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem;
-        min-height: 100vh;
-    }
-
-    /* Header */
-    .tasks-header {
-        margin-bottom: 2rem;
-    }
-
-    .header-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .tasks-title {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 2rem;
-        color: #f1f5f9;
-    }
-
-    .tasks-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 12px;
-        font-size: 1.5rem;
-    }
-
-    .header-stats {
-        display: flex;
-        gap: 2rem;
-    }
-
-    .stat-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #f1f5f9;
-    }
-
-    .stat-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        color: #64748b;
-        margin-top: 0.25rem;
-    }
-
-    /* Add Task Section */
-    .add-task-section {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .add-task-form {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    .task-input {
-        flex: 1;
-        min-width: 200px;
-        padding: 0.75rem 1rem;
-        background: rgba(15, 23, 42, 0.5);
-        border: 1px solid #475569;
-        border-radius: 8px;
-        color: #f1f5f9;
-        font-size: 1rem;
-        transition: all 0.2s;
-    }
-
-    .task-input:focus {
-        outline: none;
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .task-category-select,
-    .task-date-input {
-        padding: 0.75rem;
-        background: rgba(15, 23, 42, 0.5);
-        border: 1px solid #475569;
-        border-radius: 8px;
-        color: #f1f5f9;
-        transition: all 0.2s;
-    }
-
-    .task-category-select:focus,
-    .task-date-input:focus {
-        outline: none;
-        border-color: #667eea;
-    }
-
-    .button-primary {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .button-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
-
-    .button-primary:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .plus-icon {
-        font-size: 1.25rem;
-    }
-
-    /* Filter Tabs */
-    .filter-tabs {
-        display: flex;
-        gap: 0.5rem;
-        padding: 0.5rem;
-        background: #1e293b;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-    }
-
-    .filter-tab {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 0.75rem;
-        background: transparent;
-        border: none;
-        border-radius: 8px;
-        color: #94a3b8;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .filter-tab:hover {
-        background: rgba(100, 116, 139, 0.1);
-        color: #cbd5e1;
-    }
-
-    .filter-tab.active {
-        background: #334155;
-        color: #f1f5f9;
-    }
-
-    .priority-tab.active {
-        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-        color: #0f172a;
-    }
-
-    .tab-icon {
-        font-size: 1.125rem;
-    }
-
-    .tab-count {
-        padding: 0.125rem 0.5rem;
-        background: rgba(100, 116, 139, 0.2);
-        border-radius: 999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    .filter-tab.active .tab-count {
-        background: rgba(241, 245, 249, 0.2);
-    }
-
-    /* Task List */
-    .task-list-container {
-        min-height: 300px;
-        margin-bottom: 2rem;
-    }
-
-    .task-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .task-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 1.25rem;
-        background: #1e293b;
-        border-radius: 12px;
-        transition: all 0.2s;
-        animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .task-item:hover {
-        background: #334155;
-        transform: translateX(4px);
-    }
-
-    .task-item.completed {
-        opacity: 0.6;
-    }
-
-    .task-item.completed .task-text {
-        text-decoration: line-through;
-        color: #64748b;
-    }
-
-    .task-checkbox {
-        width: 24px;
-        height: 24px;
-        border-radius: 6px;
-        border: 2px solid #475569;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .task-checkbox:checked {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-color: transparent;
-    }
-
-    .task-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .task-text-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .task-text {
-        color: #f1f5f9;
-        font-size: 1rem;
-    }
-
-    .task-meta {
-        display: flex;
-        gap: 0.75rem;
-        align-items: center;
-    }
-
-    .task-category {
-        padding: 0.25rem 0.75rem;
-        background: rgba(100, 116, 139, 0.2);
-        border-radius: 999px;
-        font-size: 0.75rem;
-        color: #94a3b8;
-    }
-
-    .task-due-date {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        font-size: 0.75rem;
-        color: #94a3b8;
-    }
-
-    .task-due-date.overdue {
-        color: #ef4444;
-    }
-
-    .task-actions {
-        display: flex;
-        gap: 0.5rem;
-    }
-
-    .action-btn {
-        padding: 0.5rem;
-        background: transparent;
-        border: none;
-        border-radius: 6px;
-        color: #64748b;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-        background: rgba(100, 116, 139, 0.1);
-        color: #cbd5e1;
-    }
-
-    .priority-btn.active {
-        color: #fbbf24;
-    }
-
-    .edit-btn:hover {
-        color: #3b82f6;
-    }
-
-    .delete-btn:hover {
-        color: #ef4444;
-    }
-
-    /* Task input for editing */
-    .task-edit-input {
-        flex: 1;
-        padding: 0.5rem;
-        background: rgba(15, 23, 42, 0.5);
-        border: 1px solid #475569;
-        border-radius: 6px;
-        color: #f1f5f9;
-        font-size: 1rem;
-    }
-
-    /* Empty state */
-    .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 4rem 2rem;
-        text-align: center;
-    }
-
-    .empty-state svg {
-        color: #475569;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-        font-size: 1.25rem;
-        color: #94a3b8;
-        margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-        color: #64748b;
-    }
-
-    /* Loading state */
-    .loading-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 4rem;
-        color: #64748b;
-    }
-
-    /* Footer */
-    .tasks-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1.5rem;
-        background: #1e293b;
-        border-radius: 12px;
-    }
-
-    .footer-info {
-        color: #94a3b8;
-    }
-
-    .footer-actions {
-        display: flex;
-        gap: 0.75rem;
-    }
-
-    .button-secondary {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: transparent;
-        border: 1px solid #475569;
-        border-radius: 8px;
-        color: #94a3b8;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .button-secondary:hover {
-        background: #334155;
-        color: #f1f5f9;
-        border-color: #475569;
-    }
-
-    /* Spinner */
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-
-    .spinner {
-        width: 2rem;
-        height: 2rem;
-        border: 3px solid #334155;
-        border-top-color: #667eea;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin-bottom: 1rem;
-    }
-
-    /* HTMX loading states */
-    .htmx-request .task-item {
-        opacity: 0.6;
-    }
-
-    .htmx-request.filter-tab {
-        pointer-events: none;
-        opacity: 0.7;
-    }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-        .tasks-container {
-            padding: 1rem;
-        }
-
-        .header-content {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-
-        .header-stats {
-            width: 100%;
-            justify-content: space-around;
-        }
-
-        .add-task-form {
-            flex-direction: column;
-        }
-
-        .task-input {
-            width: 100%;
-        }
-
-        .filter-tabs {
-            flex-wrap: wrap;
-        }
-
-        .tasks-footer {
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-        }
-    }
-</style>
-
-<script>
-    // Set active tab
-    function setActiveTab(button) {
-        document.querySelectorAll(".filter-tab").forEach((tab) => {
-            tab.classList.remove("active");
-        });
-        button.classList.add("active");
-    }
-
-    // Export tasks as JSON
-    function exportTasks() {
-        fetch("/api/tasks?format=json")
-            .then((response) => response.json())
-            .then((tasks) => {
-                const dataStr = JSON.stringify(tasks, null, 2);
-                const dataUri =
-                    "data:application/json;charset=utf-8," +
-                    encodeURIComponent(dataStr);
-
-                const exportFileDefaultName = `tasks-${new Date().toISOString().split("T")[0]}.json`;
-
-                const linkElement = document.createElement("a");
-                linkElement.setAttribute("href", dataUri);
-                linkElement.setAttribute("download", exportFileDefaultName);
-                linkElement.click();
-            });
-    }
-
-    // Update task statistics
-    function updateStats() {
-        fetch("/api/tasks/stats")
-            .then((response) => response.json())
-            .then((stats) => {
-                // Update header stats
-                document.querySelector(
-                    ".stat-item:nth-child(1) .stat-value",
-                ).textContent = stats.total || 0;
-                document.querySelector(
-                    ".stat-item:nth-child(2) .stat-value",
-                ).textContent = stats.active || 0;
-                document.querySelector(
-                    ".stat-item:nth-child(3) .stat-value",
-                ).textContent = stats.completed || 0;
-
-                // Update tab counts
-                document.getElementById("count-all").textContent =
-                    stats.total || 0;
-                document.getElementById("count-active").textContent =
-                    stats.active || 0;
-                document.getElementById("count-completed").textContent =
-                    stats.completed || 0;
-                document.getElementById("count-priority").textContent =
-                    stats.priority || 0;
-
-                // Update footer text
-                const footerText = document.getElementById("footer-text");
-                if (stats.active === 0) {
-                    footerText.innerHTML = "All tasks completed! 🎉";
-                } else {
-                    footerText.innerHTML = `<strong>${stats.active}</strong> ${stats.active === 1 ? "task" : "tasks"} remaining`;
-                }
-
-                // Show/hide footer
-                const footer = document.getElementById("task-footer");
-                footer.style.display = stats.total > 0 ? "flex" : "none";
-            });
-    }
-
-    // Handle checkbox changes
-    document.addEventListener("change", function (e) {
-        if (e.target.classList.contains("task-checkbox")) {
-            const taskId = e.target.dataset.taskId;
-            const completed = e.target.checked;
-
-            fetch(`/api/tasks/${taskId}/status`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ completed }),
-            }).then(() => {
-                const taskItem = e.target.closest(".task-item");
-                if (completed) {
-                    taskItem.classList.add("completed");
-                } else {
-                    taskItem.classList.remove("completed");
-                }
-                updateStats();
-            });
-        }
-    });
-
-    // Handle task actions
-    document.addEventListener("click", function (e) {
-        // Priority toggle
-        if (e.target.closest('[data-action="priority"]')) {
-            const btn = e.target.closest('[data-action="priority"]');
-            const taskId = btn.dataset.taskId;
-            const priority = !btn.classList.contains("active");
-
-            fetch(`/api/tasks/${taskId}/priority`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ priority }),
-            }).then(() => {
-                btn.classList.toggle("active");
-                updateStats();
-            });
-        }
-
-        // Edit task
-        if (e.target.closest('[data-action="edit"]')) {
-            const btn = e.target.closest('[data-action="edit"]');
-            const taskId = btn.dataset.taskId;
-            const taskItem = btn.closest(".task-item");
-            const taskText = taskItem.querySelector(".task-text");
-            const currentText = taskText.textContent;
-
-            const input = document.createElement("input");
-            input.type = "text";
-            input.className = "task-edit-input";
-            input.value = currentText;
-
-            taskText.replaceWith(input);
-            input.focus();
-            input.select();
-
-            input.addEventListener("blur", function () {
-                saveEdit();
-            });
-
-            input.addEventListener("keydown", function (e) {
-                if (e.key === "Enter") {
-                    saveEdit();
-                } else if (e.key === "Escape") {
-                    cancelEdit();
-                }
-            });
-
-            function saveEdit() {
-                const newText = input.value.trim();
-                if (newText && newText !== currentText) {
-                    fetch(`/api/tasks/${taskId}`, {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ text: newText }),
-                    }).then(() => {
-                        const span = document.createElement("span");
-                        span.className = "task-text";
-                        span.textContent = newText;
-                        input.replaceWith(span);
-                    });
-                } else {
-                    cancelEdit();
-                }
-            }
-
-            function cancelEdit() {
-                const span = document.createElement("span");
-                span.className = "task-text";
-                span.textContent = currentText;
-                input.replaceWith(span);
-            }
-        }
-
-        // Delete task
-        if (e.target.closest('[data-action="delete"]')) {
-            const btn = e.target.closest('[data-action="delete"]');
-            const taskId = btn.dataset.taskId;
-
-            if (confirm("Delete this task?")) {
-                fetch(`/api/tasks/${taskId}`, {
-                    method: "DELETE",
-                }).then(() => {
-                    const taskItem = btn.closest(".task-item");
-                    taskItem.style.animation = "slideOut 0.3s ease";
-                    setTimeout(() => {
-                        taskItem.remove();
-                        updateStats();
-                    }, 300);
-                });
-            }
-        }
-    });
-
-    // Animation for removing tasks
-    const style = document.createElement("style");
-    style.textContent = `
-    @keyframes slideOut {
-        to {
-            opacity: 0;
-            transform: translateX(-100%);
-        }
-    }
-`;
-    document.head.appendChild(style);
-
-    // Update stats after any HTMX request
-    document.body.addEventListener("htmx:afterSwap", function (evt) {
-        if (evt.detail.target.id === "task-list") {
-            updateStats();
-        }
-    });
-
-    // Initial stats load
-    document.addEventListener("DOMContentLoaded", function () {
-        updateStats();
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener("keydown", function (e) {
-        // Alt + N for new task
-        if (e.altKey && e.key === "n") {
-            e.preventDefault();
-            document.querySelector(".task-input").focus();
-        }
-
-        // Alt + 1-4 for filter tabs
-        if (e.altKey && e.key >= "1" && e.key <= "4") {
-            e.preventDefault();
-            const tabs = document.querySelectorAll(".filter-tab");
-            const index = parseInt(e.key) - 1;
-            if (tabs[index]) {
-                tabs[index].click();
-            }
-        }
-    });
-</script>
+<script src="/suite/tasks/tasks-sentient.js"></script>
