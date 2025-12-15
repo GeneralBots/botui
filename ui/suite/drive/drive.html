@@ -1,0 +1,319 @@
+<!-- =============================================================================
+     DRIVE APP
+     File Management Interface
+     ============================================================================= -->
+
+<link rel="stylesheet" href="/themes/sentient/sentient.css" />
+<link rel="stylesheet" href="/suite/drive/drive.css" />
+
+<div class="drive-app sentient-theme">
+    <!-- Top Header Bar -->
+    <header class="drive-topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo">
+                <div class="topbar-logo-icon">📁</div>
+                <span>Drive</span>
+            </div>
+            <nav class="topbar-nav">
+                <button class="topbar-nav-item active">My Files</button>
+                <button class="topbar-nav-item">Shared</button>
+                <button class="topbar-nav-item">Recent</button>
+                <button class="topbar-nav-item">Starred</button>
+            </nav>
+        </div>
+
+        <div class="topbar-center">
+            <div class="topbar-search">
+                <span class="topbar-search-icon">🔍</span>
+                <input
+                    type="text"
+                    class="topbar-search-input"
+                    placeholder="Search files and folders..."
+                />
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <button class="topbar-btn-primary" onclick="uploadFile()">
+                <span>⬆️</span> Upload
+            </button>
+            <button class="topbar-icon-btn" title="New Folder" onclick="createFolder()">
+                📁+
+            </button>
+            <button class="topbar-icon-btn" title="Grid View" onclick="toggleView('grid')">
+                ⊞
+            </button>
+            <button class="topbar-icon-btn" title="List View" onclick="toggleView('list')">
+                ☰
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="drive-main">
+        <!-- Left: File Browser -->
+        <section class="drive-content-panel">
+            <!-- Stat Cards -->
+            <div class="drive-stat-cards">
+                <div class="stat-card highlight">
+                    <div class="stat-card-icon">💾</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">Storage Used</div>
+                        <div class="stat-card-value">12.4 GB</div>
+                        <div class="stat-card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 62%"></div>
+                            </div>
+                            <span class="progress-text">62% of 20 GB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">📄</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">Files</div>
+                        <div class="stat-card-value">1,847</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">📂</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">Folders</div>
+                        <div class="stat-card-value">156</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">🔗</div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">Shared</div>
+                        <div class="stat-card-value">42</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breadcrumb Navigation -->
+            <div class="drive-breadcrumb">
+                <button class="breadcrumb-item" onclick="navigateTo('root')">
+                    🏠 Home
+                </button>
+                <span class="breadcrumb-separator">›</span>
+                <button class="breadcrumb-item" onclick="navigateTo('projects')">
+                    Projects
+                </button>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item current">General Bots</span>
+            </div>
+
+            <!-- File Grid -->
+            <div
+                class="drive-file-grid"
+                id="file-view"
+                hx-get="/api/drive/list"
+                hx-trigger="load"
+                hx-swap="innerHTML"
+            >
+                <!-- Folders -->
+                <article class="file-item folder" data-id="1" onclick="openFolder(this)">
+                    <div class="file-icon">📁</div>
+                    <div class="file-info">
+                        <div class="file-name">Documents</div>
+                        <div class="file-meta">12 items • Modified 2 hours ago</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item folder" data-id="2" onclick="openFolder(this)">
+                    <div class="file-icon">📁</div>
+                    <div class="file-info">
+                        <div class="file-name">Images</div>
+                        <div class="file-meta">45 items • Modified yesterday</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item folder" data-id="3" onclick="openFolder(this)">
+                    <div class="file-icon">📁</div>
+                    <div class="file-info">
+                        <div class="file-name">Source Code</div>
+                        <div class="file-meta">89 items • Modified 3 days ago</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item folder" data-id="4" onclick="openFolder(this)">
+                    <div class="file-icon">📁</div>
+                    <div class="file-info">
+                        <div class="file-name">Backups</div>
+                        <div class="file-meta">8 items • Modified last week</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <!-- Files -->
+                <article class="file-item" data-id="5" onclick="selectFile(this)">
+                    <div class="file-icon">📄</div>
+                    <div class="file-info">
+                        <div class="file-name">project-report.pdf</div>
+                        <div class="file-meta">2.4 MB • Modified today</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Download">⬇️</button>
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item" data-id="6" onclick="selectFile(this)">
+                    <div class="file-icon">🖼️</div>
+                    <div class="file-info">
+                        <div class="file-name">dashboard-mockup.png</div>
+                        <div class="file-meta">1.8 MB • Modified yesterday</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Download">⬇️</button>
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item" data-id="7" onclick="selectFile(this)">
+                    <div class="file-icon">📊</div>
+                    <div class="file-info">
+                        <div class="file-name">analytics-2025.xlsx</div>
+                        <div class="file-meta">890 KB • Modified 2 days ago</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Download">⬇️</button>
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item" data-id="8" onclick="selectFile(this)">
+                    <div class="file-icon">📝</div>
+                    <div class="file-info">
+                        <div class="file-name">meeting-notes.md</div>
+                        <div class="file-meta">45 KB • Modified 3 days ago</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Download">⬇️</button>
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item" data-id="9" onclick="selectFile(this)">
+                    <div class="file-icon">🎬</div>
+                    <div class="file-info">
+                        <div class="file-name">demo-video.mp4</div>
+                        <div class="file-meta">125 MB • Modified last week</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Download">⬇️</button>
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+
+                <article class="file-item" data-id="10" onclick="selectFile(this)">
+                    <div class="file-icon">📦</div>
+                    <div class="file-info">
+                        <div class="file-name">release-v2.0.zip</div>
+                        <div class="file-meta">45 MB • Modified last week</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="file-action-btn" title="Download">⬇️</button>
+                        <button class="file-action-btn" title="Share">🔗</button>
+                        <button class="file-action-btn" title="More">⋯</button>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Right: File Details / AI Panel -->
+        <aside class="drive-detail-panel" id="detail-panel">
+            <!-- File Preview Section -->
+            <div class="detail-header">
+                <h2 class="detail-title">File Details</h2>
+                <div class="detail-actions">
+                    <button class="detail-action-btn" title="Close">✕</button>
+                </div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-preview">
+                    <div class="preview-placeholder">
+                        <span class="preview-icon">📄</span>
+                        <p>Select a file to preview</p>
+                    </div>
+                </div>
+
+                <div class="detail-info">
+                    <div class="info-row">
+                        <span class="info-label">Name</span>
+                        <span class="info-value" id="detail-name">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Size</span>
+                        <span class="info-value" id="detail-size">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Type</span>
+                        <span class="info-value" id="detail-type">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Modified</span>
+                        <span class="info-value" id="detail-modified">—</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Location</span>
+                        <span class="info-value" id="detail-location">—</span>
+                    </div>
+                </div>
+
+                <div class="detail-quick-actions">
+                    <button class="quick-action-btn">⬇️ Download</button>
+                    <button class="quick-action-btn">🔗 Share</button>
+                    <button class="quick-action-btn">✏️ Rename</button>
+                    <button class="quick-action-btn">🗑️ Delete</button>
+                </div>
+            </div>
+
+            <!-- AI Assistant Section -->
+            <section class="drive-ai-section">
+                <div class="ai-section-header">
+                    <span class="ai-icon">🤖</span>
+                    <span class="ai-title">AI Assistant</span>
+                </div>
+                <div class="ai-suggestions">
+                    <button class="ai-suggestion-btn" onclick="aiAction('organize')">
+                        Organize files
+                    </button>
+                    <button class="ai-suggestion-btn" onclick="aiAction('find')">
+                        Find duplicates
+                    </button>
+                    <button class="ai-suggestion-btn" onclick="aiAction('analyze')">
+                        Analyze content
+                    </button>
+                    <button class="ai-suggestion-btn" onclick="aiAction('summarize')">
+                        Summarize document
+                    </button>
+                </div>
+            </section>
+        </aside>
+    </main>
+</div>
+
+<script src="/suite/drive/drive.js"></script>
