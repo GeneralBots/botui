@@ -7,13 +7,16 @@
 // STATE MANAGEMENT
 // =============================================================================
 
-const TasksState = {
-  selectedTaskId: 2, // Default selected task
-  currentFilter: "complete",
-  tasks: [],
-  wsConnection: null,
-  agentLogPaused: false,
-};
+// Prevent duplicate declaration when script is reloaded via HTMX
+if (typeof TasksState === "undefined") {
+  var TasksState = {
+    selectedTaskId: 2, // Default selected task
+    currentFilter: "complete",
+    tasks: [],
+    wsConnection: null,
+    agentLogPaused: false,
+  };
+}
 
 // =============================================================================
 // INITIALIZATION

@@ -14,7 +14,7 @@
         <!-- Quick Actions -->
         <div class="sidebar-actions">
             <button class="btn-primary-full" id="new-event-btn"
-                    hx-get="/api/calendar/event/new"
+                    hx-get="/ui/calendar/event/new"
                     hx-target="#event-modal-content"
                     hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -55,7 +55,7 @@
             <div class="section-header">
                 <h3>My Calendars</h3>
                 <button class="btn-icon-sm" title="Add Calendar"
-                        hx-get="/api/calendar/new"
+                        hx-get="/ui/calendar/new"
                         hx-target="#calendar-modal-content">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -64,7 +64,7 @@
                 </button>
             </div>
             <div class="calendars-list" id="calendars-list"
-                 hx-get="/api/calendar/list"
+                 hx-get="/ui/calendar/list"
                  hx-trigger="load"
                  hx-swap="innerHTML">
                 <!-- Calendars loaded here -->
@@ -75,7 +75,7 @@
         <div class="sidebar-section">
             <h3>Upcoming</h3>
             <div class="upcoming-events" id="upcoming-events"
-                 hx-get="/api/calendar/upcoming"
+                 hx-get="/ui/calendar/upcoming"
                  hx-trigger="load"
                  hx-swap="innerHTML">
                 <!-- Upcoming events loaded here -->
@@ -423,7 +423,7 @@
                 <div class="form-group">
                     <label>Import to calendar</label>
                     <select name="calendar_id"
-                            hx-get="/api/calendar/list"
+                            hx-get="/ui/calendar/list"
                             hx-trigger="load"
                             hx-swap="innerHTML">
                         <option value="">Default Calendar</option>
@@ -1692,6 +1692,8 @@
 
     function updateCurrentTimeIndicator() {
         const indicator = document.getElementById('current-time-indicator');
+        if (!indicator) return; // Guard against null element
+
         const now = new Date();
         const minutes = now.getHours() * 60 + now.getMinutes();
         const top = (minutes / 60) * 48; // 48px per hour

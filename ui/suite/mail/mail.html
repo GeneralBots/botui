@@ -12,7 +12,7 @@
 
         <!-- Folder List -->
         <div class="folders-section">
-            <div class="nav-item active" data-folder="inbox" hx-get="/api/email/list?folder=inbox" hx-target="#mail-list" hx-swap="innerHTML">
+            <div class="nav-item active" data-folder="inbox" hx-get="/ui/email/list?folder=inbox" hx-target="#mail-list" hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
                     <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
@@ -20,20 +20,20 @@
                 <span>Inbox</span>
                 <span class="folder-badge unread" id="inbox-count">0</span>
             </div>
-            <div class="nav-item" data-folder="starred" hx-get="/api/email/list?folder=starred" hx-target="#mail-list" hx-swap="innerHTML">
+            <div class="nav-item" data-folder="starred" hx-get="/ui/email/list?folder=starred" hx-target="#mail-list" hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                 </svg>
                 <span>Starred</span>
             </div>
-            <div class="nav-item" data-folder="sent" hx-get="/api/email/list?folder=sent" hx-target="#mail-list" hx-swap="innerHTML">
+            <div class="nav-item" data-folder="sent" hx-get="/ui/email/list?folder=sent" hx-target="#mail-list" hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="22" y1="2" x2="11" y2="13"/>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                 </svg>
                 <span>Sent</span>
             </div>
-            <div class="nav-item" data-folder="scheduled" hx-get="/api/email/list?folder=scheduled" hx-target="#mail-list" hx-swap="innerHTML">
+            <div class="nav-item" data-folder="scheduled" hx-get="/ui/email/list?folder=scheduled" hx-target="#mail-list" hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="10"/>
                     <polyline points="12 6 12 12 16 14"/>
@@ -41,7 +41,7 @@
                 <span>Scheduled</span>
                 <span class="folder-badge" id="scheduled-count">0</span>
             </div>
-            <div class="nav-item" data-folder="drafts" hx-get="/api/email/list?folder=drafts" hx-target="#mail-list" hx-swap="innerHTML">
+            <div class="nav-item" data-folder="drafts" hx-get="/ui/email/list?folder=drafts" hx-target="#mail-list" hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14 2 14 8 20 8"/>
@@ -58,7 +58,7 @@
                 </svg>
                 <span>Tracking</span>
             </div>
-            <div class="nav-item" data-folder="spam" hx-get="/api/email/list?folder=spam" hx-target="#mail-list" hx-swap="innerHTML">
+            <div class="nav-item" data-folder="spam" hx-get="/ui/email/list?folder=spam" hx-target="#mail-list" hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
                     <line x1="12" y1="9" x2="12" y2="13"/>
@@ -66,7 +66,7 @@
                 </svg>
                 <span>Spam</span>
             </div>
-            <div class="nav-item" data-folder="trash" hx-get="/api/email/list?folder=trash" hx-target="#mail-list" hx-swap="innerHTML">
+            <div class="nav-item" data-folder="trash" hx-get="/ui/email/list?folder=trash" hx-target="#mail-list" hx-swap="innerHTML">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
@@ -87,7 +87,7 @@
                 </button>
             </div>
             <div id="accounts-list"
-                 hx-get="/api/email/accounts"
+                 hx-get="/ui/email/accounts"
                  hx-trigger="load"
                  hx-swap="innerHTML">
                 <!-- Accounts loaded here -->
@@ -105,7 +105,7 @@
                     </svg>
                 </button>
             </div>
-            <div id="labels-list" hx-get="/api/email/labels" hx-trigger="load" hx-swap="innerHTML">
+            <div id="labels-list" hx-get="/ui/email/labels" hx-trigger="load" hx-swap="innerHTML">
                 <div class="label-item" style="--label-color: #ef4444;">
                     <span class="label-dot"></span>
                     <span>Important</span>
@@ -169,7 +169,7 @@
                         <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
                     <input type="text" placeholder="Search emails..." id="email-search"
-                           hx-get="/api/email/search" hx-trigger="keyup changed delay:300ms"
+                           hx-get="/ui/email/search" hx-trigger="keyup changed delay:300ms"
                            hx-target="#mail-list" hx-include="this" name="q"/>
                 </div>
                 <button class="icon-btn" onclick="refreshMailList()" title="Refresh">
@@ -212,7 +212,7 @@
             </button>
         </div>
 
-        <div id="mail-list" hx-get="/api/email/list?folder=inbox" hx-trigger="load" hx-swap="innerHTML">
+        <div id="mail-list" hx-get="/ui/email/list?folder=inbox" hx-trigger="load" hx-swap="innerHTML">
             <div class="loading-state">
                 <div class="spinner"></div>
                 <p>Loading emails...</p>
@@ -421,7 +421,7 @@
                 </svg>
             </button>
         </div>
-        <div class="templates-list" id="templates-list" hx-get="/api/email/templates" hx-trigger="load" hx-swap="innerHTML">
+        <div class="templates-list" id="templates-list" hx-get="/ui/email/templates" hx-trigger="load" hx-swap="innerHTML">
             <div class="loading-state"><div class="spinner"></div></div>
         </div>
         <div class="modal-footer">
@@ -443,7 +443,7 @@
                 </svg>
             </button>
         </div>
-        <div class="signatures-list" id="signatures-list" hx-get="/api/email/signatures" hx-trigger="load" hx-swap="innerHTML">
+        <div class="signatures-list" id="signatures-list" hx-get="/ui/email/signatures" hx-trigger="load" hx-swap="innerHTML">
             <div class="loading-state"><div class="spinner"></div></div>
         </div>
         <div class="modal-footer">
@@ -465,7 +465,7 @@
                 </svg>
             </button>
         </div>
-        <div class="rules-list" id="rules-list" hx-get="/api/email/rules" hx-trigger="load" hx-swap="innerHTML">
+        <div class="rules-list" id="rules-list" hx-get="/ui/email/rules" hx-trigger="load" hx-swap="innerHTML">
             <div class="loading-state"><div class="spinner"></div></div>
         </div>
         <div class="modal-footer">
@@ -487,7 +487,7 @@
                 </svg>
             </button>
         </div>
-        <form id="autoresponder-form" hx-post="/api/email/auto-responder" hx-swap="none">
+        <form id="autoresponder-form" hx-post="/ui/email/auto-responder" hx-swap="none">
             <div class="form-group">
                 <label class="toggle-label">
                     <input type="checkbox" name="enabled" id="autoresponder-enabled"/>
@@ -1013,19 +1013,28 @@
         to { transform: rotate(360deg); }
     }
 
-    /* Modals */
-    .modal {
+    /* Modals - dialog elements are hidden by default */
+    dialog.modal {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: transparent;
+        border: none;
+        padding: 1rem;
+        z-index: 1000;
+        max-width: 100vw;
+        max-height: 100vh;
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+
+    dialog.modal[open] {
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 1000;
-        padding: 1rem;
     }
 
-    .modal::backdrop {
+    dialog.modal::backdrop {
         background: rgba(0, 0, 0, 0.5);
     }
 

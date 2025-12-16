@@ -6,9 +6,10 @@
 /* Research Container */
 .research-container {
     display: flex;
-    height: calc(100vh - 60px);
-    background: var(--background);
-    color: var(--foreground);
+    height: 100%;
+    min-height: 0;
+    background: var(--background, var(--bg-primary, #0a0a0f));
+    color: var(--foreground, var(--text-primary, #ffffff));
 }
 
 /* Sidebar */
@@ -398,12 +399,22 @@
     animation: bounce 1.4s infinite ease-in-out both;
 }
 
-.indicator-dots span:nth-child(1) { animation-delay: -0.32s; }
-.indicator-dots span:nth-child(2) { animation-delay: -0.16s; }
+.indicator-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+.indicator-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
 
 @keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
 }
 
 .indicator-text {
@@ -557,7 +568,7 @@
     background: var(--muted);
     padding: 2px 6px;
     border-radius: 4px;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
     font-size: 13px;
 }
 

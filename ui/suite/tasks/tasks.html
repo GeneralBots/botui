@@ -14,6 +14,24 @@
                     <span class="tasks-count" id="tasks-total-count"
                         >24 tasks</span
                     >
+                    <button
+                        class="btn-new-intent"
+                        onclick="showNewIntentModal()"
+                        title="Create new intent"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        New Intent
+                    </button>
                 </div>
 
                 <!-- Status Filter Pills -->
@@ -505,4 +523,156 @@
     </main>
 </div>
 
-<script src="/suite/tasks/tasks.js"></script>
+<!-- New Intent Modal -->
+<div class="modal-overlay" id="newIntentModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Create New Intent</h3>
+            <button class="modal-close" onclick="closeNewIntentModal()">
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form
+                id="newIntentForm"
+                hx-post="/api/tasks"
+                hx-target="#task-list"
+                hx-swap="afterbegin"
+            >
+                <div class="form-group">
+                    <label class="form-label" for="intentTitle"
+                        >Intent Title</label
+                    >
+                    <input
+                        type="text"
+                        class="form-input"
+                        id="intentTitle"
+                        name="title"
+                        placeholder="e.g., Launch Q4 Campaign for Verse"
+                        required
+                    />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="intentDescription"
+                        >Description</label
+                    >
+                    <textarea
+                        class="form-input"
+                        id="intentDescription"
+                        name="description"
+                        rows="3"
+                        placeholder="Describe what this intent should accomplish..."
+                    ></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="intentDueDate"
+                            >Due Date</label
+                        >
+                        <input
+                            type="date"
+                            class="form-input"
+                            id="intentDueDate"
+                            name="due_date"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="intentPriority"
+                            >Priority</label
+                        >
+                        <select
+                            class="form-input"
+                            id="intentPriority"
+                            name="priority"
+                        >
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="intentGoal"
+                        >Goal / Success Criteria</label
+                    >
+                    <textarea
+                        class="form-input"
+                        id="intentGoal"
+                        name="goal"
+                        rows="2"
+                        placeholder="How will you know when this intent is complete?"
+                    ></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button
+                class="decision-btn decision-btn-secondary"
+                onclick="closeNewIntentModal()"
+            >
+                Cancel
+            </button>
+            <button
+                class="decision-btn decision-btn-primary"
+                type="submit"
+                form="newIntentForm"
+            >
+                Create Intent
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Conditionally load tasks.js only if not already loaded
+    if (typeof TasksState === "undefined") {
+        const script = document.createElement("script");
+        script.src = "tasks/tasks.js";
+        document.head.appendChild(script);
+    }
+</script>
+<script>
+    // New Intent Modal functions
+    function showNewIntentModal() {
+        document.getElementById("newIntentModal").classList.add("show");
+        document.getElementById("intentTitle").focus();
+    }
+
+    function closeNewIntentModal() {
+        document.getElementById("newIntentModal").classList.remove("show");
+        document.getElementById("newIntentForm").reset();
+    }
+
+    // Close modal on escape key
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            closeNewIntentModal();
+        }
+    });
+
+    // Close modal when clicking overlay
+    document
+        .getElementById("newIntentModal")
+        ?.addEventListener("click", (e) => {
+            if (e.target.classList.contains("modal-overlay")) {
+                closeNewIntentModal();
+            }
+        });
+
+    // Close modal after successful form submission
+    document.body.addEventListener("htmx:afterRequest", (e) => {
+        if (e.detail.elt.id === "newIntentForm" && e.detail.successful) {
+            closeNewIntentModal();
+        }
+    });
+</script>

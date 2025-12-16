@@ -8,13 +8,14 @@
             name="description"
             content="General Bots - AI-powered workspace"
         />
-        <meta name="theme-color" content="#3b82f6" />
+        <meta name="theme-color" content="#d4f505" />
 
         <!-- Styles -->
         <link rel="stylesheet" href="css/app.css" />
         <link rel="stylesheet" href="css/apps-extended.css" />
         <link rel="stylesheet" href="css/components.css" />
         <link rel="stylesheet" href="css/base.css" />
+        <link rel="stylesheet" href="css/theme-sentient.css" />
 
         <!-- App-specific CSS -->
         <link rel="stylesheet" href="chat/chat.css" />
@@ -41,7 +42,7 @@
         </script>
     </head>
 
-    <body>
+    <body data-theme="sentient">
         <!-- Loading overlay -->
         <div class="loading-overlay" id="loadingOverlay">
             <div class="loading-spinner"></div>
@@ -231,7 +232,13 @@
                     </svg>
                     <span class="notification-badge">3</span>
                 </button>
-                <button class="icon-button" title="Settings">
+                <button
+                    class="icon-button"
+                    id="settingsBtn"
+                    title="Settings"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                >
                     <svg
                         width="20"
                         height="20"
@@ -246,6 +253,108 @@
                         />
                     </svg>
                 </button>
+
+                <!-- Settings/Theme Panel -->
+                <div
+                    class="settings-panel"
+                    id="settingsPanel"
+                    role="menu"
+                    aria-label="Settings"
+                >
+                    <div class="settings-panel-title">Theme</div>
+                    <div class="theme-grid">
+                        <button
+                            class="theme-option theme-sentient"
+                            data-theme="sentient"
+                            title="Sentient"
+                        >
+                            <div class="theme-option-inner">
+                                <div class="theme-option-header">
+                                    <div class="theme-option-dot"></div>
+                                </div>
+                                <div class="theme-option-body">
+                                    <div class="theme-option-line"></div>
+                                </div>
+                            </div>
+                            <span class="theme-option-name">Sentient</span>
+                        </button>
+                        <button
+                            class="theme-option theme-dark"
+                            data-theme="dark"
+                            title="Dark"
+                        >
+                            <div class="theme-option-inner">
+                                <div class="theme-option-header">
+                                    <div class="theme-option-dot"></div>
+                                </div>
+                                <div class="theme-option-body">
+                                    <div class="theme-option-line"></div>
+                                </div>
+                            </div>
+                            <span class="theme-option-name">Dark</span>
+                        </button>
+                        <button
+                            class="theme-option theme-light"
+                            data-theme="light"
+                            title="Light"
+                        >
+                            <div class="theme-option-inner">
+                                <div class="theme-option-header">
+                                    <div class="theme-option-dot"></div>
+                                </div>
+                                <div class="theme-option-body">
+                                    <div class="theme-option-line"></div>
+                                </div>
+                            </div>
+                            <span class="theme-option-name">Light</span>
+                        </button>
+                        <button
+                            class="theme-option theme-orange"
+                            data-theme="orange"
+                            title="Orange"
+                        >
+                            <div class="theme-option-inner">
+                                <div class="theme-option-header">
+                                    <div class="theme-option-dot"></div>
+                                </div>
+                                <div class="theme-option-body">
+                                    <div class="theme-option-line"></div>
+                                </div>
+                            </div>
+                            <span class="theme-option-name">Orange</span>
+                        </button>
+                        <button
+                            class="theme-option theme-purple"
+                            data-theme="purple"
+                            title="Purple"
+                        >
+                            <div class="theme-option-inner">
+                                <div class="theme-option-header">
+                                    <div class="theme-option-dot"></div>
+                                </div>
+                                <div class="theme-option-body">
+                                    <div class="theme-option-line"></div>
+                                </div>
+                            </div>
+                            <span class="theme-option-name">Purple</span>
+                        </button>
+                        <button
+                            class="theme-option theme-green"
+                            data-theme="green"
+                            title="Green"
+                        >
+                            <div class="theme-option-inner">
+                                <div class="theme-option-header">
+                                    <div class="theme-option-dot"></div>
+                                </div>
+                                <div class="theme-option-body">
+                                    <div class="theme-option-line"></div>
+                                </div>
+                            </div>
+                            <span class="theme-option-name">Green</span>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Apps dropdown menu -->
                 <nav
@@ -804,12 +913,17 @@
                 // Simple apps menu handling
                 const appsBtn = document.getElementById("appsButton");
                 const appsDropdown = document.getElementById("appsDropdown");
+                const settingsBtn = document.getElementById("settingsBtn");
+                const settingsPanel = document.getElementById("settingsPanel");
 
                 if (appsBtn && appsDropdown) {
                     appsBtn.addEventListener("click", (e) => {
                         e.stopPropagation();
                         const isOpen = appsDropdown.classList.toggle("show");
                         appsBtn.setAttribute("aria-expanded", isOpen);
+                        // Close settings panel
+                        if (settingsPanel)
+                            settingsPanel.classList.remove("show");
                     });
 
                     document.addEventListener("click", (e) => {
@@ -822,6 +936,69 @@
                         }
                     });
                 }
+
+                // Settings panel handling
+                if (settingsBtn && settingsPanel) {
+                    settingsBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const isOpen = settingsPanel.classList.toggle("show");
+                        settingsBtn.setAttribute("aria-expanded", isOpen);
+                        // Close apps dropdown
+                        if (appsDropdown) appsDropdown.classList.remove("show");
+                    });
+
+                    document.addEventListener("click", (e) => {
+                        if (
+                            !settingsPanel.contains(e.target) &&
+                            !settingsBtn.contains(e.target)
+                        ) {
+                            settingsPanel.classList.remove("show");
+                            settingsBtn.setAttribute("aria-expanded", "false");
+                        }
+                    });
+                }
+
+                // Theme selection handling
+                const themeOptions = document.querySelectorAll(".theme-option");
+                const savedTheme =
+                    localStorage.getItem("gb-theme") || "sentient";
+
+                // Apply saved theme
+                document.body.setAttribute("data-theme", savedTheme);
+                document
+                    .querySelector(`.theme-option[data-theme="${savedTheme}"]`)
+                    ?.classList.add("active");
+
+                themeOptions.forEach((option) => {
+                    option.addEventListener("click", () => {
+                        const theme = option.getAttribute("data-theme");
+                        document.body.setAttribute("data-theme", theme);
+                        localStorage.setItem("gb-theme", theme);
+                        themeOptions.forEach((o) =>
+                            o.classList.remove("active"),
+                        );
+                        option.classList.add("active");
+
+                        // Update theme-color meta tag
+                        const themeColors = {
+                            dark: "#3b82f6",
+                            light: "#3b82f6",
+                            purple: "#a855f7",
+                            green: "#22c55e",
+                            orange: "#f97316",
+                            sentient: "#d4f505",
+                        };
+                        const metaTheme = document.querySelector(
+                            'meta[name="theme-color"]',
+                        );
+                        if (metaTheme) {
+                            metaTheme.setAttribute(
+                                "content",
+                                themeColors[theme] || "#d4f505",
+                            );
+                        }
+                    });
+                });
 
                 // Handle app item clicks - update active state
                 document.querySelectorAll(".app-item").forEach((item) => {

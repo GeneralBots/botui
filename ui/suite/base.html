@@ -362,182 +362,64 @@
                         <!-- Theme Selection -->
                         <div class="settings-section">
                             <div class="settings-section-title">Theme</div>
-                            <div class="theme-grid">
-                                <div
-                                    class="theme-option theme-dark"
-                                    data-theme="dark"
-                                    title="Dark"
-                                >
-                                    <div class="theme-option-inner">
-                                        <div class="theme-option-header">
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                        </div>
-                                        <div class="theme-option-body">
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 80%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 60%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 70%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    <span class="theme-option-name">Dark</span>
-                                </div>
-                                <div
-                                    class="theme-option theme-light"
-                                    data-theme="light"
-                                    title="Light"
-                                >
-                                    <div class="theme-option-inner">
-                                        <div class="theme-option-header">
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                        </div>
-                                        <div class="theme-option-body">
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 80%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 60%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 70%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    <span class="theme-option-name">Light</span>
-                                </div>
-                                <div
-                                    class="theme-option theme-blue"
-                                    data-theme="blue"
-                                    title="Ocean"
-                                >
-                                    <div class="theme-option-inner">
-                                        <div class="theme-option-header">
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                        </div>
-                                        <div class="theme-option-body">
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 80%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 60%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 70%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    <span class="theme-option-name">Ocean</span>
-                                </div>
-                                <div
-                                    class="theme-option theme-purple"
-                                    data-theme="purple"
-                                    title="Violet"
-                                >
-                                    <div class="theme-option-inner">
-                                        <div class="theme-option-header">
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                        </div>
-                                        <div class="theme-option-body">
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 80%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 60%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 70%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    <span class="theme-option-name"
-                                        >Violet</span
-                                    >
-                                </div>
-                                <div
-                                    class="theme-option theme-green"
-                                    data-theme="green"
-                                    title="Forest"
-                                >
-                                    <div class="theme-option-inner">
-                                        <div class="theme-option-header">
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                        </div>
-                                        <div class="theme-option-body">
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 80%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 60%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 70%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    <span class="theme-option-name"
-                                        >Forest</span
-                                    >
-                                </div>
-                                <div
-                                    class="theme-option theme-orange"
-                                    data-theme="orange"
-                                    title="Sunset"
-                                >
-                                    <div class="theme-option-inner">
-                                        <div class="theme-option-header">
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                            <div class="theme-option-dot"></div>
-                                        </div>
-                                        <div class="theme-option-body">
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 80%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 60%"
-                                            ></div>
-                                            <div
-                                                class="theme-option-line"
-                                                style="width: 70%"
-                                            ></div>
-                                        </div>
-                                    </div>
-                                    <span class="theme-option-name"
-                                        >Sunset</span
-                                    >
-                                </div>
-                            </div>
+                            <select id="themeSelector" class="theme-dropdown">
+                                <optgroup label="Core Themes">
+                                    <option value="sentient">
+                                        🤖 Sentient
+                                    </option>
+                                    <option value="dark">🌑 Dark</option>
+                                    <option value="light">☀️ Light</option>
+                                    <option value="blue">🌊 Ocean</option>
+                                    <option value="purple">💜 Violet</option>
+                                    <option value="green">🌲 Forest</option>
+                                    <option value="orange">🌅 Sunset</option>
+                                </optgroup>
+                                <optgroup label="Retro Themes">
+                                    <option value="cyberpunk">
+                                        🌃 Cyberpunk
+                                    </option>
+                                    <option value="retrowave">
+                                        🌴 Retrowave
+                                    </option>
+                                    <option value="vapordream">
+                                        💭 Vapor Dream
+                                    </option>
+                                    <option value="y2kglow">✨ Y2K</option>
+                                    <option value="arcadeflash">
+                                        🕹️ Arcade
+                                    </option>
+                                    <option value="discofever">🪩 Disco</option>
+                                    <option value="grungeera">🎸 Grunge</option>
+                                </optgroup>
+                                <optgroup label="Classic Themes">
+                                    <option value="jazzage">🎺 Jazz Age</option>
+                                    <option value="mellowgold">
+                                        🌻 Mellow Gold
+                                    </option>
+                                    <option value="midcenturymod">
+                                        🏠 Mid Century
+                                    </option>
+                                    <option value="polaroidmemories">
+                                        📷 Polaroid
+                                    </option>
+                                    <option value="saturdaycartoons">
+                                        📺 Cartoons
+                                    </option>
+                                    <option value="seasidepostcard">
+                                        🏖️ Seaside
+                                    </option>
+                                    <option value="typewriter">
+                                        ⌨️ Typewriter
+                                    </option>
+                                </optgroup>
+                                <optgroup label="Tech Themes">
+                                    <option value="3dbevel">🔲 3D Bevel</option>
+                                    <option value="xeroxui">📠 Xerox UI</option>
+                                    <option value="xtreegold">
+                                        📁 XTree Gold
+                                    </option>
+                                </optgroup>
+                            </select>
                         </div>
 
                         <div class="settings-divider"></div>
@@ -730,7 +612,7 @@
             <div id="main-content" aria-busy="false" tabindex="-1">
                 {% block content %}{% endblock %}
             </div>
-            
+
             <!-- AI Assistant Panel (visible on all screens except Chat) -->
             <aside class="ai-assistant-panel" id="ai-panel">
                 <div class="ai-panel-header">
@@ -741,31 +623,56 @@
                             <p class="ai-status">Ready to help</p>
                         </div>
                     </div>
-                    <button class="ai-panel-toggle" onclick="toggleAIPanel()" aria-label="Close AI Panel">✕</button>
+                    <button
+                        class="ai-panel-toggle"
+                        onclick="toggleAIPanel()"
+                        aria-label="Close AI Panel"
+                    >
+                        ✕
+                    </button>
                 </div>
-                
+
                 <div class="ai-panel-messages" id="ai-messages">
                     <div class="ai-message assistant">
-                        <div class="ai-message-bubble">Olá! Sou seu assistente AI. Posso ajudar com qualquer tarefa nesta tela.</div>
+                        <div class="ai-message-bubble">
+                            Olá! Sou seu assistente AI. Posso ajudar com
+                            qualquer tarefa nesta tela.
+                        </div>
                     </div>
                 </div>
-                
+
                 <div class="ai-quick-actions">
                     <span class="quick-actions-label">AÇÕES RÁPIDAS</span>
                     <div class="quick-actions-grid" id="ai-quick-actions">
                         <!-- Quick actions loaded dynamically based on current app -->
                     </div>
                 </div>
-                
+
                 <div class="ai-panel-input">
-                    <input type="text" class="ai-input" placeholder="Como posso ajudar?" id="ai-input" 
-                           onkeypress="if(event.key==='Enter')sendAIMessage()">
-                    <button class="ai-send-btn" onclick="sendAIMessage()" aria-label="Send message">➤</button>
+                    <input
+                        type="text"
+                        class="ai-input"
+                        placeholder="Como posso ajudar?"
+                        id="ai-input"
+                        onkeypress="if(event.key==='Enter')sendAIMessage()"
+                    />
+                    <button
+                        class="ai-send-btn"
+                        onclick="sendAIMessage()"
+                        aria-label="Send message"
+                    >
+                        ➤
+                    </button>
                 </div>
             </aside>
-            
+
             <!-- AI Panel Toggle Button (when panel is collapsed) -->
-            <button class="ai-panel-fab" id="ai-fab" onclick="toggleAIPanel()" aria-label="Open AI Assistant">
+            <button
+                class="ai-panel-fab"
+                id="ai-fab"
+                onclick="toggleAIPanel()"
+                aria-label="Open AI Assistant"
+            >
                 🤖
             </button>
         </main>
@@ -868,23 +775,26 @@
                 }
             });
 
-            // Theme handling
-            const themeOptions = document.querySelectorAll(".theme-option");
-            const savedTheme = localStorage.getItem("gb-theme") || "dark";
+            // Theme handling with dropdown
+            const themeSelector = document.getElementById("themeSelector");
+            const savedTheme = localStorage.getItem("gb-theme") || "sentient";
             document.body.setAttribute("data-theme", savedTheme);
-            document
-                .querySelector(`.theme-option[data-theme="${savedTheme}"]`)
-                ?.classList.add("active");
 
-            themeOptions.forEach((option) => {
-                option.addEventListener("click", () => {
-                    const theme = option.getAttribute("data-theme");
+            // Set dropdown to saved value
+            if (themeSelector) {
+                themeSelector.value = savedTheme;
+
+                themeSelector.addEventListener("change", (e) => {
+                    const theme = e.target.value;
                     document.body.setAttribute("data-theme", theme);
                     localStorage.setItem("gb-theme", theme);
-                    themeOptions.forEach((o) => o.classList.remove("active"));
-                    option.classList.add("active");
+
+                    // Also notify ThemeManager if it exists
+                    if (window.ThemeManager && window.ThemeManager.loadTheme) {
+                        window.ThemeManager.loadTheme(theme);
+                    }
                 });
-            });
+            }
 
             function toggleQuickSetting(el) {
                 el.classList.toggle("active");
@@ -1183,148 +1093,151 @@
             // =================================================================
             // AI ASSISTANT PANEL
             // =================================================================
-            
+
             // Quick actions per app
             const aiQuickActions = {
                 drive: [
-                    { label: 'Upload file', action: 'upload_file' },
-                    { label: 'Create folder', action: 'create_folder' },
-                    { label: 'Search files', action: 'search_files' },
-                    { label: 'Share', action: 'share_item' }
+                    { label: "Upload file", action: "upload_file" },
+                    { label: "Create folder", action: "create_folder" },
+                    { label: "Search files", action: "search_files" },
+                    { label: "Share", action: "share_item" },
                 ],
                 tasks: [
-                    { label: 'New task', action: 'create_task' },
-                    { label: 'Due today', action: 'show_due_today' },
-                    { label: 'Summary', action: 'tasks_summary' },
-                    { label: 'Priorities', action: 'show_priorities' }
+                    { label: "New task", action: "create_task" },
+                    { label: "Due today", action: "show_due_today" },
+                    { label: "Summary", action: "tasks_summary" },
+                    { label: "Priorities", action: "show_priorities" },
                 ],
                 mail: [
-                    { label: 'Compose', action: 'compose_email' },
-                    { label: 'Unread', action: 'show_unread' },
-                    { label: 'Search', action: 'search_mail' },
-                    { label: 'Summary', action: 'mail_summary' }
+                    { label: "Compose", action: "compose_email" },
+                    { label: "Unread", action: "show_unread" },
+                    { label: "Search", action: "search_mail" },
+                    { label: "Summary", action: "mail_summary" },
                 ],
                 calendar: [
-                    { label: 'New event', action: 'create_event' },
-                    { label: 'Today', action: 'show_today' },
-                    { label: 'This week', action: 'show_week' },
-                    { label: 'Find time', action: 'find_free_time' }
+                    { label: "New event", action: "create_event" },
+                    { label: "Today", action: "show_today" },
+                    { label: "This week", action: "show_week" },
+                    { label: "Find time", action: "find_free_time" },
                 ],
                 meet: [
-                    { label: 'Start call', action: 'start_meeting' },
-                    { label: 'Schedule', action: 'schedule_meeting' },
-                    { label: 'Join', action: 'join_meeting' }
+                    { label: "Start call", action: "start_meeting" },
+                    { label: "Schedule", action: "schedule_meeting" },
+                    { label: "Join", action: "join_meeting" },
                 ],
                 paper: [
-                    { label: 'New doc', action: 'create_document' },
-                    { label: 'Templates', action: 'show_templates' },
-                    { label: 'Recent', action: 'show_recent' }
+                    { label: "New doc", action: "create_document" },
+                    { label: "Templates", action: "show_templates" },
+                    { label: "Recent", action: "show_recent" },
                 ],
                 research: [
-                    { label: 'New search', action: 'new_research' },
-                    { label: 'Sources', action: 'show_sources' },
-                    { label: 'Citations', action: 'generate_citations' }
+                    { label: "New search", action: "new_research" },
+                    { label: "Sources", action: "show_sources" },
+                    { label: "Citations", action: "generate_citations" },
                 ],
                 sources: [
-                    { label: 'Add source', action: 'add_source' },
-                    { label: 'Import', action: 'import_sources' },
-                    { label: 'Categories', action: 'show_categories' }
+                    { label: "Add source", action: "add_source" },
+                    { label: "Import", action: "import_sources" },
+                    { label: "Categories", action: "show_categories" },
                 ],
                 analytics: [
-                    { label: 'Dashboard', action: 'show_dashboard' },
-                    { label: 'Reports', action: 'show_reports' },
-                    { label: 'Export', action: 'export_data' }
+                    { label: "Dashboard", action: "show_dashboard" },
+                    { label: "Reports", action: "show_reports" },
+                    { label: "Export", action: "export_data" },
                 ],
                 admin: [
-                    { label: 'Users', action: 'manage_users' },
-                    { label: 'Settings', action: 'show_settings' },
-                    { label: 'Logs', action: 'show_logs' }
+                    { label: "Users", action: "manage_users" },
+                    { label: "Settings", action: "show_settings" },
+                    { label: "Logs", action: "show_logs" },
                 ],
                 monitoring: [
-                    { label: 'Status', action: 'show_status' },
-                    { label: 'Alerts', action: 'show_alerts' },
-                    { label: 'Metrics', action: 'show_metrics' }
+                    { label: "Status", action: "show_status" },
+                    { label: "Alerts", action: "show_alerts" },
+                    { label: "Metrics", action: "show_metrics" },
                 ],
                 default: [
-                    { label: 'Help', action: 'show_help' },
-                    { label: 'Shortcuts', action: 'show_shortcuts' },
-                    { label: 'Settings', action: 'open_settings' }
-                ]
+                    { label: "Help", action: "show_help" },
+                    { label: "Shortcuts", action: "show_shortcuts" },
+                    { label: "Settings", action: "open_settings" },
+                ],
             };
 
             // Get current app from URL or hash
             function getCurrentApp() {
-                const hash = window.location.hash.replace('#', '');
+                const hash = window.location.hash.replace("#", "");
                 const path = window.location.pathname;
                 if (hash) return hash;
                 const match = path.match(/\/([a-z]+)\//);
-                return match ? match[1] : 'default';
+                return match ? match[1] : "default";
             }
 
             // Update body data-app attribute
             function updateCurrentApp() {
                 const app = getCurrentApp();
-                document.body.setAttribute('data-app', app);
+                document.body.setAttribute("data-app", app);
                 loadQuickActions(app);
             }
 
             // Load quick actions for current app
             function loadQuickActions(app) {
-                const container = document.getElementById('ai-quick-actions');
+                const container = document.getElementById("ai-quick-actions");
                 if (!container) return;
-                
+
                 const actions = aiQuickActions[app] || aiQuickActions.default;
-                container.innerHTML = actions.map(a => 
-                    `<button class="quick-action-btn" onclick="handleQuickAction('${a.action}')">${a.label}</button>`
-                ).join('');
+                container.innerHTML = actions
+                    .map(
+                        (a) =>
+                            `<button class="quick-action-btn" onclick="handleQuickAction('${a.action}')">${a.label}</button>`,
+                    )
+                    .join("");
             }
 
             // Handle quick action click
             function handleQuickAction(action) {
-                const input = document.getElementById('ai-input');
+                const input = document.getElementById("ai-input");
                 const actionMessages = {
-                    upload_file: 'Help me upload a file',
-                    create_folder: 'Create a new folder',
-                    search_files: 'Search for files',
-                    share_item: 'Help me share this item',
-                    create_task: 'Create a new task',
-                    show_due_today: 'Show tasks due today',
-                    tasks_summary: 'Give me a summary of my tasks',
-                    show_priorities: 'Show my priority tasks',
-                    compose_email: 'Help me compose an email',
-                    show_unread: 'Show unread emails',
-                    search_mail: 'Search my emails',
-                    mail_summary: 'Summarize my inbox',
-                    create_event: 'Create a calendar event',
-                    show_today: 'Show today\'s schedule',
-                    show_week: 'Show this week\'s events',
-                    find_free_time: 'Find free time slots',
-                    start_meeting: 'Start a new meeting',
-                    schedule_meeting: 'Schedule a meeting',
-                    join_meeting: 'Join a meeting',
-                    create_document: 'Create a new document',
-                    show_templates: 'Show document templates',
-                    show_recent: 'Show recent documents',
-                    new_research: 'Start new research',
-                    show_sources: 'Show my sources',
-                    generate_citations: 'Generate citations',
-                    add_source: 'Add a new source',
-                    import_sources: 'Import sources',
-                    show_categories: 'Show categories',
-                    show_dashboard: 'Show analytics dashboard',
-                    show_reports: 'Show reports',
-                    export_data: 'Export analytics data',
-                    manage_users: 'Manage users',
-                    show_settings: 'Show admin settings',
-                    show_logs: 'Show system logs',
-                    show_status: 'Show system status',
-                    show_alerts: 'Show active alerts',
-                    show_metrics: 'Show performance metrics',
-                    show_help: 'Help me get started',
-                    show_shortcuts: 'Show keyboard shortcuts',
-                    open_settings: 'Open settings'
+                    upload_file: "Help me upload a file",
+                    create_folder: "Create a new folder",
+                    search_files: "Search for files",
+                    share_item: "Help me share this item",
+                    create_task: "Create a new task",
+                    show_due_today: "Show tasks due today",
+                    tasks_summary: "Give me a summary of my tasks",
+                    show_priorities: "Show my priority tasks",
+                    compose_email: "Help me compose an email",
+                    show_unread: "Show unread emails",
+                    search_mail: "Search my emails",
+                    mail_summary: "Summarize my inbox",
+                    create_event: "Create a calendar event",
+                    show_today: "Show today's schedule",
+                    show_week: "Show this week's events",
+                    find_free_time: "Find free time slots",
+                    start_meeting: "Start a new meeting",
+                    schedule_meeting: "Schedule a meeting",
+                    join_meeting: "Join a meeting",
+                    create_document: "Create a new document",
+                    show_templates: "Show document templates",
+                    show_recent: "Show recent documents",
+                    new_research: "Start new research",
+                    show_sources: "Show my sources",
+                    generate_citations: "Generate citations",
+                    add_source: "Add a new source",
+                    import_sources: "Import sources",
+                    show_categories: "Show categories",
+                    show_dashboard: "Show analytics dashboard",
+                    show_reports: "Show reports",
+                    export_data: "Export analytics data",
+                    manage_users: "Manage users",
+                    show_settings: "Show admin settings",
+                    show_logs: "Show system logs",
+                    show_status: "Show system status",
+                    show_alerts: "Show active alerts",
+                    show_metrics: "Show performance metrics",
+                    show_help: "Help me get started",
+                    show_shortcuts: "Show keyboard shortcuts",
+                    open_settings: "Open settings",
                 };
-                
+
                 if (input && actionMessages[action]) {
                     input.value = actionMessages[action];
                     sendAIMessage();
@@ -1333,77 +1246,83 @@
 
             // Toggle AI panel
             function toggleAIPanel() {
-                document.body.classList.toggle('ai-panel-collapsed');
-                localStorage.setItem('ai-panel-collapsed', document.body.classList.contains('ai-panel-collapsed'));
+                document.body.classList.toggle("ai-panel-collapsed");
+                localStorage.setItem(
+                    "ai-panel-collapsed",
+                    document.body.classList.contains("ai-panel-collapsed"),
+                );
             }
 
             // Send AI message
             function sendAIMessage() {
-                const input = document.getElementById('ai-input');
-                const messagesContainer = document.getElementById('ai-messages');
+                const input = document.getElementById("ai-input");
+                const messagesContainer =
+                    document.getElementById("ai-messages");
                 const message = input?.value?.trim();
-                
+
                 if (!message || !messagesContainer) return;
-                
+
                 // Add user message
-                const userMsg = document.createElement('div');
-                userMsg.className = 'ai-message user';
+                const userMsg = document.createElement("div");
+                userMsg.className = "ai-message user";
                 userMsg.innerHTML = `<div class="ai-message-bubble">${escapeHtml(message)}</div>`;
                 messagesContainer.appendChild(userMsg);
-                
+
                 // Clear input
-                input.value = '';
-                
+                input.value = "";
+
                 // Scroll to bottom
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
+
                 // Show typing indicator
-                const typing = document.createElement('div');
-                typing.className = 'ai-message assistant';
-                typing.id = 'ai-typing';
+                const typing = document.createElement("div");
+                typing.className = "ai-message assistant";
+                typing.id = "ai-typing";
                 typing.innerHTML = `<div class="ai-typing-indicator"><span></span><span></span><span></span></div>`;
                 messagesContainer.appendChild(typing);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
+
                 // Simulate AI response (replace with actual API call)
                 setTimeout(() => {
                     typing.remove();
-                    const aiMsg = document.createElement('div');
-                    aiMsg.className = 'ai-message assistant';
+                    const aiMsg = document.createElement("div");
+                    aiMsg.className = "ai-message assistant";
                     aiMsg.innerHTML = `<div class="ai-message-bubble">Entendi! Estou processando sua solicitação: "${escapeHtml(message)}". Como posso ajudar mais?</div>`;
                     messagesContainer.appendChild(aiMsg);
-                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    messagesContainer.scrollTop =
+                        messagesContainer.scrollHeight;
                 }, 1500);
             }
 
             // Escape HTML
             function escapeHtml(text) {
-                const div = document.createElement('div');
+                const div = document.createElement("div");
                 div.textContent = text;
                 return div.innerHTML;
             }
 
             // Restore AI panel state on load
             function initAIPanel() {
-                const collapsed = localStorage.getItem('ai-panel-collapsed') === 'true';
+                const collapsed =
+                    localStorage.getItem("ai-panel-collapsed") === "true";
                 if (collapsed) {
-                    document.body.classList.add('ai-panel-collapsed');
+                    document.body.classList.add("ai-panel-collapsed");
                 }
                 updateCurrentApp();
             }
 
             // Initialize on DOM ready
-            document.addEventListener('DOMContentLoaded', initAIPanel);
+            document.addEventListener("DOMContentLoaded", initAIPanel);
 
             // Update app on navigation
-            document.body.addEventListener('htmx:afterSwap', function(e) {
-                if (e.detail.target.id === 'main-content') {
+            document.body.addEventListener("htmx:afterSwap", function (e) {
+                if (e.detail.target.id === "main-content") {
                     updateCurrentApp();
                 }
             });
 
             // Also track hash changes
-            window.addEventListener('hashchange', updateCurrentApp);
+            window.addEventListener("hashchange", updateCurrentApp);
         </script>
 
         {% block scripts %}{% endblock %}

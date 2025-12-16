@@ -2,8 +2,10 @@
 
 .attendant-container {
     display: flex;
-    height: calc(100vh - 60px);
-    background: var(--bg);
+    height: 100%;
+    min-height: 0;
+    background: var(--bg, var(--bg-primary, #0a0a0f));
+    color: var(--text, var(--text-primary, #ffffff));
 }
 
 /* Queue Panel */
@@ -300,10 +302,18 @@
     margin-right: 6px;
 }
 
-.status-dot.online { background: #22c55e; }
-.status-dot.away { background: #f59e0b; }
-.status-dot.busy { background: #ef4444; }
-.status-dot.offline { background: #6b7280; }
+.status-dot.online {
+    background: #22c55e;
+}
+.status-dot.away {
+    background: #f59e0b;
+}
+.status-dot.busy {
+    background: #ef4444;
+}
+.status-dot.offline {
+    background: #6b7280;
+}
 
 /* Responsive */
 @media (max-width: 1024px) {

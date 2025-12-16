@@ -18,8 +18,7 @@ use log::{debug, error, info};
 use serde::Deserialize;
 use std::{fs, path::PathBuf};
 use tokio_tungstenite::{
-    connect_async_tls_with_config,
-    tungstenite::protocol::Message as TungsteniteMessage,
+    connect_async_tls_with_config, tungstenite::protocol::Message as TungsteniteMessage,
 };
 
 use crate::shared::AppState;
@@ -99,7 +98,10 @@ async fn proxy_api(
     req: Request<Body>,
 ) -> Response<Body> {
     let path = original_uri.path();
-    let query = original_uri.query().map(|q| format!("?{}", q)).unwrap_or_default();
+    let query = original_uri
+        .query()
+        .map(|q| format!("?{}", q))
+        .unwrap_or_default();
     let method = req.method().clone();
     let headers = req.headers().clone();
 
@@ -217,7 +219,11 @@ async fn ws_proxy(
 async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQuery) {
     let backend_url = format!(
         "{}/ws?session_id={}&user_id={}",
-        state.client.base_url().replace("https://", "wss://").replace("http://", "ws://"),
+        state
+            .client
+            .base_url()
+            .replace("https://", "wss://")
+            .replace("http://", "ws://"),
         params.session_id,
         params.user_id
     );
@@ -234,12 +240,8 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
     let connector = tokio_tungstenite::Connector::NativeTls(tls_connector);
 
     // Connect to backend WebSocket
-    let backend_result = connect_async_tls_with_config(
-        &backend_url,
-        None,
-        false,
-        Some(connector),
-    ).await;
+    let backend_result =
+        connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
 
     let backend_socket = match backend_result {
         Ok((socket, _)) => socket,
@@ -260,22 +262,38 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         while let Some(msg) = client_rx.next().await {
             match msg {
                 Ok(AxumMessage::Text(text)) => {
-                    if backend_tx.send(TungsteniteMessage::Text(text)).await.is_err() {
+                    if backend_tx
+                        .send(TungsteniteMessage::Text(text))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
                 Ok(AxumMessage::Binary(data)) => {
-                    if backend_tx.send(TungsteniteMessage::Binary(data)).await.is_err() {
+                    if backend_tx
+                        .send(TungsteniteMessage::Binary(data))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
                 Ok(AxumMessage::Ping(data)) => {
-                    if backend_tx.send(TungsteniteMessage::Ping(data)).await.is_err() {
+                    if backend_tx
+                        .send(TungsteniteMessage::Ping(data))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
                 Ok(AxumMessage::Pong(data)) => {
-                    if backend_tx.send(TungsteniteMessage::Pong(data)).await.is_err() {
+                    if backend_tx
+                        .send(TungsteniteMessage::Pong(data))
+                        .await
+                        .is_err()
+                    {
                         break;
                     }
                 }
@@ -323,8 +341,32 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
 
 /// Create WebSocket proxy router
 fn create_ws_router() -> Router<AppState> {
+    Router::new().fallback(any(ws_proxy))
+}
+
+/// Create UI HTMX proxy router (for HTML fragment endpoints)
+fn create_ui_router() -> Router<AppState> {
     Router::new()
-        .fallback(get(ws_proxy))
+        // Email UI endpoints
+        .route("/email/accounts", any(proxy_api))
+        .route("/email/list", any(proxy_api))
+        .route("/email/folders", any(proxy_api))
+        .route("/email/compose", any(proxy_api))
+        .route("/email/labels", any(proxy_api))
+        .route("/email/templates", any(proxy_api))
+        .route("/email/signatures", any(proxy_api))
+        .route("/email/rules", any(proxy_api))
+        .route("/email/search", any(proxy_api))
+        .route("/email/auto-responder", any(proxy_api))
+        .route("/email/{id}", any(proxy_api))
+        .route("/email/{id}/delete", any(proxy_api))
+        // Calendar UI endpoints
+        .route("/calendar/list", any(proxy_api))
+        .route("/calendar/upcoming", any(proxy_api))
+        .route("/calendar/event/new", any(proxy_api))
+        .route("/calendar/new", any(proxy_api))
+        // Fallback for any other /ui/* routes
+        .fallback(any(proxy_api))
 }
 
 /// Configure and return the main router
@@ -338,6 +380,8 @@ pub fn configure_router() -> Router {
         .route("/health", get(health))
         // API proxy routes
         .nest("/api", create_api_router())
+        // UI HTMX proxy routes (for /ui/* endpoints that return HTML fragments)
+        .nest("/ui", create_ui_router())
         // WebSocket proxy routes
         .nest("/ws", create_ws_router())
         // UI routes
@@ -372,6 +416,62 @@ pub fn configure_router() -> Router {
         .nest_service(
             "/suite/tasks",
             tower_http::services::ServeDir::new(suite_path.join("tasks")),
+        )
+        .nest_service(
+            "/suite/calendar",
+            tower_http::services::ServeDir::new(suite_path.join("calendar")),
+        )
+        .nest_service(
+            "/suite/meet",
+            tower_http::services::ServeDir::new(suite_path.join("meet")),
+        )
+        .nest_service(
+            "/suite/paper",
+            tower_http::services::ServeDir::new(suite_path.join("paper")),
+        )
+        .nest_service(
+            "/suite/research",
+            tower_http::services::ServeDir::new(suite_path.join("research")),
+        )
+        .nest_service(
+            "/suite/analytics",
+            tower_http::services::ServeDir::new(suite_path.join("analytics")),
+        )
+        .nest_service(
+            "/suite/monitoring",
+            tower_http::services::ServeDir::new(suite_path.join("monitoring")),
+        )
+        .nest_service(
+            "/suite/admin",
+            tower_http::services::ServeDir::new(suite_path.join("admin")),
+        )
+        .nest_service(
+            "/suite/auth",
+            tower_http::services::ServeDir::new(suite_path.join("auth")),
+        )
+        .nest_service(
+            "/suite/settings",
+            tower_http::services::ServeDir::new(suite_path.join("settings")),
+        )
+        .nest_service(
+            "/suite/sources",
+            tower_http::services::ServeDir::new(suite_path.join("sources")),
+        )
+        .nest_service(
+            "/suite/attendant",
+            tower_http::services::ServeDir::new(suite_path.join("attendant")),
+        )
+        .nest_service(
+            "/suite/tools",
+            tower_http::services::ServeDir::new(suite_path.join("tools")),
+        )
+        .nest_service(
+            "/suite/assets",
+            tower_http::services::ServeDir::new(suite_path.join("assets")),
+        )
+        .nest_service(
+            "/suite/partials",
+            tower_http::services::ServeDir::new(suite_path.join("partials")),
         )
         // Legacy paths for backward compatibility (serve suite assets)
         .nest_service(

@@ -41,8 +41,15 @@
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.2); }
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
 }
 
 /* Messages Area */
@@ -62,8 +69,14 @@
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .message.user {
@@ -113,7 +126,7 @@
     background: rgba(0, 0, 0, 0.1);
     padding: 2px 6px;
     border-radius: 4px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: "Monaco", "Menlo", monospace;
     font-size: 13px;
 }
 
@@ -165,25 +178,44 @@ footer {
 /* Input Container */
 .input-container {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     align-items: center;
+    padding: 8px 12px;
+    background: var(--surface, var(--secondary-bg, #f9fafb));
+    border: 1px solid var(--border, var(--border-color, #e5e7eb));
+    border-radius: 28px;
+}
+
+[data-theme="dark"] .input-container,
+[data-theme="sentient"] .input-container {
+    background: var(--surface, #1a1a24);
+    border-color: var(--border, #2a2a3a);
+}
+
+.input-container:focus-within {
+    border-color: var(--accent, var(--accent-color, #3b82f6));
+    box-shadow: 0 0 0 3px var(--accent-glow, rgba(59, 130, 246, 0.1));
 }
 
 #messageInput {
     flex: 1;
-    padding: 12px 16px;
-    border-radius: 24px;
-    border: 1px solid var(--border-color, #e5e7eb);
-    background: var(--secondary-bg, #f9fafb);
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: none;
+    background: transparent;
     color: var(--text-primary, #1f2937);
-    font-size: 14px;
+    font-size: 15px;
     outline: none;
     transition: all 0.2s;
 }
 
+[data-theme="dark"] #messageInput,
+[data-theme="sentient"] #messageInput {
+    color: var(--text-primary, #ffffff);
+}
+
 #messageInput:focus {
-    border-color: var(--accent-color, #3b82f6);
-    box-shadow: 0 0 0 3px var(--accent-light, rgba(59, 130, 246, 0.1));
+    outline: none;
 }
 
 #messageInput::placeholder {
@@ -192,29 +224,60 @@ footer {
 
 #voiceBtn,
 #sendBtn {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     border-radius: 50%;
     border: none;
-    background: var(--accent-color, #3b82f6);
-    color: white;
+    background: var(--accent, var(--accent-color, #3b82f6));
+    color: var(--accent-foreground, white);
     cursor: pointer;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 18px;
     transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+#sendBtn {
+    background: var(--accent, var(--accent-color, #3b82f6));
+}
+
+#voiceBtn {
+    background: var(--surface, var(--secondary-bg, #f9fafb));
+    color: var(--text-primary, #374151);
+    border: 1px solid var(--border, var(--border-color, #e5e7eb));
 }
 
 #voiceBtn:hover,
 #sendBtn:hover {
     transform: scale(1.05);
-    background: var(--accent-hover, #2563eb);
+    opacity: 0.9;
+}
+
+#sendBtn:hover {
+    background: var(--accent-hover, var(--accent, #2563eb));
 }
 
 #voiceBtn:active,
 #sendBtn:active {
     transform: scale(0.95);
+}
+
+/* Dark/Sentient theme overrides */
+[data-theme="dark"] #sendBtn,
+[data-theme="sentient"] #sendBtn {
+    background: var(--accent, #d4f505);
+    color: #000000;
+}
+
+[data-theme="dark"] #voiceBtn,
+[data-theme="sentient"] #voiceBtn {
+    background: var(--surface, #1a1a24);
+    color: var(--text-primary, #ffffff);
+    border-color: var(--border, #2a2a3a);
 }
 
 /* Scroll to Bottom Button */
@@ -251,12 +314,11 @@ footer {
     .chat-layout {
         padding: 0 12px;
     }
-    
+
     .message-content {
         max-width: 90%;
     }
 }
-
 
 /* Projector Overlay */
 .projector-overlay {
@@ -278,8 +340,12 @@ footer {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /* Container */
@@ -394,7 +460,9 @@ footer {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Video Player */
@@ -445,7 +513,7 @@ footer {
 
 .projector-code pre {
     margin: 0;
-    font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+    font-family: "Fira Code", "Monaco", "Consolas", monospace;
     font-size: 14px;
     line-height: 1.5;
     color: #d4d4d4;
