@@ -31,16 +31,12 @@ jobs:
             ${{ runner.os }}-cargo-botui-
 
       - name: Install Rust
-        uses: msrd0/rust-toolchain@v1
-        with:
-          toolchain: stable
-          targets: |
-            x86_64-unknown-linux-gnu
-            aarch64-unknown-linux-gnu
-            x86_64-pc-windows-gnu
-            aarch64-pc-windows-msvc
-            x86_64-apple-darwin
-            aarch64-apple-darwin
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source ~/.cargo/env
+          rustup target add x86_64-unknown-linux-gnu
+          rustup target add aarch64-unknown-linux-gnu
+          rustup target add x86_64-pc-windows-gnu
 
       - name: Install cross-compilation dependencies
         run: |
@@ -56,35 +52,28 @@ jobs:
 
       - name: Build Linux x86_64
         run: |
+          source ~/.cargo/env
           cargo build --locked --release --target x86_64-unknown-linux-gnu
 
       - name: Build Linux ARM64
         env:
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
         run: |
+          source ~/.cargo/env
           cargo build --locked --release --target aarch64-unknown-linux-gnu
 
       - name: Build Windows x86_64
         env:
           CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
         run: |
+          source ~/.cargo/env
           cargo build --locked --release --target x86_64-pc-windows-gnu
-
-      - name: Build macOS x86_64 (cross-compile)
-        run: |
-          cargo build --locked --release --target x86_64-apple-darwin || echo "macOS x86_64 cross-compile requires osxcross"
-
-      - name: Build macOS ARM64 (cross-compile)
-        run: |
-          cargo build --locked --release --target aarch64-apple-darwin || echo "macOS ARM64 cross-compile requires osxcross"
 
       - name: Organize release artifacts
         run: |
           mkdir -p release/linux-x86_64
           mkdir -p release/linux-arm64
           mkdir -p release/windows-x86_64
-          mkdir -p release/macos-x86_64
-          mkdir -p release/macos-arm64
 
           # Linux x86_64
           cp ./target/x86_64-unknown-linux-gnu/release/botui release/linux-x86_64/ || true
@@ -95,19 +84,11 @@ jobs:
           # Windows x86_64
           cp ./target/x86_64-pc-windows-gnu/release/botui.exe release/windows-x86_64/ || true
 
-          # macOS x86_64
-          cp ./target/x86_64-apple-darwin/release/botui release/macos-x86_64/ || true
-
-          # macOS ARM64
-          cp ./target/aarch64-apple-darwin/release/botui release/macos-arm64/ || true
-
       - name: Deploy binaries
         run: |
           sudo mkdir -p /opt/gbo/releases/botui/linux-x86_64
           sudo mkdir -p /opt/gbo/releases/botui/linux-arm64
           sudo mkdir -p /opt/gbo/releases/botui/windows-x86_64
-          sudo mkdir -p /opt/gbo/releases/botui/macos-x86_64
-          sudo mkdir -p /opt/gbo/releases/botui/macos-arm64
 
           sudo cp -r release/* /opt/gbo/releases/botui/
           sudo chmod -R 755 /opt/gbo/releases/botui/
