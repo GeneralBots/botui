@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: ["main"]
 
-env:
-  CARGO_HOME: /root/.cargo
-  PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
 jobs:
   build:
     runs-on: gbo
@@ -38,64 +34,25 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           echo "/root/.cargo/bin" >> $GITHUB_PATH
-          /root/.cargo/bin/rustup target add x86_64-unknown-linux-gnu
-          /root/.cargo/bin/rustup target add aarch64-unknown-linux-gnu
-          /root/.cargo/bin/rustup target add x86_64-pc-windows-gnu
-
-      - name: Install cross-compilation dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            gcc-aarch64-linux-gnu \
-            gcc-mingw-w64-x86-64 \
-            musl-tools
 
       - name: Setup environment
         run: |
           sudo cp /opt/gbo/bin/system/botui.env .env
 
       - name: Build Linux x86_64
-        run: /root/.cargo/bin/cargo build --locked --release --target x86_64-unknown-linux-gnu
+        run: /root/.cargo/bin/cargo build --locked --release
 
-      - name: Build Linux ARM64
-        env:
-          CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
-        run: /root/.cargo/bin/cargo build --locked --release --target aarch64-unknown-linux-gnu
-
-      - name: Build Windows x86_64
-        env:
-          CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER: x86_64-w64-mingw32-gcc
-        run: /root/.cargo/bin/cargo build --locked --release --target x86_64-pc-windows-gnu
-
-      - name: Organize release artifacts
-        run: |
-          mkdir -p release/linux-x86_64
-          mkdir -p release/linux-arm64
-          mkdir -p release/windows-x86_64
-
-          # Linux x86_64
-          cp ./target/x86_64-unknown-linux-gnu/release/botui release/linux-x86_64/ || true
-
-          # Linux ARM64
-          cp ./target/aarch64-unknown-linux-gnu/release/botui release/linux-arm64/ || true
-
-          # Windows x86_64
-          cp ./target/x86_64-pc-windows-gnu/release/botui.exe release/windows-x86_64/ || true
-
-      - name: Deploy binaries
+      - name: Prepare release artifacts
         run: |
           sudo mkdir -p /opt/gbo/releases/botui/linux-x86_64
-          sudo mkdir -p /opt/gbo/releases/botui/linux-arm64
-          sudo mkdir -p /opt/gbo/releases/botui/windows-x86_64
-
-          sudo cp -r release/* /opt/gbo/releases/botui/
+          sudo cp ./target/release/botui /opt/gbo/releases/botui/linux-x86_64/ || true
           sudo chmod -R 755 /opt/gbo/releases/botui/
 
       - name: Deploy and restart local service
         run: |
           lxc exec bot:pragmatismo-system -- systemctl stop botui
 
-          sudo cp ./target/x86_64-unknown-linux-gnu/release/botui /opt/gbo/bin/botui
+          sudo cp ./target/release/botui /opt/gbo/bin/botui
           sudo chmod +x /opt/gbo/bin/botui
 
           lxc exec bot:pragmatismo-system -- systemctl start botui
