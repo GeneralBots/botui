@@ -99,6 +99,213 @@
     --info: #3b82f6;
 }
 
+/* Retro Themes */
+[data-theme="cyberpunk"] {
+    --primary: #ff00ff;
+    --primary-hover: #cc00cc;
+    --primary-light: rgba(255, 0, 255, 0.15);
+    --bg: #0d0221;
+    --surface: #1a0a3e;
+    --surface-hover: #2a1a5e;
+    --border: #ff00ff33;
+    --text: #00ffff;
+    --text-secondary: #ff6ec7;
+}
+
+[data-theme="retrowave"] {
+    --primary: #ff6b9d;
+    --primary-hover: #ff4081;
+    --primary-light: rgba(255, 107, 157, 0.15);
+    --bg: #1a0a2e;
+    --surface: #2d1b4e;
+    --surface-hover: #3d2b6e;
+    --border: #ff6b9d33;
+    --text: #ffeaa7;
+    --text-secondary: #a29bfe;
+}
+
+[data-theme="vapordream"] {
+    --primary: #a29bfe;
+    --primary-hover: #6c5ce7;
+    --primary-light: rgba(162, 155, 254, 0.15);
+    --bg: #2d3436;
+    --surface: #636e72;
+    --surface-hover: #74b9ff;
+    --border: #a29bfe33;
+    --text: #ffeaa7;
+    --text-secondary: #fd79a8;
+}
+
+[data-theme="y2kglow"] {
+    --primary: #00ff00;
+    --primary-hover: #00cc00;
+    --primary-light: rgba(0, 255, 0, 0.15);
+    --bg: #000033;
+    --surface: #000066;
+    --surface-hover: #000099;
+    --border: #00ff0033;
+    --text: #ffffff;
+    --text-secondary: #00ffff;
+}
+
+[data-theme="arcadeflash"] {
+    --primary: #ffff00;
+    --primary-hover: #cccc00;
+    --primary-light: rgba(255, 255, 0, 0.15);
+    --bg: #000000;
+    --surface: #1a1a1a;
+    --surface-hover: #333333;
+    --border: #ffff0033;
+    --text: #ff0000;
+    --text-secondary: #00ff00;
+}
+
+[data-theme="discofever"] {
+    --primary: #ff1493;
+    --primary-hover: #ff69b4;
+    --primary-light: rgba(255, 20, 147, 0.15);
+    --bg: #1a0a1a;
+    --surface: #2d1a2d;
+    --surface-hover: #4a2a4a;
+    --border: #ff149333;
+    --text: #ffd700;
+    --text-secondary: #00ced1;
+}
+
+[data-theme="grungeera"] {
+    --primary: #8b4513;
+    --primary-hover: #a0522d;
+    --primary-light: rgba(139, 69, 19, 0.15);
+    --bg: #1a1a0a;
+    --surface: #2d2d1a;
+    --surface-hover: #3d3d2a;
+    --border: #8b451333;
+    --text: #daa520;
+    --text-secondary: #808000;
+}
+
+/* Classic Themes */
+[data-theme="jazzage"] {
+    --primary: #d4af37;
+    --primary-hover: #b8960c;
+    --primary-light: rgba(212, 175, 55, 0.15);
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --surface-hover: #0f3460;
+    --border: #d4af3733;
+    --text: #eee8aa;
+    --text-secondary: #cd853f;
+}
+
+[data-theme="mellowgold"] {
+    --primary: #daa520;
+    --primary-hover: #b8860b;
+    --primary-light: rgba(218, 165, 32, 0.15);
+    --bg: #2c2416;
+    --surface: #3d3222;
+    --surface-hover: #4e422e;
+    --border: #daa52033;
+    --text: #faebd7;
+    --text-secondary: #d2b48c;
+}
+
+[data-theme="midcenturymod"] {
+    --primary: #e07b39;
+    --primary-hover: #c56a2d;
+    --primary-light: rgba(224, 123, 57, 0.15);
+    --bg: #2d4a3e;
+    --surface: #3d5a4e;
+    --surface-hover: #4d6a5e;
+    --border: #e07b3933;
+    --text: #f5f5dc;
+    --text-secondary: #8fbc8f;
+}
+
+[data-theme="polaroidmemories"] {
+    --primary: #e6b89c;
+    --primary-hover: #d4a384;
+    --primary-light: rgba(230, 184, 156, 0.15);
+    --bg: #f5f5dc;
+    --surface: #fffaf0;
+    --surface-hover: #faf0e6;
+    --border: #d2b48c;
+    --text: #4a4a4a;
+    --text-secondary: #8b7355;
+}
+
+[data-theme="saturdaycartoons"] {
+    --primary: #ff6347;
+    --primary-hover: #ff4500;
+    --primary-light: rgba(255, 99, 71, 0.15);
+    --bg: #4169e1;
+    --surface: #5179f1;
+    --surface-hover: #6189ff;
+    --border: #ff634733;
+    --text: #ffff00;
+    --text-secondary: #00ff00;
+}
+
+[data-theme="seasidepostcard"] {
+    --primary: #20b2aa;
+    --primary-hover: #008b8b;
+    --primary-light: rgba(32, 178, 170, 0.15);
+    --bg: #f0f8ff;
+    --surface: #e0ffff;
+    --surface-hover: #b0e0e6;
+    --border: #87ceeb;
+    --text: #2f4f4f;
+    --text-secondary: #5f9ea0;
+}
+
+[data-theme="typewriter"] {
+    --primary: #2f2f2f;
+    --primary-hover: #1a1a1a;
+    --primary-light: rgba(47, 47, 47, 0.15);
+    --bg: #f5f5dc;
+    --surface: #fffff0;
+    --surface-hover: #fafad2;
+    --border: #8b8b7a;
+    --text: #2f2f2f;
+    --text-secondary: #696969;
+}
+
+/* Tech Themes */
+[data-theme="3dbevel"] {
+    --primary: #0000ff;
+    --primary-hover: #0000cc;
+    --primary-light: rgba(0, 0, 255, 0.15);
+    --bg: #c0c0c0;
+    --surface: #d4d4d4;
+    --surface-hover: #e8e8e8;
+    --border: #808080;
+    --text: #000000;
+    --text-secondary: #404040;
+}
+
+[data-theme="xeroxui"] {
+    --primary: #4a86cf;
+    --primary-hover: #3a76bf;
+    --primary-light: rgba(74, 134, 207, 0.15);
+    --bg: #e8e8e8;
+    --surface: #ffffff;
+    --surface-hover: #f0f0f0;
+    --border: #a0a0a0;
+    --text: #000000;
+    --text-secondary: #606060;
+}
+
+[data-theme="xtreegold"] {
+    --primary: #ffff00;
+    --primary-hover: #cccc00;
+    --primary-light: rgba(255, 255, 0, 0.15);
+    --bg: #000080;
+    --surface: #0000a0;
+    --surface-hover: #0000c0;
+    --border: #ffff0033;
+    --text: #ffff00;
+    --text-secondary: #00ffff;
+}
+
 /* ============================================ */
 /* BASE RESETS                                  */
 /* ============================================ */
@@ -381,18 +588,20 @@ body {
 /* Legacy theme-grid support (if needed) */
 .theme-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
 }
 
 .theme-option {
     position: relative;
     aspect-ratio: 1;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     border: 2px solid transparent;
     transition: all 0.2s;
     overflow: hidden;
+    padding: 0;
+    background: none;
 }
 
 .theme-option:hover {
@@ -419,8 +628,8 @@ body {
 }
 
 .theme-option-dot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     margin-right: 2px;
 }
@@ -441,9 +650,13 @@ body {
     bottom: 2px;
     left: 0;
     right: 0;
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     text-align: center;
     color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 2px;
 }
 
 /* Theme Preview Colors */
@@ -545,6 +758,247 @@ body {
     background: #2a2a2a;
 }
 
+/* Retro Theme Previews */
+.theme-cyberpunk .theme-option-inner {
+    background: #0d0221;
+    color: #00ffff;
+}
+.theme-cyberpunk .theme-option-header {
+    background: #1a0a3e;
+}
+.theme-cyberpunk .theme-option-dot {
+    background: #ff00ff;
+}
+.theme-cyberpunk .theme-option-line {
+    background: #ff00ff33;
+}
+
+.theme-retrowave .theme-option-inner {
+    background: #1a0a2e;
+    color: #ffeaa7;
+}
+.theme-retrowave .theme-option-header {
+    background: #2d1b4e;
+}
+.theme-retrowave .theme-option-dot {
+    background: #ff6b9d;
+}
+.theme-retrowave .theme-option-line {
+    background: #ff6b9d33;
+}
+
+.theme-vapordream .theme-option-inner {
+    background: #2d3436;
+    color: #ffeaa7;
+}
+.theme-vapordream .theme-option-header {
+    background: #636e72;
+}
+.theme-vapordream .theme-option-dot {
+    background: #a29bfe;
+}
+.theme-vapordream .theme-option-line {
+    background: #a29bfe33;
+}
+
+.theme-y2kglow .theme-option-inner {
+    background: #000033;
+    color: #ffffff;
+}
+.theme-y2kglow .theme-option-header {
+    background: #000066;
+}
+.theme-y2kglow .theme-option-dot {
+    background: #00ff00;
+}
+.theme-y2kglow .theme-option-line {
+    background: #00ff0033;
+}
+
+.theme-arcadeflash .theme-option-inner {
+    background: #000000;
+    color: #ff0000;
+}
+.theme-arcadeflash .theme-option-header {
+    background: #1a1a1a;
+}
+.theme-arcadeflash .theme-option-dot {
+    background: #ffff00;
+}
+.theme-arcadeflash .theme-option-line {
+    background: #ffff0033;
+}
+
+.theme-discofever .theme-option-inner {
+    background: #1a0a1a;
+    color: #ffd700;
+}
+.theme-discofever .theme-option-header {
+    background: #2d1a2d;
+}
+.theme-discofever .theme-option-dot {
+    background: #ff1493;
+}
+.theme-discofever .theme-option-line {
+    background: #ff149333;
+}
+
+.theme-grungeera .theme-option-inner {
+    background: #1a1a0a;
+    color: #daa520;
+}
+.theme-grungeera .theme-option-header {
+    background: #2d2d1a;
+}
+.theme-grungeera .theme-option-dot {
+    background: #8b4513;
+}
+.theme-grungeera .theme-option-line {
+    background: #8b451333;
+}
+
+/* Classic Theme Previews */
+.theme-jazzage .theme-option-inner {
+    background: #1a1a2e;
+    color: #eee8aa;
+}
+.theme-jazzage .theme-option-header {
+    background: #16213e;
+}
+.theme-jazzage .theme-option-dot {
+    background: #d4af37;
+}
+.theme-jazzage .theme-option-line {
+    background: #d4af3733;
+}
+
+.theme-mellowgold .theme-option-inner {
+    background: #2c2416;
+    color: #faebd7;
+}
+.theme-mellowgold .theme-option-header {
+    background: #3d3222;
+}
+.theme-mellowgold .theme-option-dot {
+    background: #daa520;
+}
+.theme-mellowgold .theme-option-line {
+    background: #daa52033;
+}
+
+.theme-midcenturymod .theme-option-inner {
+    background: #2d4a3e;
+    color: #f5f5dc;
+}
+.theme-midcenturymod .theme-option-header {
+    background: #3d5a4e;
+}
+.theme-midcenturymod .theme-option-dot {
+    background: #e07b39;
+}
+.theme-midcenturymod .theme-option-line {
+    background: #e07b3933;
+}
+
+.theme-polaroidmemories .theme-option-inner {
+    background: #f5f5dc;
+    color: #4a4a4a;
+}
+.theme-polaroidmemories .theme-option-header {
+    background: #fffaf0;
+}
+.theme-polaroidmemories .theme-option-dot {
+    background: #e6b89c;
+}
+.theme-polaroidmemories .theme-option-line {
+    background: #d2b48c;
+}
+
+.theme-saturdaycartoons .theme-option-inner {
+    background: #4169e1;
+    color: #ffff00;
+}
+.theme-saturdaycartoons .theme-option-header {
+    background: #5179f1;
+}
+.theme-saturdaycartoons .theme-option-dot {
+    background: #ff6347;
+}
+.theme-saturdaycartoons .theme-option-line {
+    background: #ff634733;
+}
+
+.theme-seasidepostcard .theme-option-inner {
+    background: #f0f8ff;
+    color: #2f4f4f;
+}
+.theme-seasidepostcard .theme-option-header {
+    background: #e0ffff;
+}
+.theme-seasidepostcard .theme-option-dot {
+    background: #20b2aa;
+}
+.theme-seasidepostcard .theme-option-line {
+    background: #87ceeb;
+}
+
+.theme-typewriter .theme-option-inner {
+    background: #f5f5dc;
+    color: #2f2f2f;
+}
+.theme-typewriter .theme-option-header {
+    background: #fffff0;
+}
+.theme-typewriter .theme-option-dot {
+    background: #2f2f2f;
+}
+.theme-typewriter .theme-option-line {
+    background: #8b8b7a;
+}
+
+/* Tech Theme Previews */
+.theme-3dbevel .theme-option-inner {
+    background: #c0c0c0;
+    color: #000000;
+}
+.theme-3dbevel .theme-option-header {
+    background: #d4d4d4;
+}
+.theme-3dbevel .theme-option-dot {
+    background: #0000ff;
+}
+.theme-3dbevel .theme-option-line {
+    background: #808080;
+}
+
+.theme-xeroxui .theme-option-inner {
+    background: #e8e8e8;
+    color: #000000;
+}
+.theme-xeroxui .theme-option-header {
+    background: #ffffff;
+}
+.theme-xeroxui .theme-option-dot {
+    background: #4a86cf;
+}
+.theme-xeroxui .theme-option-line {
+    background: #a0a0a0;
+}
+
+.theme-xtreegold .theme-option-inner {
+    background: #000080;
+    color: #ffff00;
+}
+.theme-xtreegold .theme-option-header {
+    background: #0000a0;
+}
+.theme-xtreegold .theme-option-dot {
+    background: #ffff00;
+}
+.theme-xtreegold .theme-option-line {
+    background: #ffff0033;
+}
+
 /* ============================================ */
 /* SETTINGS PANEL                               */
 /* ============================================ */
@@ -553,7 +1007,9 @@ body {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
-    width: 280px;
+    width: 320px;
+    max-height: 70vh;
+    overflow-y: auto;
     background: var(--surface, #161616);
     border: 1px solid var(--border, #2a2a2a);
     border-radius: 12px;

@@ -118,6 +118,7 @@ document
 // Update theme-color meta tag based on theme
 function updateThemeColor(theme) {
   const themeColors = {
+    // Core Themes
     dark: "#3b82f6",
     light: "#3b82f6",
     blue: "#0ea5e9",
@@ -125,6 +126,26 @@ function updateThemeColor(theme) {
     green: "#22c55e",
     orange: "#f97316",
     sentient: "#d4f505",
+    // Retro Themes
+    cyberpunk: "#ff00ff",
+    retrowave: "#ff6b9d",
+    vapordream: "#a29bfe",
+    y2kglow: "#00ff00",
+    arcadeflash: "#ffff00",
+    discofever: "#ff1493",
+    grungeera: "#8b4513",
+    // Classic Themes
+    jazzage: "#d4af37",
+    mellowgold: "#daa520",
+    midcenturymod: "#e07b39",
+    polaroidmemories: "#e6b89c",
+    saturdaycartoons: "#ff6347",
+    seasidepostcard: "#20b2aa",
+    typewriter: "#2f2f2f",
+    // Tech Themes
+    "3dbevel": "#0000ff",
+    xeroxui: "#4a86cf",
+    xtreegold: "#ffff00",
   };
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if (metaTheme) {
