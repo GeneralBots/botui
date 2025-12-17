@@ -91,6 +91,34 @@ async fn api_health() -> (StatusCode, axum::Json<serde_json::Value>) {
     )
 }
 
+/// Extract app context from Referer header or path
+fn extract_app_context(headers: &axum::http::HeaderMap, path: &str) -> Option<String> {
+    // Try to extract from Referer header first
+    if let Some(referer) = headers.get("referer") {
+        if let Ok(referer_str) = referer.to_str() {
+            // Match /apps/{app_name}/ pattern
+            if let Some(start) = referer_str.find("/apps/") {
+                let after_apps = &referer_str[start + 6..];
+                if let Some(end) = after_apps.find('/') {
+                    return Some(after_apps[..end].to_string());
+                } else if !after_apps.is_empty() {
+                    return Some(after_apps.to_string());
+                }
+            }
+        }
+    }
+
+    // Try to extract from path (for /apps/{app}/api/* routes)
+    if path.starts_with("/apps/") {
+        let after_apps = &path[6..];
+        if let Some(end) = after_apps.find('/') {
+            return Some(after_apps[..end].to_string());
+        }
+    }
+
+    None
+}
+
 /// Proxy API requests to botserver
 async fn proxy_api(
     State(state): State<AppState>,
@@ -105,8 +133,14 @@ async fn proxy_api(
     let method = req.method().clone();
     let headers = req.headers().clone();
 
+    // Extract app context from request
+    let app_context = extract_app_context(&headers, path);
+
     let target_url = format!("{}{}{}", state.client.base_url(), path, query);
-    debug!("Proxying {} {} to {}", method, path, target_url);
+    debug!(
+        "Proxying {} {} to {} (app: {:?})",
+        method, path, target_url, app_context
+    );
 
     // Build the proxied request with self-signed cert support
     let client = reqwest::Client::builder()
@@ -122,6 +156,11 @@ async fn proxy_api(
                 proxy_req = proxy_req.header(name.as_str(), v);
             }
         }
+    }
+
+    // Inject X-App-Context header if we detected an app
+    if let Some(app) = app_context {
+        proxy_req = proxy_req.header("X-App-Context", app);
     }
 
     // Copy body for non-GET requests
@@ -344,6 +383,15 @@ fn create_ws_router() -> Router<AppState> {
     Router::new().fallback(any(ws_proxy))
 }
 
+/// Create apps proxy router - proxies /apps/* to botserver
+fn create_apps_router() -> Router<AppState> {
+    Router::new()
+        // Proxy all /apps/* requests to botserver
+        // botserver serves static files from site_path
+        // API calls from apps also go through here with X-App-Context header
+        .fallback(any(proxy_api))
+}
+
 /// Create UI HTMX proxy router (for HTML fragment endpoints)
 fn create_ui_router() -> Router<AppState> {
     Router::new()
@@ -384,6 +432,8 @@ pub fn configure_router() -> Router {
         .nest("/ui", create_ui_router())
         // WebSocket proxy routes
         .nest("/ws", create_ws_router())
+        // Apps proxy routes - proxy /apps/* to botserver (which serves from site_path)
+        .nest("/apps", create_apps_router())
         // UI routes
         .route("/", get(index))
         .route("/minimal", get(serve_minimal))
