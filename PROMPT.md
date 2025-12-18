@@ -30,7 +30,7 @@
 4. **Frontend Asset Updates**
    ```bash
    # Check vendor libs in ui/suite/js/vendor/
-   # Compare with latest versions of htmx, alpine, etc.
+   # Compare with latest versions of htmx, gsap, etc.
    ```
 
 ### Packages to Watch
@@ -39,7 +39,6 @@
 |------|-------------------|---------|
 | HTTP Client | `reqwest` | Consolidate HTTP handling |
 | Templates | `askama` | Efficient HTML templates |
-| State Mgmt | `alpine.js` | Minimal JS reactivity |
 | Animations | `gsap` | Replace CSS animations |
 
 ---
@@ -198,7 +197,7 @@ botbook/       # Documentation
 ```
 - Keep it minimal - one function per concern
 - No frameworks (React, Vue, etc.) - vanilla JS only
-- Use vendor libs sparingly (htmx, marked, gsap, alpine)
+- Use vendor libs sparingly (htmx, marked, gsap)
 - All JS must work with HTMX lifecycle (htmx:afterSwap, etc.)
 - Prefer CSS for animations when possible
 ```
@@ -214,7 +213,6 @@ ui/suite/js/vendor/
 ├── htmx-json-enc.js      # JSON encoding
 ├── marked.min.js         # Markdown parser
 ├── gsap.min.js           # Animation (minimal use)
-├── alpinejs.min.js       # Alpine.js (minimal use)
 └── livekit-client.umd.min.js  # LiveKit video
 
 ui/minimal/js/vendor/
