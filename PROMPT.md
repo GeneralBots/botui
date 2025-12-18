@@ -5,6 +5,45 @@
 
 ---
 
+## Weekly Maintenance - EVERY MONDAY
+
+### Package Review Checklist
+
+**Every Monday, review the following:**
+
+1. **Dependency Updates**
+   ```bash
+   cargo outdated
+   cargo audit
+   ```
+
+2. **Package Consolidation Opportunities**
+   - Check if new crates can replace custom code
+   - Look for crates that combine multiple dependencies
+   - Review `Cargo.toml` for redundant dependencies
+
+3. **Code Reduction Candidates**
+   - Custom implementations that now have crate equivalents
+   - Boilerplate that can be replaced with derive macros
+   - Manual serialization that `serde` can handle
+
+4. **Frontend Asset Updates**
+   ```bash
+   # Check vendor libs in ui/suite/js/vendor/
+   # Compare with latest versions of htmx, alpine, etc.
+   ```
+
+### Packages to Watch
+
+| Area | Potential Packages | Purpose |
+|------|-------------------|---------|
+| HTTP Client | `reqwest` | Consolidate HTTP handling |
+| Templates | `askama` | Efficient HTML templates |
+| State Mgmt | `alpine.js` | Minimal JS reactivity |
+| Animations | `gsap` | Replace CSS animations |
+
+---
+
 ## Version Management - CRITICAL
 
 **Current version is 6.1.0 - DO NOT CHANGE without explicit approval!**
