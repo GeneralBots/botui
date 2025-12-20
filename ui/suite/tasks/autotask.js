@@ -373,8 +373,121 @@ function discardPlan() {
 }
 
 function editPlan() {
-  // TODO: Implement plan editor
-  showToast("Plan editor coming soon!", "info");
+  if (!AutoTaskState.compiledPlan) {
+    showToast("No plan to edit", "warning");
+    return;
+  }
+
+  const modal = document.createElement("div");
+  modal.className = "modal-overlay";
+  modal.id = "plan-editor-modal";
+  modal.innerHTML = `
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h3>Edit Plan</h3>
+        <button class="close-btn" onclick="closePlanEditor()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="plan-name">Plan Name</label>
+          <input type="text" id="plan-name" value="${AutoTaskState.compiledPlan.name || "Untitled Plan"}" />
+        </div>
+        <div class="form-group">
+          <label for="plan-description">Description</label>
+          <textarea id="plan-description" rows="3">${AutoTaskState.compiledPlan.description || ""}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="plan-steps">Steps (JSON)</label>
+          <textarea id="plan-steps" rows="10" class="code-editor">${JSON.stringify(AutoTaskState.compiledPlan.steps || [], null, 2)}</textarea>
+        </div>
+        <div class="form-group">
+          <label for="plan-priority">Priority</label>
+          <select id="plan-priority">
+            <option value="low" ${AutoTaskState.compiledPlan.priority === "low" ? "selected" : ""}>Low</option>
+            <option value="medium" ${AutoTaskState.compiledPlan.priority === "medium" ? "selected" : ""}>Medium</option>
+            <option value="high" ${AutoTaskState.compiledPlan.priority === "high" ? "selected" : ""}>High</option>
+            <option value="urgent" ${AutoTaskState.compiledPlan.priority === "urgent" ? "selected" : ""}>Urgent</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePlanEditor()">Cancel</button>
+        <button class="btn btn-primary" onclick="savePlanEdits()">Save Changes</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function closePlanEditor() {
+  const modal = document.getElementById("plan-editor-modal");
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function savePlanEdits() {
+  const name = document.getElementById("plan-name").value;
+  const description = document.getElementById("plan-description").value;
+  const stepsJson = document.getElementById("plan-steps").value;
+  const priority = document.getElementById("plan-priority").value;
+
+  let steps;
+  try {
+    steps = JSON.parse(stepsJson);
+  } catch (e) {
+    showToast("Invalid JSON in steps", "error");
+    return;
+  }
+
+  AutoTaskState.compiledPlan = {
+    ...AutoTaskState.compiledPlan,
+    name: name,
+    description: description,
+    steps: steps,
+    priority: priority,
+  };
+
+  closePlanEditor();
+  showToast("Plan updated successfully", "success");
+
+  const resultDiv = document.getElementById("compilation-result");
+  if (resultDiv && AutoTaskState.compiledPlan) {
+    renderCompiledPlan(AutoTaskState.compiledPlan);
+  }
+}
+
+function renderCompiledPlan(plan) {
+  const resultDiv = document.getElementById("compilation-result");
+  if (!resultDiv) return;
+
+  const stepsHtml = (plan.steps || [])
+    .map(
+      (step, i) => `
+      <div class="plan-step">
+        <span class="step-number">${i + 1}</span>
+        <span class="step-action">${step.action || step.type || "Action"}</span>
+        <span class="step-target">${step.target || step.description || ""}</span>
+      </div>
+    `,
+    )
+    .join("");
+
+  resultDiv.innerHTML = `
+    <div class="compiled-plan">
+      <div class="plan-header">
+        <h4>${plan.name || "Compiled Plan"}</h4>
+        <span class="plan-priority priority-${plan.priority || "medium"}">${plan.priority || "medium"}</span>
+      </div>
+      ${plan.description ? `<p class="plan-description">${plan.description}</p>` : ""}
+      <div class="plan-steps">${stepsHtml}</div>
+      <div class="plan-actions">
+        <button class="btn btn-secondary" onclick="editPlan()">Edit</button>
+        <button class="btn btn-secondary" onclick="discardPlan()">Discard</button>
+        <button class="btn btn-primary" onclick="executePlan('${plan.id || ""}')">Execute</button>
+      </div>
+    </div>
+  `;
 }
 
 // =============================================================================

@@ -1,16 +1,8 @@
-/**
- * Base Module JavaScript
- * Core functionality for the General Bots Suite
- * Handles navigation, theme, settings, accessibility, and HTMX error handling
- */
-
-// DOM Elements
 const appsBtn = document.getElementById("apps-btn");
 const appsDropdown = document.getElementById("apps-dropdown");
 const settingsBtn = document.getElementById("settings-btn");
 const settingsPanel = document.getElementById("settings-panel");
 
-// Apps Menu Toggle
 if (appsBtn) {
   appsBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -20,7 +12,6 @@ if (appsBtn) {
   });
 }
 
-// Settings Panel Toggle
 if (settingsBtn) {
   settingsBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -30,7 +21,6 @@ if (settingsBtn) {
   });
 }
 
-// Close dropdowns when clicking outside
 document.addEventListener("click", (e) => {
   if (
     appsDropdown &&
@@ -50,7 +40,6 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Escape key closes dropdowns
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     if (appsDropdown) appsDropdown.classList.remove("show");
@@ -60,7 +49,6 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// Alt+key shortcuts for navigation
 document.addEventListener("keydown", (e) => {
   if (e.altKey && !e.ctrlKey && !e.shiftKey) {
     const shortcuts = {
@@ -95,7 +83,6 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-// Update active app on HTMX swap
 document.body.addEventListener("htmx:afterSwap", (e) => {
   if (e.detail.target.id === "main-content") {
     const hash = window.location.hash || "#chat";
@@ -106,8 +93,6 @@ document.body.addEventListener("htmx:afterSwap", (e) => {
   }
 });
 
-// Theme handling
-// Available themes: dark, light, blue, purple, green, orange, sentient
 const themeOptions = document.querySelectorAll(".theme-option");
 const savedTheme = localStorage.getItem("gb-theme") || "sentient";
 document.body.setAttribute("data-theme", savedTheme);
@@ -115,10 +100,8 @@ document
   .querySelector(`.theme-option[data-theme="${savedTheme}"]`)
   ?.classList.add("active");
 
-// Update theme-color meta tag based on theme
 function updateThemeColor(theme) {
   const themeColors = {
-    // Core Themes
     dark: "#3b82f6",
     light: "#3b82f6",
     blue: "#0ea5e9",
@@ -126,7 +109,6 @@ function updateThemeColor(theme) {
     green: "#22c55e",
     orange: "#f97316",
     sentient: "#d4f505",
-    // Retro Themes
     cyberpunk: "#ff00ff",
     retrowave: "#ff6b9d",
     vapordream: "#a29bfe",
@@ -134,7 +116,6 @@ function updateThemeColor(theme) {
     arcadeflash: "#ffff00",
     discofever: "#ff1493",
     grungeera: "#8b4513",
-    // Classic Themes
     jazzage: "#d4af37",
     mellowgold: "#daa520",
     midcenturymod: "#e07b39",
@@ -142,7 +123,6 @@ function updateThemeColor(theme) {
     saturdaycartoons: "#ff6347",
     seasidepostcard: "#20b2aa",
     typewriter: "#2f2f2f",
-    // Tech Themes
     "3dbevel": "#0000ff",
     xeroxui: "#4a86cf",
     xtreegold: "#ffff00",
@@ -165,7 +145,6 @@ themeOptions.forEach((option) => {
   });
 });
 
-// Global theme setter function (can be called from settings or elsewhere)
 window.setTheme = function (theme) {
   document.body.setAttribute("data-theme", theme);
   localStorage.setItem("gb-theme", theme);
@@ -175,14 +154,12 @@ window.setTheme = function (theme) {
   updateThemeColor(theme);
 };
 
-// Quick Settings Toggle
 function toggleQuickSetting(el) {
   el.classList.toggle("active");
   const setting = el.id.replace("toggle-", "");
   localStorage.setItem(`gb-${setting}`, el.classList.contains("active"));
 }
 
-// Load quick toggle states
 ["notifications", "sound", "compact"].forEach((setting) => {
   const saved = localStorage.getItem(`gb-${setting}`);
   const toggle = document.getElementById(`toggle-${setting}`);
@@ -191,7 +168,6 @@ function toggleQuickSetting(el) {
   }
 });
 
-// Show keyboard shortcuts notification
 function showKeyboardShortcuts() {
   window.showNotification(
     "Alt+1-9,0 for apps, Alt+A Admin, Alt+M Monitoring, Alt+S Settings, Alt+, quick settings",
@@ -200,19 +176,16 @@ function showKeyboardShortcuts() {
   );
 }
 
-// Accessibility: Announce page changes to screen readers
 function announceToScreenReader(message) {
   const liveRegion = document.getElementById("aria-live");
   if (liveRegion) {
     liveRegion.textContent = message;
-    // Clear after announcement
     setTimeout(() => {
       liveRegion.textContent = "";
     }, 1000);
   }
 }
 
-// HTMX accessibility hooks
 document.body.addEventListener("htmx:beforeRequest", function (e) {
   const target = e.detail.target;
   if (target && target.id === "main-content") {
@@ -225,7 +198,6 @@ document.body.addEventListener("htmx:afterSwap", function (e) {
   const target = e.detail.target;
   if (target && target.id === "main-content") {
     target.setAttribute("aria-busy", "false");
-    // Focus management: move focus to main content after navigation
     target.focus();
     announceToScreenReader("Content loaded");
   }
@@ -239,7 +211,6 @@ document.body.addEventListener("htmx:responseError", function (e) {
   announceToScreenReader("Error loading content. Please try again.");
 });
 
-// Keyboard navigation for apps grid
 document.addEventListener("keydown", function (e) {
   const appsGrid = document.querySelector(".apps-grid");
   if (!appsGrid || !appsGrid.closest(".show")) return;
@@ -252,7 +223,7 @@ document.addEventListener("keydown", function (e) {
   if (currentIndex === -1) return;
 
   let newIndex = currentIndex;
-  const columns = 3; // Grid has 3 columns on desktop
+  const columns = 3;
 
   switch (e.key) {
     case "ArrowRight":
@@ -283,7 +254,6 @@ document.addEventListener("keydown", function (e) {
   }
 });
 
-// Notification System
 window.showNotification = function (message, type = "info", duration = 5000) {
   const container = document.getElementById("notifications");
   if (!container) return;
@@ -302,7 +272,6 @@ window.showNotification = function (message, type = "info", duration = 5000) {
   }
 };
 
-// Global HTMX error handling with retry mechanism
 const htmxRetryConfig = {
   maxRetries: 3,
   retryDelay: 1000,
@@ -357,12 +326,10 @@ window.retryLastRequest = function (btn) {
   if (retryCallback && window[retryCallback]) {
     window[retryCallback]();
   } else {
-    // Try to re-trigger HTMX request
     const triggers = target.querySelectorAll("[hx-get], [hx-post]");
     if (triggers.length > 0) {
       htmx.trigger(triggers[0], "htmx:trigger");
     } else {
-      // Reload the current app
       const activeApp = document.querySelector(".app-item.active");
       if (activeApp) {
         activeApp.click();
@@ -371,7 +338,6 @@ window.retryLastRequest = function (btn) {
   }
 };
 
-// Handle HTMX errors globally
 document.body.addEventListener("htmx:responseError", function (e) {
   const target = e.detail.target;
   const xhr = e.detail.xhr;
@@ -379,7 +345,6 @@ document.body.addEventListener("htmx:responseError", function (e) {
 
   let currentRetries = htmxRetryConfig.retryCount.get(retryKey) || 0;
 
-  // Auto-retry for network errors (status 0) or server errors (5xx)
   if (
     (xhr.status === 0 || xhr.status >= 500) &&
     currentRetries < htmxRetryConfig.maxRetries
@@ -397,7 +362,6 @@ document.body.addEventListener("htmx:responseError", function (e) {
       htmx.trigger(e.detail.elt, "htmx:trigger");
     }, delay);
   } else {
-    // Max retries reached or client error - show error state
     htmxRetryConfig.retryCount.delete(retryKey);
 
     let errorMessage = "We couldn't load the content.";
@@ -423,7 +387,6 @@ document.body.addEventListener("htmx:responseError", function (e) {
   }
 });
 
-// Clear retry count on successful request
 document.body.addEventListener("htmx:afterRequest", function (e) {
   if (e.detail.successful) {
     const retryKey = getRetryKey(e.detail.elt);
@@ -431,7 +394,6 @@ document.body.addEventListener("htmx:afterRequest", function (e) {
   }
 });
 
-// Handle timeout errors
 document.body.addEventListener("htmx:timeout", function (e) {
   window.showNotification(
     "Request timed out. Please try again.",
@@ -440,7 +402,6 @@ document.body.addEventListener("htmx:timeout", function (e) {
   );
 });
 
-// Handle send errors (network issues before request sent)
 document.body.addEventListener("htmx:sendError", function (e) {
   window.showNotification(
     "Network error. Please check your connection.",

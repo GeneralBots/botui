@@ -1,7 +1,3 @@
-//! UI Server module for BotUI
-//!
-//! Serves the web UI (suite, minimal) and handles API proxying.
-
 use axum::{
     body::Body,
     extract::{
@@ -20,15 +16,38 @@ use std::{fs, path::PathBuf};
 use tokio_tungstenite::{
     connect_async_tls_with_config, tungstenite::protocol::Message as TungsteniteMessage,
 };
+use tower_http::services::ServeDir;
 
 use crate::shared::AppState;
 
-/// Serve the index page (suite UI)
+const SUITE_DIRS: &[&str] = &[
+    "js",
+    "css",
+    "public",
+    "drive",
+    "chat",
+    "mail",
+    "tasks",
+    "calendar",
+    "meet",
+    "paper",
+    "research",
+    "analytics",
+    "monitoring",
+    "admin",
+    "auth",
+    "settings",
+    "sources",
+    "attendant",
+    "tools",
+    "assets",
+    "partials",
+];
+
 pub async fn index() -> impl IntoResponse {
     serve_suite().await
 }
 
-/// Handler for minimal UI
 pub async fn serve_minimal() -> impl IntoResponse {
     match fs::read_to_string("ui/minimal/index.html") {
         Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
@@ -43,7 +62,6 @@ pub async fn serve_minimal() -> impl IntoResponse {
     }
 }
 
-/// Handler for suite UI
 pub async fn serve_suite() -> impl IntoResponse {
     match fs::read_to_string("ui/suite/index.html") {
         Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
@@ -58,7 +76,6 @@ pub async fn serve_suite() -> impl IntoResponse {
     }
 }
 
-/// Health check endpoint - checks BotServer connectivity
 async fn health(State(state): State<AppState>) -> (StatusCode, axum::Json<serde_json::Value>) {
     match state.health_check().await {
         true => (
@@ -80,7 +97,6 @@ async fn health(State(state): State<AppState>) -> (StatusCode, axum::Json<serde_
     }
 }
 
-/// API health check endpoint
 async fn api_health() -> (StatusCode, axum::Json<serde_json::Value>) {
     (
         StatusCode::OK,
@@ -91,12 +107,9 @@ async fn api_health() -> (StatusCode, axum::Json<serde_json::Value>) {
     )
 }
 
-/// Extract app context from Referer header or path
 fn extract_app_context(headers: &axum::http::HeaderMap, path: &str) -> Option<String> {
-    // Try to extract from Referer header first
     if let Some(referer) = headers.get("referer") {
         if let Ok(referer_str) = referer.to_str() {
-            // Match /apps/{app_name}/ pattern
             if let Some(start) = referer_str.find("/apps/") {
                 let after_apps = &referer_str[start + 6..];
                 if let Some(end) = after_apps.find('/') {
@@ -108,7 +121,6 @@ fn extract_app_context(headers: &axum::http::HeaderMap, path: &str) -> Option<St
         }
     }
 
-    // Try to extract from path (for /apps/{app}/api/* routes)
     if path.starts_with("/apps/") {
         let after_apps = &path[6..];
         if let Some(end) = after_apps.find('/') {
@@ -119,7 +131,6 @@ fn extract_app_context(headers: &axum::http::HeaderMap, path: &str) -> Option<St
     None
 }
 
-/// Proxy API requests to botserver
 async fn proxy_api(
     State(state): State<AppState>,
     original_uri: OriginalUri,
@@ -133,7 +144,6 @@ async fn proxy_api(
     let method = req.method().clone();
     let headers = req.headers().clone();
 
-    // Extract app context from request
     let app_context = extract_app_context(&headers, path);
 
     let target_url = format!("{}{}{}", state.client.base_url(), path, query);
@@ -142,14 +152,12 @@ async fn proxy_api(
         method, path, target_url, app_context
     );
 
-    // Build the proxied request with self-signed cert support
     let client = reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
         .build()
         .unwrap_or_else(|_| reqwest::Client::new());
     let mut proxy_req = client.request(method.clone(), &target_url);
 
-    // Copy headers (excluding host)
     for (name, value) in headers.iter() {
         if name != "host" {
             if let Ok(v) = value.to_str() {
@@ -158,12 +166,10 @@ async fn proxy_api(
         }
     }
 
-    // Inject X-App-Context header if we detected an app
     if let Some(app) = app_context {
         proxy_req = proxy_req.header("X-App-Context", app);
     }
 
-    // Copy body for non-GET requests
     let body_bytes = match axum::body::to_bytes(req.into_body(), usize::MAX).await {
         Ok(bytes) => bytes,
         Err(e) => {
@@ -179,7 +185,6 @@ async fn proxy_api(
         proxy_req = proxy_req.body(body_bytes.to_vec());
     }
 
-    // Execute the request
     match proxy_req.send().await {
         Ok(resp) => {
             let status = resp.status();
@@ -189,7 +194,6 @@ async fn proxy_api(
                 Ok(body) => {
                     let mut response = Response::builder().status(status);
 
-                    // Copy response headers
                     for (name, value) in headers.iter() {
                         response = response.header(name, value);
                     }
@@ -220,32 +224,18 @@ async fn proxy_api(
     }
 }
 
-/// Create API proxy router
 fn create_api_router() -> Router<AppState> {
     Router::new()
         .route("/health", get(api_health))
-        .route("/chat", any(proxy_api))
-        .route("/sessions", any(proxy_api))
-        .route("/sessions/{id}", any(proxy_api))
-        .route("/sessions/{id}/history", any(proxy_api))
-        .route("/sessions/{id}/start", any(proxy_api))
-        .route("/drive/files", any(proxy_api))
-        .route("/drive/files/{path}", any(proxy_api))
-        .route("/drive/upload", any(proxy_api))
-        .route("/drive/download/{path}", any(proxy_api))
-        .route("/tasks", any(proxy_api))
-        .route("/tasks/{id}", any(proxy_api))
         .fallback(any(proxy_api))
 }
 
-/// WebSocket query parameters
 #[derive(Debug, Deserialize)]
 struct WsQuery {
     session_id: String,
     user_id: String,
 }
 
-/// WebSocket proxy handler
 async fn ws_proxy(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
@@ -254,7 +244,6 @@ async fn ws_proxy(
     ws.on_upgrade(move |socket| handle_ws_proxy(socket, state, params))
 }
 
-/// Handle WebSocket proxy connection
 async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQuery) {
     let backend_url = format!(
         "{}/ws?session_id={}&user_id={}",
@@ -269,7 +258,6 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
 
     info!("Proxying WebSocket to: {}", backend_url);
 
-    // Create TLS connector that accepts self-signed certs
     let tls_connector = native_tls::TlsConnector::builder()
         .danger_accept_invalid_certs(true)
         .danger_accept_invalid_hostnames(true)
@@ -278,7 +266,6 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
 
     let connector = tokio_tungstenite::Connector::NativeTls(tls_connector);
 
-    // Connect to backend WebSocket
     let backend_result =
         connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
 
@@ -292,11 +279,9 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
 
     info!("Connected to backend WebSocket");
 
-    // Split both sockets
     let (mut client_tx, mut client_rx) = client_socket.split();
     let (mut backend_tx, mut backend_rx) = backend_socket.split();
 
-    // Forward messages from client to backend
     let client_to_backend = async {
         while let Some(msg) = client_rx.next().await {
             match msg {
@@ -341,7 +326,6 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         }
     };
 
-    // Forward messages from backend to client
     let backend_to_client = async {
         while let Some(msg) = backend_rx.next().await {
             match msg {
@@ -371,250 +355,57 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         }
     };
 
-    // Run both forwarding tasks concurrently
     tokio::select! {
         _ = client_to_backend => info!("Client connection closed"),
         _ = backend_to_client => info!("Backend connection closed"),
     }
 }
 
-/// Create WebSocket proxy router
 fn create_ws_router() -> Router<AppState> {
     Router::new().fallback(any(ws_proxy))
 }
 
-/// Create apps proxy router - proxies /apps/* to botserver
 fn create_apps_router() -> Router<AppState> {
-    Router::new()
-        // Proxy all /apps/* requests to botserver
-        // botserver serves static files from site_path
-        // API calls from apps also go through here with X-App-Context header
-        .fallback(any(proxy_api))
+    Router::new().fallback(any(proxy_api))
 }
 
-/// Create UI HTMX proxy router (for HTML fragment endpoints)
 fn create_ui_router() -> Router<AppState> {
-    Router::new()
-        // Email UI endpoints
-        .route("/email/accounts", any(proxy_api))
-        .route("/email/list", any(proxy_api))
-        .route("/email/folders", any(proxy_api))
-        .route("/email/compose", any(proxy_api))
-        .route("/email/labels", any(proxy_api))
-        .route("/email/templates", any(proxy_api))
-        .route("/email/signatures", any(proxy_api))
-        .route("/email/rules", any(proxy_api))
-        .route("/email/search", any(proxy_api))
-        .route("/email/auto-responder", any(proxy_api))
-        .route("/email/{id}", any(proxy_api))
-        .route("/email/{id}/delete", any(proxy_api))
-        // Calendar UI endpoints
-        .route("/calendar/list", any(proxy_api))
-        .route("/calendar/upcoming", any(proxy_api))
-        .route("/calendar/event/new", any(proxy_api))
-        .route("/calendar/new", any(proxy_api))
-        // Fallback for any other /ui/* routes
-        .fallback(any(proxy_api))
+    Router::new().fallback(any(proxy_api))
 }
 
-/// Configure and return the main router
+fn add_static_routes(router: Router<AppState>, suite_path: &PathBuf) -> Router<AppState> {
+    let mut r = router;
+
+    for dir in SUITE_DIRS {
+        let path = suite_path.join(dir);
+        r = r
+            .nest_service(&format!("/suite/{}", dir), ServeDir::new(path.clone()))
+            .nest_service(&format!("/{}", dir), ServeDir::new(path));
+    }
+
+    r
+}
+
 pub fn configure_router() -> Router {
     let suite_path = PathBuf::from("./ui/suite");
-    let _minimal_path = PathBuf::from("./ui/minimal");
     let state = AppState::new();
 
-    Router::new()
-        // Health check endpoints
+    let mut router = Router::new()
         .route("/health", get(health))
-        // API proxy routes
         .nest("/api", create_api_router())
-        // UI HTMX proxy routes (for /ui/* endpoints that return HTML fragments)
         .nest("/ui", create_ui_router())
-        // WebSocket proxy routes
         .nest("/ws", create_ws_router())
-        // Apps proxy routes - proxy /apps/* to botserver (which serves from site_path)
         .nest("/apps", create_apps_router())
-        // UI routes
         .route("/", get(index))
         .route("/minimal", get(serve_minimal))
-        .route("/suite", get(serve_suite))
-        // Suite static assets (when accessing /suite/*)
-        .nest_service(
-            "/suite/js",
-            tower_http::services::ServeDir::new(suite_path.join("js")),
-        )
-        .nest_service(
-            "/suite/css",
-            tower_http::services::ServeDir::new(suite_path.join("css")),
-        )
-        .nest_service(
-            "/suite/public",
-            tower_http::services::ServeDir::new(suite_path.join("public")),
-        )
-        .nest_service(
-            "/suite/drive",
-            tower_http::services::ServeDir::new(suite_path.join("drive")),
-        )
-        .nest_service(
-            "/suite/chat",
-            tower_http::services::ServeDir::new(suite_path.join("chat")),
-        )
-        .nest_service(
-            "/suite/mail",
-            tower_http::services::ServeDir::new(suite_path.join("mail")),
-        )
-        .nest_service(
-            "/suite/tasks",
-            tower_http::services::ServeDir::new(suite_path.join("tasks")),
-        )
-        .nest_service(
-            "/suite/calendar",
-            tower_http::services::ServeDir::new(suite_path.join("calendar")),
-        )
-        .nest_service(
-            "/suite/meet",
-            tower_http::services::ServeDir::new(suite_path.join("meet")),
-        )
-        .nest_service(
-            "/suite/paper",
-            tower_http::services::ServeDir::new(suite_path.join("paper")),
-        )
-        .nest_service(
-            "/suite/research",
-            tower_http::services::ServeDir::new(suite_path.join("research")),
-        )
-        .nest_service(
-            "/suite/analytics",
-            tower_http::services::ServeDir::new(suite_path.join("analytics")),
-        )
-        .nest_service(
-            "/suite/monitoring",
-            tower_http::services::ServeDir::new(suite_path.join("monitoring")),
-        )
-        .nest_service(
-            "/suite/admin",
-            tower_http::services::ServeDir::new(suite_path.join("admin")),
-        )
-        .nest_service(
-            "/suite/auth",
-            tower_http::services::ServeDir::new(suite_path.join("auth")),
-        )
-        .nest_service(
-            "/suite/settings",
-            tower_http::services::ServeDir::new(suite_path.join("settings")),
-        )
-        .nest_service(
-            "/suite/sources",
-            tower_http::services::ServeDir::new(suite_path.join("sources")),
-        )
-        .nest_service(
-            "/suite/attendant",
-            tower_http::services::ServeDir::new(suite_path.join("attendant")),
-        )
-        .nest_service(
-            "/suite/tools",
-            tower_http::services::ServeDir::new(suite_path.join("tools")),
-        )
-        .nest_service(
-            "/suite/assets",
-            tower_http::services::ServeDir::new(suite_path.join("assets")),
-        )
-        .nest_service(
-            "/suite/partials",
-            tower_http::services::ServeDir::new(suite_path.join("partials")),
-        )
-        // Legacy paths for backward compatibility (serve suite assets)
-        .nest_service(
-            "/js",
-            tower_http::services::ServeDir::new(suite_path.join("js")),
-        )
-        .nest_service(
-            "/css",
-            tower_http::services::ServeDir::new(suite_path.join("css")),
-        )
-        .nest_service(
-            "/public",
-            tower_http::services::ServeDir::new(suite_path.join("public")),
-        )
-        .nest_service(
-            "/drive",
-            tower_http::services::ServeDir::new(suite_path.join("drive")),
-        )
-        .nest_service(
-            "/chat",
-            tower_http::services::ServeDir::new(suite_path.join("chat")),
-        )
-        .nest_service(
-            "/mail",
-            tower_http::services::ServeDir::new(suite_path.join("mail")),
-        )
-        .nest_service(
-            "/tasks",
-            tower_http::services::ServeDir::new(suite_path.join("tasks")),
-        )
-        // Additional app routes
-        .nest_service(
-            "/paper",
-            tower_http::services::ServeDir::new(suite_path.join("paper")),
-        )
-        .nest_service(
-            "/calendar",
-            tower_http::services::ServeDir::new(suite_path.join("calendar")),
-        )
-        .nest_service(
-            "/research",
-            tower_http::services::ServeDir::new(suite_path.join("research")),
-        )
-        .nest_service(
-            "/meet",
-            tower_http::services::ServeDir::new(suite_path.join("meet")),
-        )
-        .nest_service(
-            "/analytics",
-            tower_http::services::ServeDir::new(suite_path.join("analytics")),
-        )
-        .nest_service(
-            "/monitoring",
-            tower_http::services::ServeDir::new(suite_path.join("monitoring")),
-        )
-        .nest_service(
-            "/admin",
-            tower_http::services::ServeDir::new(suite_path.join("admin")),
-        )
-        .nest_service(
-            "/auth",
-            tower_http::services::ServeDir::new(suite_path.join("auth")),
-        )
-        .nest_service(
-            "/settings",
-            tower_http::services::ServeDir::new(suite_path.join("settings")),
-        )
-        .nest_service(
-            "/sources",
-            tower_http::services::ServeDir::new(suite_path.join("sources")),
-        )
-        .nest_service(
-            "/tools",
-            tower_http::services::ServeDir::new(suite_path.join("tools")),
-        )
-        .nest_service(
-            "/assets",
-            tower_http::services::ServeDir::new(suite_path.join("assets")),
-        )
-        .nest_service(
-            "/partials",
-            tower_http::services::ServeDir::new(suite_path.join("partials")),
-        )
-        .nest_service(
-            "/attendant",
-            tower_http::services::ServeDir::new(suite_path.join("attendant")),
-        )
-        // Fallback for other static files (serve suite by default)
+        .route("/suite", get(serve_suite));
+
+    router = add_static_routes(router, &suite_path);
+
+    router
         .fallback_service(
-            tower_http::services::ServeDir::new(suite_path.clone()).fallback(
-                tower_http::services::ServeDir::new(suite_path)
-                    .append_index_html_on_directories(true),
-            ),
+            ServeDir::new(suite_path.clone())
+                .fallback(ServeDir::new(suite_path).append_index_html_on_directories(true)),
         )
         .with_state(state)
 }

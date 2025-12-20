@@ -1,28 +1,63 @@
-//! BotUI - General Bots Pure Web UI Server
-//!
-//! This is the entry point for the botui web server.
-//! For desktop/mobile native features, see the `botapp` crate.
-
 use log::info;
+use std::net::SocketAddr;
 
 mod shared;
 mod ui_server;
 
-#[tokio::main]
-async fn main() -> std::io::Result<()> {
-    env_logger::init();
-    info!("BotUI starting...");
-    info!("Starting web UI server...");
+fn init_logging() {
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
+        .format_timestamp_millis()
+        .init();
+}
 
-    let app = ui_server::configure_router();
-
-    let port: u16 = std::env::var("BOTUI_PORT")
+fn get_port() -> u16 {
+    std::env::var("BOTUI_PORT")
         .ok()
         .and_then(|p| p.parse().ok())
-        .unwrap_or(3000);
-    let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
-    let listener = tokio::net::TcpListener::bind(addr).await?;
-    info!("UI server listening on {}", addr);
+        .unwrap_or(3000)
+}
 
-    axum::serve(listener, app).await
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    init_logging();
+
+    info!("BotUI {} starting...", env!("CARGO_PKG_VERSION"));
+
+    let app = ui_server::configure_router();
+    let port = get_port();
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
+
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    info!("UI server listening on http://{}", addr);
+
+    axum::serve(listener, app)
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
+
+    info!("BotUI shutdown complete");
+    Ok(())
+}
+
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c()
+            .await
+            .expect("Failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .expect("Failed to install SIGTERM handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => info!("Received Ctrl+C, shutting down..."),
+        _ = terminate => info!("Received SIGTERM, shutting down..."),
+    }
 }
