@@ -1,22 +1,23 @@
 //! Application state management
 //!
 //! This module contains the shared application state that is passed to all
-//! route handlers and provides access to the BotServer client.
+//! route handlers and provides access to the `BotServer` client.
 
 use botlib::http_client::BotServerClient;
 use std::sync::Arc;
 
 /// Application state shared across all handlers
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AppState {
-    /// HTTP client for communicating with BotServer
+    /// HTTP client for communicating with `BotServer`
     pub client: Arc<BotServerClient>,
 }
 
 impl AppState {
     /// Create a new application state
     ///
-    /// Uses BOTSERVER_URL environment variable if set, otherwise defaults to localhost:8080
+    /// Uses `BOTSERVER_URL` environment variable if set, otherwise defaults to localhost:8080
+    #[must_use]
     pub fn new() -> Self {
         let url = std::env::var("BOTSERVER_URL").ok();
         Self {
@@ -24,7 +25,7 @@ impl AppState {
         }
     }
 
-    /// Check if the BotServer is healthy
+    /// Check if the `BotServer` is healthy
     pub async fn health_check(&self) -> bool {
         self.client.health_check().await
     }

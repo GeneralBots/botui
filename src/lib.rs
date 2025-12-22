@@ -1,9 +1,9 @@
-//! BotUI - General Bots Pure Web UI
+//! `BotUI` - General Bots Pure Web UI
 //!
 //! This crate provides the web UI layer for General Bots:
 //! - Serves static HTMX UI files (suite, minimal)
 //! - Proxies API requests to botserver
-//! - WebSocket support for real-time communication
+//! - `WebSocket` support for real-time communication
 //!
 //! For desktop/mobile native features, see the `botapp` crate which
 //! wraps this pure web UI with Tauri.

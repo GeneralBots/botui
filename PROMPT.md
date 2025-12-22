@@ -5,6 +5,118 @@
 
 ---
 
+## ZERO TOLERANCE POLICY
+
+**This project has the strictest code quality requirements possible.**
+
+**EVERY SINGLE WARNING MUST BE FIXED. NO EXCEPTIONS.**
+
+---
+
+## ABSOLUTE PROHIBITIONS
+
+```
+❌ NEVER use #![allow()] or #[allow()] in source code to silence warnings
+❌ NEVER use _ prefix for unused variables - DELETE the variable or USE it
+❌ NEVER use .unwrap() - use ? or proper error handling
+❌ NEVER use .expect() - use ? or proper error handling  
+❌ NEVER use panic!() or unreachable!() - handle all cases
+❌ NEVER use todo!() or unimplemented!() - write real code
+❌ NEVER leave unused imports - DELETE them
+❌ NEVER leave dead code - DELETE it or IMPLEMENT it
+❌ NEVER use approximate constants (3.14159) - use std::f64::consts::PI
+❌ NEVER silence clippy in code - FIX THE CODE or configure in Cargo.toml
+❌ NEVER add comments explaining what code does - code must be self-documenting
+❌ NEVER use CDN links - all assets must be local
+```
+
+---
+
+## CARGO.TOML LINT EXCEPTIONS
+
+When a clippy lint has **technical false positives** that cannot be fixed in code,
+disable it in `Cargo.toml` with a comment explaining why:
+
+```toml
+[lints.clippy]
+# Disabled: has false positives for functions with mut self, heap types (Vec, String)
+missing_const_for_fn = "allow"
+# Disabled: Tauri commands require owned types (Window) that cannot be passed by reference
+needless_pass_by_value = "allow"
+# Disabled: transitive dependencies we cannot control
+multiple_crate_versions = "allow"
+```
+
+**Approved exceptions:**
+- `missing_const_for_fn` - false positives for `mut self`, heap types
+- `needless_pass_by_value` - Tauri/framework requirements
+- `multiple_crate_versions` - transitive dependencies
+- `future_not_send` - when async traits require non-Send futures
+
+---
+
+## MANDATORY CODE PATTERNS
+
+### Error Handling - Use `?` Operator
+
+```rust
+// ❌ WRONG
+let value = something.unwrap();
+let value = something.expect("msg");
+
+// ✅ CORRECT
+let value = something?;
+let value = something.ok_or_else(|| Error::NotFound)?;
+```
+
+### Self Usage in Impl Blocks
+
+```rust
+// ❌ WRONG
+impl MyStruct {
+    fn new() -> MyStruct { MyStruct { } }
+}
+
+// ✅ CORRECT
+impl MyStruct {
+    fn new() -> Self { Self { } }
+}
+```
+
+### Format Strings - Inline Variables
+
+```rust
+// ❌ WRONG
+format!("Hello {}", name)
+
+// ✅ CORRECT
+format!("Hello {name}")
+```
+
+### Display vs ToString
+
+```rust
+// ❌ WRONG
+impl ToString for MyType { }
+
+// ✅ CORRECT
+impl std::fmt::Display for MyType { }
+```
+
+### Derive Eq with PartialEq
+
+```rust
+// ❌ WRONG
+#[derive(PartialEq)]
+struct MyStruct { }
+
+// ✅ CORRECT
+#[derive(PartialEq, Eq)]
+struct MyStruct { }
+```
+
+---
+
 ## Weekly Maintenance - EVERY MONDAY
 
 ### Package Review Checklist
@@ -435,13 +547,20 @@ ui/minimal/index.html # Minimal chat UI
 
 ## Remember
 
-- **Two LLM modes**: Execution (fazer) vs Review (conferir)
+- **ZERO WARNINGS** - Every clippy warning must be fixed
+- **NO ALLOW IN CODE** - Never use #[allow()] in source files
+- **CARGO.TOML EXCEPTIONS OK** - Disable lints with false positives in Cargo.toml with comment
+- **NO DEAD CODE** - Delete unused code, never prefix with _
+- **NO UNWRAP/EXPECT** - Use ? operator or proper error handling
+- **INLINE FORMAT ARGS** - format!("{name}") not format!("{}", name)
+- **USE SELF** - In impl blocks, use Self not the type name
+- **DERIVE EQ** - Always derive Eq with PartialEq
+- **DISPLAY NOT TOSTRING** - Implement Display, not ToString
+- **USE DIAGNOSTICS** - Use IDE diagnostics tool, never call cargo clippy directly
 - **HTMX first**: Minimize JS, delegate to server
 - **Local assets**: No CDN, all vendor files local
-- **Dead code**: Never use _ prefix, implement real code
-- **cargo audit**: Must pass with 0 warnings
 - **No business logic**: All logic in botserver
-- **Feature gates**: Unused code never compiles
 - **HTML responses**: Server returns fragments, not JSON
 - **Version**: Always 6.1.0 - do not change without approval
 - **Theme system**: Use data-theme attribute on body, 6 themes available
+- **Session Continuation**: When running out of context, create detailed summary: (1) what was done, (2) what remains, (3) specific files and line numbers, (4) exact next steps.

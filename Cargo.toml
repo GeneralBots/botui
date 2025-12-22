@@ -4,6 +4,9 @@ version = "6.1.0"
 edition = "2021"
 description = "General Bots UI - Pure web interface"
 license = "AGPL-3.0"
+repository = "https://github.com/GeneralBots/BotServer"
+keywords = ["chatbot", "ui", "web-interface", "general-bots"]
+categories = ["web-programming", "gui"]
 
 [dependencies.botlib]
 path = "../botlib"
@@ -49,3 +52,22 @@ tracing = "0.1"
 urlencoding = "2.1"
 uuid = { version = "1.11", features = ["serde", "v4"] }
 webbrowser = "0.8"
+
+[lints.rust]
+unused_imports = "warn"
+unused_variables = "warn"
+unused_mut = "warn"
+unsafe_code = "deny"
+missing_debug_implementations = "warn"
+
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
+nursery = "warn"
+cargo = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+panic = "warn"
+todo = "warn"
+# Disabled: transitive dependencies we cannot control
+multiple_crate_versions = "allow"

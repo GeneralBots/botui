@@ -1,3 +1,7 @@
+//! UI Server module for `BotUI`
+//!
+//! Handles HTTP routing, WebSocket proxying, and static file serving.
+
 use axum::{
     body::Body,
     extract::{
@@ -12,7 +16,7 @@ use axum::{
 use futures_util::{SinkExt, StreamExt};
 use log::{debug, error, info};
 use serde::Deserialize;
-use std::{fs, path::PathBuf};
+use std::{fs, path::Path, path::PathBuf};
 use tokio_tungstenite::{
     connect_async_tls_with_config, tungstenite::protocol::Message as TungsteniteMessage,
 };
@@ -52,7 +56,7 @@ pub async fn serve_minimal() -> impl IntoResponse {
     match fs::read_to_string("ui/minimal/index.html") {
         Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
         Err(e) => {
-            error!("Failed to load minimal UI: {}", e);
+            error!("Failed to load minimal UI: {e}");
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 [("content-type", "text/plain")],
@@ -66,7 +70,7 @@ pub async fn serve_suite() -> impl IntoResponse {
     match fs::read_to_string("ui/suite/index.html") {
         Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
         Err(e) => {
-            error!("Failed to load suite UI: {}", e);
+            error!("Failed to load suite UI: {e}");
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 [("content-type", "text/plain")],
@@ -77,23 +81,24 @@ pub async fn serve_suite() -> impl IntoResponse {
 }
 
 async fn health(State(state): State<AppState>) -> (StatusCode, axum::Json<serde_json::Value>) {
-    match state.health_check().await {
-        true => (
+    if state.health_check().await {
+        (
             StatusCode::OK,
             axum::Json(serde_json::json!({
                 "status": "healthy",
                 "service": "botui",
                 "mode": "web"
             })),
-        ),
-        false => (
+        )
+    } else {
+        (
             StatusCode::SERVICE_UNAVAILABLE,
             axum::Json(serde_json::json!({
                 "status": "unhealthy",
                 "service": "botui",
                 "error": "botserver unreachable"
             })),
-        ),
+        )
     }
 }
 
@@ -121,8 +126,7 @@ fn extract_app_context(headers: &axum::http::HeaderMap, path: &str) -> Option<St
         }
     }
 
-    if path.starts_with("/apps/") {
-        let after_apps = &path[6..];
+    if let Some(after_apps) = path.strip_prefix("/apps/") {
         if let Some(end) = after_apps.find('/') {
             return Some(after_apps[..end].to_string());
         }
@@ -139,18 +143,14 @@ async fn proxy_api(
     let path = original_uri.path();
     let query = original_uri
         .query()
-        .map(|q| format!("?{}", q))
-        .unwrap_or_default();
+        .map_or_else(String::new, |q| format!("?{q}"));
     let method = req.method().clone();
     let headers = req.headers().clone();
 
     let app_context = extract_app_context(&headers, path);
 
-    let target_url = format!("{}{}{}", state.client.base_url(), path, query);
-    debug!(
-        "Proxying {} {} to {} (app: {:?})",
-        method, path, target_url, app_context
-    );
+    let target_url = format!("{}{path}{query}", state.client.base_url());
+    debug!("Proxying {method} {path} to {target_url} (app: {app_context:?})");
 
     let client = reqwest::Client::builder()
         .danger_accept_invalid_certs(true)
@@ -158,7 +158,7 @@ async fn proxy_api(
         .unwrap_or_else(|_| reqwest::Client::new());
     let mut proxy_req = client.request(method.clone(), &target_url);
 
-    for (name, value) in headers.iter() {
+    for (name, value) in &headers {
         if name != "host" {
             if let Ok(v) = value.to_str() {
                 proxy_req = proxy_req.header(name.as_str(), v);
@@ -173,11 +173,11 @@ async fn proxy_api(
     let body_bytes = match axum::body::to_bytes(req.into_body(), usize::MAX).await {
         Ok(bytes) => bytes,
         Err(e) => {
-            error!("Failed to read request body: {}", e);
-            return Response::builder()
-                .status(StatusCode::INTERNAL_SERVER_ERROR)
-                .body(Body::from("Failed to read request body"))
-                .unwrap();
+            error!("Failed to read request body: {e}");
+            return build_error_response(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to read request body",
+            );
         }
     };
 
@@ -186,40 +186,51 @@ async fn proxy_api(
     }
 
     match proxy_req.send().await {
-        Ok(resp) => {
-            let status = resp.status();
-            let headers = resp.headers().clone();
+        Ok(resp) => build_proxy_response(resp).await,
+        Err(e) => {
+            error!("Proxy request failed: {e}");
+            build_error_response(StatusCode::BAD_GATEWAY, &format!("Proxy error: {e}"))
+        }
+    }
+}
 
-            match resp.bytes().await {
-                Ok(body) => {
-                    let mut response = Response::builder().status(status);
+fn build_error_response(status: StatusCode, message: &str) -> Response<Body> {
+    Response::builder()
+        .status(status)
+        .body(Body::from(message.to_string()))
+        .unwrap_or_else(|_| {
+            Response::builder()
+                .status(StatusCode::INTERNAL_SERVER_ERROR)
+                .body(Body::from("Failed to build error response"))
+                .unwrap_or_default()
+        })
+}
 
-                    for (name, value) in headers.iter() {
-                        response = response.header(name, value);
-                    }
+async fn build_proxy_response(resp: reqwest::Response) -> Response<Body> {
+    let status = resp.status();
+    let headers = resp.headers().clone();
 
-                    response.body(Body::from(body)).unwrap_or_else(|_| {
-                        Response::builder()
-                            .status(StatusCode::INTERNAL_SERVER_ERROR)
-                            .body(Body::from("Failed to build response"))
-                            .unwrap()
-                    })
-                }
-                Err(e) => {
-                    error!("Failed to read response body: {}", e);
-                    Response::builder()
-                        .status(StatusCode::BAD_GATEWAY)
-                        .body(Body::from(format!("Failed to read response: {}", e)))
-                        .unwrap()
-                }
+    match resp.bytes().await {
+        Ok(body) => {
+            let mut response = Response::builder().status(status);
+
+            for (name, value) in &headers {
+                response = response.header(name, value);
             }
+
+            response.body(Body::from(body)).unwrap_or_else(|_| {
+                build_error_response(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Failed to build response",
+                )
+            })
         }
         Err(e) => {
-            error!("Proxy request failed: {}", e);
-            Response::builder()
-                .status(StatusCode::BAD_GATEWAY)
-                .body(Body::from(format!("Proxy error: {}", e)))
-                .unwrap()
+            error!("Failed to read response body: {e}");
+            build_error_response(
+                StatusCode::BAD_GATEWAY,
+                &format!("Failed to read response: {e}"),
+            )
         }
     }
 }
@@ -244,6 +255,7 @@ async fn ws_proxy(
     ws.on_upgrade(move |socket| handle_ws_proxy(socket, state, params))
 }
 
+#[allow(clippy::too_many_lines)]
 async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQuery) {
     let backend_url = format!(
         "{}/ws?session_id={}&user_id={}",
@@ -256,13 +268,16 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         params.user_id
     );
 
-    info!("Proxying WebSocket to: {}", backend_url);
+    info!("Proxying WebSocket to: {backend_url}");
 
-    let tls_connector = native_tls::TlsConnector::builder()
+    let Ok(tls_connector) = native_tls::TlsConnector::builder()
         .danger_accept_invalid_certs(true)
         .danger_accept_invalid_hostnames(true)
         .build()
-        .expect("Failed to build TLS connector");
+    else {
+        error!("Failed to build TLS connector");
+        return;
+    };
 
     let connector = tokio_tungstenite::Connector::NativeTls(tls_connector);
 
@@ -272,7 +287,7 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
     let backend_socket = match backend_result {
         Ok((socket, _)) => socket,
         Err(e) => {
-            error!("Failed to connect to backend WebSocket: {}", e);
+            error!("Failed to connect to backend WebSocket: {e}");
             return;
         }
     };
@@ -350,14 +365,14 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
                     }
                 }
                 Ok(TungsteniteMessage::Close(_)) | Err(_) => break,
-                _ => {}
+                Ok(_) => {}
             }
         }
     };
 
     tokio::select! {
-        _ = client_to_backend => info!("Client connection closed"),
-        _ = backend_to_client => info!("Backend connection closed"),
+        () = client_to_backend => info!("Client connection closed"),
+        () = backend_to_client => info!("Backend connection closed"),
     }
 }
 
@@ -373,14 +388,14 @@ fn create_ui_router() -> Router<AppState> {
     Router::new().fallback(any(proxy_api))
 }
 
-fn add_static_routes(router: Router<AppState>, suite_path: &PathBuf) -> Router<AppState> {
+fn add_static_routes(router: Router<AppState>, suite_path: &Path) -> Router<AppState> {
     let mut r = router;
 
     for dir in SUITE_DIRS {
         let path = suite_path.join(dir);
         r = r
-            .nest_service(&format!("/suite/{}", dir), ServeDir::new(path.clone()))
-            .nest_service(&format!("/{}", dir), ServeDir::new(path));
+            .nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()))
+            .nest_service(&format!("/{dir}"), ServeDir::new(path));
     }
 
     r
