@@ -1,6 +1,3 @@
-//! `BotUI` main entry point
-//!
-//! Starts the web UI server for General Bots.
 
 use log::info;
 use std::net::SocketAddr;

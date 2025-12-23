@@ -53,21 +53,5 @@ urlencoding = "2.1"
 uuid = { version = "1.11", features = ["serde", "v4"] }
 webbrowser = "0.8"
 
-[lints.rust]
-unused_imports = "warn"
-unused_variables = "warn"
-unused_mut = "warn"
-unsafe_code = "deny"
-missing_debug_implementations = "warn"
-
-[lints.clippy]
-all = "warn"
-pedantic = "warn"
-nursery = "warn"
-cargo = "warn"
-unwrap_used = "warn"
-expect_used = "warn"
-panic = "warn"
-todo = "warn"
-# Disabled: transitive dependencies we cannot control
-multiple_crate_versions = "allow"
+[lints]
+workspace = true

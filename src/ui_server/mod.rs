@@ -1,6 +1,3 @@
-//! UI Server module for `BotUI`
-//!
-//! Handles HTTP routing, WebSocket proxying, and static file serving.
 
 use axum::{
     body::Body,
