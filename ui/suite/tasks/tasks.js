@@ -28,19 +28,76 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function initTasksApp() {
-  // Initialize WebSocket for real-time updates
   initWebSocket();
-
-  // Setup event listeners
   setupEventListeners();
-
-  // Setup keyboard shortcuts
   setupKeyboardShortcuts();
-
-  // Auto-scroll agent log to bottom
+  setupIntentInputHandlers();
   scrollAgentLogToBottom();
-
   console.log("[Tasks] Initialized");
+}
+
+function setupIntentInputHandlers() {
+  const input = document.getElementById("quick-intent-input");
+  const btn = document.getElementById("quick-intent-btn");
+
+  if (input) {
+    input.addEventListener("keypress", function (e) {
+      if (e.key === "Enter" && input.value.trim()) {
+        btn.click();
+      }
+    });
+  }
+
+  document.body.addEventListener("htmx:beforeRequest", function (e) {
+    if (e.detail.elt.id === "quick-intent-btn") {
+      const resultDiv = document.getElementById("intent-result");
+      resultDiv.innerHTML = `
+        <div class="result-card">
+          <div class="result-message">Processing your request...</div>
+          <div class="result-progress">
+            <div class="result-progress-bar" style="width: 30%"></div>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  document.body.addEventListener("htmx:afterRequest", function (e) {
+    if (e.detail.elt.id === "quick-intent-btn") {
+      const resultDiv = document.getElementById("intent-result");
+      try {
+        const response = JSON.parse(e.detail.xhr.responseText);
+        if (response.success) {
+          let html = `<div class="result-card">
+            <div class="result-message result-success">✓ ${response.message || "Done!"}</div>`;
+
+          if (response.app_url) {
+            html += `<a href="${response.app_url}" class="result-link" target="_blank">
+              Open App →
+            </a>`;
+          }
+
+          if (response.task_id) {
+            html += `<div style="margin-top:8px;color:#666;font-size:13px;">Task ID: ${response.task_id}</div>`;
+          }
+
+          html += `</div>`;
+          resultDiv.innerHTML = html;
+
+          document.getElementById("quick-intent-input").value = "";
+          htmx.trigger(document.body, "taskCreated");
+        } else {
+          resultDiv.innerHTML = `<div class="result-card">
+            <div class="result-message result-error">✗ ${response.error || response.message || "Something went wrong"}</div>
+          </div>`;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = `<div class="result-card">
+          <div class="result-message result-error">✗ Failed to process response</div>
+        </div>`;
+      }
+    }
+  });
 }
 
 // =============================================================================

@@ -4,6 +4,173 @@
    ============================================================================= */
 
 /* =============================================================================
+   INTENT INPUT SECTION
+   ============================================================================= */
+
+.intent-input-section {
+    padding: 24px;
+    background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+    border-bottom: 1px solid var(--border);
+}
+
+.intent-input-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.intent-input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+}
+
+.quick-intent-input {
+    flex: 1;
+    padding: 16px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    outline: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.2s ease;
+}
+
+.quick-intent-input::placeholder {
+    color: #888;
+}
+
+.quick-intent-input:focus {
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+}
+
+.btn-create-run {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 28px;
+    background: #fff;
+    color: var(--primary);
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+}
+
+.btn-create-run:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.2);
+}
+
+.btn-create-run:active {
+    transform: translateY(0);
+}
+
+.btn-create-run .spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--primary);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.btn-create-run.htmx-request .btn-text {
+    opacity: 0.5;
+}
+
+.btn-create-run.htmx-request .spinner {
+    display: block;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.intent-result {
+    margin-top: 16px;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.intent-result:empty {
+    display: none;
+}
+
+.intent-result .result-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.intent-result .result-success {
+    color: #059669;
+}
+
+.intent-result .result-error {
+    color: #dc2626;
+}
+
+.intent-result .result-message {
+    font-size: 15px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.intent-result .result-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.intent-result .result-link:hover {
+    background: #5b21b6;
+}
+
+.intent-result .result-progress {
+    margin-top: 12px;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.intent-result .result-progress-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    animation: progress-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes progress-pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* =============================================================================
    LAYOUT STRUCTURE
    ============================================================================= */
 

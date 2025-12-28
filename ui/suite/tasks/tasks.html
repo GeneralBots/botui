@@ -4,9 +4,35 @@
      ============================================================================= -->
 
 <div class="tasks-app">
-    <!-- Main Content Area -->
+    <section class="intent-input-section">
+        <div class="intent-input-container">
+            <div class="intent-input-wrapper">
+                <input
+                    type="text"
+                    id="quick-intent-input"
+                    name="intent"
+                    class="quick-intent-input"
+                    placeholder="What would you like to do? e.g., 'create a CRM app' or 'remind me to call John tomorrow'"
+                    autocomplete="off"
+                />
+                <button
+                    id="quick-intent-btn"
+                    class="btn-create-run"
+                    hx-post="/api/autotask/create"
+                    hx-include="#quick-intent-input"
+                    hx-target="#intent-result"
+                    hx-swap="innerHTML"
+                    hx-indicator="#intent-spinner"
+                >
+                    <span class="btn-text">Create & Run</span>
+                    <span class="spinner" id="intent-spinner"></span>
+                </button>
+            </div>
+            <div id="intent-result" class="intent-result"></div>
+        </div>
+    </section>
+
     <main class="tasks-main">
-        <!-- Task List Panel (Left) -->
         <section class="tasks-list-panel">
             <div class="tasks-list-header">
                 <div class="tasks-list-title">
