@@ -9,7 +9,7 @@
 
 .intent-input-section {
     padding: 24px;
-    background: linear-gradient(135deg, var(--primary) 0%, #764ba2 100%);
+    background: var(--surface);
     border-bottom: 1px solid var(--border);
 }
 
@@ -392,7 +392,7 @@
 .topbar-avatar {
     width: 28px;
     height: 28px;
-    background: linear-gradient(135deg, var(--primary), #a5d622);
+    background: var(--primary);
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -1306,7 +1306,7 @@
 
 .goal-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary), var(--success));
+    background: var(--primary);
     border-radius: 6px;
     transition: width 0.5s ease;
 }

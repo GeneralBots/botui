@@ -19,6 +19,7 @@
                     id="quick-intent-btn"
                     class="btn-create-run"
                     hx-post="/api/autotask/create"
+                    hx-ext="json-enc"
                     hx-include="#quick-intent-input"
                     hx-target="#intent-result"
                     hx-swap="innerHTML"
@@ -45,24 +46,6 @@
                         hx-swap="innerHTML"
                         >Loading...</span
                     ></h1>
-                    <button
-                        class="btn-new-intent"
-                        onclick="showNewIntentModal()"
-                        title="Create new intent"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                        New Intent
-                    </button>
                 </div>
 
                 <!-- Status Filter Pills -->
@@ -542,137 +525,6 @@
 ></div>
 
 <!-- New Intent Modal -->
-<div class="modal-overlay" id="newIntentModal">
-    <div class="modal">
-        <div class="modal-header">
-            <h3>Create New Intent</h3>
-            <button class="modal-close" onclick="closeNewIntentModal()">
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form
-                id="newIntentForm"
-                hx-post="/api/tasks"
-                hx-ext="json-enc"
-                hx-target="#task-list"
-                hx-swap="afterbegin"
-                hx-on::after-request="if(event.detail.successful) { closeNewIntentModal(); htmx.trigger(document.body, 'taskCreated'); }"
-            >
-                <div class="form-group">
-                    <label class="form-label" for="intentTitle"
-                        >Intent (Natural Language)</label
-                    >
-                    <input
-                        type="text"
-                        class="form-input"
-                        id="intentTitle"
-                        name="title"
-                        placeholder="e.g., cria app de agendamento, quando IBM mudar avisa, todo dia 9h resumo..."
-                        required
-                    />
-                    <p class="form-hint">
-                        Describe what you want: create apps, schedule tasks, monitor changes, or set goals.
-                    </p>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="intentDescription"
-                        >Additional Details (Optional)</label
-                    >
-                    <textarea
-                        class="form-input"
-                        id="intentDescription"
-                        name="description"
-                        rows="3"
-                        placeholder="Add more context: tables needed, fields, triggers, etc."
-                    ></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="intentDueDate"
-                            >Due Date (Optional)</label
-                        >
-                        <input
-                            type="datetime-local"
-                            class="form-input"
-                            id="intentDueDate"
-                            name="due_date"
-                        />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="intentPriority"
-                            >Priority</label
-                        >
-                        <select
-                            class="form-input"
-                            id="intentPriority"
-                            name="priority"
-                        >
-                            <option value="normal">Normal</option>
-                            <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="intentType"
-                        >Intent Type (Auto-detected)</label
-                    >
-                    <select
-                        class="form-input"
-                        id="intentType"
-                        name="intent_type"
-                    >
-                        <option value="auto">Auto-detect</option>
-                        <option value="app">📱 App - Create HTMX app</option>
-                        <option value="table">🗃️ Table - Define new table</option>
-                        <option value="todo">✅ Todo - Simple task</option>
-                        <option value="goal">🎯 Goal - Autonomous goal</option>
-                        <option value="schedule">⏰ Schedule - Recurring task</option>
-                        <option value="monitor">👁️ Monitor - Watch for changes</option>
-                        <option value="tool">🔧 Tool - Voice/chat command</option>
-                        <option value="action">⚡ Action - Execute immediately</option>
-                    </select>
-                </div>
-                <div class="form-info-box">
-                    <strong>🗄️ Bot Database Architecture:</strong>
-                    <ul>
-                        <li>All apps share the same database tables</li>
-                        <li>Tables are defined in <code>.gbdialog/tables.bas</code></li>
-                        <li>Schedulers, tools, and monitors are shared resources</li>
-                        <li>Use <code>FIND x IN table</code> to query data</li>
-                    </ul>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button
-                class="decision-btn decision-btn-secondary</strong>"
-                onclick="closeNewIntentModal()"
-            >
-                Cancel
-            </button>
-            <button
-                class="decision-btn decision-btn-primary"
-                type="submit"
-                form="newIntentForm"
-            >
-                Create Intent
-            </button>
-        </div>
-    </div>
-</div>
-
 <!-- Edit Tables Modal -->
 <div class="modal-overlay" id="editTablesModal">
     <div class="modal modal-large">
@@ -731,17 +583,6 @@
     }
 </script>
 <script>
-    // New Intent Modal functions
-    function showNewIntentModal() {
-        document.getElementById("newIntentModal").classList.add("show");
-        document.getElementById("intentTitle").focus();
-    }
-
-    function closeNewIntentModal() {
-        document.getElementById("newIntentModal").classList.remove("show");
-        document.getElementById("newIntentForm").reset();
-    }
-
     // Edit Tables Modal functions
     function showEditTablesModal() {
         document.getElementById("editTablesModal").classList.add("show");

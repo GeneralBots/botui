@@ -52,7 +52,7 @@
     font-size: 10px;
     font-weight: 700;
     padding: 4px 8px;
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: #f59e0b;
     color: #000;
     border-radius: 4px;
     letter-spacing: 0.5px;
@@ -107,7 +107,7 @@
    ============================================================================= */
 
 .intent-section {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+    background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: 16px;
     padding: 24px;
@@ -201,7 +201,7 @@
     align-items: center;
     gap: 8px;
     padding: 12px 24px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: #6366f1;
     border: none;
     border-radius: 8px;
     color: #ffffff;
@@ -698,7 +698,7 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: #22c55e;
     border: none;
     color: #ffffff;
 }
@@ -1012,7 +1012,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    background: #6366f1;
     border-radius: 3px;
     transition: width 0.3s ease;
 }

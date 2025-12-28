@@ -97,6 +97,146 @@
             transition: all 0.15s;
         }
 
+        .toolbar-btn.magic {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            border-color: var(--accent-purple);
+        }
+
+        .toolbar-btn.magic:hover {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            transform: scale(1.05);
+        }
+
+        .magic-panel {
+            position: fixed;
+            right: 20px;
+            bottom: 60px;
+            width: 380px;
+            max-height: 500px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .magic-panel.visible {
+            display: flex;
+        }
+
+        .magic-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, rgba(203,166,247,0.1), rgba(137,180,250,0.1));
+        }
+
+        .magic-header svg {
+            width: 20px;
+            height: 20px;
+            color: var(--accent-purple);
+        }
+
+        .magic-header h3 {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .magic-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .magic-close:hover {
+            color: var(--text-primary);
+        }
+
+        .magic-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .magic-loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .magic-loading .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        .magic-suggestion {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .magic-suggestion-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .magic-suggestion-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .magic-suggestion-icon.ux { background: rgba(166,227,161,0.2); color: var(--accent-green); }
+        .magic-suggestion-icon.perf { background: rgba(249,226,175,0.2); color: var(--accent-yellow); }
+        .magic-suggestion-icon.a11y { background: rgba(137,180,250,0.2); color: var(--accent-blue); }
+        .magic-suggestion-icon.feature { background: rgba(203,166,247,0.2); color: var(--accent-purple); }
+
+        .magic-suggestion-title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .magic-suggestion-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .magic-suggestion-apply {
+            margin-top: 10px;
+            background: var(--accent-purple);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .magic-suggestion-apply:hover {
+            opacity: 0.9;
+        }
+
         .toolbar-btn:hover {
             background: var(--border-color);
         }
@@ -845,6 +985,17 @@
                     </svg>
                     Export
                 </button>
+
+                <div class="toolbar-separator"></div>
+
+                <button class="toolbar-btn magic" id="btn-magic"
+                        onclick="showMagicPanel()"
+                        title="AI Improvements (Ctrl+M)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    </svg>
+                    Magic
+                </button>
             </div>
         </header>
 
@@ -1108,6 +1259,28 @@
             <!-- Minimap -->
             <div class="minimap" id="minimap">
                 <div class="minimap-viewport" id="minimap-viewport"></div>
+            </div>
+        </div>
+
+        <!-- Magic AI Panel -->
+        <div class="magic-panel" id="magic-panel">
+            <div class="magic-header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+                <h3>AI Improvements</h3>
+                <button class="magic-close" onclick="hideMagicPanel()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="magic-content" id="magic-content">
+                <div class="magic-loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing your dialog...</p>
+                </div>
             </div>
         </div>
 
@@ -2124,6 +2297,122 @@
                 document.querySelectorAll('.file-item').forEach(f => f.classList.remove('selected'));
                 fileItem.classList.add('selected');
                 document.getElementById('selected-file').value = fileItem.dataset.path;
+            }
+        });
+
+        function showMagicPanel() {
+            const panel = document.getElementById('magic-panel');
+            panel.classList.add('visible');
+            analyzeMagicSuggestions();
+        }
+
+        function hideMagicPanel() {
+            document.getElementById('magic-panel').classList.remove('visible');
+        }
+
+        async function analyzeMagicSuggestions() {
+            const content = document.getElementById('magic-content');
+            content.innerHTML = '<div class="magic-loading"><div class="spinner"></div><p>Analyzing your dialog...</p></div>';
+
+            const nodes = Array.from(state.nodes.values());
+            const dialogData = {
+                nodes: nodes.map(n => ({ type: n.type, fields: n.fields })),
+                connections: state.connections.length,
+                filename: document.getElementById('current-filename').value || 'untitled'
+            };
+
+            try {
+                const response = await fetch('/api/v1/designer/magic', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dialogData)
+                });
+
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    renderMagicSuggestions(suggestions);
+                } else {
+                    renderFallbackSuggestions(dialogData);
+                }
+            } catch (e) {
+                renderFallbackSuggestions(dialogData);
+            }
+        }
+
+        function renderFallbackSuggestions(dialogData) {
+            const suggestions = [];
+            const nodes = dialogData.nodes;
+
+            if (!nodes.some(n => n.type === 'HEAR')) {
+                suggestions.push({
+                    type: 'ux',
+                    title: 'Add User Input',
+                    description: 'Your dialog has no HEAR nodes. Consider adding user input to make it interactive.'
+                });
+            }
+
+            if (nodes.filter(n => n.type === 'TALK').length > 5) {
+                suggestions.push({
+                    type: 'ux',
+                    title: 'Break Up Long Responses',
+                    description: 'You have many TALK nodes. Consider grouping related messages or using a menu.'
+                });
+            }
+
+            if (!nodes.some(n => n.type === 'IF' || n.type === 'SWITCH')) {
+                suggestions.push({
+                    type: 'feature',
+                    title: 'Add Decision Logic',
+                    description: 'Add IF or SWITCH nodes to handle different user responses dynamically.'
+                });
+            }
+
+            if (dialogData.connections < nodes.length - 1 && nodes.length > 1) {
+                suggestions.push({
+                    type: 'perf',
+                    title: 'Check Connections',
+                    description: 'Some nodes may not be connected. Ensure all nodes flow properly.'
+                });
+            }
+
+            suggestions.push({
+                type: 'a11y',
+                title: 'Use Clear Language',
+                description: 'Keep messages short and clear. Avoid jargon for better accessibility.'
+            });
+
+            renderMagicSuggestions(suggestions);
+        }
+
+        function renderMagicSuggestions(suggestions) {
+            const content = document.getElementById('magic-content');
+            if (!suggestions || suggestions.length === 0) {
+                content.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:40px;">Your dialog looks great! No suggestions at this time.</p>';
+                return;
+            }
+
+            const icons = {
+                ux: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+                perf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+                a11y: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+                feature: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>'
+            };
+
+            content.innerHTML = suggestions.map(s => `
+                <div class="magic-suggestion">
+                    <div class="magic-suggestion-header">
+                        <div class="magic-suggestion-icon ${s.type}">${icons[s.type] || icons.feature}</div>
+                        <span class="magic-suggestion-title">${s.title}</span>
+                    </div>
+                    <p class="magic-suggestion-desc">${s.description}</p>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'm') {
+                e.preventDefault();
+                showMagicPanel();
             }
         });
     </script>
