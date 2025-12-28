@@ -15,6 +15,7 @@ if (typeof TasksState === "undefined") {
     tasks: [],
     wsConnection: null,
     agentLogPaused: false,
+    selectedItemType: "task", // task, goal, pending, scheduler, monitor
   };
 }
 
@@ -639,6 +640,238 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+// =============================================================================
+// GOALS, PENDING INFO, SCHEDULERS, MONITORS
+// =============================================================================
+
+// Select a goal and show its details
+window.selectGoal = function (goalId) {
+  TasksState.selectedItemType = "goal";
+  window.selectedTaskId = goalId;
+
+  document.querySelectorAll(".task-item, .task-card").forEach((el) => {
+    el.classList.remove("selected");
+  });
+  const selectedEl = document.querySelector(`[data-goal-id="${goalId}"]`);
+  if (selectedEl) {
+    selectedEl.classList.add("selected");
+  }
+
+  document.getElementById("task-detail-empty").style.display = "none";
+  document.getElementById("task-detail-content").style.display = "block";
+
+  // Hide other sections, show goal section
+  hideAllDetailSections();
+  document.getElementById("goal-progress-section").style.display = "block";
+
+  fetch(`/api/goals/${goalId}`)
+    .then((response) => response.json())
+    .then((goal) => {
+      document.getElementById("detail-title").textContent =
+        goal.goal_text || "Untitled Goal";
+      document.getElementById("detail-status-text").textContent =
+        goal.status || "active";
+      document.getElementById("detail-priority-text").textContent = "Goal";
+      document.getElementById("detail-description").textContent =
+        goal.goal_text || "";
+
+      const percent =
+        goal.target_value > 0
+          ? Math.round((goal.current_value / goal.target_value) * 100)
+          : 0;
+      document.getElementById("goal-progress-fill").style.width = `${percent}%`;
+      document.getElementById("goal-current-value").textContent =
+        goal.current_value || 0;
+      document.getElementById("goal-target-value").textContent =
+        goal.target_value || 0;
+      document.getElementById("goal-percent").textContent = percent;
+      document.getElementById("goal-last-action").textContent = goal.last_action
+        ? `Last action: ${goal.last_action}`
+        : "No actions yet";
+    })
+    .catch((err) => console.error("Failed to load goal:", err));
+};
+
+// Select a pending info item
+window.selectPendingInfo = function (pendingId) {
+  TasksState.selectedItemType = "pending";
+  window.selectedTaskId = pendingId;
+
+  document.querySelectorAll(".task-item, .task-card").forEach((el) => {
+    el.classList.remove("selected");
+  });
+  const selectedEl = document.querySelector(`[data-pending-id="${pendingId}"]`);
+  if (selectedEl) {
+    selectedEl.classList.add("selected");
+  }
+
+  document.getElementById("task-detail-empty").style.display = "none";
+  document.getElementById("task-detail-content").style.display = "block";
+
+  hideAllDetailSections();
+  document.getElementById("pending-fill-section").style.display = "block";
+
+  fetch(`/api/pending-info/${pendingId}`)
+    .then((response) => response.json())
+    .then((pending) => {
+      document.getElementById("detail-title").textContent =
+        pending.field_label || "Pending Info";
+      document.getElementById("detail-status-text").textContent = "Pending";
+      document.getElementById("detail-priority-text").textContent =
+        pending.app_name || "";
+      document.getElementById("detail-description").textContent =
+        pending.reason || "";
+
+      document.getElementById("pending-reason").textContent =
+        pending.reason || "Required for app functionality";
+      document.getElementById("pending-fill-id").value = pending.id;
+      document.getElementById("pending-fill-label").textContent =
+        pending.field_label;
+      document.getElementById("pending-fill-value").type =
+        pending.field_type === "secret" ? "password" : "text";
+    })
+    .catch((err) => console.error("Failed to load pending info:", err));
+};
+
+// Select a scheduler
+window.selectScheduler = function (schedulerName) {
+  TasksState.selectedItemType = "scheduler";
+  window.selectedTaskId = schedulerName;
+
+  document.querySelectorAll(".task-item, .task-card").forEach((el) => {
+    el.classList.remove("selected");
+  });
+  const selectedEl = document.querySelector(
+    `[data-scheduler-name="${schedulerName}"]`,
+  );
+  if (selectedEl) {
+    selectedEl.classList.add("selected");
+  }
+
+  document.getElementById("task-detail-empty").style.display = "none";
+  document.getElementById("task-detail-content").style.display = "block";
+
+  hideAllDetailSections();
+  document.getElementById("scheduler-info-section").style.display = "block";
+
+  fetch(`/api/schedulers/${encodeURIComponent(schedulerName)}`)
+    .then((response) => response.json())
+    .then((scheduler) => {
+      document.getElementById("detail-title").textContent =
+        scheduler.name || schedulerName;
+      document.getElementById("detail-status-text").textContent =
+        scheduler.status || "active";
+      document.getElementById("detail-priority-text").textContent = "Scheduler";
+      document.getElementById("detail-description").textContent =
+        scheduler.description || "";
+
+      document.getElementById("scheduler-cron").textContent =
+        scheduler.cron || "-";
+      document.getElementById("scheduler-next").textContent = scheduler.next_run
+        ? `Next run: ${new Date(scheduler.next_run).toLocaleString()}`
+        : "Next run: -";
+      document.getElementById("scheduler-file").textContent = scheduler.file
+        ? `File: ${scheduler.file}`
+        : "File: -";
+    })
+    .catch((err) => console.error("Failed to load scheduler:", err));
+};
+
+// Select a monitor
+window.selectMonitor = function (monitorName) {
+  TasksState.selectedItemType = "monitor";
+  window.selectedTaskId = monitorName;
+
+  document.querySelectorAll(".task-item, .task-card").forEach((el) => {
+    el.classList.remove("selected");
+  });
+  const selectedEl = document.querySelector(
+    `[data-monitor-name="${monitorName}"]`,
+  );
+  if (selectedEl) {
+    selectedEl.classList.add("selected");
+  }
+
+  document.getElementById("task-detail-empty").style.display = "none";
+  document.getElementById("task-detail-content").style.display = "block";
+
+  hideAllDetailSections();
+  document.getElementById("monitor-info-section").style.display = "block";
+
+  fetch(`/api/monitors/${encodeURIComponent(monitorName)}`)
+    .then((response) => response.json())
+    .then((monitor) => {
+      document.getElementById("detail-title").textContent =
+        monitor.name || monitorName;
+      document.getElementById("detail-status-text").textContent =
+        monitor.status || "active";
+      document.getElementById("detail-priority-text").textContent = "Monitor";
+      document.getElementById("detail-description").textContent =
+        monitor.description || "";
+
+      document.getElementById("monitor-target").textContent = monitor.target
+        ? `Target: ${monitor.target}`
+        : "Target: -";
+      document.getElementById("monitor-interval").textContent = monitor.interval
+        ? `Interval: ${monitor.interval}`
+        : "Interval: -";
+      document.getElementById("monitor-last-check").textContent =
+        monitor.last_check
+          ? `Last check: ${new Date(monitor.last_check).toLocaleString()}`
+          : "Last check: -";
+      document.getElementById("monitor-last-value").textContent =
+        monitor.last_value
+          ? `Last value: ${monitor.last_value}`
+          : "Last value: -";
+    })
+    .catch((err) => console.error("Failed to load monitor:", err));
+};
+
+// Hide all detail sections
+function hideAllDetailSections() {
+  document.getElementById("goal-progress-section").style.display = "none";
+  document.getElementById("pending-fill-section").style.display = "none";
+  document.getElementById("scheduler-info-section").style.display = "none";
+  document.getElementById("monitor-info-section").style.display = "none";
+}
+
+// Fill pending info form submission
+document.addEventListener("htmx:afterRequest", function (event) {
+  if (event.detail.elt.id === "pending-fill-form" && event.detail.successful) {
+    htmx.trigger(document.body, "taskCreated");
+    document.getElementById("pending-fill-value").value = "";
+    addAgentLog("success", "[OK] Pending info filled successfully");
+  }
+});
+
+// Update counts for new filters
+function updateFilterCounts() {
+  fetch("/api/tasks/stats")
+    .then((response) => response.json())
+    .then((stats) => {
+      if (stats.pending_count !== undefined) {
+        document.getElementById("count-pending").textContent =
+          stats.pending_count;
+      }
+      if (stats.goals_count !== undefined) {
+        document.getElementById("count-goals").textContent = stats.goals_count;
+      }
+      if (stats.schedulers_count !== undefined) {
+        document.getElementById("count-schedulers").textContent =
+          stats.schedulers_count;
+      }
+      if (stats.monitors_count !== undefined) {
+        document.getElementById("count-monitors").textContent =
+          stats.monitors_count;
+      }
+    })
+    .catch(() => {});
+}
+
+// Call updateFilterCounts on load
+document.addEventListener("DOMContentLoaded", updateFilterCounts);
+document.body.addEventListener("taskCreated", updateFilterCounts);
 
 // =============================================================================
 // DEMO: Simulate real-time activity

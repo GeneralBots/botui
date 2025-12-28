@@ -35,7 +35,7 @@
             <span class="section-icon">💡</span>
             <h2>What would you like to accomplish?</h2>
         </div>
-        <form class="intent-form" id="intent-form" hx-post="/api/autotask/compile" hx-target="#compilation-result" hx-indicator="#compile-spinner">
+        <form class="intent-form" id="intent-form" hx-post="/api/autotask/create" hx-target="#compilation-result" hx-indicator="#compile-spinner">
             <div class="intent-input-wrapper">
                 <textarea
                     name="intent"
@@ -59,9 +59,9 @@
                         <option value="low">Low</option>
                         <option value="background">Background</option>
                     </select>
-                    <button type="submit" class="btn-compile">
+                    <button type="submit" class="btn-create">
                         <span class="btn-icon">🚀</span>
-                        Compile & Plan
+                        Create & Execute
                         <span class="spinner" id="compile-spinner"></span>
                     </button>
                 </div>
