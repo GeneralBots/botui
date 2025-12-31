@@ -334,15 +334,32 @@ function handleWebSocketMessage(data) {
     case "task_completed":
       console.log("[Tasks WS] TASK_COMPLETED:", data.message);
       addAgentLog("success", `[COMPLETE] ${data.message}`);
+
+      // Extract app_url from details if present
+      let appUrl = null;
+      if (data.details && data.details.startsWith("app_url:")) {
+        appUrl = data.details.substring(8);
+        addAgentLog("success", `🚀 App URL: ${appUrl}`);
+        showAppUrlNotification(appUrl);
+      }
+
       if (data.activity) {
         updateActivityMetrics(data.activity);
         logFinalStats(data.activity);
       }
-      completeFloatingProgress(data.message, data.activity);
+      completeFloatingProgress(data.message, data.activity, appUrl);
       updateProgressUI(data);
-      onTaskCompleted(data);
+      onTaskCompleted(data, appUrl);
+
+      // Play completion sound
+      playCompletionSound();
+
+      // Refresh task list and details
       if (typeof htmx !== "undefined") {
         htmx.trigger(document.body, "taskCreated");
+      }
+      if (data.task_id && data.task_id === TasksState.selectedTaskId) {
+        loadTaskDetails(data.task_id);
       }
       break;
 
@@ -588,7 +605,7 @@ function updateFloatingProgressBar(
   }
 }
 
-function completeFloatingProgress(message, activity) {
+function completeFloatingProgress(message, activity, appUrl) {
   const fillEl = document.getElementById("floating-progress-fill");
   if (fillEl) fillEl.style.width = "100%";
 
@@ -1188,10 +1205,120 @@ function showDetailedView(taskId) {
 // TASK LIFECYCLE
 // =============================================================================
 
-function onTaskCompleted(task) {
-  showToast(`Task completed: ${task.title}`, "success");
-  addAgentLog("success", `[COMPLETE] Task #${task.id}: ${task.title}`);
-  updateTaskCard(task);
+function onTaskCompleted(data, appUrl) {
+  const title = data.title || data.message || "Task";
+  const taskId = data.task_id || data.id;
+
+  if (appUrl) {
+    showToast(`App ready! Click to open: ${appUrl}`, "success", 10000, () => {
+      window.open(appUrl, "_blank");
+    });
+    addAgentLog("success", `[COMPLETE] Task #${taskId}: ${title}`);
+    addAgentLog("success", `[URL] ${appUrl}`);
+  } else {
+    showToast(`Task completed: ${title}`, "success");
+    addAgentLog("success", `[COMPLETE] Task #${taskId}: ${title}`);
+  }
+
+  if (data.task) {
+    updateTaskCard(data.task);
+  }
+}
+
+function showAppUrlNotification(appUrl) {
+  // Create a prominent notification for the app URL
+  let notification = document.getElementById("app-url-notification");
+  if (!notification) {
+    notification = document.createElement("div");
+    notification.id = "app-url-notification";
+    notification.style.cssText = `
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4);
+      z-index: 10001;
+      max-width: 400px;
+      animation: slideInRight 0.5s ease;
+    `;
+    document.body.appendChild(notification);
+  }
+
+  notification.innerHTML = `
+    <div style="font-weight: 600; margin-bottom: 8px;">🎉 App Created Successfully!</div>
+    <div style="font-size: 13px; opacity: 0.9; margin-bottom: 12px;">Your app is ready to use</div>
+    <a href="${appUrl}" target="_blank" style="
+      display: inline-block;
+      background: white;
+      color: #16a34a;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    ">Open App →</a>
+    <button onclick="this.parentElement.remove()" style="
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      opacity: 0.7;
+    ">×</button>
+  `;
+
+  // Auto-hide after 30 seconds
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.style.animation = "slideOutRight 0.5s ease forwards";
+      setTimeout(() => notification.remove(), 500);
+    }
+  }, 30000);
+}
+
+function playCompletionSound() {
+  try {
+    // Create a simple beep sound using Web Audio API
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.frequency.value = 800;
+    oscillator.type = "sine";
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(
+      0.01,
+      audioCtx.currentTime + 0.5,
+    );
+
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.5);
+
+    // Play a second higher tone for success feel
+    setTimeout(() => {
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(audioCtx.destination);
+      osc2.frequency.value = 1200;
+      osc2.type = "sine";
+      gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc2.start(audioCtx.currentTime);
+      osc2.stop(audioCtx.currentTime + 0.3);
+    }, 150);
+  } catch (e) {
+    console.log("[Tasks] Could not play completion sound:", e);
+  }
 }
 
 function onTaskFailed(task, error) {
@@ -1204,7 +1331,7 @@ function onTaskFailed(task, error) {
 // TOAST NOTIFICATIONS
 // =============================================================================
 
-function showToast(message, type = "info") {
+function showToast(message, type = "info", duration = 4000, onClick = null) {
   let container = document.getElementById("toast-container");
   if (!container) {
     container = document.createElement("div");
@@ -1255,12 +1382,17 @@ function showToast(message, type = "info") {
         <span>${message}</span>
     `;
 
+  if (onClick) {
+    toast.style.cursor = "pointer";
+    toast.addEventListener("click", onClick);
+  }
+
   container.appendChild(toast);
 
   setTimeout(() => {
     toast.style.animation = "fadeOut 0.3s ease forwards";
     setTimeout(() => toast.remove(), 300);
-  }, 4000);
+  }, duration);
 }
 
 // =============================================================================
@@ -1326,6 +1458,28 @@ style.textContent = `
         to {
             opacity: 0;
             transform: translateX(20px);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100px);
         }
     }
 `;
