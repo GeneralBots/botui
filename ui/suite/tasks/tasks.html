@@ -103,15 +103,17 @@
                 hx-post="/api/autotask/create"
                 hx-ext="json-enc"
                 hx-include="#quick-intent-input"
-                hx-target="#intent-result"
-                hx-swap="innerHTML"
+                hx-target="#intent-result-hidden"
+                hx-swap="none"
                 hx-indicator="#intent-spinner"
+                hx-timeout="300000"
             >
                 <span class="btn-text">Create & Run</span>
                 <span class="spinner" id="intent-spinner"></span>
             </button>
         </div>
         <div id="intent-result" class="intent-result"></div>
+        <div id="intent-result-hidden" style="display: none"></div>
     </div>
 
     <!-- Main Two-Column Layout -->
@@ -202,6 +204,9 @@
         </div>
         <div class="floating-progress-log" id="floating-progress-log">
             <!-- Live log entries appear here -->
+        </div>
+        <div class="floating-llm-terminal" id="floating-llm-terminal">
+            <!-- LLM streaming output appears here -->
         </div>
     </div>
 </div>
@@ -300,11 +305,120 @@
         }
         // Load stats
         loadTaskStats();
+
+        // Handle create task response - auto-select new task and show progress
+        document.body.addEventListener("htmx:afterRequest", function (evt) {
+            // Check if this is the create task response
+            if (
+                evt.detail.pathInfo &&
+                evt.detail.pathInfo.requestPath === "/api/autotask/create"
+            ) {
+                const xhr = evt.detail.xhr;
+                const intentResult = document.getElementById("intent-result");
+
+                if (xhr && xhr.status === 202) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success && response.task_id) {
+                            console.log(
+                                "[TASK] Created task:",
+                                response.task_id,
+                            );
+
+                            // Show success feedback
+                            intentResult.innerHTML = `<span class="intent-success">✓ Task created - running...</span>`;
+                            intentResult.style.display = "block";
+
+                            // Clear the input
+                            document.getElementById(
+                                "quick-intent-input",
+                            ).value = "";
+
+                            // Trigger task list refresh
+                            htmx.trigger(document.body, "taskCreated");
+
+                            // After a short delay to let the list reload, select the new task
+                            setTimeout(function () {
+                                selectTask(response.task_id);
+                                // Start polling for updates
+                                startTaskPolling(response.task_id);
+                                // Hide success message after task is selected
+                                setTimeout(function () {
+                                    intentResult.style.display = "none";
+                                }, 2000);
+                            }, 500);
+                        } else {
+                            intentResult.innerHTML = `<span class="intent-error">✗ ${response.message || "Failed to create task"}</span>`;
+                            intentResult.style.display = "block";
+                        }
+                    } catch (e) {
+                        console.warn("Failed to parse create response:", e);
+                        intentResult.innerHTML = `<span class="intent-error">✗ Failed to parse response</span>`;
+                        intentResult.style.display = "block";
+                    }
+                } else if (xhr && xhr.status >= 400) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        intentResult.innerHTML = `<span class="intent-error">✗ ${response.error || response.message || "Error creating task"}</span>`;
+                    } catch (e) {
+                        intentResult.innerHTML = `<span class="intent-error">✗ Error: ${xhr.status}</span>`;
+                    }
+                    intentResult.style.display = "block";
+                }
+            }
+        });
     });
+
+    // Poll for task status updates
+    let taskPollingInterval = null;
+    function startTaskPolling(taskId) {
+        // Clear any existing polling
+        if (taskPollingInterval) {
+            clearInterval(taskPollingInterval);
+        }
+
+        taskPollingInterval = setInterval(function () {
+            fetch(`/api/autotask/${taskId}`)
+                .then((r) => r.json())
+                .then((task) => {
+                    console.log("[TASK] Poll status:", task.status);
+
+                    // Refresh the detail panel
+                    htmx.ajax("GET", `/api/tasks/${taskId}`, {
+                        target: "#task-detail-content",
+                        swap: "innerHTML",
+                    });
+
+                    // Refresh task list to update status badges
+                    htmx.trigger(document.body, "taskCreated");
+
+                    // Stop polling if task is complete or failed
+                    if (
+                        task.status === "completed" ||
+                        task.status === "failed" ||
+                        task.status === "cancelled"
+                    ) {
+                        clearInterval(taskPollingInterval);
+                        taskPollingInterval = null;
+                        loadTaskStats();
+                    }
+                })
+                .catch((e) => {
+                    console.warn("Failed to poll task:", e);
+                });
+        }, 2000); // Poll every 2 seconds
+    }
+
+    function stopTaskPolling() {
+        if (taskPollingInterval) {
+            clearInterval(taskPollingInterval);
+            taskPollingInterval = null;
+        }
+    }
 
     // Load task statistics
     function loadTaskStats() {
-        fetch("/api/tasks/stats")
+        fetch("/api/tasks/stats/json")
             .then((r) => r.json())
             .then((stats) => {
                 if (stats.complete !== undefined)

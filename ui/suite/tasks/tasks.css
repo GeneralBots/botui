@@ -218,6 +218,40 @@
     color: var(--error, #ef4444);
 }
 
+.intent-result .intent-success {
+    color: var(--success, #22c55e);
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 6px;
+    animation: fadeIn 0.3s ease;
+}
+
+.intent-result .intent-error {
+    color: var(--error, #ef4444);
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 6px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 .intent-result .result-progress {
     height: 6px;
     background: var(--surface, #1a1a1a);
@@ -1813,6 +1847,42 @@
 }
 
 /* =============================================================================
+   LLM STREAMING TERMINAL
+   ============================================================================= */
+
+.floating-llm-terminal {
+    max-height: 120px;
+    overflow-y: auto;
+    background: var(--bg, #0a0a0a);
+    border: 1px solid var(--border, #2a2a2a);
+    border-radius: 6px;
+    padding: 8px;
+    margin-top: 8px;
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--text-secondary, #a1a1a1);
+}
+
+.floating-llm-terminal .llm-output {
+    color: var(--primary, #c5f82a);
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 2px 0;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-2px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================================================
    ACTIVITY METRICS PANEL
    ============================================================================= */
 
@@ -2017,4 +2087,571 @@
         left: 16px;
         right: 16px;
     }
+}
+
+/* =============================================================================
+   RICH TASK DETAIL PANEL - BASE STYLES (All Themes)
+   ============================================================================= */
+
+.task-detail-rich {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.detail-header-rich {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border, #2a2a2a);
+}
+
+.detail-title-rich {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text, #fff);
+    margin: 0;
+}
+
+.status-badge-rich {
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--surface-hover, #333);
+    color: var(--text, #fff);
+}
+
+.status-badge-rich.status-running,
+.status-badge-rich.status-pending {
+    background: var(--primary, #c5f82a);
+    color: #000;
+}
+
+.status-badge-rich.status-completed {
+    background: var(--success, #22c55e);
+    color: #fff;
+}
+
+.status-badge-rich.status-error,
+.status-badge-rich.status-failed {
+    background: var(--error, #ef4444);
+    color: #fff;
+}
+
+.status-badge-rich.status-paused {
+    background: var(--warning, #f59e0b);
+    color: #000;
+}
+
+/* Section Boxes */
+.detail-section-box {
+    background: var(--surface, #161616);
+    border: 1px solid var(--border, #2a2a2a);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary, #888);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Status Section */
+.status-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.status-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary, #c5f82a);
+}
+
+.status-dot.status-running {
+    animation: pulse-status-dot 1.5s ease-in-out infinite;
+}
+
+.status-dot.status-completed {
+    background: var(--success, #22c55e);
+}
+
+.status-dot.status-error {
+    background: var(--error, #ef4444);
+}
+
+@keyframes pulse-status-dot {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+.status-text {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text, #fff);
+}
+
+.status-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #888);
+}
+
+.error-alert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--error, #ef4444);
+    border-radius: 6px;
+    margin-bottom: 12px;
+}
+
+.error-icon {
+    color: var(--error, #ef4444);
+    font-size: 1.1rem;
+}
+
+.error-text {
+    color: var(--error, #ef4444);
+    font-size: 0.85rem;
+}
+
+.status-details {
+    border-top: 1px solid var(--border-light, #222);
+    padding-top: 12px;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+}
+
+.status-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary, #c5f82a);
+}
+
+.status-indicator.active {
+    animation: pulse-status-dot 1.5s ease-in-out infinite;
+}
+
+.status-step-name {
+    color: var(--text, #fff);
+}
+
+.status-step-note {
+    color: var(--text-tertiary, #666);
+    font-size: 0.8rem;
+    margin-left: auto;
+}
+
+/* Progress Bar Rich */
+.detail-progress-rich {
+    padding: 0 4px;
+}
+
+.progress-bar-rich {
+    height: 8px;
+    background: var(--surface, #161616);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--border, #2a2a2a);
+}
+
+.progress-fill-rich {
+    height: 100%;
+    background: var(--primary, #c5f82a);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-info-rich {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+}
+
+.progress-label-rich {
+    font-size: 0.8rem;
+    color: var(--text-secondary, #888);
+}
+
+/* Progress Log Section */
+.progress-log-content {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.log-group {
+    margin-bottom: 12px;
+}
+
+.log-group:last-child {
+    margin-bottom: 0;
+}
+
+.log-group-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--surface-hover, #1e1e1e);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.log-group-header:hover {
+    background: var(--surface-active, #252525);
+}
+
+.log-group-name {
+    font-weight: 500;
+    color: var(--text, #fff);
+    flex: 1;
+}
+
+.log-group-toggle {
+    font-size: 0.75rem;
+    color: var(--text-tertiary, #666);
+}
+
+.log-step-badge {
+    padding: 3px 10px;
+    background: var(--primary, #c5f82a);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.log-status-badge {
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border-radius: 4px;
+    background: var(--surface-active, #252525);
+    color: var(--text-secondary, #888);
+}
+
+.log-status-badge.completed {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--success, #22c55e);
+}
+
+.log-group-items {
+    padding: 8px 0 0 20px;
+    border-left: 2px solid var(--border, #2a2a2a);
+    margin-left: 12px;
+    margin-top: 8px;
+}
+
+.log-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface, #161616);
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.log-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border, #2a2a2a);
+}
+
+.log-dot.completed {
+    background: var(--success, #22c55e);
+}
+
+.log-dot.running {
+    background: var(--primary, #c5f82a);
+    animation: pulse-status-dot 1.5s ease-in-out infinite;
+}
+
+.log-dot.failed {
+    background: var(--error, #ef4444);
+}
+
+.log-dot.pending {
+    background: var(--text-tertiary, #666);
+}
+
+.log-dot.active {
+    background: var(--primary, #c5f82a);
+    animation: pulse-status-dot 1.5s ease-in-out infinite;
+}
+
+.log-item-name {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text, #fff);
+}
+
+.log-item-badge {
+    padding: 2px 8px;
+    background: var(--surface-active, #252525);
+    color: var(--text-secondary, #888);
+    font-size: 0.7rem;
+    border-radius: 4px;
+}
+
+.log-item-status {
+    font-size: 0.75rem;
+    color: var(--success, #22c55e);
+}
+
+.log-subitem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px 6px 28px;
+    font-size: 0.8rem;
+}
+
+.log-subdot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border, #2a2a2a);
+}
+
+.log-subdot.completed {
+    background: var(--primary, #c5f82a);
+}
+
+.log-subdot.running {
+    background: var(--primary, #c5f82a);
+    animation: pulse-status-dot 1.5s ease-in-out infinite;
+}
+
+.log-subdot.failed {
+    background: var(--error, #ef4444);
+}
+
+.log-subdot.pending {
+    background: var(--text-tertiary, #666);
+}
+
+.log-subitem-name {
+    flex: 1;
+    color: var(--text-secondary, #888);
+}
+
+.log-duration {
+    color: var(--text-tertiary, #666);
+    font-size: 0.75rem;
+}
+
+/* Terminal Section Rich */
+.terminal-section-rich {
+    background: #0d0d0d;
+}
+
+.section-header-rich {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.terminal-dot-rich {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-tertiary, #666);
+    display: inline-block;
+}
+
+.terminal-dot-rich.active {
+    background: var(--primary, #c5f82a);
+    animation: pulse-status-dot 1.5s ease-in-out infinite;
+}
+
+.terminal-stats-rich {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    font-size: 0.75rem;
+    color: var(--text-tertiary, #666);
+}
+
+.terminal-stats-rich strong {
+    color: var(--text-secondary, #888);
+}
+
+.terminal-output-rich {
+    background: #000;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid var(--border-light, #222);
+}
+
+.terminal-line {
+    color: var(--text-tertiary, #666);
+    padding: 2px 0;
+}
+
+.terminal-line.current {
+    color: var(--primary, #c5f82a);
+}
+
+.terminal-line.error {
+    color: var(--error, #ef4444);
+}
+
+.terminal-line.success {
+    color: var(--success, #22c55e);
+}
+
+.terminal-footer-rich {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-light, #222);
+    font-size: 0.8rem;
+    color: var(--text-tertiary, #666);
+    text-align: right;
+}
+
+.terminal-footer-rich strong {
+    color: var(--primary, #c5f82a);
+}
+
+/* Intent Section */
+.intent-text-rich {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #888);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Action Buttons */
+.detail-actions-rich {
+    display: flex;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border, #2a2a2a);
+    margin-top: auto;
+}
+
+.btn-action-rich {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border, #2a2a2a);
+    background: transparent;
+    color: var(--text-secondary, #888);
+}
+
+.btn-action-rich:hover {
+    background: var(--surface-hover, #1e1e1e);
+    color: var(--text, #fff);
+}
+
+.btn-action-rich.btn-pause {
+    border-color: var(--warning, #f59e0b);
+    color: var(--warning, #f59e0b);
+}
+
+.btn-action-rich.btn-pause:hover {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.btn-action-rich.btn-cancel {
+    border-color: var(--error, #ef4444);
+    color: var(--error, #ef4444);
+}
+
+.btn-action-rich.btn-cancel:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.btn-action-rich.btn-detailed {
+    margin-left: auto;
+    border-color: var(--primary, #c5f82a);
+    color: var(--primary, #c5f82a);
+}
+
+.btn-action-rich.btn-detailed:hover {
+    background: rgba(197, 248, 42, 0.15);
+}
+
+/* Scrollbar for rich task detail */
+.task-detail-rich::-webkit-scrollbar,
+.progress-log-content::-webkit-scrollbar,
+.terminal-output-rich::-webkit-scrollbar {
+    width: 6px;
+}
+
+.task-detail-rich::-webkit-scrollbar-track,
+.progress-log-content::-webkit-scrollbar-track,
+.terminal-output-rich::-webkit-scrollbar-track {
+    background: var(--bg, #0a0a0a);
+}
+
+.task-detail-rich::-webkit-scrollbar-thumb,
+.progress-log-content::-webkit-scrollbar-thumb,
+.terminal-output-rich::-webkit-scrollbar-thumb {
+    background: var(--border, #2a2a2a);
+    border-radius: 3px;
+}
+
+.task-detail-rich::-webkit-scrollbar-thumb:hover,
+.progress-log-content::-webkit-scrollbar-thumb:hover,
+.terminal-output-rich::-webkit-scrollbar-thumb:hover {
+    background: var(--primary, #c5f82a);
 }

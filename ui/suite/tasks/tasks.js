@@ -24,11 +24,35 @@ if (typeof TasksState === "undefined") {
 // =============================================================================
 
 document.addEventListener("DOMContentLoaded", function () {
-  initTasksApp();
+  // Only init if tasks app is visible
+  if (document.querySelector(".tasks-app")) {
+    initTasksApp();
+  }
+});
+
+// Reinitialize when tasks page is loaded via HTMX
+document.body.addEventListener("htmx:afterSwap", function (evt) {
+  // Check if tasks app was just loaded
+  if (evt.detail.target && evt.detail.target.id === "main-content") {
+    if (document.querySelector(".tasks-app")) {
+      console.log(
+        "[Tasks] Detected tasks app loaded via HTMX, initializing...",
+      );
+      initTasksApp();
+    }
+  }
 });
 
 function initTasksApp() {
-  initWebSocket();
+  // Only init WebSocket if not already connected
+  if (
+    !TasksState.wsConnection ||
+    TasksState.wsConnection.readyState !== WebSocket.OPEN
+  ) {
+    initWebSocket();
+  } else {
+    console.log("[Tasks] WebSocket already connected, skipping init");
+  }
   setupEventListeners();
   setupKeyboardShortcuts();
   setupIntentInputHandlers();
@@ -68,6 +92,32 @@ function setupIntentInputHandlers() {
       const resultDiv = document.getElementById("intent-result");
       try {
         const response = JSON.parse(e.detail.xhr.responseText);
+
+        // Handle async task creation (status 202 Accepted)
+        if (response.status === "running" && response.task_id) {
+          // Clear input immediately
+          document.getElementById("quick-intent-input").value = "";
+
+          // Show floating progress panel
+          const intentText =
+            document
+              .getElementById("quick-intent-input")
+              .getAttribute("data-last-intent") || "Processing...";
+          showFloatingProgress(intentText);
+
+          // Clear result div - progress is shown in floating panel
+          resultDiv.innerHTML = "";
+
+          // Trigger task list refresh to show new task
+          htmx.trigger(document.body, "taskCreated");
+
+          // Start polling for task status
+          startTaskPolling(response.task_id);
+
+          return;
+        }
+
+        // Handle completed task (legacy sync response)
         if (response.success) {
           let html = `<div class="result-card">
             <div class="result-message result-success">✓ ${response.message || "Done!"}</div>`;
@@ -99,6 +149,80 @@ function setupIntentInputHandlers() {
       }
     }
   });
+
+  // Save intent text before submit for progress display
+  if (input) {
+    input.addEventListener("input", function () {
+      input.setAttribute("data-last-intent", input.value);
+    });
+  }
+}
+
+// Task polling for async task creation
+let activePollingTaskId = null;
+let pollingInterval = null;
+
+function startTaskPolling(taskId) {
+  // Stop any existing polling
+  stopTaskPolling();
+
+  activePollingTaskId = taskId;
+  let pollCount = 0;
+  const maxPolls = 180; // 3 minutes at 1 second intervals
+
+  console.log(`[POLL] Starting polling for task ${taskId}`);
+
+  pollingInterval = setInterval(async () => {
+    pollCount++;
+
+    if (pollCount > maxPolls) {
+      console.log(`[POLL] Max polls reached for task ${taskId}`);
+      stopTaskPolling();
+      errorFloatingProgress("Task timed out");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/autotask/tasks/${taskId}`);
+      if (!response.ok) {
+        console.error(`[POLL] Failed to fetch task status: ${response.status}`);
+        return;
+      }
+
+      const task = await response.json();
+      console.log(
+        `[POLL] Task ${taskId} status: ${task.status}, progress: ${task.progress || 0}%`,
+      );
+
+      // Update progress
+      const progress = task.progress || 0;
+      const message = task.current_step || task.status || "Processing...";
+      updateFloatingProgressBar(message, progress, task);
+
+      // Check if task is complete
+      if (task.status === "completed" || task.status === "complete") {
+        stopTaskPolling();
+        completeFloatingProgress(task);
+        htmx.trigger(document.body, "taskCreated"); // Refresh task list
+        showToast("Task completed successfully!", "success");
+      } else if (task.status === "failed" || task.status === "error") {
+        stopTaskPolling();
+        errorFloatingProgress(task.error || "Task failed");
+        htmx.trigger(document.body, "taskCreated"); // Refresh task list
+        showToast(task.error || "Task failed", "error");
+      }
+    } catch (err) {
+      console.error(`[POLL] Error polling task ${taskId}:`, err);
+    }
+  }, 1000); // Poll every 1 second
+}
+
+function stopTaskPolling() {
+  if (pollingInterval) {
+    clearInterval(pollingInterval);
+    pollingInterval = null;
+  }
+  activePollingTaskId = null;
 }
 
 // =============================================================================
@@ -106,6 +230,17 @@ function setupIntentInputHandlers() {
 // =============================================================================
 
 function initWebSocket() {
+  // Don't create new connection if one already exists and is open/connecting
+  if (TasksState.wsConnection) {
+    const state = TasksState.wsConnection.readyState;
+    if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) {
+      console.log(
+        "[Tasks WS] WebSocket already connected/connecting, skipping",
+      );
+      return;
+    }
+  }
+
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const wsUrl = `${protocol}//${window.location.host}/ws/task-progress`;
 
@@ -235,6 +370,14 @@ function handleWebSocketMessage(data) {
 
     case "decision_required":
       showDecisionRequired(data.decision);
+      break;
+
+    case "llm_stream":
+      // Stream LLM output to terminal in real-time
+      if (data.text) {
+        addAgentLog("accent", data.text);
+        addLLMStreamOutput(data.text);
+      }
       break;
   }
 }
@@ -518,6 +661,23 @@ function closeFloatingProgress() {
   }
 }
 
+function addLLMStreamOutput(text) {
+  // Add LLM streaming output to the floating terminal
+  const terminal = document.getElementById("floating-llm-terminal");
+  if (!terminal) return;
+
+  const line = document.createElement("div");
+  line.className = "llm-output";
+  line.textContent = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+
+  // Keep only last 100 lines to prevent memory issues
+  while (terminal.children.length > 100) {
+    terminal.removeChild(terminal.firstChild);
+  }
+}
+
 function updateProgressUI(data) {
   const progressBar = document.querySelector(".result-progress-bar");
   const resultDiv = document.getElementById("intent-result");
@@ -707,10 +867,20 @@ function searchTasks(query) {
 // =============================================================================
 
 function loadTaskDetails(taskId) {
-  // In real app, fetch from API
-  // htmx.ajax('GET', `/api/tasks/${taskId}`, {target: '#task-detail-panel', swap: 'innerHTML'});
-
   addAgentLog("info", `[LOAD] Loading task #${taskId} details`);
+
+  // Show detail panel and hide empty state
+  const emptyState = document.getElementById("detail-empty");
+  const detailContent = document.getElementById("task-detail-content");
+
+  if (emptyState) emptyState.style.display = "none";
+  if (detailContent) detailContent.style.display = "block";
+
+  // Fetch task details from API
+  htmx.ajax("GET", `/api/tasks/${taskId}`, {
+    target: "#task-detail-content",
+    swap: "innerHTML",
+  });
 }
 
 function updateTaskCard(task) {
@@ -935,6 +1105,83 @@ function toggleAgentLogPause() {
     "info",
     TasksState.agentLogPaused ? "[SYSTEM] Log paused" : "[SYSTEM] Log resumed",
   );
+}
+
+// =============================================================================
+// TASK ACTIONS
+// =============================================================================
+
+function pauseTask(taskId) {
+  addAgentLog("info", `[TASK] Pausing task #${taskId}...`);
+
+  fetch(`/api/autotask/${taskId}/pause`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.success) {
+        showToast("Task paused", "success");
+        addAgentLog("success", `[OK] Task #${taskId} paused`);
+        htmx.trigger(document.body, "taskCreated");
+        if (TasksState.selectedTaskId === taskId) {
+          loadTaskDetails(taskId);
+        }
+      } else {
+        showToast("Failed to pause task", "error");
+        addAgentLog(
+          "error",
+          `[ERROR] Failed to pause task: ${result.error || result.message}`,
+        );
+      }
+    })
+    .catch((error) => {
+      showToast("Failed to pause task", "error");
+      addAgentLog("error", `[ERROR] Failed to pause task: ${error}`);
+    });
+}
+
+function cancelTask(taskId) {
+  if (!confirm("Are you sure you want to cancel this task?")) {
+    return;
+  }
+
+  addAgentLog("info", `[TASK] Cancelling task #${taskId}...`);
+
+  fetch(`/api/autotask/${taskId}/cancel`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.success) {
+        showToast("Task cancelled", "success");
+        addAgentLog("success", `[OK] Task #${taskId} cancelled`);
+        htmx.trigger(document.body, "taskCreated");
+        if (TasksState.selectedTaskId === taskId) {
+          loadTaskDetails(taskId);
+        }
+      } else {
+        showToast("Failed to cancel task", "error");
+        addAgentLog(
+          "error",
+          `[ERROR] Failed to cancel task: ${result.error || result.message}`,
+        );
+      }
+    })
+    .catch((error) => {
+      showToast("Failed to cancel task", "error");
+      addAgentLog("error", `[ERROR] Failed to cancel task: ${error}`);
+    });
+}
+
+function showDetailedView(taskId) {
+  addAgentLog("info", `[TASK] Opening detailed view for task #${taskId}...`);
+
+  // For now, just reload the task details
+  // In the future, this could open a modal or new page with more details
+  loadTaskDetails(taskId);
+  showToast("Detailed view loaded", "info");
 }
 
 // =============================================================================
