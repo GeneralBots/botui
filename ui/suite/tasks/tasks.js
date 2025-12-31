@@ -98,12 +98,10 @@ function setupIntentInputHandlers() {
           // Clear input immediately
           document.getElementById("quick-intent-input").value = "";
 
-          // Show floating progress panel
-          const intentText =
-            document
-              .getElementById("quick-intent-input")
-              .getAttribute("data-last-intent") || "Processing...";
-          showFloatingProgress(intentText);
+          // Select the task to show progress in detail panel
+          setTimeout(() => {
+            selectTask(response.task_id);
+          }, 500);
 
           // Clear result div - progress is shown in floating panel
           resultDiv.innerHTML = "";
@@ -293,15 +291,18 @@ function handleWebSocketMessage(data) {
       break;
 
     case "task_started":
-      console.log(
-        "[Tasks WS] TASK_STARTED - showing floating progress:",
-        data.message,
-      );
+      console.log("[Tasks WS] TASK_STARTED:", data.message);
       addAgentLog("accent", `[TASK] Started: ${data.message}`);
-      showFloatingProgress(data.message);
-      updateFloatingProgressBar(0, data.total_steps, data.message);
-      updateActivityMetrics(data.activity);
-      updateProgressUI(data);
+      // Update terminal in detail panel
+      updateDetailTerminal(data.task_id, data.message, "started");
+      // Refresh task list
+      if (typeof htmx !== "undefined") {
+        htmx.trigger(document.body, "taskCreated");
+      }
+      // Select the task if not already selected
+      if (data.task_id) {
+        selectTask(data.task_id);
+      }
       break;
 
     case "task_progress":
@@ -312,23 +313,20 @@ function handleWebSocketMessage(data) {
         data.message,
       );
       addAgentLog("info", `[${data.step}] ${data.message}`);
-      if (data.activity) {
-        updateActivityMetrics(data.activity);
-        if (data.activity.current_item) {
-          addAgentLog("info", `  → Processing: ${data.activity.current_item}`);
-        }
-      } else if (data.details) {
-        addAgentLog("info", `  → ${data.details}`);
-      }
-      updateFloatingProgressBar(
-        data.current_step,
-        data.total_steps,
+      // Update terminal in detail panel with real data
+      updateDetailTerminal(
+        data.task_id,
         data.message,
         data.step,
-        data.details,
         data.activity,
       );
-      updateProgressUI(data);
+      // Update progress bar in detail panel
+      updateDetailProgress(
+        data.task_id,
+        data.current_step,
+        data.total_steps,
+        data.progress,
+      );
       break;
 
     case "task_completed":
@@ -343,12 +341,20 @@ function handleWebSocketMessage(data) {
         showAppUrlNotification(appUrl);
       }
 
-      if (data.activity) {
-        updateActivityMetrics(data.activity);
-        logFinalStats(data.activity);
-      }
-      completeFloatingProgress(data.message, data.activity, appUrl);
-      updateProgressUI(data);
+      // Update terminal with completion
+      updateDetailTerminal(
+        data.task_id,
+        data.message,
+        "complete",
+        data.activity,
+      );
+      updateDetailProgress(
+        data.task_id,
+        data.total_steps,
+        data.total_steps,
+        100,
+      );
+
       onTaskCompleted(data, appUrl);
 
       // Play completion sound
@@ -358,16 +364,20 @@ function handleWebSocketMessage(data) {
       if (typeof htmx !== "undefined") {
         htmx.trigger(document.body, "taskCreated");
       }
-      if (data.task_id && data.task_id === TasksState.selectedTaskId) {
-        loadTaskDetails(data.task_id);
+      if (data.task_id) {
+        setTimeout(() => loadTaskDetails(data.task_id), 500);
       }
       break;
 
     case "task_error":
       console.log("[Tasks WS] TASK_ERROR:", data.error || data.message);
       addAgentLog("error", `[ERROR] ${data.error || data.message}`);
-      errorFloatingProgress(data.error || data.message);
+      updateDetailTerminal(data.task_id, data.error || data.message, "error");
       onTaskFailed(data, data.error);
+      // Refresh task details to show error
+      if (data.task_id) {
+        setTimeout(() => loadTaskDetails(data.task_id), 500);
+      }
       break;
 
     case "task_update":
@@ -479,66 +489,67 @@ function logFinalStats(activity) {
 // FLOATING PROGRESS PANEL
 // =============================================================================
 
+// Update terminal in the detail panel with real-time data
+function updateDetailTerminal(taskId, message, step, activity) {
+  const terminalOutput = document.getElementById(`terminal-output-${taskId}`);
+  if (!terminalOutput) {
+    // Try generic terminal output
+    const genericTerminal = document.querySelector(".terminal-output-rich");
+    if (genericTerminal) {
+      addTerminalLine(genericTerminal, message, step);
+    }
+    return;
+  }
+  addTerminalLine(terminalOutput, message, step, activity);
+}
+
+function addTerminalLine(terminal, message, step, activity) {
+  const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
+  const stepClass =
+    step === "error" ? "error" : step === "complete" ? "success" : "";
+  const prefix = step === "error" ? "✗" : step === "complete" ? "✓" : "►";
+
+  const line = document.createElement("div");
+  line.className = `terminal-line ${stepClass} current`;
+  line.innerHTML = `<span class="term-time">${timestamp}</span> ${prefix} ${message}`;
+
+  // Remove 'current' class from previous lines
+  terminal.querySelectorAll(".terminal-line.current").forEach((el) => {
+    el.classList.remove("current");
+  });
+
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+
+  // Keep only last 50 lines
+  while (terminal.children.length > 50) {
+    terminal.removeChild(terminal.firstChild);
+  }
+}
+
+// Update progress bar in detail panel
+function updateDetailProgress(taskId, current, total, percent) {
+  const progressFill = document.querySelector(".progress-fill-rich");
+  const progressLabel = document.querySelector(".progress-label-rich");
+  const stepInfo = document.querySelector(".meta-estimated");
+
+  const pct = percent || (total > 0 ? Math.round((current / total) * 100) : 0);
+
+  if (progressFill) {
+    progressFill.style.width = `${pct}%`;
+  }
+  if (progressLabel) {
+    progressLabel.textContent = `Progress: ${pct}%`;
+  }
+  if (stepInfo) {
+    stepInfo.textContent = `Step ${current}/${total}`;
+  }
+}
+
+// Legacy functions kept for compatibility but now do nothing
 function showFloatingProgress(taskName) {
-  let panel = document.getElementById("floating-progress");
-  if (!panel) {
-    panel = document.createElement("div");
-    panel.id = "floating-progress";
-    panel.className = "floating-progress-panel";
-    panel.innerHTML = `
-      <div class="floating-progress-header">
-        <div class="floating-progress-title">
-          <span class="progress-dot"></span>
-          <span id="floating-task-name">Processing...</span>
-        </div>
-        <div class="floating-progress-actions">
-          <button class="btn-minimize" onclick="minimizeFloatingProgress()">—</button>
-          <button class="btn-close-float" onclick="closeFloatingProgress()">×</button>
-        </div>
-      </div>
-      <div class="floating-progress-body">
-        <div class="floating-progress-bar">
-          <div class="floating-progress-fill" id="floating-progress-fill" style="width: 0%"></div>
-        </div>
-        <div class="floating-progress-info">
-          <span id="floating-progress-step">Starting...</span>
-          <span id="floating-progress-percent">0%</span>
-        </div>
-        <div class="floating-activity-metrics" id="floating-activity-metrics"></div>
-        <div class="floating-progress-terminal" id="floating-progress-terminal">
-          <div class="terminal-header">
-            <span class="terminal-title">LIVE AGENT ACTIVITY</span>
-            <span class="terminal-status" id="terminal-status">●</span>
-          </div>
-          <div class="terminal-content" id="floating-progress-log"></div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(panel);
-  }
-
-  const taskNameEl = document.getElementById("floating-task-name");
-  if (taskNameEl) taskNameEl.textContent = taskName || "Processing...";
-
-  const fillEl = document.getElementById("floating-progress-fill");
-  if (fillEl) fillEl.style.width = "0%";
-
-  const stepEl = document.getElementById("floating-progress-step");
-  if (stepEl) stepEl.textContent = "Starting...";
-
-  const percentEl = document.getElementById("floating-progress-percent");
-  if (percentEl) percentEl.textContent = "0%";
-
-  const logEl = document.getElementById("floating-progress-log");
-  if (logEl) logEl.innerHTML = "";
-
-  const dotEl = panel.querySelector(".progress-dot");
-  if (dotEl) {
-    dotEl.classList.remove("completed", "error");
-  }
-
-  panel.style.display = "block";
-  panel.classList.remove("minimized");
+  // Progress now shown in detail panel terminal
+  console.log("[Tasks] Progress:", taskName);
 }
 
 function updateFloatingProgressBar(
@@ -549,133 +560,56 @@ function updateFloatingProgressBar(
   details,
   activity,
 ) {
-  const panel = document.getElementById("floating-progress");
-  if (!panel || panel.style.display === "none") {
-    showFloatingProgress(message);
-  }
-
-  const percent = total > 0 ? Math.round((current / total) * 100) : 0;
-
-  const fillEl = document.getElementById("floating-progress-fill");
-  if (fillEl) fillEl.style.width = percent + "%";
-
-  const stepEl = document.getElementById("floating-progress-step");
-  if (stepEl) stepEl.textContent = message;
-
-  const percentEl = document.getElementById("floating-progress-percent");
-  if (percentEl) percentEl.textContent = percent + "%";
-
-  const statusEl = document.getElementById("terminal-status");
-  if (statusEl) statusEl.classList.add("active");
-
-  if (step) {
-    const logEl = document.getElementById("floating-progress-log");
-    if (logEl) {
-      const entry = document.createElement("div");
-      entry.className = "log-entry";
-      const timestamp = new Date().toLocaleTimeString("en-US", {
-        hour12: false,
-      });
-
-      let logContent = `<span class="log-time">${timestamp}</span> <span class="log-step">[${step.toUpperCase()}]</span> ${message}`;
-
-      if (activity) {
-        if (activity.current_item) {
-          logContent += `<span class="log-current"> → ${activity.current_item}</span>`;
-        }
-        if (activity.items_processed !== undefined && activity.items_total) {
-          logContent += `<span class="log-progress"> (${activity.items_processed}/${activity.items_total})</span>`;
-        }
-        if (activity.bytes_processed) {
-          const kb = (activity.bytes_processed / 1024).toFixed(1);
-          logContent += `<span class="log-bytes"> [${kb} KB]</span>`;
-        }
-      } else if (details) {
-        logContent += `<span class="log-details"> → ${details}</span>`;
-      }
-
-      entry.innerHTML = logContent;
-      logEl.appendChild(entry);
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-  }
-
-  if (activity) {
-    updateActivityMetrics(activity);
+  // Progress now shown in detail panel
+  updateDetailProgress(null, current, total);
+  if (message) {
+    updateDetailTerminal(null, message, step, activity);
   }
 }
 
 function completeFloatingProgress(message, activity, appUrl) {
-  const fillEl = document.getElementById("floating-progress-fill");
-  if (fillEl) fillEl.style.width = "100%";
-
-  const stepEl = document.getElementById("floating-progress-step");
-  if (stepEl) stepEl.textContent = message || "Completed!";
-
-  const percentEl = document.getElementById("floating-progress-percent");
-  if (percentEl) percentEl.textContent = "100%";
-
-  const panel = document.getElementById("floating-progress");
-  if (panel) {
-    const dotEl = panel.querySelector(".progress-dot");
-    if (dotEl) dotEl.classList.add("completed");
-  }
-
-  const statusEl = document.getElementById("terminal-status");
-  if (statusEl) {
-    statusEl.classList.remove("active");
-    statusEl.classList.add("completed");
-  }
-
-  if (activity) {
-    const logEl = document.getElementById("floating-progress-log");
-    if (logEl) {
-      const summary = document.createElement("div");
-      summary.className = "log-entry log-summary";
-      let summaryText = "═══════════════════════════════════\n";
-      summaryText += "✓ GENERATION COMPLETE\n";
-      if (activity.files_created) {
-        summaryText += `  Files: ${activity.files_created.length} created\n`;
-      }
-      if (activity.tables_created) {
-        summaryText += `  Tables: ${activity.tables_created.length} synced\n`;
-      }
-      if (activity.bytes_processed) {
-        summaryText += `  Size: ${(activity.bytes_processed / 1024).toFixed(1)} KB\n`;
-      }
-      summaryText += "═══════════════════════════════════";
-      summary.innerHTML = `<pre class="summary-pre">${summaryText}</pre>`;
-      logEl.appendChild(summary);
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-  }
-
-  setTimeout(closeFloatingProgress, 8000);
-}
-
-function errorFloatingProgress(errorMessage) {
-  const stepEl = document.getElementById("floating-progress-step");
-  if (stepEl) stepEl.textContent = "Error: " + errorMessage;
-
-  const panel = document.getElementById("floating-progress");
-  if (panel) {
-    const dotEl = panel.querySelector(".progress-dot");
-    if (dotEl) dotEl.classList.add("error");
-  }
-}
-
-function minimizeFloatingProgress() {
-  const panel = document.getElementById("floating-progress");
-  if (panel) panel.classList.toggle("minimized");
+  // Completion now shown in detail panel
+  console.log("[Tasks] Complete:", message);
 }
 
 function closeFloatingProgress() {
-  const panel = document.getElementById("floating-progress");
-  if (panel) {
-    panel.style.display = "none";
-    const dotEl = panel.querySelector(".progress-dot");
-    if (dotEl) dotEl.classList.remove("completed", "error");
+  // No floating panel to close
+}
+
+function minimizeFloatingProgress() {
+  // No floating panel to minimize
+}
+
+function updateProgressUI(data) {
+  if (data && data.current_step !== undefined) {
+    updateDetailProgress(
+      data.task_id,
+      data.current_step,
+      data.total_steps,
+      data.progress,
+    );
   }
+}
+
+// Legacy function - errors now shown in detail panel
+function errorFloatingProgress(errorMessage) {
+  updateDetailTerminal(null, errorMessage, "error");
+}
+
+function updateActivityMetrics(activity) {
+  // Activity metrics are now shown in terminal output
+  if (!activity) return;
+  console.log("[Tasks] Activity update:", activity);
+}
+
+function logFinalStats(activity) {
+  if (!activity) return;
+  let stats = "Generation complete";
+  if (activity.files_created)
+    stats += ` - ${activity.files_created.length} files`;
+  if (activity.bytes_processed)
+    stats += ` - ${Math.round(activity.bytes_processed / 1024)}KB`;
+  console.log("[Tasks]", stats);
 }
 
 function addLLMStreamOutput(text) {
