@@ -40,10 +40,11 @@ function setupIntentInputHandlers() {
   const input = document.getElementById("quick-intent-input");
   const btn = document.getElementById("quick-intent-btn");
 
-  if (input) {
+  if (input && btn) {
     input.addEventListener("keypress", function (e) {
       if (e.key === "Enter" && input.value.trim()) {
-        btn.click();
+        e.preventDefault();
+        htmx.trigger(btn, "click");
       }
     });
   }
@@ -106,56 +107,441 @@ function setupIntentInputHandlers() {
 
 function initWebSocket() {
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const wsUrl = `${protocol}//${window.location.host}/ws/tasks`;
+  const wsUrl = `${protocol}//${window.location.host}/ws/task-progress`;
+
+  console.log("[Tasks WS] Attempting connection to:", wsUrl);
 
   try {
     TasksState.wsConnection = new WebSocket(wsUrl);
 
     TasksState.wsConnection.onopen = function () {
-      console.log("[Sentient Tasks] WebSocket connected");
+      console.log("[Tasks WS] WebSocket connected successfully");
       addAgentLog("info", "[SYSTEM] Connected to task orchestrator");
     };
 
     TasksState.wsConnection.onmessage = function (event) {
-      handleWebSocketMessage(JSON.parse(event.data));
+      console.log("[Tasks WS] Raw message received:", event.data);
+      try {
+        const data = JSON.parse(event.data);
+        console.log("[Tasks WS] Parsed message:", data.type, data);
+        handleWebSocketMessage(data);
+      } catch (e) {
+        console.error("[Tasks WS] Failed to parse message:", e, event.data);
+      }
     };
 
-    TasksState.wsConnection.onclose = function () {
-      console.log("[Sentient Tasks] WebSocket disconnected, reconnecting...");
+    TasksState.wsConnection.onclose = function (event) {
+      console.log(
+        "[Tasks WS] WebSocket disconnected, code:",
+        event.code,
+        "reason:",
+        event.reason,
+      );
       setTimeout(initWebSocket, 5000);
     };
 
     TasksState.wsConnection.onerror = function (error) {
-      console.error("[Sentient Tasks] WebSocket error:", error);
+      console.error("[Tasks WS] WebSocket error:", error);
     };
   } catch (e) {
-    console.warn("[Sentient Tasks] WebSocket not available");
+    console.error("[Tasks WS] Failed to create WebSocket:", e);
   }
 }
 
 function handleWebSocketMessage(data) {
+  console.log("[Tasks WS] handleWebSocketMessage called with type:", data.type);
+
   switch (data.type) {
+    case "connected":
+      console.log("[Tasks WS] Connected to task progress stream");
+      addAgentLog("info", "[SYSTEM] Task progress stream connected");
+      break;
+
+    case "task_started":
+      console.log(
+        "[Tasks WS] TASK_STARTED - showing floating progress:",
+        data.message,
+      );
+      addAgentLog("accent", `[TASK] Started: ${data.message}`);
+      showFloatingProgress(data.message);
+      updateFloatingProgressBar(0, data.total_steps, data.message);
+      updateActivityMetrics(data.activity);
+      updateProgressUI(data);
+      break;
+
+    case "task_progress":
+      console.log(
+        "[Tasks WS] TASK_PROGRESS - step:",
+        data.step,
+        "message:",
+        data.message,
+      );
+      addAgentLog("info", `[${data.step}] ${data.message}`);
+      if (data.activity) {
+        updateActivityMetrics(data.activity);
+        if (data.activity.current_item) {
+          addAgentLog("info", `  → Processing: ${data.activity.current_item}`);
+        }
+      } else if (data.details) {
+        addAgentLog("info", `  → ${data.details}`);
+      }
+      updateFloatingProgressBar(
+        data.current_step,
+        data.total_steps,
+        data.message,
+        data.step,
+        data.details,
+        data.activity,
+      );
+      updateProgressUI(data);
+      break;
+
+    case "task_completed":
+      console.log("[Tasks WS] TASK_COMPLETED:", data.message);
+      addAgentLog("success", `[COMPLETE] ${data.message}`);
+      if (data.activity) {
+        updateActivityMetrics(data.activity);
+        logFinalStats(data.activity);
+      }
+      completeFloatingProgress(data.message, data.activity);
+      updateProgressUI(data);
+      onTaskCompleted(data);
+      if (typeof htmx !== "undefined") {
+        htmx.trigger(document.body, "taskCreated");
+      }
+      break;
+
+    case "task_error":
+      console.log("[Tasks WS] TASK_ERROR:", data.error || data.message);
+      addAgentLog("error", `[ERROR] ${data.error || data.message}`);
+      errorFloatingProgress(data.error || data.message);
+      onTaskFailed(data, data.error);
+      break;
+
     case "task_update":
       updateTaskCard(data.task);
-      if (data.task.id === TasksState.selectedTaskId) {
+      if (data.task && data.task.id === TasksState.selectedTaskId) {
         updateTaskDetail(data.task);
       }
       break;
+
     case "step_progress":
       updateStepProgress(data.taskId, data.step);
       break;
+
     case "agent_log":
       addAgentLog(data.level, data.message);
       break;
+
     case "decision_required":
       showDecisionRequired(data.decision);
       break;
-    case "task_completed":
-      onTaskCompleted(data.task);
-      break;
-    case "task_failed":
-      onTaskFailed(data.task, data.error);
-      break;
+  }
+}
+
+function updateActivityMetrics(activity) {
+  if (!activity) return;
+
+  const metricsEl = document.getElementById("floating-activity-metrics");
+  if (!metricsEl) return;
+
+  let html = "";
+
+  if (activity.phase) {
+    html += `<div class="metric-row"><span class="metric-label">Phase:</span> <span class="metric-value phase-${activity.phase}">${activity.phase.toUpperCase()}</span></div>`;
+  }
+
+  if (activity.items_processed !== undefined) {
+    const total = activity.items_total ? `/${activity.items_total}` : "";
+    html += `<div class="metric-row"><span class="metric-label">Processed:</span> <span class="metric-value">${activity.items_processed}${total} items</span></div>`;
+  }
+
+  if (activity.speed_per_min) {
+    html += `<div class="metric-row"><span class="metric-label">Speed:</span> <span class="metric-value">~${activity.speed_per_min.toFixed(1)} items/min</span></div>`;
+  }
+
+  if (activity.eta_seconds) {
+    const mins = Math.floor(activity.eta_seconds / 60);
+    const secs = activity.eta_seconds % 60;
+    const eta = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+    html += `<div class="metric-row"><span class="metric-label">ETA:</span> <span class="metric-value">${eta}</span></div>`;
+  }
+
+  if (activity.bytes_processed) {
+    const kb = (activity.bytes_processed / 1024).toFixed(1);
+    html += `<div class="metric-row"><span class="metric-label">Generated:</span> <span class="metric-value">${kb} KB</span></div>`;
+  }
+
+  if (activity.tokens_used) {
+    html += `<div class="metric-row"><span class="metric-label">Tokens:</span> <span class="metric-value">${activity.tokens_used.toLocaleString()}</span></div>`;
+  }
+
+  if (activity.files_created && activity.files_created.length > 0) {
+    html += `<div class="metric-row"><span class="metric-label">Files:</span> <span class="metric-value">${activity.files_created.length} created</span></div>`;
+  }
+
+  if (activity.tables_created && activity.tables_created.length > 0) {
+    html += `<div class="metric-row"><span class="metric-label">Tables:</span> <span class="metric-value">${activity.tables_created.length} synced</span></div>`;
+  }
+
+  if (activity.current_item) {
+    html += `<div class="metric-row current-item"><span class="metric-label">Current:</span> <span class="metric-value">${activity.current_item}</span></div>`;
+  }
+
+  metricsEl.innerHTML = html;
+}
+
+function logFinalStats(activity) {
+  if (!activity) return;
+
+  addAgentLog("info", "─────────────────────────────────");
+  addAgentLog("info", "GENERATION COMPLETE");
+
+  if (activity.files_created && activity.files_created.length > 0) {
+    addAgentLog("success", `Files created: ${activity.files_created.length}`);
+    activity.files_created.forEach((f) => addAgentLog("info", `  • ${f}`));
+  }
+
+  if (activity.tables_created && activity.tables_created.length > 0) {
+    addAgentLog("success", `Tables synced: ${activity.tables_created.length}`);
+    activity.tables_created.forEach((t) => addAgentLog("info", `  • ${t}`));
+  }
+
+  if (activity.bytes_processed) {
+    const kb = (activity.bytes_processed / 1024).toFixed(1);
+    addAgentLog("info", `Total size: ${kb} KB`);
+  }
+
+  addAgentLog("info", "─────────────────────────────────");
+}
+
+// =============================================================================
+// FLOATING PROGRESS PANEL
+// =============================================================================
+
+function showFloatingProgress(taskName) {
+  let panel = document.getElementById("floating-progress");
+  if (!panel) {
+    panel = document.createElement("div");
+    panel.id = "floating-progress";
+    panel.className = "floating-progress-panel";
+    panel.innerHTML = `
+      <div class="floating-progress-header">
+        <div class="floating-progress-title">
+          <span class="progress-dot"></span>
+          <span id="floating-task-name">Processing...</span>
+        </div>
+        <div class="floating-progress-actions">
+          <button class="btn-minimize" onclick="minimizeFloatingProgress()">—</button>
+          <button class="btn-close-float" onclick="closeFloatingProgress()">×</button>
+        </div>
+      </div>
+      <div class="floating-progress-body">
+        <div class="floating-progress-bar">
+          <div class="floating-progress-fill" id="floating-progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="floating-progress-info">
+          <span id="floating-progress-step">Starting...</span>
+          <span id="floating-progress-percent">0%</span>
+        </div>
+        <div class="floating-activity-metrics" id="floating-activity-metrics"></div>
+        <div class="floating-progress-terminal" id="floating-progress-terminal">
+          <div class="terminal-header">
+            <span class="terminal-title">LIVE AGENT ACTIVITY</span>
+            <span class="terminal-status" id="terminal-status">●</span>
+          </div>
+          <div class="terminal-content" id="floating-progress-log"></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(panel);
+  }
+
+  const taskNameEl = document.getElementById("floating-task-name");
+  if (taskNameEl) taskNameEl.textContent = taskName || "Processing...";
+
+  const fillEl = document.getElementById("floating-progress-fill");
+  if (fillEl) fillEl.style.width = "0%";
+
+  const stepEl = document.getElementById("floating-progress-step");
+  if (stepEl) stepEl.textContent = "Starting...";
+
+  const percentEl = document.getElementById("floating-progress-percent");
+  if (percentEl) percentEl.textContent = "0%";
+
+  const logEl = document.getElementById("floating-progress-log");
+  if (logEl) logEl.innerHTML = "";
+
+  const dotEl = panel.querySelector(".progress-dot");
+  if (dotEl) {
+    dotEl.classList.remove("completed", "error");
+  }
+
+  panel.style.display = "block";
+  panel.classList.remove("minimized");
+}
+
+function updateFloatingProgressBar(
+  current,
+  total,
+  message,
+  step,
+  details,
+  activity,
+) {
+  const panel = document.getElementById("floating-progress");
+  if (!panel || panel.style.display === "none") {
+    showFloatingProgress(message);
+  }
+
+  const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+
+  const fillEl = document.getElementById("floating-progress-fill");
+  if (fillEl) fillEl.style.width = percent + "%";
+
+  const stepEl = document.getElementById("floating-progress-step");
+  if (stepEl) stepEl.textContent = message;
+
+  const percentEl = document.getElementById("floating-progress-percent");
+  if (percentEl) percentEl.textContent = percent + "%";
+
+  const statusEl = document.getElementById("terminal-status");
+  if (statusEl) statusEl.classList.add("active");
+
+  if (step) {
+    const logEl = document.getElementById("floating-progress-log");
+    if (logEl) {
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+      const timestamp = new Date().toLocaleTimeString("en-US", {
+        hour12: false,
+      });
+
+      let logContent = `<span class="log-time">${timestamp}</span> <span class="log-step">[${step.toUpperCase()}]</span> ${message}`;
+
+      if (activity) {
+        if (activity.current_item) {
+          logContent += `<span class="log-current"> → ${activity.current_item}</span>`;
+        }
+        if (activity.items_processed !== undefined && activity.items_total) {
+          logContent += `<span class="log-progress"> (${activity.items_processed}/${activity.items_total})</span>`;
+        }
+        if (activity.bytes_processed) {
+          const kb = (activity.bytes_processed / 1024).toFixed(1);
+          logContent += `<span class="log-bytes"> [${kb} KB]</span>`;
+        }
+      } else if (details) {
+        logContent += `<span class="log-details"> → ${details}</span>`;
+      }
+
+      entry.innerHTML = logContent;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  }
+
+  if (activity) {
+    updateActivityMetrics(activity);
+  }
+}
+
+function completeFloatingProgress(message, activity) {
+  const fillEl = document.getElementById("floating-progress-fill");
+  if (fillEl) fillEl.style.width = "100%";
+
+  const stepEl = document.getElementById("floating-progress-step");
+  if (stepEl) stepEl.textContent = message || "Completed!";
+
+  const percentEl = document.getElementById("floating-progress-percent");
+  if (percentEl) percentEl.textContent = "100%";
+
+  const panel = document.getElementById("floating-progress");
+  if (panel) {
+    const dotEl = panel.querySelector(".progress-dot");
+    if (dotEl) dotEl.classList.add("completed");
+  }
+
+  const statusEl = document.getElementById("terminal-status");
+  if (statusEl) {
+    statusEl.classList.remove("active");
+    statusEl.classList.add("completed");
+  }
+
+  if (activity) {
+    const logEl = document.getElementById("floating-progress-log");
+    if (logEl) {
+      const summary = document.createElement("div");
+      summary.className = "log-entry log-summary";
+      let summaryText = "═══════════════════════════════════\n";
+      summaryText += "✓ GENERATION COMPLETE\n";
+      if (activity.files_created) {
+        summaryText += `  Files: ${activity.files_created.length} created\n`;
+      }
+      if (activity.tables_created) {
+        summaryText += `  Tables: ${activity.tables_created.length} synced\n`;
+      }
+      if (activity.bytes_processed) {
+        summaryText += `  Size: ${(activity.bytes_processed / 1024).toFixed(1)} KB\n`;
+      }
+      summaryText += "═══════════════════════════════════";
+      summary.innerHTML = `<pre class="summary-pre">${summaryText}</pre>`;
+      logEl.appendChild(summary);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+  }
+
+  setTimeout(closeFloatingProgress, 8000);
+}
+
+function errorFloatingProgress(errorMessage) {
+  const stepEl = document.getElementById("floating-progress-step");
+  if (stepEl) stepEl.textContent = "Error: " + errorMessage;
+
+  const panel = document.getElementById("floating-progress");
+  if (panel) {
+    const dotEl = panel.querySelector(".progress-dot");
+    if (dotEl) dotEl.classList.add("error");
+  }
+}
+
+function minimizeFloatingProgress() {
+  const panel = document.getElementById("floating-progress");
+  if (panel) panel.classList.toggle("minimized");
+}
+
+function closeFloatingProgress() {
+  const panel = document.getElementById("floating-progress");
+  if (panel) {
+    panel.style.display = "none";
+    const dotEl = panel.querySelector(".progress-dot");
+    if (dotEl) dotEl.classList.remove("completed", "error");
+  }
+}
+
+function updateProgressUI(data) {
+  const progressBar = document.querySelector(".result-progress-bar");
+  const resultDiv = document.getElementById("intent-result");
+
+  if (data.total_steps && data.current_step) {
+    const percent = Math.round((data.current_step / data.total_steps) * 100);
+
+    if (progressBar) {
+      progressBar.style.width = `${percent}%`;
+    }
+
+    if (resultDiv && data.message) {
+      resultDiv.innerHTML = `
+        <div class="result-card">
+          <div class="result-message">${data.message}</div>
+          <div class="result-progress">
+            <div class="result-progress-bar" style="width: ${percent}%"></div>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--sentient-text-muted);">
+            Step ${data.current_step}/${data.total_steps} (${percent}%)
+          </div>
+        </div>
+      `;
+    }
   }
 }
 
@@ -904,47 +1290,41 @@ document.addEventListener("htmx:afterRequest", function (event) {
 
 // Update counts for new filters
 function updateFilterCounts() {
-  fetch("/api/tasks/stats")
+  fetch("/api/tasks/stats/json")
     .then((response) => response.json())
     .then((stats) => {
-      if (stats.pending_count !== undefined) {
-        document.getElementById("count-pending").textContent =
-          stats.pending_count;
+      if (stats.total !== undefined) {
+        const el = document.getElementById("count-all");
+        if (el) el.textContent = stats.total;
       }
-      if (stats.goals_count !== undefined) {
-        document.getElementById("count-goals").textContent = stats.goals_count;
+      if (stats.completed !== undefined) {
+        const el = document.getElementById("count-complete");
+        if (el) el.textContent = stats.completed;
       }
-      if (stats.schedulers_count !== undefined) {
-        document.getElementById("count-schedulers").textContent =
-          stats.schedulers_count;
+      if (stats.active !== undefined) {
+        const el = document.getElementById("count-active");
+        if (el) el.textContent = stats.active;
       }
-      if (stats.monitors_count !== undefined) {
-        document.getElementById("count-monitors").textContent =
-          stats.monitors_count;
+      if (stats.awaiting !== undefined) {
+        const el = document.getElementById("count-awaiting");
+        if (el) el.textContent = stats.awaiting;
+      }
+      if (stats.paused !== undefined) {
+        const el = document.getElementById("count-paused");
+        if (el) el.textContent = stats.paused;
+      }
+      if (stats.blocked !== undefined) {
+        const el = document.getElementById("count-blocked");
+        if (el) el.textContent = stats.blocked;
+      }
+      if (stats.time_saved !== undefined) {
+        const el = document.getElementById("time-saved-value");
+        if (el) el.textContent = stats.time_saved;
       }
     })
-    .catch(() => {});
+    .catch((e) => console.warn("Failed to load task stats:", e));
 }
 
 // Call updateFilterCounts on load
 document.addEventListener("DOMContentLoaded", updateFilterCounts);
 document.body.addEventListener("taskCreated", updateFilterCounts);
-
-// =============================================================================
-// DEMO: Simulate real-time activity
-// =============================================================================
-
-// Simulate agent activity for demo
-setInterval(() => {
-  if (Math.random() > 0.7) {
-    const messages = [
-      { level: "info", msg: "[SCAN] Monitoring task queues..." },
-      { level: "info", msg: "[AGENT] Processing next batch..." },
-      { level: "success", msg: "[OK] Checkpoint saved" },
-      { level: "info", msg: "[SYNC] Synchronizing state..." },
-    ];
-    const { level, msg } =
-      messages[Math.floor(Math.random() * messages.length)];
-    addAgentLog(level, msg);
-  }
-}, 5000);

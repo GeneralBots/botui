@@ -1,158 +1,123 @@
 <!-- =============================================================================
      TASKS APP - Autonomous Task Management
-     Bot Database Architecture with Shared Resources
+     Respects Theme Manager - No hardcoded theme
      ============================================================================= -->
 
 <div class="tasks-app">
-    <section class="intent-input-section">
-        <div class="intent-input-container">
-            <div class="intent-input-wrapper">
-                <input
-                    type="text"
-                    id="quick-intent-input"
-                    name="intent"
-                    class="quick-intent-input"
-                    placeholder="What would you like to do? e.g., 'create a CRM app' or 'remind me to call John tomorrow'"
-                    autocomplete="off"
-                />
-                <button
-                    id="quick-intent-btn"
-                    class="btn-create-run"
-                    hx-post="/api/autotask/create"
-                    hx-ext="json-enc"
-                    hx-include="#quick-intent-input"
-                    hx-target="#intent-result"
-                    hx-swap="innerHTML"
-                    hx-indicator="#intent-spinner"
-                >
-                    <span class="btn-text">Create & Run</span>
-                    <span class="spinner" id="intent-spinner"></span>
-                </button>
-            </div>
-            <div id="intent-result" class="intent-result"></div>
+    <!-- Hidden element to load stats on page load -->
+    <div
+        hx-get="/api/tasks/stats"
+        hx-trigger="load, taskCreated from:body"
+        hx-swap="innerHTML"
+        style="display: none"
+    ></div>
+
+    <!-- Status Filter Pills Row -->
+    <div class="status-filter-row">
+        <button
+            class="filter-pill"
+            data-filter="complete"
+            hx-get="/api/tasks?filter=complete"
+            hx-target="#task-list"
+            hx-swap="innerHTML"
+        >
+            <span class="pill-icon">✓</span>
+            <span class="pill-label">Complete</span>
+            <span class="pill-count" id="count-complete">-</span>
+        </button>
+        <button
+            class="filter-pill active"
+            data-filter="all"
+            hx-get="/api/tasks?filter=all"
+            hx-target="#task-list"
+            hx-swap="innerHTML"
+        >
+            <span class="pill-icon">📋</span>
+            <span class="pill-label">All Tasks</span>
+            <span class="pill-count" id="count-all">-</span>
+        </button>
+        <button
+            class="filter-pill"
+            data-filter="active"
+            hx-get="/api/tasks?filter=active"
+            hx-target="#task-list"
+            hx-swap="innerHTML"
+        >
+            <span class="pill-icon">⚡</span>
+            <span class="pill-label">Active Intents</span>
+            <span class="pill-count" id="count-active">-</span>
+        </button>
+        <button
+            class="filter-pill"
+            data-filter="awaiting"
+            hx-get="/api/tasks?filter=awaiting"
+            hx-target="#task-list"
+            hx-swap="innerHTML"
+        >
+            <span class="pill-icon">⏳</span>
+            <span class="pill-label">Awaiting Decision</span>
+            <span class="pill-count" id="count-awaiting">-</span>
+        </button>
+        <button
+            class="filter-pill"
+            data-filter="paused"
+            hx-get="/api/tasks?filter=paused"
+            hx-target="#task-list"
+            hx-swap="innerHTML"
+        >
+            <span class="pill-icon">⏸</span>
+            <span class="pill-label">Paused</span>
+            <span class="pill-count" id="count-paused">-</span>
+        </button>
+        <button
+            class="filter-pill"
+            data-filter="blocked"
+            hx-get="/api/tasks?filter=blocked"
+            hx-target="#task-list"
+            hx-swap="innerHTML"
+        >
+            <span class="pill-icon">⚠</span>
+            <span class="pill-label">Blocked/Issues</span>
+            <span class="pill-count" id="count-blocked">-</span>
+        </button>
+        <div class="time-saved-badge">
+            <span class="time-label">Active Time Saved:</span>
+            <span class="time-value" id="time-saved-value">-</span>
         </div>
-    </section>
+    </div>
 
+    <!-- Quick Intent Input -->
+    <div class="quick-intent-bar">
+        <div class="intent-input-wrapper">
+            <input
+                type="text"
+                id="quick-intent-input"
+                name="intent"
+                class="quick-intent-input"
+                placeholder="What would you like to do? e.g., 'create a CRM app' or 'remind me to call John tomorrow'"
+                autocomplete="off"
+            />
+            <button
+                id="quick-intent-btn"
+                class="btn-create-run"
+                hx-post="/api/autotask/create"
+                hx-ext="json-enc"
+                hx-include="#quick-intent-input"
+                hx-target="#intent-result"
+                hx-swap="innerHTML"
+                hx-indicator="#intent-spinner"
+            >
+                <span class="btn-text">Create & Run</span>
+                <span class="spinner" id="intent-spinner"></span>
+            </button>
+        </div>
+        <div id="intent-result" class="intent-result"></div>
+    </div>
+
+    <!-- Main Two-Column Layout -->
     <main class="tasks-main">
+        <!-- Left Panel: Task Cards List -->
         <section class="tasks-list-panel">
-            <div class="tasks-list-header">
-                <div class="tasks-list-title">
-                    <h1>Autonomous Tasks</h1>
-                    <span
-                        class="tasks-count"
-                        id="tasks-total-count"
-                        hx-get="/api/tasks/stats"
-                        hx-trigger="load, taskCreated from:body"
-                        hx-swap="innerHTML"
-                        >Loading...</span
-                    ></h1>
-                </div>
-
-                <!-- Status Filter Pills -->
-                <div class="status-filters" id="status-filters">
-                    <button
-                        class="status-pill complete active"
-                        data-filter="all"
-                        hx-get="/api/tasks?filter=all"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        All <span class="pill-count" id="count-all">-</span>
-                    </button>
-                    <button
-                        class="status-pill active-intents"
-                        data-filter="active"
-                        hx-get="/api/tasks?filter=active"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        Active
-                        <span class="pill-count" id="count-active">-</span>
-                    </button>
-                    <button
-                        class="status-pill complete"
-                        data-filter="completed"
-                        hx-get="/api/tasks?filter=completed"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        Completed
-                        <span class="pill-count" id="count-completed">-</span>
-                    </button>
-                    <button
-                        class="status-pill blocked"
-                        data-filter="priority"
-                        hx-get="/api/tasks?filter=priority"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        High Priority
-                        <span class="pill-count" id="count-priority">-</span>
-                    </button>
-                    <button
-                        class="status-pill pending-info"
-                        data-filter="pending"
-                        hx-get="/api/pending-info"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        🔑 Pending Info
-                        <span class="pill-count" id="count-pending">-</span>
-                    </button>
-                    <button
-                        class="status-pill goals"
-                        data-filter="goals"
-                        hx-get="/api/goals"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        🎯 Goals
-                        <span class="pill-count" id="count-goals">-</span>
-                    </button>
-                    <button
-                        class="status-pill schedulers"
-                        data-filter="schedulers"
-                        hx-get="/api/schedulers"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        ⏰ Schedulers
-                        <span class="pill-count" id="count-schedulers">-</span>
-                    </button>
-                    <button
-                        class="status-pill monitors"
-                        data-filter="monitors"
-                        hx-get="/api/monitors"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        👁️ Monitors
-                        <span class="pill-count" id="count-monitors">-</span>
-                    </button>
-                    <button
-                        class="status-pill tables"
-                        data-filter="tables"
-                        hx-get="/api/tables"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        🗃️ Tables
-                        <span class="pill-count" id="count-tables">-</span>
-                    </button>
-                    <button
-                        class="status-pill apps"
-                        data-filter="apps"
-                        hx-get="/api/apps"
-                        hx-target="#task-list"
-                        hx-swap="innerHTML"
-                    >
-                        📱 Apps
-                        <span class="pill-count" id="count-apps">-</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Task List -->
             <div
                 class="tasks-list-scroll"
                 id="task-list"
@@ -160,7 +125,7 @@
                 hx-trigger="load, taskCreated from:body"
                 hx-swap="innerHTML"
             >
-                <!-- Loading indicator - will be replaced by HTMX -->
+                <!-- Loading state - replaced by HTMX -->
                 <div class="loading-state">
                     <div class="loading-spinner"></div>
                     <p>Loading tasks...</p>
@@ -168,728 +133,381 @@
             </div>
         </section>
 
-        <!-- Task Detail Panel (Right) -->
+        <!-- Right Panel: Task Detail -->
         <aside class="task-detail-panel" id="task-detail-panel">
-            <!-- Empty state shown when no task selected -->
-            <div class="task-detail-empty" id="task-detail-empty">
-                <div class="empty-state">
-                    <svg
-                        width="64"
-                        height="64"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                    >
-                        <path
-                            d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"
-                        />
-                        <rect x="9" y="3" width="6" height="4" rx="2" />
-                        <path d="M9 12h6" />
-                        <path d="M9 16h6" />
-                    </svg>
-                    <h3>Select a task</h3>
-                    <p>Click on a task from the list to view details</p>
-                    <div class="empty-state-info">
-                        <p class="info-text">
-                            <strong>Bot Database:</strong> All apps share the same database tables.<br>
-                            <strong>Shared Resources:</strong> Schedulers, tools, and monitors work across all apps.
-                        </p>
-                    </div>
+            <!-- Detail content loaded dynamically -->
+            <div class="detail-empty" id="detail-empty">
+                <div class="empty-icon">📋</div>
+                <h3 class="empty-title">Select a task</h3>
+                <p class="empty-description">
+                    Click on a task from the list to view details
+                </p>
+                <div class="empty-info">
+                    <p>
+                        <strong>Bot Database:</strong> All apps share the same
+                        database tables.
+                    </p>
+                    <p>
+                        <strong>Shared Resources:</strong> Schedulers, tools,
+                        and monitors work across all apps.
+                    </p>
                 </div>
             </div>
 
-            <!-- Dynamic task detail content loaded via HTMX -->
-            <div id="task-detail-content" style="display: none">
-                <div class="task-detail-header">
-                    <div class="task-detail-title-row">
-                        <h2 class="task-detail-title" id="detail-title">-</h2>
-                        <div class="task-detail-actions">
-                            <button
-                                class="task-detail-action-btn"
-                                title="Edit"
-                                onclick="editSelectedTask()"
-                            >
-                                ✏️
-                            </button>
-                            <button
-                                class="task-detail-action-btn"
-                                title="Delete"
-                                onclick="deleteSelectedTask()"
-                            >
-                                🗑️
-                            </button>
-                            <button class="task-detail-action-btn" title="More">
-                                ⋯
-                            </button>
-                        </div>
-                    </div>
-                    <div class="task-detail-meta">
-                        <span class="task-detail-meta-item" id="detail-status">
-                            <span class="icon">📊</span>
-                            <span id="detail-status-text">-</span>
-                        </span>
-                        <span
-                            class="task-detail-meta-item"
-                            id="detail-priority"
-                        >
-                            <span class="icon">🎯</span>
-                            <span id="detail-priority-text">-</span>
-                        </span>
-                        <span
-                            class="task-detail-meta-item"
-                            id="detail-due-date"
-                        >
-                            <span class="icon">📅</span>
-                            <span id="detail-due-date-text">-</span>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="task-detail-scroll">
-                    <!-- Task Description Section -->
-                    <section class="task-description-section">
-                        <div class="section-header">
-                            <span class="section-title">Description</span>
-                        </div>
-                        <p class="task-description" id="detail-description">
-                            No description provided.
-                        </p>
-                    </section>
-
-                    <!-- Task Actions Section -->
-                    <section class="task-actions-section">
-                        <div class="section-header">
-                            <span class="section-title">Quick Actions</span>
-                        </div>
-                        <div class="task-action-buttons">
-                            <button
-                                class="task-action-btn"
-                                onclick="updateTaskStatus('in_progress')"
-                            >
-                                ▶️ Start
-                            </button>
-                            <button
-                                class="task-action-btn"
-                                onclick="updateTaskStatus('done')"
-                            >
-                                ✓ Complete
-                            </button>
-                            <button
-                                class="task-action-btn"
-                                onclick="updateTaskStatus('blocked')"
-                            >
-                                ⏸️ Block
-                            </button>
-                        </div>
-                    </section>
-
-                    <!-- Task Activity Log -->
-                    <section class="progress-log-section">
-                        <div class="progress-log-header">
-                            <span class="progress-log-title">Activity</span>
-                        </div>
-                        <div class="step-list" id="detail-activity">
-                            <div class="step-item completed">
-                                <div class="step-icon">✓</div>
-                                <div class="step-content">
-                                    <div class="step-name">Task created</div>
-                                    <div
-                                        class="step-detail"
-                                        id="detail-created-at"
-                                    >
-                                        -
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Goal Progress (shown for GOAL type) -->
-                    <section
-                        class="goal-progress-section"
-                        id="goal-progress-section"
-                        style="display: none"
-                    >
-                        <div class="section-header">
-                            <span class="section-title">🎯 Goal Progress</span>
-                        </div>
-                        <div class="goal-progress-content">
-                            <div class="goal-progress-bar">
-                                <div
-                                    class="goal-progress-fill"
-                                    id="goal-progress-fill"
-                                    style="width: 0%"
-                                ></div>
-                            </div>
-                            <div class="goal-progress-stats">
-                                <span id="goal-current-value">0</span> /
-                                <span id="goal-target-value">0</span> (<span
-                                    id="goal-percent"
-                                    >0</span
-                                >%)
-                            </div>
-                            <div class="goal-last-action" id="goal-last-action">
-                                Last action: -
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Pending Info Fill Form (shown for PENDING type) -->
-                    <section
-                        class="pending-fill-section"
-                        id="pending-fill-section"
-                        style="display: none"
-                    >
-                        <div class="section-header">
-                            <span class="section-title"
-                                >🔑 Fill Information</span
-                            >
-                        </div>
-                        <div class="pending-fill-content">
-                            <p class="pending-reason" id="pending-reason">-</p>
-                            <form
-                                id="pending-fill-form"
-                                hx-post="/api/pending-info/fill"
-                                hx-swap="none"
-                            >
-                                <input
-                                    type="hidden"
-                                    name="id"
-                                    id="pending-fill-id"
-                                />
-                                <div class="form-group">
-                                    <label id="pending-fill-label">Value</label>
-                                    <input
-                                        type="password"
-                                        class="form-input"
-                                        name="value"
-                                        id="pending-fill-value"
-                                        required
-                                    />
-                                </div>
-                                <button type="submit" class="task-action-btn">
-                                    Save to Bot Config
-                                </button>
-                            </form>
-                        </div>
-                    </section>
-
-                    <!-- Scheduler Info (shown for SCHEDULER type) -->
-                    <section
-                        class="scheduler-info-section"
-                        id="scheduler-info-section"
-                        style="display: none"
-                    >
-                        <div class="section-header">
-                            <span class="section-title">⏰ Schedule (Shared)</span>
-                        </div>
-                        <div class="scheduler-info-content">
-                            <div class="scheduler-cron" id="scheduler-cron">
-                                Cron: -
-                            </div>
-                            <div class="scheduler-next" id="scheduler-next">
-                                Next run: -
-                            </div>
-                            <div class="scheduler-file" id="scheduler-file">
-                                File: .gbdialog/schedulers/-
-                            </div>
-                            <p class="shared-resource-note">
-                                ℹ️ This scheduler runs for all apps in this bot
-                            </p>
-                        </div>
-                    </section>
-
-                    <!-- Monitor Info (shown for MONITOR type) -->
-                    <section
-                        class="monitor-info-section"
-                        id="monitor-info-section"
-                        style="display: none"
-                    >
-                        <div class="section-header">
-                            <span class="section-title">👁️ Monitor (Shared)</span>
-                        </div>
-                        <div class="monitor-info-content">
-                            <div class="monitor-target" id="monitor-target">
-                                Target: -
-                            </div>
-                            <div class="monitor-interval" id="monitor-interval">
-                                Interval: -
-                            </div>
-                            <div
-                                class="monitor-last-check"
-                                id="monitor-last-check"
-                            >
-                                Last check: -
-                            </div>
-                            <div
-                                class="monitor-last-value"
-                                id="monitor-last-value"
-                            >
-                                Last value: -
-                            </div>
-                            <p class="shared-resource-note">
-                                ℹ️ This monitor triggers for all apps in this bot
-                            </p>
-                        </div>
-                    </section>
-
-                    <!-- Table Info (shown for TABLE type) -->
-                    <section
-                        class="table-info-section"
-                        id="table-info-section"
-                        style="display: none"
-                    >
-                        <div class="section-header">
-                            <span class="section-title">🗃️ Table (Shared)</span>
-                        </div>
-                        <div class="table-info-content">
-                            <div class="table-name" id="table-name">
-                                Table: -
-                            </div>
-                            <div class="table-fields" id="table-fields">
-                                Fields: -
-                            </div>
-                            <div class="table-records" id="table-records">
-                                Records: -
-                            </div>
-                            <div class="table-source">
-                                Defined in: <code>.gbdialog/tables.bas</code>
-                            </div>
-                            <p class="shared-resource-note">
-                                ℹ️ All apps in this bot access this table via FIND keyword
-                            </p>
-                            <div class="table-query-example">
-                                <strong>Example:</strong>
-                                <code id="table-query-example">FIND * IN table_name</code>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- App Info (shown for APP type) -->
-                    <section
-                        class="app-info-section"
-                        id="app-info-section"
-                        style="display: none"
-                    >
-                        <div class="section-header">
-                            <span class="section-title">📱 App</span>
-                        </div>
-                        <div class="app-info-content">
-                            <div class="app-name" id="app-name">
-                                App: -
-                            </div>
-                            <div class="app-url" id="app-url">
-                                URL: /apps/-
-                            </div>
-                            <div class="app-tables" id="app-tables">
-                                Uses tables: -
-                            </div>
-                            <p class="shared-resource-note">
-                                ℹ️ This app uses the bot's shared database
-                            </p>
-                            <div class="app-actions">
-                                <button class="task-action-btn" onclick="openApp()">
-                                    🚀 Open App
-                                </button>
-                                <button class="task-action-btn" onclick="editAppTables()">
-                                    🗃️ Edit Tables
-                                </button>
-                            </div>
-                        </div>
-                    </section>
-                </div>
+            <!-- Dynamic detail content -->
+            <div
+                id="task-detail-content"
+                style="display: none"
+                hx-get=""
+                hx-trigger="taskSelected from:body"
+                hx-swap="innerHTML"
+            >
+                <!-- Loaded via HTMX when task selected -->
             </div>
         </aside>
     </main>
 </div>
 
-<!-- Bot Database Summary Panel -->
+<!-- Floating Progress Panel - Shows live task generation progress -->
 <div
-    class="bot-db-summary-panel"
-    id="bot-db-summary-panel"
-    hx-get="/api/bot/database/summary"
-    hx-trigger="load"
-    hx-swap="innerHTML"
+    class="floating-progress-panel"
+    id="floating-progress"
+    style="display: none"
 >
-    <div class="bot-db-loading">Loading bot database info...</div>
-</div>
-
-<!-- Pending Info Summary Panel -->
-<div
-    class="pending-summary-panel"
-    id="pending-summary-panel"
-    hx-get="/api/pending-info/summary"
-    hx-trigger="load"
-    hx-swap="innerHTML"
-></div>
-
-<!-- New Intent Modal -->
-<!-- Edit Tables Modal -->
-<div class="modal-overlay" id="editTablesModal">
-    <div class="modal modal-large">
-        <div class="modal-header">
-            <h3>🗃️ Edit Tables (tables.bas)</h3>
-            <button class="modal-close" onclick="closeEditTablesModal()">
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" /></h3>
-                </svg>
+    <div class="floating-progress-header">
+        <div class="floating-progress-title">
+            <span class="progress-dot"></span>
+            <span id="floating-task-name">Processing...</span>
+        </div>
+        <div class="floating-progress-actions">
+            <button class="btn-minimize" onclick="minimizeFloatingProgress()">
+                —
+            </button>
+            <button class="btn-close-float" onclick="closeFloatingProgress()">
+                ×
             </button>
         </div>
-        <div class="modal-body">
-            <p class="modal-description">
-                Define tables using the TABLE keyword. Changes auto-sync to the bot database.
-            </p>
+    </div>
+    <div class="floating-progress-body">
+        <div class="floating-progress-bar">
             <div
-                id="tables-editor"
-                hx-get="/api/tables/source"
-                hx-trigger="load"
-                hx-swap="innerHTML"
-            >
-                <div class="loading-state">Loading tables.bas...</div>
+                class="floating-progress-fill"
+                id="floating-progress-fill"
+                style="width: 0%"
+            ></div>
+        </div>
+        <div class="floating-progress-info">
+            <span id="floating-progress-step">Starting...</span>
+            <span id="floating-progress-percent">0%</span>
+        </div>
+        <div class="floating-progress-log" id="floating-progress-log">
+            <!-- Live log entries appear here -->
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- New Intent Modal -->
+<div class="modal" id="new-intent-modal" style="display: none">
+    <div class="modal-backdrop" onclick="closeNewIntentModal()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create New Intent</h3>
+            <button class="btn-close" onclick="closeNewIntentModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="new-intent-form">
+                <div class="form-group">
+                    <label for="intent-text"
+                        >What would you like to accomplish?</label
+                    >
+                    <textarea
+                        id="intent-text"
+                        name="intent"
+                        rows="4"
+                        placeholder="Describe what you want to create or automate..."
+                    ></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="intent-priority">Priority</label>
+                        <select id="intent-priority" name="priority">
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="intent-mode">Execution Mode</label>
+                        <select id="intent-mode" name="mode">
+                            <option value="auto">Automatic</option>
+                            <option value="supervised">Supervised</option>
+                            <option value="manual">Manual Approval</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeNewIntentModal()">
+                Cancel
+            </button>
+            <button class="btn-primary" onclick="submitNewIntent()">
+                Create & Run
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Decision Modal -->
+<div class="modal" id="decision-modal" style="display: none">
+    <div class="modal-backdrop" onclick="closeDecisionModal()"></div>
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>Make Decision</h3>
+            <button class="btn-close" onclick="closeDecisionModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="decision-question" id="decision-question">
+                <h4>Decision Required</h4>
+                <p>Loading decision details...</p>
+            </div>
+            <div class="decision-options" id="decision-options">
+                <!-- Options loaded dynamically -->
             </div>
         </div>
         <div class="modal-footer">
-            <button
-                class="decision-btn decision-btn-secondary"
-                onclick="closeEditTablesModal()"
-            >
+            <button class="btn-secondary" onclick="closeDecisionModal()">
                 Cancel
             </button>
-            <button
-                class="decision-btn decision-btn-primary"
-                onclick="saveTablesFile()"
-            >
-                Save & Sync
+            <button class="btn-secondary" onclick="skipDecision()">
+                Skip for Now
+            </button>
+            <button class="btn-primary" onclick="submitDecision()">
+                Confirm Decision
             </button>
         </div>
     </div>
 </div>
 
 <script>
-    // Conditionally load tasks.js only if not already loaded
-    if (typeof TasksState === "undefined") {
-        const script = document.createElement("script");
-        script.src = "tasks/tasks.js";
-        document.head.appendChild(script);
-    }
-</script>
-<script>
-    // Edit Tables Modal functions
-    function showEditTablesModal() {
-        document.getElementById("editTablesModal").classList.add("show");
-        htmx.trigger(document.getElementById("tables-editor"), "load");
-    }
-
-    function closeEditTablesModal() {
-        document.getElementById("editTablesModal").classList.remove("show");
-    }
-
-    function editAppTables() {
-        showEditTablesModal();
-    }
-
-    function saveTablesFile() {
-        const editor = document.getElementById("tables-editor-content");
-        if (!editor) return;
-
-        fetch("/api/tables/source", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: editor.value }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    closeEditTablesModal();
-                    htmx.trigger(document.body, "taskCreated");
-                    showToast("Tables saved and synced to database", "success");
-                } else {
-                    showToast("Failed to save tables", "error");
-                }
-            })
-            .catch((err) => {
-                console.error("Failed to save tables:", err);
-                showToast("Failed to save tables", "error");
-            });
-    }
-
-    function showToast(message, type) {
-        // Simple toast notification
-        const toast = document.createElement("div");
-        toast.className = `toast toast-${type}`;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-
-    // Transform form data before sending to API - using global listener
-    document.body.addEventListener("htmx:configRequest", function (event) {
-        const form = event.detail.elt;
-        if (form.id !== "newIntentForm") return;
-
-        const formData = event.detail.parameters;
-
-        // Convert due_date to ISO 8601 format if present
-        if (formData.due_date && formData.due_date.trim() !== "") {
-            const date = new Date(formData.due_date);
-            formData.due_date = date.toISOString();
-        } else {
-            delete formData.due_date;
+    // Initialize on load
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof initTasksApp === "function") {
+            initTasksApp();
         }
-
-        // Remove empty optional fields
-        if (!formData.description || formData.description.trim() === "") {
-            delete formData.description;
-        }
-
-        // Handle auto-detect intent type
-        if (formData.intent_type === "auto") {
-            delete formData.intent_type;
-        }
+        // Load stats
+        loadTaskStats();
     });
 
-    // Currently selected task
-    window.selectedTaskId = null;
-    window.selectedTaskType = null;
+    // Load task statistics
+    function loadTaskStats() {
+        fetch("/api/tasks/stats")
+            .then((r) => r.json())
+            .then((stats) => {
+                if (stats.complete !== undefined)
+                    document.getElementById("count-complete").textContent =
+                        stats.complete;
+                if (stats.active !== undefined)
+                    document.getElementById("count-active").textContent =
+                        stats.active;
+                if (stats.awaiting !== undefined)
+                    document.getElementById("count-awaiting").textContent =
+                        stats.awaiting;
+                if (stats.paused !== undefined)
+                    document.getElementById("count-paused").textContent =
+                        stats.paused;
+                if (stats.blocked !== undefined)
+                    document.getElementById("count-blocked").textContent =
+                        stats.blocked;
+                if (stats.time_saved !== undefined)
+                    document.getElementById("time-saved-value").textContent =
+                        stats.time_saved;
+            })
+            .catch((e) => console.warn("Failed to load stats:", e));
+    }
 
-    // Select a task and load its details (global for HTMX onclick)
-    window.selectTask = function (taskId, taskType) {
-        window.selectedTaskId = taskId;
-        window.selectedTaskType = taskType || "task";
-
-        // Update UI selection state
-        document.querySelectorAll(".task-item, .task-card").forEach((el) => {
-            el.classList.remove("selected");
+    // Filter pill click handler
+    document.querySelectorAll(".filter-pill").forEach((pill) => {
+        pill.addEventListener("click", function () {
+            document
+                .querySelectorAll(".filter-pill")
+                .forEach((p) => p.classList.remove("active"));
+            this.classList.add("active");
         });
-        const selectedEl = document.querySelector(`[data-task-id="${taskId}"]`);
-        if (selectedEl) {
-            selectedEl.classList.add("selected");
-        }
-
-        // Show detail panel content
-        document.getElementById("task-detail-empty").style.display = "none";
-        document.getElementById("task-detail-content").style.display = "block";
-
-        // Hide all type-specific sections
-        document.getElementById("goal-progress-section").style.display = "none";
-        document.getElementById("pending-fill-section").style.display = "none";
-        document.getElementById("scheduler-info-section").style.display = "none";
-        document.getElementById("monitor-info-section").style.display = "none";
-        document.getElementById("table-info-section").style.display = "none";
-        document.getElementById("app-info-section").style.display = "none";
-
-        // Load details based on type
-        const endpoint = getEndpointForType(taskType, taskId);
-        fetch(endpoint)
-            .then((response) => response.json())
-            .then((data) => {
-                populateDetails(data, taskType);
-            })
-            .catch((err) => {
-                console.error("Failed to load details:", err);
-            });
-    };
-
-    function getEndpointForType(type, id) {
-        switch (type) {
-            case "goal":
-                return `/api/goals/${id}`;
-            case "pending":
-                return `/api/pending-info/${id}`;
-            case "scheduler":
-                return `/api/schedulers/${id}`;
-            case "monitor":
-                return `/api/monitors/${id}`;
-            case "table":
-                return `/api/tables/${id}`;
-            case "app":
-                return `/api/apps/${id}`;
-            default:
-                return `/api/tasks/${id}`;
-        }
-    }
-
-    function populateDetails(data, type) {
-        document.getElementById("detail-title").textContent =
-            data.title || data.name || "Untitled";
-        document.getElementById("detail-status-text").textContent =
-            data.status || "unknown";
-        document.getElementById("detail-priority-text").textContent =
-            data.priority || "normal";
-        document.getElementById("detail-description").textContent =
-            data.description || "No description provided.";
-
-        const dueDateText = data.due_date
-            ? new Date(data.due_date).toLocaleDateString()
-            : "No due date";
-        document.getElementById("detail-due-date-text").textContent = dueDateText;
-
-        const createdText = data.created_at
-            ? new Date(data.created_at).toLocaleString()
-            : "-";
-        document.getElementById("detail-created-at").textContent = createdText;
-
-        // Show type-specific sections
-        switch (type) {
-            case "goal":
-                document.getElementById("goal-progress-section").style.display = "block";
-                document.getElementById("goal-current-value").textContent = data.current_value || 0;
-                document.getElementById("goal-target-value").textContent = data.target_value || 0;
-                const percent = data.target_value ? Math.round((data.current_value / data.target_value) * 100) : 0;
-                document.getElementById("goal-percent").textContent = percent;
-                document.getElementById("goal-progress-fill").style.width = percent + "%";
-                document.getElementById("goal-last-action").textContent = "Last action: " + (data.last_action || "-");
-                break;
-
-            case "pending":
-                document.getElementById("pending-fill-section").style.display = "block";
-                document.getElementById("pending-fill-id").value = data.id;
-                document.getElementById("pending-fill-label").textContent = data.field_label || "Value";
-                document.getElementById("pending-reason").textContent = data.reason || "Required for app functionality";
-                break;
-
-            case "scheduler":
-                document.getElementById("scheduler-info-section").style.display = "block";
-                document.getElementById("scheduler-cron").textContent = "Cron: " + (data.cron || "-");
-                document.getElementById("scheduler-next").textContent = "Next run: " + (data.next_run || "-");
-                document.getElementById("scheduler-file").textContent = "File: .gbdialog/schedulers/" + (data.file || "-");
-                break;
-
-            case "monitor":
-                document.getElementById("monitor-info-section").style.display = "block";
-                document.getElementById("monitor-target").textContent = "Target: " + (data.target || "-");
-                document.getElementById("monitor-interval").textContent = "Interval: " + (data.interval || "-");
-                document.getElementById("monitor-last-check").textContent = "Last check: " + (data.last_check || "-");
-                document.getElementById("monitor-last-value").textContent = "Last value: " + (data.last_value || "-");
-                break;
-
-            case "table":
-                document.getElementById("table-info-section").style.display = "block";
-                document.getElementById("table-name").textContent = "Table: " + (data.name || "-");
-                document.getElementById("table-fields").textContent = "Fields: " + (data.fields?.join(", ") || "-");
-                document.getElementById("table-records").textContent = "Records: " + (data.record_count || 0);
-                document.getElementById("table-query-example").textContent = "FIND * IN " + (data.name || "table_name");
-                break;
-
-            case "app":
-                document.getElementById("app-info-section").style.display = "block";
-                document.getElementById("app-name").textContent = "App: " + (data.name || "-");
-                document.getElementById("app-url").textContent = "URL: /apps/" + (data.name || "-");
-                document.getElementById("app-tables").textContent = "Uses tables: " + (data.tables?.join(", ") || "-");
-                break;
-        }
-    }
-
-    // Update task status (global for onclick)
-    window.updateTaskStatus = function (newStatus) {
-        if (!window.selectedTaskId) return;
-
-        fetch(`/api/tasks/${window.selectedTaskId}/status`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: newStatus }),
-        })
-            .then((response) => {
-                if (response.ok) {
-                    htmx.trigger(document.body, "taskCreated");
-                    window.selectTask(window.selectedTaskId, window.selectedTaskType);
-                }
-            })
-            .catch((err) => console.error("Failed to update status:", err));
-    };
-
-    // Delete selected task (global for onclick)
-    window.deleteSelectedTask = function () {
-        if (!window.selectedTaskId) return;
-        if (!confirm("Are you sure you want to delete this?")) return;
-
-        const endpoint = getEndpointForType(window.selectedTaskType, window.selectedTaskId);
-        fetch(endpoint, { method: "DELETE" })
-            .then((response) => {
-                if (response.ok) {
-                    window.selectedTaskId = null;
-                    window.selectedTaskType = null;
-                    document.getElementById("task-detail-empty").style.display = "flex";
-                    document.getElementById("task-detail-content").style.display = "none";
-                    htmx.trigger(document.body, "taskCreated");
-                    showToast("Deleted successfully", "success");
-                }
-            })
-            .catch((err) => console.error("Failed to delete:", err));
-    };
-
-    // Edit selected task (global for onclick)
-    window.editSelectedTask = function () {
-        if (!window.selectedTaskId) return;
-
-        if (window.selectedTaskType === "table") {
-            showEditTablesModal();
-        } else {
-            alert("Edit functionality for " + window.selectedTaskType + ": " + window.selectedTaskId);
-        }
-    };
-
-    // Open app in new tab
-    window.openApp = function () {
-        if (window.selectedTaskType === "app" && window.selectedTaskId) {
-            window.open("/apps/" + window.selectedTaskId, "_blank");
-        }
-    };
-
-    // Close modal on escape key
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-            closeNewIntentModal();
-            closeEditTablesModal();
-        }
     });
 
-    // Close modal when clicking overlay
-    document.querySelectorAll(".modal-overlay").forEach((overlay) => {
-        overlay.addEventListener("click", (e) => {
-            if (e.target.classList.contains("modal-overlay")) {
-                closeNewIntentModal();
-                closeEditTablesModal();
+    // Modal functions
+    function showNewIntentModal() {
+        document.getElementById("new-intent-modal").style.display = "flex";
+    }
+
+    function closeNewIntentModal() {
+        document.getElementById("new-intent-modal").style.display = "none";
+    }
+
+    function showDecisionModal(decision) {
+        if (decision) {
+            document.getElementById("decision-question").innerHTML = `
+                <h4>${decision.title || "Decision Required"}</h4>
+                <p>${decision.description || ""}</p>
+            `;
+        }
+        document.getElementById("decision-modal").style.display = "flex";
+    }
+
+    function closeDecisionModal() {
+        document.getElementById("decision-modal").style.display = "none";
+    }
+
+    function submitNewIntent() {
+        const form = document.getElementById("new-intent-form");
+        const intent = form.querySelector('[name="intent"]').value;
+        if (intent.trim()) {
+            document.getElementById("quick-intent-input").value = intent;
+            htmx.trigger(document.getElementById("quick-intent-btn"), "click");
+            closeNewIntentModal();
+        }
+    }
+
+    function submitDecision() {
+        // Implementation for submitting decision
+        closeDecisionModal();
+        htmx.trigger(document.body, "taskCreated");
+    }
+
+    function skipDecision() {
+        closeDecisionModal();
+    }
+
+    // Task selection
+    function selectTask(taskId) {
+        // Update selection UI
+        document.querySelectorAll(".task-card").forEach((card) => {
+            card.classList.remove("selected");
+        });
+        const selectedCard = document.querySelector(
+            `[data-task-id="${taskId}"]`,
+        );
+        if (selectedCard) {
+            selectedCard.classList.add("selected");
+        }
+
+        // Show detail panel
+        document.getElementById("detail-empty").style.display = "none";
+        const detailContent = document.getElementById("task-detail-content");
+        detailContent.style.display = "block";
+
+        // Load task details
+        htmx.ajax("GET", `/api/tasks/${taskId}`, {
+            target: "#task-detail-content",
+            swap: "innerHTML",
+        });
+    }
+
+    function deselectTask() {
+        document.querySelectorAll(".task-card").forEach((card) => {
+            card.classList.remove("selected");
+        });
+        document.getElementById("detail-empty").style.display = "flex";
+        document.getElementById("task-detail-content").style.display = "none";
+    }
+
+    // Floating Progress Panel Functions
+    function showFloatingProgress(taskName) {
+        let panel = document.getElementById("floating-progress");
+        document.getElementById("floating-task-name").textContent =
+            taskName || "Processing...";
+        document.getElementById("floating-progress-fill").style.width = "0%";
+        document.getElementById("floating-progress-step").textContent =
+            "Starting...";
+        document.getElementById("floating-progress-percent").textContent = "0%";
+        document.getElementById("floating-progress-log").innerHTML = "";
+        const dot = panel.querySelector(".progress-dot");
+        if (dot) dot.classList.remove("completed", "error");
+        panel.style.display = "block";
+        panel.classList.remove("minimized");
+    }
+
+    function updateFloatingProgress(step, message, current, total, details) {
+        const panel = document.getElementById("floating-progress");
+        if (panel.style.display === "none") {
+            showFloatingProgress(message);
+        }
+
+        const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+        document.getElementById("floating-progress-fill").style.width =
+            percent + "%";
+        document.getElementById("floating-progress-step").textContent = message;
+        document.getElementById("floating-progress-percent").textContent =
+            percent + "%";
+
+        // Add log entry
+        if (step) {
+            const log = document.getElementById("floating-progress-log");
+            const entry = document.createElement("div");
+            entry.className = "log-entry";
+            const time = new Date().toLocaleTimeString();
+            entry.innerHTML = `<span class="log-time">${time}</span> <span class="log-step">[${step}]</span> ${message}`;
+            if (details) {
+                entry.innerHTML += `<br><span class="log-details">→ ${details}</span>`;
             }
-        });
-    });
-
-    // Close modal after successful form submission
-    document.body.addEventListener("htmx:afterRequest", (e) => {
-        if (e.detail.elt.id === "newIntentForm" && e.detail.successful) {
-            closeNewIntentModal();
-            showToast("Intent created successfully", "success");
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
         }
-    });
+    }
 
-    // Update stats counts on load
-    document.body.addEventListener("htmx:afterSwap", (e) => {
-        if (e.detail.target.id === "tasks-total-count") {
-            // Stats loaded, update pill counts
-            try {
-                const stats = JSON.parse(e.detail.target.textContent);
-                if (stats.total !== undefined) {
-                    document.getElementById("count-all").textContent = stats.total;
-                    document.getElementById("count-active").textContent = stats.running || 0;
-                    document.getElementById("count-completed").textContent = stats.completed || 0;
-                    document.getElementById("count-pending").textContent = stats.pending_count || 0;
-                    document.getElementById("count-goals").textContent = stats.goals_count || 0;
-                    document.getElementById("count-schedulers").textContent = stats.schedulers_count || 0;
-                    document.getElementById("count-monitors").textContent = stats.monitors_count || 0;
-                    document.getElementById("count-tables").textContent = stats.tables_count || 0;
-                    document.getElementById("count-apps").textContent = stats.apps_count || 0;
-                    e.detail.target.textContent = stats.total + " items";
-                }
-            } catch (err) {
-                // Not JSON, leave as is
+    function completeFloatingProgress(message) {
+        document.getElementById("floating-progress-fill").style.width = "100%";
+        document.getElementById("floating-progress-step").textContent =
+            message || "Completed!";
+        document.getElementById("floating-progress-percent").textContent =
+            "100%";
+        const panel = document.getElementById("floating-progress");
+        const dot = panel.querySelector(".progress-dot");
+        if (dot) dot.classList.add("completed");
+
+        // Refresh task list
+        htmx.trigger(document.body, "taskCreated");
+        loadTaskStats();
+
+        // Auto-hide after 5 seconds
+        setTimeout(closeFloatingProgress, 5000);
+    }
+
+    function errorFloatingProgress(errorMessage) {
+        document.getElementById("floating-progress-step").textContent =
+            "Error: " + errorMessage;
+        const panel = document.getElementById("floating-progress");
+        const dot = panel.querySelector(".progress-dot");
+        if (dot) dot.classList.add("error");
+    }
+
+    function minimizeFloatingProgress() {
+        document
+            .getElementById("floating-progress")
+            .classList.toggle("minimized");
+    }
+
+    function closeFloatingProgress() {
+        const panel = document.getElementById("floating-progress");
+        panel.style.display = "none";
+        const dot = panel.querySelector(".progress-dot");
+        if (dot) dot.classList.remove("completed", "error");
+    }
+
+    // Listen for HTMX events to refresh stats
+    document.body.addEventListener("htmx:afterSwap", function (e) {
+        if (e.detail.target.id === "task-list") {
+            loadTaskStats();
+            // Show empty state if no tasks
+            const taskList = document.getElementById("task-list");
+            const emptyState = document.getElementById("empty-state");
+            if (taskList && emptyState) {
+                const hasTasks = taskList.querySelector(".task-card");
+                emptyState.style.display = hasTasks ? "none" : "flex";
             }
         }
     });

@@ -1,6 +1,6 @@
 /* =============================================================================
-   AUTO TASK JAVASCRIPT - Intelligent Self-Executing Task Interface
-   Premium VIP Mode Functionality
+   AUTO TASK JAVASCRIPT - Sentient Theme
+   Intelligent Self-Executing Task Interface
    ============================================================================= */
 
 // =============================================================================
@@ -8,13 +8,17 @@
 // =============================================================================
 
 const AutoTaskState = {
-  currentFilter: "all",
-  tasks: [],
+  currentFilter: "active",
+  selectedIntentId: null,
+  intents: [],
   compiledPlan: null,
   pendingDecisions: [],
   pendingApprovals: [],
   refreshInterval: null,
   wsConnection: null,
+  progressWsConnection: null,
+  activeTaskProgress: {},
+  llmOutputStream: [],
 };
 
 // =============================================================================
@@ -29,6 +33,9 @@ function initAutoTask() {
   // Initialize WebSocket for real-time updates
   initWebSocket();
 
+  // Initialize task progress WebSocket
+  initTaskProgressWebSocket();
+
   // Start auto-refresh
   startAutoRefresh();
 
@@ -41,7 +48,101 @@ function initAutoTask() {
   // Setup keyboard shortcuts
   setupKeyboardShortcuts();
 
-  console.log("AutoTask initialized");
+  // Initialize floating panel (hidden by default)
+  initFloatingPanel();
+
+  console.log("AutoTask Sentient initialized");
+}
+
+// =============================================================================
+// FLOATING PANEL
+// =============================================================================
+
+function initFloatingPanel() {
+  const panel = document.getElementById("floating-progress");
+  if (panel) {
+    panel.style.display = "none";
+  }
+}
+
+function showFloatingPanel(taskId, taskName) {
+  const panel = document.getElementById("floating-progress");
+  if (!panel) return;
+
+  panel.style.display = "block";
+  panel.dataset.taskId = taskId;
+
+  const nameEl = document.getElementById("floating-task-name");
+  if (nameEl) nameEl.textContent = taskName || "Processing...";
+
+  updateFloatingProgress(0, 0, 0, "Initializing...");
+}
+
+function updateFloatingProgress(progress, current, total, statusText) {
+  const fill = document.getElementById("floating-progress-fill");
+  const pct = document.getElementById("floating-percentage");
+  const steps = document.getElementById("floating-status-steps");
+  const status = document.getElementById("floating-status-text");
+
+  if (fill) fill.style.width = `${progress}%`;
+  if (pct) pct.textContent = `${progress}%`;
+  if (steps) steps.textContent = `${current}/${total}`;
+  if (status) status.textContent = statusText;
+}
+
+function addFloatingLog(icon, message, type = "info") {
+  const log = document.getElementById("floating-log");
+  if (!log) return;
+
+  const entry = document.createElement("div");
+  entry.className = `floating-log-entry ${type}`;
+  entry.innerHTML = `
+    <span class="log-icon">${icon}</span>
+    <span class="log-message">${escapeHtml(message)}</span>
+    <span class="log-time">${formatTime(new Date())}</span>
+  `;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function addFloatingTerminalOutput(text) {
+  const terminal = document.getElementById("floating-terminal");
+  if (!terminal) return;
+
+  const line = document.createElement("div");
+  line.className = "llm-output";
+  line.textContent = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+
+  // Keep only last 50 lines
+  while (terminal.children.length > 50) {
+    terminal.removeChild(terminal.firstChild);
+  }
+}
+
+function minimizeFloatingPanel() {
+  const panel = document.getElementById("floating-progress");
+  if (panel) {
+    panel.classList.toggle("minimized");
+  }
+}
+
+function closeFloatingPanel() {
+  const panel = document.getElementById("floating-progress");
+  if (panel) {
+    panel.style.display = "none";
+  }
+}
+
+function completeFloatingPanel(message) {
+  updateFloatingProgress(100, 0, 0, message || "Complete!");
+  addFloatingLog("✅", message || "Task completed successfully", "success");
+
+  // Auto-hide after delay
+  setTimeout(() => {
+    closeFloatingPanel();
+  }, 5000);
 }
 
 // =============================================================================
@@ -76,10 +177,485 @@ function initWebSocket() {
   }
 }
 
+function initTaskProgressWebSocket() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsUrl = `${protocol}//${window.location.host}/ws/task-progress`;
+
+  try {
+    AutoTaskState.progressWsConnection = new WebSocket(wsUrl);
+
+    AutoTaskState.progressWsConnection.onopen = function () {
+      console.log("Task Progress WebSocket connected");
+    };
+
+    AutoTaskState.progressWsConnection.onmessage = function (event) {
+      handleTaskProgressMessage(JSON.parse(event.data));
+    };
+
+    AutoTaskState.progressWsConnection.onclose = function () {
+      console.log("Task Progress WebSocket disconnected, reconnecting...");
+      setTimeout(initTaskProgressWebSocket, 3000);
+    };
+
+    AutoTaskState.progressWsConnection.onerror = function (error) {
+      console.error("Task Progress WebSocket error:", error);
+    };
+  } catch (e) {
+    console.warn("Task Progress WebSocket not available");
+  }
+}
+
+function handleTaskProgressMessage(data) {
+  console.log("Task progress:", data);
+
+  switch (data.type) {
+    case "connected":
+      console.log("Connected to task progress stream");
+      break;
+    case "task_started":
+      onTaskStarted(data);
+      break;
+    case "task_progress":
+      onTaskProgress(data);
+      break;
+    case "task_completed":
+      onTaskProgressCompleted(data);
+      break;
+    case "task_error":
+      onTaskProgressError(data);
+      break;
+    case "llm_stream":
+      onLLMStream(data);
+      break;
+    default:
+      console.log("Unknown progress event:", data.type);
+  }
+}
+
+function onTaskStarted(data) {
+  AutoTaskState.activeTaskProgress[data.task_id] = {
+    started: new Date(),
+    totalSteps: data.total_steps,
+    currentStep: 0,
+    progress: 0,
+    logs: [],
+  };
+
+  // Show floating panel
+  showFloatingPanel(data.task_id, data.message);
+  addFloatingLog("🚀", data.message, "started");
+
+  // Also update detail panel if viewing this intent
+  if (AutoTaskState.selectedIntentId === data.task_id) {
+    updateDetailPanelProgress(data);
+  }
+}
+
+function onTaskProgress(data) {
+  const taskProgress = AutoTaskState.activeTaskProgress[data.task_id];
+  if (taskProgress) {
+    taskProgress.currentStep = data.current_step;
+    taskProgress.progress = data.progress;
+    taskProgress.logs.push({
+      time: new Date(),
+      step: data.step,
+      message: data.message,
+      details: data.details,
+    });
+  }
+
+  // Update floating panel
+  updateFloatingProgress(
+    data.progress,
+    data.current_step,
+    data.total_steps,
+    data.message,
+  );
+
+  const stepIcons = {
+    llm_request: "🤖",
+    llm_response: "✨",
+    parse_structure: "📋",
+    create_tables: "🗄️",
+    tables_synced: "✅",
+    write_files: "📝",
+    write_file: "📄",
+    write_designer: "🎨",
+    write_tools: "🔧",
+    sync_site: "🔄",
+  };
+  const icon = stepIcons[data.step] || "📌";
+  addFloatingLog(icon, data.message, "progress");
+
+  // Update detail panel if viewing this intent
+  if (AutoTaskState.selectedIntentId === data.task_id) {
+    updateDetailPanelProgress(data);
+    addTerminalLine(data.message);
+  }
+}
+
+function onTaskProgressCompleted(data) {
+  const taskProgress = AutoTaskState.activeTaskProgress[data.task_id];
+  if (taskProgress) {
+    taskProgress.progress = 100;
+    taskProgress.completed = new Date();
+  }
+
+  completeFloatingPanel(data.message);
+
+  // Refresh intent list
+  setTimeout(() => {
+    refreshIntents();
+    updateStats();
+  }, 1000);
+}
+
+function onTaskProgressError(data) {
+  addFloatingLog("❌", data.error, "error");
+  updateFloatingProgress(
+    AutoTaskState.activeTaskProgress[data.task_id]?.progress || 0,
+    0,
+    0,
+    `Error: ${data.error}`,
+  );
+}
+
+function onLLMStream(data) {
+  // Stream LLM output to terminal
+  addFloatingTerminalOutput(data.text);
+  if (AutoTaskState.selectedIntentId === data.task_id) {
+    addTerminalLine(data.text, true);
+  }
+}
+
+function addTerminalLine(text, isLLM = false) {
+  const terminal = document.querySelector(
+    `#terminal-${AutoTaskState.selectedIntentId}`,
+  );
+  if (!terminal) return;
+
+  const line = document.createElement("div");
+  line.className = `terminal-line${isLLM ? " highlight" : ""}`;
+  line.textContent = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
+
+function updateDetailPanelProgress(data) {
+  // Update progress bar in detail panel
+  const progressFill = document.querySelector(
+    ".detail-progress .progress-fill",
+  );
+  const progressSteps = document.querySelector(
+    ".detail-progress .progress-steps",
+  );
+  const progressPct = document.querySelector(
+    ".detail-progress .progress-percent",
+  );
+
+  if (progressFill) progressFill.style.width = `${data.progress}%`;
+  if (progressSteps)
+    progressSteps.textContent = `${data.current_step}/${data.total_steps} Steps`;
+  if (progressPct) progressPct.textContent = `${data.progress}%`;
+}
+
+// =============================================================================
+// INTENT SELECTION & DETAIL PANEL
+// =============================================================================
+
+function selectIntent(intentId) {
+  // Update selected state
+  document.querySelectorAll(".intent-card").forEach((card) => {
+    card.classList.remove("selected");
+  });
+
+  const selectedCard = document.querySelector(
+    `.intent-card[data-intent-id="${intentId}"]`,
+  );
+  if (selectedCard) {
+    selectedCard.classList.add("selected");
+  }
+
+  AutoTaskState.selectedIntentId = intentId;
+
+  // Load detail panel
+  loadIntentDetail(intentId);
+}
+
+function loadIntentDetail(intentId) {
+  const panel = document.getElementById("intent-detail-panel");
+  if (!panel) return;
+
+  // Show loading state
+  panel.innerHTML = `
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Loading intent details...</span>
+    </div>
+  `;
+
+  // Fetch intent details
+  fetch(`/api/autotask/${intentId}`)
+    .then((response) => response.json())
+    .then((data) => {
+      renderIntentDetail(data);
+    })
+    .catch((error) => {
+      console.error("Failed to load intent detail:", error);
+      panel.innerHTML = `
+        <div class="detail-placeholder">
+          <span class="placeholder-icon">⚠️</span>
+          <p>Failed to load intent details</p>
+        </div>
+      `;
+    });
+}
+
+function renderIntentDetail(intent) {
+  const panel = document.getElementById("intent-detail-panel");
+  if (!panel) return;
+
+  const statusIcons = {
+    active: "⚡",
+    complete: "✓",
+    paused: "⏸",
+    blocked: "⚠",
+    awaiting: "⏳",
+  };
+
+  const healthClass =
+    intent.health >= 80 ? "good" : intent.health >= 50 ? "warning" : "bad";
+
+  panel.innerHTML = `
+    <div class="detail-view">
+      <!-- Header -->
+      <div class="detail-header">
+        <button class="btn-back" onclick="closeDetailPanel()">
+          <span>◀</span>
+        </button>
+        <h2 class="detail-title">${escapeHtml(intent.title || intent.intent)}</h2>
+        <div class="detail-status">
+          <span class="status-icon">${statusIcons[intent.status] || "⚡"}</span>
+          <span class="status-label">${intent.status_display || intent.status}</span>
+        </div>
+        <button class="btn-pause" onclick="togglePause('${intent.id}')">
+          <span class="pause-icon">${intent.status === "paused" ? "▶" : "⏸"}</span>
+        </button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="detail-progress">
+        <div class="progress-bar large">
+          <div class="progress-fill" style="width: ${intent.progress || 0}%"></div>
+        </div>
+        <div class="progress-stats">
+          <span class="progress-steps">${intent.current_step || 0}/${intent.total_steps || 0} Steps</span>
+          <span class="progress-percent">${intent.progress || 0}%</span>
+        </div>
+      </div>
+
+      ${
+        intent.decision_required
+          ? `
+      <!-- Decision Required Panel -->
+      <div class="decision-panel">
+        <div class="decision-header">
+          <span class="decision-badge">DECISION REQUIRED</span>
+          <span class="decision-title">${escapeHtml(intent.decision_title || "Decision needed")}</span>
+        </div>
+        <div class="decision-body">
+          <div class="decision-actions">
+            <button class="btn-decision-primary" onclick="openDecisionModal('${intent.id}')">
+              Make Decision
+            </button>
+            <button class="btn-decision-secondary" onclick="viewDecisionContext('${intent.id}')">
+              View Context Details
+            </button>
+          </div>
+          <div class="decision-context">
+            <div class="context-label">Context:</div>
+            <p class="context-text">${escapeHtml(intent.decision_context || "")}</p>
+          </div>
+        </div>
+      </div>
+      `
+          : ""
+      }
+
+      <!-- Status Section -->
+      <div class="detail-section">
+        <div class="section-header">
+          <span class="section-title">STATUS</span>
+          <span class="section-runtime">Runtime: ${intent.runtime || "0 min"}</span>
+        </div>
+        <div class="status-current-task">
+          <span class="task-name">${escapeHtml(intent.current_task_name || "Processing...")}</span>
+          <span class="task-estimate">Estimated: ${intent.estimated_time || "calculating..."}</span>
+        </div>
+        <div class="status-steps-preview">
+          ${renderStepsPreview(intent.steps || [])}
+        </div>
+      </div>
+
+      <!-- Progress Log Section -->
+      <div class="detail-section">
+        <div class="section-header">
+          <span class="section-title">PROGRESS LOG</span>
+        </div>
+        <div class="progress-log" id="progress-log-${intent.id}">
+          ${renderProgressLog(intent.logs || [])}
+        </div>
+      </div>
+
+      <!-- Terminal Activity Section -->
+      <div class="detail-section terminal-section">
+        <div class="section-header">
+          <span class="section-title">TERMINAL (LIVE AGENT ACTIVITY)</span>
+          <span class="terminal-stats">
+            Processed: <strong>${intent.processed_count || 0}</strong> data points /
+            Processing speed: <strong>${intent.processing_speed || "~8 sources/s"}</strong> /
+            Estimated completion: <strong>${intent.estimated_completion || "calculating"}</strong>
+          </span>
+        </div>
+        <div class="terminal-output" id="terminal-${intent.id}">
+          <div class="terminal-line">Initializing agent...</div>
+        </div>
+        <div class="terminal-cursor"></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderStepsPreview(steps) {
+  if (!steps || steps.length === 0) {
+    return '<div class="step-item pending"><span class="step-dot"></span><span class="step-name">No steps yet</span></div>';
+  }
+
+  return steps
+    .slice(0, 3)
+    .map(
+      (step) => `
+    <div class="step-item ${step.status || "pending"}">
+      <span class="step-dot"></span>
+      <span class="step-name">${escapeHtml(step.name)}</span>
+      ${step.note ? `<span class="step-note">${escapeHtml(step.note)}</span>` : ""}
+    </div>
+  `,
+    )
+    .join("");
+}
+
+function renderProgressLog(logs) {
+  if (!logs || logs.length === 0) {
+    return '<div class="log-entry"><div class="log-entry-header"><span class="log-icon pending">●</span><span class="log-title">Waiting for activity...</span></div></div>';
+  }
+
+  return logs
+    .map(
+      (log) => `
+    <div class="log-entry ${log.expanded ? "expanded" : ""}">
+      <div class="log-entry-header" onclick="toggleLogEntry(this)">
+        <span class="log-icon ${log.status || "pending"}">●</span>
+        <span class="log-title">${escapeHtml(log.title)}</span>
+        <span class="log-expand">▶</span>
+        ${log.step_label ? `<span class="log-step-badge">${escapeHtml(log.step_label)}</span>` : ""}
+      </div>
+      <div class="log-entry-body">
+        <div class="log-sub-entries">
+          ${(log.sub_entries || [])
+            .map(
+              (sub) => `
+            <div class="log-sub-entry">
+              <span class="sub-icon ${sub.status || "complete"}">●</span>
+              <span class="sub-text">${escapeHtml(sub.text)}</span>
+              <span class="sub-duration">Duration: ${sub.duration || "< 1 min"}</span>
+              <span class="sub-check">${sub.status === "complete" ? "✓" : ""}</span>
+            </div>
+          `,
+            )
+            .join("")}
+        </div>
+      </div>
+    </div>
+  `,
+    )
+    .join("");
+}
+
+function toggleLogEntry(header) {
+  const entry = header.closest(".log-entry");
+  if (entry) {
+    entry.classList.toggle("expanded");
+  }
+}
+
+function closeDetailPanel() {
+  AutoTaskState.selectedIntentId = null;
+
+  document.querySelectorAll(".intent-card").forEach((card) => {
+    card.classList.remove("selected");
+  });
+
+  const panel = document.getElementById("intent-detail-panel");
+  if (panel) {
+    panel.innerHTML = `
+      <div class="detail-placeholder">
+        <span class="placeholder-icon">📋</span>
+        <p>Select an intent to view details</p>
+      </div>
+    `;
+  }
+}
+
+function viewDetailedIntent(intentId) {
+  selectIntent(intentId);
+}
+
+function togglePause(intentId) {
+  const intent = AutoTaskState.intents.find((i) => i.id === intentId);
+  if (!intent) return;
+
+  const action = intent.status === "paused" ? "resume" : "pause";
+
+  fetch(`/api/autotask/${intentId}/${action}`, { method: "POST" })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.success) {
+        showToast(`Intent ${action}d`, "success");
+        refreshIntents();
+        if (AutoTaskState.selectedIntentId === intentId) {
+          loadIntentDetail(intentId);
+        }
+      } else {
+        showToast(`Failed to ${action} intent`, "error");
+      }
+    })
+    .catch((error) => {
+      console.error(`Failed to ${action} intent:`, error);
+      showToast(`Failed to ${action} intent`, "error");
+    });
+}
+
+function formatTime(date) {
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function handleWebSocketMessage(data) {
   switch (data.type) {
     case "task_update":
-      updateTaskInList(data.task);
+    case "intent_update":
+      updateIntentInList(data.task || data.intent);
       break;
     case "step_progress":
       updateStepProgress(data.taskId, data.step, data.progress);
@@ -91,15 +667,52 @@ function handleWebSocketMessage(data) {
       showApprovalNotification(data.approval);
       break;
     case "task_completed":
-      onTaskCompleted(data.task);
+    case "intent_completed":
+      onIntentCompleted(data.task || data.intent);
       break;
     case "task_failed":
-      onTaskFailed(data.task, data.error);
+    case "intent_failed":
+      onIntentFailed(data.task || data.intent, data.error);
       break;
     case "stats_update":
       updateStatsFromData(data.stats);
       break;
   }
+}
+
+function updateIntentInList(intent) {
+  const card = document.querySelector(
+    `.intent-card[data-intent-id="${intent.id}"]`,
+  );
+  if (card) {
+    // Update progress
+    const progressFill = card.querySelector(".progress-fill");
+    const progressSteps = card.querySelector(".progress-steps");
+    const progressPct = card.querySelector(".progress-percent");
+
+    if (progressFill) progressFill.style.width = `${intent.progress}%`;
+    if (progressSteps)
+      progressSteps.textContent = `${intent.current_step}/${intent.total_steps} Steps`;
+    if (progressPct) progressPct.textContent = `${intent.progress}%`;
+
+    // Update status indicator
+    const statusIndicator = card.querySelector(".intent-status-indicator");
+    if (statusIndicator) {
+      statusIndicator.className = `intent-status-indicator ${intent.status}`;
+    }
+  }
+}
+
+function onIntentCompleted(intent) {
+  showToast(`Intent completed: ${intent.title || intent.id}`, "success");
+  updateIntentInList(intent);
+  updateStats();
+}
+
+function onIntentFailed(intent, error) {
+  showToast(`Intent failed: ${intent.title || intent.id} - ${error}`, "error");
+  updateIntentInList(intent);
+  updateStats();
 }
 
 // =============================================================================
@@ -212,28 +825,33 @@ function updateStats() {
 }
 
 function updateStatsFromData(stats) {
-  // Header stats
-  document.getElementById("stat-running").textContent = stats.running || 0;
-  document.getElementById("stat-pending").textContent = stats.pending || 0;
-  document.getElementById("stat-completed").textContent = stats.completed || 0;
-  document.getElementById("stat-approval").textContent =
-    stats.pending_approval || 0;
+  // Sentient filter counts
+  const countComplete = document.getElementById("count-complete");
+  const countActive = document.getElementById("count-active");
+  const countAwaiting = document.getElementById("count-awaiting");
+  const countPaused = document.getElementById("count-paused");
+  const countBlocked = document.getElementById("count-blocked");
+  const timeSaved = document.getElementById("time-saved");
 
-  // Filter counts
-  document.getElementById("count-all").textContent = stats.total || 0;
-  document.getElementById("count-running").textContent = stats.running || 0;
-  document.getElementById("count-approval").textContent =
-    stats.pending_approval || 0;
-  document.getElementById("count-decision").textContent =
-    stats.pending_decision || 0;
+  if (countComplete) countComplete.textContent = stats.completed || 0;
+  if (countActive) countActive.textContent = stats.running || stats.active || 0;
+  if (countAwaiting)
+    countAwaiting.textContent = stats.pending_decision || stats.awaiting || 0;
+  if (countPaused) countPaused.textContent = stats.paused || 0;
+  if (countBlocked)
+    countBlocked.textContent = stats.blocked || stats.failed || 0;
+  if (timeSaved) timeSaved.textContent = stats.time_saved || "0 hrs this week";
 
-  // Highlight if approvals needed
-  const approvalStat = document.querySelector(".stat-item.highlight");
-  if (approvalStat && stats.pending_approval > 0) {
-    approvalStat.classList.add("attention");
-  } else if (approvalStat) {
-    approvalStat.classList.remove("attention");
-  }
+  // Legacy support
+  const statRunning = document.getElementById("stat-running");
+  const statPending = document.getElementById("stat-pending");
+  const statCompleted = document.getElementById("stat-completed");
+  const statApproval = document.getElementById("stat-approval");
+
+  if (statRunning) statRunning.textContent = stats.running || 0;
+  if (statPending) statPending.textContent = stats.pending || 0;
+  if (statCompleted) statCompleted.textContent = stats.completed || 0;
+  if (statApproval) statApproval.textContent = stats.pending_approval || 0;
 }
 
 // =============================================================================
@@ -256,6 +874,23 @@ function filterTasks(filter, button) {
   });
 }
 
+// Sentient status filter
+function filterByStatus(status, button) {
+  AutoTaskState.currentFilter = status;
+
+  // Update active filter
+  document.querySelectorAll(".status-filter").forEach((filter) => {
+    filter.classList.remove("active");
+  });
+  button.classList.add("active");
+
+  // Trigger HTMX request for intent list
+  htmx.ajax("GET", `/api/autotask/list?status=${status}`, {
+    target: "#intent-list",
+    swap: "innerHTML",
+  });
+}
+
 function refreshTasks() {
   const filter = AutoTaskState.currentFilter;
   htmx.ajax("GET", `/api/autotask/list?filter=${filter}`, {
@@ -263,6 +898,176 @@ function refreshTasks() {
     swap: "innerHTML",
   });
   updateStats();
+}
+
+function refreshIntents() {
+  const status = AutoTaskState.currentFilter;
+  htmx.ajax("GET", `/api/autotask/list?status=${status}`, {
+    target: "#intent-list",
+    swap: "innerHTML",
+  });
+  updateStats();
+}
+
+// =============================================================================
+// MODAL FUNCTIONS - SENTIENT
+// =============================================================================
+
+function showNewIntentModal() {
+  const modal = document.getElementById("new-intent-modal");
+  if (modal) {
+    modal.style.display = "flex";
+    document.body.classList.add("modal-open");
+    setTimeout(() => {
+      document.getElementById("intent-input")?.focus();
+    }, 100);
+  }
+}
+
+function closeNewIntentModal() {
+  const modal = document.getElementById("new-intent-modal");
+  if (modal) {
+    modal.style.display = "none";
+    document.body.classList.remove("modal-open");
+  }
+}
+
+function openDecisionModal(intentId) {
+  const modal = document.getElementById("decision-modal");
+  if (!modal) return;
+
+  modal.style.display = "flex";
+  document.body.classList.add("modal-open");
+
+  const content = document.getElementById("decision-content");
+  if (content) {
+    content.innerHTML = `
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Loading decision options...</span>
+      </div>
+    `;
+  }
+
+  // Fetch decision details
+  fetch(`/api/autotask/${intentId}/decisions`)
+    .then((response) => response.json())
+    .then((decisions) => {
+      renderDecisionContent(intentId, decisions);
+    })
+    .catch((error) => {
+      console.error("Failed to load decisions:", error);
+      if (content) {
+        content.innerHTML = `
+          <div class="detail-placeholder">
+            <span class="placeholder-icon">⚠️</span>
+            <p>Failed to load decision options</p>
+          </div>
+        `;
+      }
+    });
+}
+
+function renderDecisionContent(intentId, decisions) {
+  const content = document.getElementById("decision-content");
+  if (!content || !decisions || decisions.length === 0) {
+    if (content) {
+      content.innerHTML = `
+        <div class="detail-placeholder">
+          <span class="placeholder-icon">✓</span>
+          <p>No pending decisions</p>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  const decision = decisions[0];
+  content.innerHTML = `
+    <div class="decision-detail">
+      <h3>${escapeHtml(decision.title)}</h3>
+      <p class="decision-desc">${escapeHtml(decision.description)}</p>
+
+      <div class="decision-options-list">
+        ${decision.options
+          .map(
+            (opt, idx) => `
+          <label class="decision-option-item ${opt.recommended ? "recommended" : ""}">
+            <input type="radio" name="decision_option" value="${opt.id}" ${idx === 0 ? "checked" : ""}>
+            <div class="option-content">
+              <span class="option-label">${escapeHtml(opt.label)}</span>
+              ${opt.recommended ? '<span class="recommended-tag">Recommended</span>' : ""}
+              <p class="option-desc">${escapeHtml(opt.description || "")}</p>
+            </div>
+          </label>
+        `,
+          )
+          .join("")}
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-secondary" onclick="closeDecisionModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitDecisionFromModal('${intentId}', '${decision.id}')">
+          Submit Decision
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function submitDecisionFromModal(intentId, decisionId) {
+  const selectedOption = document.querySelector(
+    'input[name="decision_option"]:checked',
+  )?.value;
+
+  if (!selectedOption) {
+    showToast("Please select an option", "warning");
+    return;
+  }
+
+  fetch(`/api/autotask/${intentId}/decide`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      decision_id: decisionId,
+      option_id: selectedOption,
+    }),
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.success) {
+        showToast("Decision submitted", "success");
+        closeDecisionModal();
+        refreshIntents();
+        if (AutoTaskState.selectedIntentId === intentId) {
+          loadIntentDetail(intentId);
+        }
+      } else {
+        showToast(`Failed: ${result.error || "Unknown error"}`, "error");
+      }
+    })
+    .catch((error) => {
+      console.error("Failed to submit decision:", error);
+      showToast("Failed to submit decision", "error");
+    });
+}
+
+function closeDecisionModal() {
+  const modal = document.getElementById("decision-modal");
+  if (modal) {
+    modal.style.display = "none";
+    document.body.classList.remove("modal-open");
+  }
+}
+
+function viewDecisionContext(intentId) {
+  openDecisionModal(intentId);
+}
+
+function closeAllModals() {
+  closeNewIntentModal();
+  closeDecisionModal();
+  document.body.classList.remove("modal-open");
 }
 
 // =============================================================================

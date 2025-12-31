@@ -1,492 +1,479 @@
-<div class="autotask-container">
-    <!-- Header -->
-    <div class="autotask-header">
-        <div class="header-content">
-            <h1 class="autotask-title">
-                <span class="autotask-icon">⚡</span>
-                Auto Tasks
-                <span class="beta-badge">PREMIUM</span>
-            </h1>
-            <p class="autotask-subtitle">Intelligent self-executing tasks powered by AI</p>
+<div class="autotask-container" data-theme="sentient">
+    <!-- Top Navigation Bar -->
+    <div class="autotask-topbar">
+        <div class="topbar-left">
+            <div class="nav-tabs">
+                <button class="nav-tab active">Dashboard</button>
+                <button class="nav-tab">Analytics</button>
+            </div>
         </div>
-        <div class="header-stats" id="autotask-stats">
-            <span class="stat-item">
-                <span class="stat-value" id="stat-running">0</span>
-                <span class="stat-label">Running</span>
-            </span>
-            <span class="stat-item">
-                <span class="stat-value" id="stat-pending">0</span>
-                <span class="stat-label">Pending</span>
-            </span>
-            <span class="stat-item">
-                <span class="stat-value" id="stat-completed">0</span>
-                <span class="stat-label">Completed</span>
-            </span>
-            <span class="stat-item highlight">
-                <span class="stat-value" id="stat-approval">0</span>
-                <span class="stat-label">Need Approval</span>
-            </span>
+        <div class="topbar-center">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input
+                    type="text"
+                    class="search-input"
+                    placeholder="Search Intents"
+                    id="intent-search"
+                />
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-new-intent" onclick="showNewIntentModal()">
+                <span>New Intent</span>
+            </button>
+            <button class="btn-settings">Settings</button>
+            <div class="user-profile">
+                <div class="user-avatar">👤</div>
+                <span class="user-name">Profile 1</span>
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="notification-bell">
+                <span class="bell-icon">🔔</span>
+                <span class="notification-count" id="notification-count"
+                    >3</span
+                >
+            </div>
         </div>
     </div>
 
-    <!-- Intent Input Section -->
-    <div class="intent-section">
-        <div class="intent-header">
-            <span class="section-icon">💡</span>
-            <h2>What would you like to accomplish?</h2>
+    <!-- Status Filter Pills -->
+    <div class="status-filters">
+        <button
+            class="status-filter"
+            data-filter="complete"
+            onclick="filterByStatus('complete', this)"
+        >
+            <span class="filter-icon">✓</span>
+            <span class="filter-label">Complete</span>
+            <span class="filter-count" id="count-complete">8</span>
+        </button>
+        <button
+            class="status-filter active"
+            data-filter="active"
+            onclick="filterByStatus('active', this)"
+        >
+            <span class="filter-icon">⚡</span>
+            <span class="filter-label">Active Intents</span>
+            <span class="filter-count" id="count-active">12</span>
+        </button>
+        <button
+            class="status-filter"
+            data-filter="awaiting"
+            onclick="filterByStatus('awaiting', this)"
+        >
+            <span class="filter-icon">⏳</span>
+            <span class="filter-label">Awaiting Decision</span>
+            <span class="filter-count" id="count-awaiting">5</span>
+        </button>
+        <button
+            class="status-filter"
+            data-filter="paused"
+            onclick="filterByStatus('paused', this)"
+        >
+            <span class="filter-icon">⏸</span>
+            <span class="filter-label">Paused</span>
+            <span class="filter-count" id="count-paused">2</span>
+        </button>
+        <button
+            class="status-filter"
+            data-filter="blocked"
+            onclick="filterByStatus('blocked', this)"
+        >
+            <span class="filter-icon">⚠</span>
+            <span class="filter-label">Blocked/Issues</span>
+            <span class="filter-count" id="count-blocked">1</span>
+        </button>
+        <div class="time-saved">
+            <span class="time-label">Active Time Saved:</span>
+            <span class="time-value" id="time-saved">23.5 hrs this week</span>
         </div>
-        <form class="intent-form" id="intent-form" hx-post="/api/autotask/create" hx-ext="json-enc" hx-target="#compilation-result" hx-indicator="#compile-spinner">
-            <div class="intent-input-wrapper">
-                <textarea
-                    name="intent"
-                    id="intent-input"
-                    class="intent-input"
-                    placeholder="Describe your task in natural language...&#10;&#10;Examples:&#10;• Make a financial CRM for Deloitte with client management and reporting&#10;• Create a website that collects leads and sends them to Salesforce&#10;• Build an automated email campaign for product launch&#10;• Analyze sales data and generate weekly reports"
-                    rows="4"
-                    required
-                ></textarea>
-                <div class="intent-actions">
-                    <select name="execution_mode" class="execution-mode-select">
-                        <option value="semi-automatic">Semi-Automatic (Recommended)</option>
-                        <option value="supervised">Supervised (Step-by-step)</option>
-                        <option value="fully-automatic">Fully Automatic</option>
-                        <option value="dry-run">Dry Run (Simulate Only)</option>
-                    </select>
-                    <select name="priority" class="priority-select">
-                        <option value="medium">Medium Priority</option>
-                        <option value="critical">Critical</option>
-                        <option value="high">High</option>
-                        <option value="low">Low</option>
-                        <option value="background">Background</option>
-                    </select>
-                    <button type="submit" class="btn-create">
-                        <span class="btn-icon">🚀</span>
-                        Create & Execute
-                        <span class="spinner" id="compile-spinner"></span>
-                    </button>
-                </div>
-            </div>
-        </form>
-
-        <!-- Compilation Result -->
-        <div id="compilation-result" class="compilation-result"></div>
     </div>
 
-    <!-- Active Tasks Section -->
-    <div class="tasks-section">
-        <div class="section-header">
-            <div class="section-title">
-                <span class="section-icon">📋</span>
-                <h2>Active Tasks</h2>
-            </div>
-            <div class="section-actions">
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="all" onclick="filterTasks('all', this)">
-                        All <span class="count" id="count-all">0</span>
-                    </button>
-                    <button class="filter-tab" data-filter="running" onclick="filterTasks('running', this)">
-                        Running <span class="count" id="count-running">0</span>
-                    </button>
-                    <button class="filter-tab" data-filter="approval" onclick="filterTasks('approval', this)">
-                        Need Approval <span class="count" id="count-approval">0</span>
-                    </button>
-                    <button class="filter-tab" data-filter="decision" onclick="filterTasks('decision', this)">
-                        Decisions <span class="count" id="count-decision">0</span>
-                    </button>
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Left Panel: Intent List -->
+        <div class="intent-list-panel">
+            <div
+                class="intent-list"
+                id="intent-list"
+                hx-get="/api/autotask/list"
+                hx-trigger="load, every 10s"
+                hx-swap="innerHTML"
+            >
+                <!-- Intent cards will be loaded here -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <span>Loading intents...</span>
                 </div>
-                <button class="btn-refresh" onclick="refreshTasks()" title="Refresh">
-                    <span>🔄</span>
+            </div>
+        </div>
+
+        <!-- Right Panel: Intent Detail -->
+        <div class="intent-detail-panel" id="intent-detail-panel">
+            <div class="detail-placeholder">
+                <span class="placeholder-icon">📋</span>
+                <p>Select an intent to view details</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Intent Modal -->
+    <div class="modal-overlay" id="new-intent-modal" style="display: none">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>New Intent</h2>
+                <button class="modal-close" onclick="closeNewIntentModal()">
+                    ×
                 </button>
             </div>
-        </div>
+            <div class="modal-body">
+                <form
+                    id="new-intent-form"
+                    hx-post="/api/autotask/create"
+                    hx-ext="json-enc"
+                    hx-target="#intent-list"
+                    hx-swap="afterbegin"
+                >
+                    <div class="form-group">
+                        <label for="intent-input"
+                            >What would you like to accomplish?</label
+                        >
+                        <textarea
+                            id="intent-input"
+                            name="intent"
+                            class="intent-textarea"
+                            placeholder="Describe your task in natural language...
 
-        <!-- Task List -->
-        <div class="task-list" id="task-list" hx-get="/api/autotask/list" hx-trigger="load, every 5s" hx-swap="innerHTML">
-            <div class="loading-placeholder">
-                <div class="spinner-large"></div>
-                <p>Loading tasks...</p>
+Examples:
+• Make a financial CRM for Deloitte
+• Create a website that collects leads
+• Build an automated email campaign
+• Analyze sales data and generate reports"
+                            rows="6"
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Execution Mode</label>
+                            <select name="execution_mode" class="form-select">
+                                <option value="semi-automatic">
+                                    Semi-Automatic
+                                </option>
+                                <option value="supervised">Supervised</option>
+                                <option value="fully-automatic">
+                                    Fully Automatic
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select name="priority" class="form-select">
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button
+                            type="button"
+                            class="btn-secondary"
+                            onclick="closeNewIntentModal()"
+                        >
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <span>Create Intent</span>
+                            <span class="spinner" id="create-spinner"></span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Pending Decisions Modal -->
-    <div class="modal" id="decision-modal" style="display: none;">
-        <div class="modal-backdrop" onclick="closeDecisionModal()"></div>
-        <div class="modal-content decision-modal-content">
+    <!-- Decision Modal -->
+    <div class="modal-overlay" id="decision-modal" style="display: none">
+        <div class="modal-container modal-lg">
             <div class="modal-header">
-                <h3><span class="modal-icon">🤔</span> Decision Required</h3>
-                <button class="modal-close" onclick="closeDecisionModal()">×</button>
+                <h2>Decision Required</h2>
+                <button class="modal-close" onclick="closeDecisionModal()">
+                    ×
+                </button>
             </div>
             <div class="modal-body" id="decision-content">
                 <!-- Decision content loaded dynamically -->
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Approval Modal -->
-    <div class="modal" id="approval-modal" style="display: none;">
-        <div class="modal-backdrop" onclick="closeApprovalModal()"></div>
-        <div class="modal-content approval-modal-content">
-            <div class="modal-header">
-                <h3><span class="modal-icon">✅</span> Approval Required</h3>
-                <button class="modal-close" onclick="closeApprovalModal()">×</button>
+<!-- Intent Card Template -->
+<template id="intent-card-template">
+    <div
+        class="intent-card"
+        data-intent-id="${id}"
+        data-status="${status}"
+        onclick="selectIntent('${id}')"
+    >
+        <div class="intent-card-header">
+            <h3 class="intent-title">${title}</h3>
+            <div class="intent-status-indicator ${status_class}"></div>
+        </div>
+
+        <div class="intent-progress">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${progress}%"></div>
             </div>
-            <div class="modal-body" id="approval-content">
-                <!-- Approval content loaded dynamically -->
+            <div class="progress-info">
+                <span class="progress-steps"
+                    >${current_step}/${total_steps} Steps</span
+                >
+                <span class="progress-percent">${progress}%</span>
+            </div>
+        </div>
+
+        <div class="intent-status-section">
+            <div class="status-label">STATUS</div>
+            <div class="status-row">
+                <span class="status-icon">${status_icon}</span>
+                <span class="status-text">${status_display}</span>
+            </div>
+        </div>
+
+        <div class="intent-current-task">
+            <div class="current-task-label">${current_task_name}</div>
+            <div class="current-task-desc">${current_task_description}</div>
+        </div>
+
+        <div class="intent-integrity">
+            <div class="integrity-label">INTEGRITY</div>
+            <div class="integrity-items">
+                <span class="integrity-item">
+                    <span class="item-icon">🕐</span>
+                    Started ${started_ago}
+                </span>
+                <span class="integrity-item">
+                    <span class="item-icon">📅</span>
+                    Due ${due_date}
+                </span>
+                <span class="integrity-badge health-${health_level}">
+                    Intent Health
+                    <span class="health-value">${health_percent}%</span>
+                </span>
+            </div>
+        </div>
+
+        <button
+            class="btn-detail-view"
+            onclick="event.stopPropagation(); viewDetailedIntent('${id}')"
+        >
+            ${action_button_text}
+        </button>
+    </div>
+</template>
+
+<!-- Intent Detail Template -->
+<template id="intent-detail-template">
+    <div class="detail-view">
+        <!-- Header -->
+        <div class="detail-header">
+            <button class="btn-back" onclick="closeDetailPanel()">
+                <span>◀</span>
+            </button>
+            <h2 class="detail-title">${title}</h2>
+            <div class="detail-status">
+                <span class="status-icon">${status_icon}</span>
+                <span class="status-label">${status_display}</span>
+            </div>
+            <button class="btn-pause" onclick="togglePause('${id}')">
+                <span class="pause-icon">⏸</span>
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="detail-progress">
+            <div class="progress-bar large">
+                <div class="progress-fill" style="width: ${progress}%"></div>
+            </div>
+            <div class="progress-stats">
+                <span class="progress-steps"
+                    >${current_step}/${total_steps} Steps</span
+                >
+                <span class="progress-percent">${progress}%</span>
+            </div>
+        </div>
+
+        <!-- Decision Required Panel -->
+        <div
+            class="decision-panel"
+            id="decision-panel-${id}"
+            style="display: ${show_decision}"
+        >
+            <div class="decision-header">
+                <span class="decision-badge">DECISION REQUIRED</span>
+                <span class="decision-title">${decision_title}</span>
+            </div>
+            <div class="decision-body">
+                <div class="decision-actions">
+                    <button
+                        class="btn-decision-primary"
+                        onclick="openDecisionModal('${id}')"
+                    >
+                        Make Decision
+                    </button>
+                    <button
+                        class="btn-decision-secondary"
+                        onclick="viewDecisionContext('${id}')"
+                    >
+                        View Context Details
+                    </button>
+                </div>
+                <div class="decision-context">
+                    <div class="context-label">Context:</div>
+                    <p class="context-text">${decision_context}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="detail-section">
+            <div class="section-header">
+                <span class="section-title">STATUS</span>
+                <span class="section-runtime">Runtime: ${runtime}</span>
+            </div>
+            <div class="status-current-task">
+                <span class="task-name">${current_task_name}</span>
+                <span class="task-estimate">Estimated: ${estimated_time}</span>
+            </div>
+            <div class="status-steps-preview">
+                <div class="step-item active">
+                    <span class="step-dot"></span>
+                    <span class="step-name">${next_step_name}</span>
+                </div>
+                <div class="step-item pending">
+                    <span class="step-dot"></span>
+                    <span class="step-name"
+                        >Decision Point Coming (Step ${decision_step})</span
+                    >
+                    <span class="step-note">${decision_note}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Log Section -->
+        <div class="detail-section">
+            <div class="section-header">
+                <span class="section-title">PROGRESS LOG</span>
+            </div>
+            <div class="progress-log" id="progress-log-${id}">
+                <!-- Log entries will be populated here -->
+            </div>
+        </div>
+
+        <!-- Terminal Activity Section -->
+        <div class="detail-section terminal-section">
+            <div class="section-header">
+                <span class="section-title"
+                    >TERMINAL (LIVE AGENT ACTIVITY)</span
+                >
+                <span class="terminal-stats">
+                    Processed: <strong>${processed_count}</strong> data points /
+                    Processing speed: <strong>${processing_speed}</strong> /
+                    Estimated completion:
+                    <strong>${estimated_completion}</strong>
+                </span>
+            </div>
+            <div class="terminal-output" id="terminal-${id}">
+                <div class="terminal-line">
+                    Synthesizing competitive insights...
+                </div>
+                <div class="terminal-line">
+                    Cross-referencing pricing data...
+                </div>
+                <!-- More terminal lines will stream here -->
+            </div>
+            <div class="terminal-cursor"></div>
+        </div>
+    </div>
+</template>
+
+<!-- Progress Log Entry Template -->
+<template id="progress-log-entry-template">
+    <div class="log-entry ${expanded_class}">
+        <div class="log-entry-header" onclick="toggleLogEntry(this)">
+            <span class="log-icon ${status_class}">●</span>
+            <span class="log-title">${title}</span>
+            <span class="log-expand">▶</span>
+            <span class="log-step-badge">${step_label}</span>
+        </div>
+        <div class="log-entry-body">
+            <div class="log-sub-entries">
+                <!-- Sub entries -->
             </div>
         </div>
     </div>
+</template>
 
-    <!-- Simulation Preview Modal -->
-    <div class="modal" id="simulation-modal" style="display: none;">
-        <div class="modal-backdrop" onclick="closeSimulationModal()"></div>
-        <div class="modal-content simulation-modal-content">
-            <div class="modal-header">
-                <h3><span class="modal-icon">🔮</span> Impact Simulation</h3>
-                <button class="modal-close" onclick="closeSimulationModal()">×</button>
-            </div>
-            <div class="modal-body" id="simulation-content">
-                <!-- Simulation content loaded dynamically -->
-            </div>
+<!-- Progress Log Sub-Entry Template -->
+<template id="progress-log-subentry-template">
+    <div class="log-sub-entry">
+        <span class="sub-icon ${status_class}">●</span>
+        <span class="sub-text">${text}</span>
+        <span class="sub-duration">Duration: ${duration}</span>
+        <span class="sub-check">${check_icon}</span>
+    </div>
+</template>
+
+<!-- Floating Progress Panel (for active task) -->
+<div
+    class="floating-progress-panel"
+    id="floating-progress"
+    style="display: none"
+>
+    <div class="floating-header">
+        <div class="floating-title">
+            <span class="floating-icon">⚡</span>
+            <span class="floating-name" id="floating-task-name"
+                >Processing...</span
+            >
+        </div>
+        <div class="floating-controls">
+            <button class="btn-minimize" onclick="minimizeFloatingPanel()">
+                −
+            </button>
+            <button class="btn-close-floating" onclick="closeFloatingPanel()">
+                ×
+            </button>
+        </div>
+    </div>
+    <div class="floating-body">
+        <div class="floating-status">
+            <span class="status-text" id="floating-status-text"
+                >Initializing...</span
+            >
+            <span class="status-steps" id="floating-status-steps">0/0</span>
+        </div>
+        <div class="floating-progress-bar">
+            <div
+                class="progress-fill"
+                id="floating-progress-fill"
+                style="width: 0%"
+            ></div>
+        </div>
+        <div class="floating-percentage" id="floating-percentage">0%</div>
+        <div class="floating-log" id="floating-log">
+            <!-- Real-time log entries -->
+        </div>
+        <div class="floating-terminal" id="floating-terminal">
+            <!-- LLM output streaming -->
         </div>
     </div>
 </div>
 
-<!-- Task Item Template (for reference, actual rendering done server-side) -->
-<template id="task-item-template">
-    <div class="autotask-item" data-task-id="${id}" data-status="${status}">
-        <div class="task-header">
-            <div class="task-info">
-                <div class="task-status-badge status-${status}">${status}</div>
-                <h4 class="task-title">${title}</h4>
-                <span class="task-priority priority-${priority}">${priority}</span>
-            </div>
-            <div class="task-meta">
-                <span class="task-time" title="Created">${created_at}</span>
-                <span class="task-mode">${execution_mode}</span>
-            </div>
-        </div>
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
 
-        <div class="task-progress">
-            <div class="progress-bar">
-                <div class="progress-fill" style="width: ${progress}%"></div>
-            </div>
-            <span class="progress-text">${current_step}/${total_steps} steps (${progress}%)</span>
-        </div>
-
-        <div class="task-details">
-            <p class="task-intent">${intent}</p>
-
-            <!-- Current Step Info -->
-            <div class="current-step" style="display: ${show_current_step}">
-                <div class="step-indicator">
-                    <span class="step-icon">▶️</span>
-                    <span class="step-name">Step ${current_step}: ${current_step_name}</span>
-                </div>
-                <div class="step-status">${current_step_status}</div>
-            </div>
-
-            <!-- Pending Decision Alert -->
-            <div class="pending-decision-alert" style="display: ${show_decision}">
-                <span class="alert-icon">🤔</span>
-                <span class="alert-text">${decision_count} decision(s) pending</span>
-                <button class="btn-view-decisions" onclick="viewDecisions('${id}')">View & Decide</button>
-            </div>
-
-            <!-- Pending Approval Alert -->
-            <div class="pending-approval-alert" style="display: ${show_approval}">
-                <span class="alert-icon">⚠️</span>
-                <span class="alert-text">${approval_count} approval(s) required</span>
-                <button class="btn-view-approvals" onclick="viewApprovals('${id}')">Review & Approve</button>
-            </div>
-
-            <!-- Risk Summary -->
-            <div class="risk-summary" style="display: ${show_risk}">
-                <span class="risk-icon risk-${risk_level}">⚡</span>
-                <span class="risk-text">Risk Level: ${risk_level}</span>
-            </div>
-        </div>
-
-        <div class="task-actions">
-            <button class="btn-action btn-view" onclick="viewTaskDetails('${id}')" title="View Details">
-                <span>👁️</span> Details
-            </button>
-            <button class="btn-action btn-simulate" onclick="simulateTask('${id}')" title="Simulate Impact" style="display: ${show_simulate}">
-                <span>🔮</span> Simulate
-            </button>
-            <button class="btn-action btn-pause" onclick="pauseTask('${id}')" title="Pause" style="display: ${show_pause}">
-                <span>⏸️</span> Pause
-            </button>
-            <button class="btn-action btn-resume" onclick="resumeTask('${id}')" title="Resume" style="display: ${show_resume}">
-                <span>▶️</span> Resume
-            </button>
-            <button class="btn-action btn-cancel" onclick="cancelTask('${id}')" title="Cancel">
-                <span>❌</span> Cancel
-            </button>
-        </div>
-
-        <!-- Execution Log (expandable) -->
-        <details class="execution-log">
-            <summary>Execution Log (${log_count} entries)</summary>
-            <div class="log-entries" id="log-${id}">
-                <!-- Log entries loaded on expand -->
-            </div>
-        </details>
-    </div>
-</template>
-
-<!-- Compilation Result Template -->
-<template id="compilation-result-template">
-    <div class="compiled-plan">
-        <div class="plan-header">
-            <div class="plan-info">
-                <h3>${plan_name}</h3>
-                <p>${plan_description}</p>
-            </div>
-            <div class="plan-meta">
-                <span class="confidence-badge confidence-${confidence_level}">
-                    Confidence: ${confidence}%
-                </span>
-                <span class="risk-badge risk-${risk_level}">
-                    Risk: ${risk_level}
-                </span>
-                <span class="duration-badge">
-                    Est. Duration: ${estimated_duration}
-                </span>
-                <span class="cost-badge">
-                    Est. Cost: $${estimated_cost}
-                </span>
-            </div>
-        </div>
-
-        <!-- Alternatives (if ambiguous) -->
-        <div class="alternatives-section" style="display: ${show_alternatives}">
-            <h4>🔀 Alternative Approaches</h4>
-            <p class="alternatives-note</h4>">The intent was ambiguous. Please choose your preferred approach:</p>
-            <div class="alternatives-list">
-                ${alternatives_html}
-            </div>
-        </div>
-
-        <!-- Execution Plan Steps -->
-        <div class="plan-steps">
-            <h4>📋 Execution Plan (${step_count} steps)</h4>
-            <div class="steps-list">
-                ${steps_html}
-            </div>
-        </div>
-
-        <!-- Resource Estimates -->
-        <div class="resource-estimates">
-            <h4>📊 Resource Estimates</h4>
-            <div class="estimates-grid">
-                <div class="estimate-item">
-                    <span class="estimate-icon">💻</span>
-                    <span class="estimate-label">Compute</span>
-                    <span class="estimate-value">${compute_hours} hours</span>
-                </div>
-                <div class="estimate-item">
-                    <span class="estimate-icon">💾</span>
-                    <span class="estimate-label">Storage</span>
-                    <span class="estimate-value">${storage_gb} GB</span>
-                </div>
-                <div class="estimate-item">
-                    <span class="estimate-icon">🌐</span>
-                    <span class="estimate-label">API Calls</span>
-                    <span class="estimate-value">${api_calls}</span>
-                </div>
-                <div class="estimate-item">
-                    <span class="estimate-icon">🤖</span>
-                    <span class="estimate-label">LLM Tokens</span>
-                    <span class="estimate-value">${llm_tokens}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- MCP Servers & APIs -->
-        <div class="integrations-section" style="display: ${show_integrations}">
-            <h4></h4>🔌 Integrations Required</h4>
-            <div class="integrations-list">
-                <div class="mcp-servers" style="display: ${show_mcp}">
-                    <h5>MCP Servers</h5>
-                    <div class="integration-tags">${mcp_servers_html}</div>
-                </div>
-                <div class="external-apis" style="display: ${show_apis}">
-                    <h5>External APIs</h5>
-                    <div class="integration-tags">${external_apis_html}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Risk Assessment -->
-        <div class="risk-assessment" style="display: ${show_risks}">
-            <h4>⚠️ Risk Assessment</h4>
-            <div class="risks-list">
-                ${risks_html}
-            </div>
-        </div>
-
-        <!-- Generated BASIC Code (collapsible) -->
-        <details class="generated-code">
-            <summary>📝 Generated BASIC Program (${code_lines} lines)</summary>
-            <pre class="code-preview"><code>${basic_program}</code></pre>
-            <button class="btn-copy-code" onclick="copyGeneratedCode()">📋 Copy Code</button>
-        </details>
-
-        <!-- Action Buttons -->
-        <div class="plan-actions">
-            <button class="btn-secondary" onclick="discardPlan()">
-                <span>🗑️</span> Discard
-            </button>
-            <button class="btn-secondary" onclick="editPlan()">
-                <span>✏️</span> Edit Plan
-            </button>
-            <button class="btn-secondary" onclick="simulatePlan('${plan_id}')">
-                <span>🔮</span> Simulate First
-            </button>
-            <button class="btn-primary" onclick="executePlan('${plan_id}')" ${execute_disabled}>
-                <span>🚀</span> Execute Plan
-            </button>
-        </div>
-    </div>
-</template>
-
-<!-- Decision Option Template -->
-<template id="decision-option-template">
-    <div class="decision-option" data-option-id="${id}">
-        <div class="option-header">
-            <input type="radio" name="decision_choice" value="${id}" id="option-${id}">
-            <label for="option-${id}">
-                <span class="option-label">${label}</span>
-                <span class="recommended-badge" style="display: ${show_recommended}">Recommended</span>
-            </label>
-        </div>
-        <p class="option-description">${description}</p>
-        <div class="option-details">
-            <div class="pros">
-                <h5>✅ Pros</h5>
-                <ul>${pros_html}</ul>
-            </div>
-            <div class="cons">
-                <h5>❌ Cons</h5>
-                <ul>${cons_html}</ul>
-            </div>
-        </div>
-        <div class="option-impact">
-            <span class="impact-item</h5>">💰 Cost: ${cost_change}</span>
-            <span class="impact-item">⏱️ Time: ${time_change}</span>
-            <span class="impact-item risk-${risk_level}">⚠️ Risk: ${risk_level}</span>
-        </div>
-    </div>
-</template>
-
-<!-- Approval Request Template -->
-<template id="approval-request-template">
-    <div class="approval-request" data-approval-id="${id}">
-        <div class="approval-header">
-            <span class="approval-type type-${approval_type}">${approval_type}</span>
-            <span class="approval-risk risk-${risk_level}">${risk_level} Risk</span>
-        </div>
-        <h4>${title}</h4>
-        <p class="approval-description">${description}</p>
-
-        <div class="approval-impact">
-            <h5>Impact Summary</h5>
-            <p>${impact_summary}</p>
-        </div>
-
-        <div class="simulation-preview" style="display: ${show_simulation}">
-            <h5>Simulation Result</h5>
-            <div class="simulation-summary">${simulation_summary}</div>
-        </div>
-
-        <div class="approval-meta">
-            <span class="meta-item">Step: ${step_name}</span>
-            <span class="meta-item">Expires: ${expires_at}</span>
-            <span class="meta-item">Default: ${default_action}</span>
-        </div>
-
-        <div class="approval-actions">
-            <button class="btn-reject" onclick="rejectApproval('${id}')">
-                <span>❌</span> Reject
-            </button>
-            <button class="btn-defer" onclick="deferApproval('${id}')">
-                <span>⏸️</span> Defer
-            </button>
-            <button class="btn-approve" onclick="approveApproval('${id}')">
-                <span>✅</span> Approve
-            </button>
-        </div>
-    </div>
-</template>
-
-<!-- Simulation Result Template -->
-<template id="simulation-result-template">
-    <div class="simulation-result">
-        <div class="simulation-header">
-            <div class="simulation-status status-${success}">
-                <span class="status-icon">${status_icon}</span>
-                <span class="status-text">${status_text}</span>
-            </div>
-            <div class="simulation-confidence">
-                Confidence: ${confidence}%
-            </div>
-        </div>
-
-        <div class="impact-overview">
-            <h4>Impact Assessment</h4>
-            <div class="impact-grid">
-                <div class="impact-card risk-${data_risk}">
-                    <span class="impact-icon">💾</span>
-                    <span class="impact-label">Data Impact</span>
-                    <span class="impact-value">${data_impact_summary}</span>
-                </div>
-                <div class="impact-card risk-${cost_risk}">
-                    <span class="impact-icon">💰</span>
-                    <span class="impact-label">Cost Impact</span>
-                    <span class="impact-value">${cost_impact_summary}</span>
-                </div>
-                <div class="impact-card risk-${time_risk}">
-                    <span class="impact-icon">⏱️</span>
-                    <span class="impact-label">Time Impact</span>
-                    <span class="impact-value">${time_impact_summary}</span>
-                </div>
-                <div class="impact-card risk-${security_risk}">
-                    <span class="impact-icon">🔒</span>
-                    <span class="impact-label">Security Impact</span>
-                    <span class="impact-value">${security_impact_summary}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="step-outcomes">
-            <h4>Step-by-Step Predictions</h4>
-            <div class="outcomes-list">
-                ${step_outcomes_html}
-            </div>
-        </div>
-
-        <div class="side-effects" style="display: ${show_side_effects}">
-            <h4>⚠️ Potential Side Effects</h4>
-            <div class="side-effects-list">
-                ${side_effects_html}
-            </div>
-        </div>
-
-        <div class="recommendations" style="display: ${show_recommendations}">
-            <h4>💡 Recommendations</h4>
-            <div class="recommendations-list">
-                ${recommendations_html}
-            </div>
-        </div>
-
-        <div class="simulation-actions">
-            <button class="btn-secondary" onclick="closeSimulationModal()">
-                <span>↩️</span> Back
-            </button>
-            <button class="btn-primary" onclick="proceedAfterSimulation('${task_id}')" ${proceed_disabled}>
-                <span>🚀</span> Proceed with Execution
-            </button>
-        </div>
-    </div>
-</template>
+<script src="autotask.js"></script>

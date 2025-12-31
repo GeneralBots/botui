@@ -244,12 +244,153 @@ struct WsQuery {
     user_id: String,
 }
 
+#[derive(Debug, Default, Deserialize)]
+struct OptionalWsQuery {
+    session_id: Option<String>,
+    user_id: Option<String>,
+    task_id: Option<String>,
+}
+
 async fn ws_proxy(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
     Query(params): Query<WsQuery>,
 ) -> impl IntoResponse {
     ws.on_upgrade(move |socket| handle_ws_proxy(socket, state, params))
+}
+
+async fn ws_task_progress_proxy(
+    ws: WebSocketUpgrade,
+    State(state): State<AppState>,
+    Query(params): Query<OptionalWsQuery>,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| handle_task_progress_ws_proxy(socket, state, params))
+}
+
+async fn handle_task_progress_ws_proxy(
+    client_socket: WebSocket,
+    state: AppState,
+    params: OptionalWsQuery,
+) {
+    let mut backend_url = format!(
+        "{}/ws/task-progress",
+        state
+            .client
+            .base_url()
+            .replace("https://", "wss://")
+            .replace("http://", "ws://"),
+    );
+
+    if let Some(task_id) = &params.task_id {
+        backend_url = format!("{}/{}", backend_url, task_id);
+    }
+
+    info!("Proxying task-progress WebSocket to: {backend_url}");
+
+    let Ok(tls_connector) = native_tls::TlsConnector::builder()
+        .danger_accept_invalid_certs(true)
+        .danger_accept_invalid_hostnames(true)
+        .build()
+    else {
+        error!("Failed to build TLS connector for task-progress");
+        return;
+    };
+
+    let connector = tokio_tungstenite::Connector::NativeTls(tls_connector);
+
+    let backend_result =
+        connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
+
+    let backend_socket = match backend_result {
+        Ok((socket, _)) => socket,
+        Err(e) => {
+            error!("Failed to connect to backend task-progress WebSocket: {e}");
+            return;
+        }
+    };
+
+    info!("Connected to backend task-progress WebSocket");
+
+    let (mut client_tx, mut client_rx) = client_socket.split();
+    let (mut backend_tx, mut backend_rx) = backend_socket.split();
+
+    let client_to_backend = async {
+        while let Some(msg) = client_rx.next().await {
+            match msg {
+                Ok(AxumMessage::Text(text)) => {
+                    if backend_tx
+                        .send(TungsteniteMessage::Text(text))
+                        .await
+                        .is_err()
+                    {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Binary(data)) => {
+                    if backend_tx
+                        .send(TungsteniteMessage::Binary(data))
+                        .await
+                        .is_err()
+                    {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Ping(data)) => {
+                    if backend_tx
+                        .send(TungsteniteMessage::Ping(data))
+                        .await
+                        .is_err()
+                    {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Pong(data)) => {
+                    if backend_tx
+                        .send(TungsteniteMessage::Pong(data))
+                        .await
+                        .is_err()
+                    {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Close(_)) | Err(_) => break,
+            }
+        }
+    };
+
+    let backend_to_client = async {
+        while let Some(msg) = backend_rx.next().await {
+            match msg {
+                Ok(TungsteniteMessage::Text(text)) => {
+                    if client_tx.send(AxumMessage::Text(text)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Binary(data)) => {
+                    if client_tx.send(AxumMessage::Binary(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Ping(data)) => {
+                    if client_tx.send(AxumMessage::Ping(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Pong(data)) => {
+                    if client_tx.send(AxumMessage::Pong(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Close(_)) | Err(_) => break,
+                Ok(_) => {}
+            }
+        }
+    };
+
+    tokio::select! {
+        () = client_to_backend => info!("Task-progress client connection closed"),
+        () = backend_to_client => info!("Task-progress backend connection closed"),
+    }
 }
 
 #[allow(clippy::too_many_lines)]
@@ -374,7 +515,10 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
 }
 
 fn create_ws_router() -> Router<AppState> {
-    Router::new().fallback(any(ws_proxy))
+    Router::new()
+        .route("/task-progress", get(ws_task_progress_proxy))
+        .route("/task-progress/{task_id}", get(ws_task_progress_proxy))
+        .fallback(any(ws_proxy))
 }
 
 fn create_apps_router() -> Router<AppState> {

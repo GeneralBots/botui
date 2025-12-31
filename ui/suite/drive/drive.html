@@ -1,4 +1,4 @@
-<!-- Drive - File Management -->
+<!-- Drive - File Management v1.0 -->
 <link rel="stylesheet" href="drive/drive.css" />
 
 <div class="drive-container" id="drive-app">
@@ -22,11 +22,7 @@
 
         <!-- Quick Actions -->
         <div class="drive-sidebar-actions">
-            <button
-                class="btn-primary-full"
-                id="upload-btn"
-                onclick="uploadFile()"
-            >
+            <button class="btn-primary-full" id="upload-btn">
                 <svg
                     width="16"
                     height="16"
@@ -41,11 +37,7 @@
                 </svg>
                 <span>Upload</span>
             </button>
-            <button
-                class="btn-secondary-full"
-                id="new-folder-btn"
-                onclick="createFolder()"
-            >
+            <button class="btn-secondary-full" id="new-folder-btn">
                 <svg
                     width="16"
                     height="16"
@@ -147,9 +139,14 @@
         <!-- Storage -->
         <div class="drive-storage">
             <div class="storage-bar">
-                <div class="storage-fill" style="width: 62%"></div>
+                <div
+                    class="storage-fill"
+                    id="storage-fill"
+                    style="width: 0%"
+                ></div>
             </div>
-            <div class="storage-text">12.4 GB of 20 GB used</div>
+            <div class="storage-text" id="storage-used">Loading storage...</div>
+            <div class="storage-detail" id="storage-detail"></div>
         </div>
     </aside>
 
@@ -158,15 +155,40 @@
         <!-- Toolbar -->
         <div class="drive-toolbar">
             <div class="drive-toolbar-left">
+                <select
+                    id="bucket-selector"
+                    class="bucket-selector"
+                    style="display: none"
+                >
+                    <!-- Populated by JavaScript -->
+                </select>
                 <div class="drive-breadcrumb">
                     <button
                         class="breadcrumb-item"
-                        onclick="navigateTo('root')"
+                        onclick="DriveModule.loadFiles('')"
                     >
                         My Drive
                     </button>
-                    <span class="breadcrumb-sep">/</span>
-                    <span class="breadcrumb-current">Projects</span>
+                </div>
+            </div>
+            <div class="drive-toolbar-center">
+                <div class="search-box">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    <input
+                        type="text"
+                        id="search-input"
+                        placeholder="Search in Drive"
+                    />
                 </div>
             </div>
             <div class="drive-toolbar-right">
@@ -213,262 +235,130 @@
             </div>
         </div>
 
-        <!-- File List -->
+        <!-- File Content Area - Populated by JavaScript -->
         <div class="drive-content" id="drive-content">
-            <!-- List Header -->
-            <div class="drive-list-header">
-                <div class="file-col file-name-col">Name</div>
-                <div class="file-col file-modified-col">Modified</div>
-                <div class="file-col file-size-col">Size</div>
-                <div class="file-col file-actions-col"></div>
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading files...</p>
             </div>
+        </div>
 
-            <!-- Folders -->
-            <div
-                class="drive-file-item folder"
-                data-id="1"
-                onclick="openFolder(this)"
-                hx-get="/api/drive/folder/1"
-                hx-target="#drive-content"
-                hx-swap="innerHTML"
+        <!-- Selection Bar -->
+        <div class="selection-bar" id="selection-bar" style="display: none">
+            <span class="selection-count"
+                ><span id="selected-count">0</span> selected</span
             >
-                <div class="file-col file-name-col">
+            <div class="selection-actions">
+                <button
+                    class="action-btn"
+                    onclick="DriveModule.copySelected()"
+                    title="Copy"
+                >
                     <svg
-                        width="20"
-                        height="20"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
-                        fill="#5f6368"
-                        stroke="none"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
+                        <rect
+                            x="9"
+                            y="9"
+                            width="13"
+                            height="13"
+                            rx="2"
+                            ry="2"
+                        ></rect>
                         <path
-                            d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"
-                        />
+                            d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                        ></path>
                     </svg>
-                    <span>Documents</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 15, 2024</div>
-                <div class="file-col file-size-col">—</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <div
-                class="drive-file-item folder"
-                data-id="2"
-                onclick="openFolder(this)"
-            >
-                <div class="file-col file-name-col">
+                </button>
+                <button
+                    class="action-btn"
+                    onclick="DriveModule.cutSelected()"
+                    title="Cut"
+                >
                     <svg
-                        width="20"
-                        height="20"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
-                        fill="#5f6368"
-                        stroke="none"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
-                        <path
-                            d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"
-                        />
+                        <circle cx="6" cy="6" r="3"></circle>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                        <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                        <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
                     </svg>
-                    <span>Images</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 14, 2024</div>
-                <div class="file-col file-size-col">—</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <div
-                class="drive-file-item folder"
-                data-id="3"
-                onclick="openFolder(this)"
-            >
-                <div class="file-col file-name-col">
+                </button>
+                <button
+                    class="action-btn danger"
+                    onclick="DriveModule.deleteSelected()"
+                    title="Delete"
+                >
                     <svg
-                        width="20"
-                        height="20"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
-                        fill="#5f6368"
-                        stroke="none"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
+                        <polyline points="3 6 5 6 21 6"></polyline>
                         <path
-                            d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"
-                        />
+                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                        ></path>
                     </svg>
-                    <span>Source Code</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 12, 2024</div>
-                <div class="file-col file-size-col">—</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <!-- Files -->
-            <div
-                class="drive-file-item"
-                data-id="10"
-                onclick="selectFile(this)"
-            >
-                <div class="file-col file-name-col">
+                </button>
+                <button
+                    class="close-selection"
+                    onclick="DriveModule.clearSelection()"
+                    title="Clear selection"
+                >
                     <svg
-                        width="20"
-                        height="20"
+                        width="16"
+                        height="16"
                         viewBox="0 0 24 24"
-                        fill="#ea4335"
-                        stroke="none"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
-                        <path
-                            d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-                        />
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
-                    <span>project-report.pdf</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 15, 2024</div>
-                <div class="file-col file-size-col">2.4 MB</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="Download">⬇</button>
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <div
-                class="drive-file-item"
-                data-id="11"
-                onclick="selectFile(this)"
-            >
-                <div class="file-col file-name-col">
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="#4285f4"
-                        stroke="none"
-                    >
-                        <path
-                            d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-                        />
-                    </svg>
-                    <span>meeting-notes.docx</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 14, 2024</div>
-                <div class="file-col file-size-col">156 KB</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="Download">⬇</button>
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <div
-                class="drive-file-item"
-                data-id="12"
-                onclick="selectFile(this)"
-            >
-                <div class="file-col file-name-col">
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="#0f9d58"
-                        stroke="none"
-                    >
-                        <path
-                            d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"
-                        />
-                    </svg>
-                    <span>analytics-2025.xlsx</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 13, 2024</div>
-                <div class="file-col file-size-col">890 KB</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="Download">⬇</button>
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <div
-                class="drive-file-item"
-                data-id="13"
-                onclick="selectFile(this)"
-            >
-                <div class="file-col file-name-col">
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="#fbbc04"
-                        stroke="none"
-                    >
-                        <path
-                            d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"
-                        />
-                    </svg>
-                    <span>dashboard-mockup.png</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 12, 2024</div>
-                <div class="file-col file-size-col">1.8 MB</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="Download">⬇</button>
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <div
-                class="drive-file-item"
-                data-id="14"
-                onclick="selectFile(this)"
-            >
-                <div class="file-col file-name-col">
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="#ea4335"
-                        stroke="none"
-                    >
-                        <path
-                            d="M18,4L20,8H17L15,4H13L15,8H12L10,4H8L10,8H7L5,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V4H18Z"
-                        />
-                    </svg>
-                    <span>demo-video.mp4</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 10, 2024</div>
-                <div class="file-col file-size-col">125 MB</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="Download">⬇</button>
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
-            </div>
-
-            <div
-                class="drive-file-item"
-                data-id="15"
-                onclick="selectFile(this)"
-            >
-                <div class="file-col file-name-col">
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="#5f6368"
-                        stroke="none"
-                    >
-                        <path
-                            d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-6 10H6v-2h8v2zm4-4H6v-2h12v2z"
-                        />
-                    </svg>
-                    <span>release-v2.0.zip</span>
-                </div>
-                <div class="file-col file-modified-col">Dec 8, 2024</div>
-                <div class="file-col file-size-col">45 MB</div>
-                <div class="file-col file-actions-col">
-                    <button class="btn-icon-sm" title="Download">⬇</button>
-                    <button class="btn-icon-sm" title="More options">⋯</button>
-                </div>
+                </button>
             </div>
         </div>
     </main>
+
+    <!-- Drop Overlay for Drag & Drop -->
+    <div class="drop-overlay" id="drop-overlay">
+        <div class="drop-zone">
+            <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p>Drop files here to upload</p>
+        </div>
+    </div>
 </div>
+
+<!-- Hidden file input for uploads -->
+<input type="file" id="file-input" multiple style="display: none" />
+
+<!-- Context Menu (dynamically populated by JS) -->
+<div id="context-menu" class="context-menu hidden"></div>
 
 <script src="drive/drive.js"></script>
