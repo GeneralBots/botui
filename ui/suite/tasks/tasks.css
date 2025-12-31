@@ -303,9 +303,9 @@
 
 .task-card {
     background: var(--surface-hover, #141414);
-    border: 1px solid var(--border, #2a2a2a);
-    border-radius: 12px;
-    padding: 16px;
+    border: 2px solid var(--border, #2a2a2a);
+    border-radius: 16px;
+    padding: 20px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
@@ -317,7 +317,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 4px;
+    width: 5px;
     height: 100%;
     background: var(--text-secondary, #666);
     transition: background 0.2s ease;
@@ -354,7 +354,7 @@
 
 .task-card.selected {
     border-color: var(--primary, #c5f82a);
-    box-shadow: 0 0 0 1px var(--primary, #c5f82a);
+    box-shadow: 0 0 0 2px var(--primary, #c5f82a);
 }
 
 .task-card-header {
@@ -366,24 +366,26 @@
 }
 
 .task-card-title {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text, #fff);
     margin: 0;
     line-height: 1.4;
     flex: 1;
     word-break: break-word;
+    letter-spacing: -0.01em;
 }
 
 .task-card-status {
     font-size: 11px;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 4px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
     text-transform: uppercase;
     white-space: nowrap;
     background: var(--surface, #1a1a1a);
     color: var(--text-secondary, #888);
+    letter-spacing: 0.02em;
 }
 
 .task-card-status.status-running {
@@ -425,11 +427,12 @@
 
 .priority-badge {
     font-size: 11px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 4px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
     background: var(--surface, #1a1a1a);
     color: var(--text-secondary, #888);
+    border: 1px solid var(--border, #2a2a2a);
 }
 
 .priority-badge.priority-high,
@@ -451,9 +454,9 @@
 .task-card-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 8px;
-    padding-top: 12px;
-    border-top: 1px solid var(--border, #2a2a2a);
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 2px solid var(--border, #2a2a2a);
 }
 
 .task-action-btn {
@@ -472,15 +475,16 @@
 
 /* Task Card Progress */
 .task-card-progress {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .progress-bar {
-    height: 8px;
+    height: 10px;
     background: var(--surface, #1a1a1a);
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    border: 2px solid var(--border, #2a2a2a);
 }
 
 .progress-fill {
@@ -488,6 +492,7 @@
     background: var(--primary, #c5f82a);
     border-radius: 4px;
     transition: width 0.3s ease;
+    box-shadow: 0 0 8px rgba(197, 248, 42, 0.4);
 }
 
 .task-card.awaiting .progress-fill {
@@ -501,17 +506,19 @@
 }
 
 .progress-steps {
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 500;
     color: var(--text-secondary, #a1a1a1);
 }
 
 .progress-percent {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--primary, #c5f82a);
     background: var(--primary-light, rgba(197, 248, 42, 0.15));
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 2px solid var(--primary, #c5f82a);
 }
 
 .task-card.awaiting .progress-percent {
@@ -2106,26 +2113,26 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border, #2a2a2a);
+    margin-bottom: 24px;
+    padding-bottom: 18px;
+    border-bottom: 2px solid var(--border, #2a2a2a);
 }
 
 .detail-title-rich {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--text, #fff);
+    font-size: 1.4rem;
+    font-weight: 700;
     margin: 0;
+    color: var(--text, #fff);
+    letter-spacing: -0.02em;
 }
 
 .status-badge-rich {
-    padding: 6px 16px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background: var(--surface-hover, #333);
-    color: var(--text, #fff);
+    letter-spacing: 0.06em;
 }
 
 .status-badge-rich.status-running,
@@ -2153,18 +2160,18 @@
 /* Section Boxes */
 .detail-section-box {
     background: var(--surface, #161616);
-    border: 1px solid var(--border, #2a2a2a);
-    border-radius: 8px;
-    padding: 16px;
+    border: 2px solid var(--border, #2a2a2a);
+    border-radius: 12px;
+    padding: 20px;
 }
 
 .section-label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.2px;
     color: var(--text-secondary, #888);
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -2185,8 +2192,8 @@
 }
 
 .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: var(--primary, #c5f82a);
 }
@@ -2233,12 +2240,12 @@
 .error-alert {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
+    gap: 10px;
+    padding: 14px 18px;
     background: rgba(239, 68, 68, 0.15);
-    border: 1px solid var(--error, #ef4444);
-    border-radius: 6px;
-    margin-bottom: 12px;
+    border: 2px solid var(--error, #ef4444);
+    border-radius: 10px;
+    margin-bottom: 16px;
 }
 
 .error-icon {
@@ -2252,20 +2259,21 @@
 }
 
 .status-details {
-    border-top: 1px solid var(--border-light, #222);
-    padding-top: 12px;
+    border-top: 2px solid var(--border-light, #222);
+    padding-top: 16px;
+    margin-top: 12px;
 }
 
 .status-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 0.85rem;
+    gap: 12px;
+    font-size: 0.9rem;
 }
 
 .status-indicator {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--primary, #c5f82a);
 }
@@ -2276,12 +2284,16 @@
 
 .status-step-name {
     color: var(--text, #fff);
+    font-weight: 500;
 }
 
 .status-step-note {
     color: var(--text-tertiary, #666);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     margin-left: auto;
+    padding: 4px 10px;
+    background: var(--surface-hover, #1e1e1e);
+    border-radius: 6px;
 }
 
 /* Progress Bar Rich */
@@ -2290,11 +2302,11 @@
 }
 
 .progress-bar-rich {
-    height: 8px;
+    height: 10px;
     background: var(--surface, #161616);
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    border: 1px solid var(--border, #2a2a2a);
+    border: 2px solid var(--border, #2a2a2a);
 }
 
 .progress-fill-rich {
@@ -2302,6 +2314,7 @@
     background: var(--primary, #c5f82a);
     border-radius: 4px;
     transition: width 0.3s ease;
+    box-shadow: 0 0 8px rgba(197, 248, 42, 0.4);
 }
 
 .progress-info-rich {
@@ -2333,9 +2346,10 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px;
+    padding: 12px 16px;
     background: var(--surface-hover, #1e1e1e);
-    border-radius: 6px;
+    border: 2px solid var(--border, #2a2a2a);
+    border-radius: 10px;
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -2345,7 +2359,8 @@
 }
 
 .log-group-name {
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 14px;
     color: var(--text, #fff);
     flex: 1;
 }
@@ -2356,19 +2371,19 @@
 }
 
 .log-step-badge {
-    padding: 3px 10px;
+    padding: 4px 12px;
     background: var(--primary, #c5f82a);
     color: #000;
-    font-size: 0.7rem;
-    font-weight: 600;
-    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 6px;
 }
 
 .log-status-badge {
-    padding: 3px 10px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
     background: var(--surface-active, #252525);
     color: var(--text-secondary, #888);
 }
@@ -2379,25 +2394,26 @@
 }
 
 .log-group-items {
-    padding: 8px 0 0 20px;
-    border-left: 2px solid var(--border, #2a2a2a);
-    margin-left: 12px;
-    margin-top: 8px;
+    padding: 12px 0 0 20px;
+    border-left: 3px solid var(--border, #2a2a2a);
+    margin-left: 16px;
+    margin-top: 10px;
 }
 
 .log-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
+    gap: 12px;
+    padding: 10px 14px;
     background: var(--surface, #161616);
-    border-radius: 4px;
-    margin-bottom: 6px;
+    border: 1px solid var(--border, #2a2a2a);
+    border-radius: 8px;
+    margin-bottom: 8px;
 }
 
 .log-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: var(--border, #2a2a2a);
 }
@@ -2487,61 +2503,69 @@
 
 /* Terminal Section Rich */
 .terminal-section-rich {
-    background: #0d0d0d;
+    background: #0a0a0a;
+    border: 2px solid var(--border, #2a2a2a);
+    border-radius: 12px;
 }
 
 .section-header-rich {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light, #1a1a1a);
 }
 
 .terminal-dot-rich {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: var(--text-tertiary, #666);
     display: inline-block;
+    margin-right: 6px;
 }
 
 .terminal-dot-rich.active {
     background: var(--primary, #c5f82a);
     animation: pulse-status-dot 1.5s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(197, 248, 42, 0.5);
 }
 
 .terminal-stats-rich {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 2px;
-    font-size: 0.75rem;
+    gap: 4px;
+    font-size: 0.8rem;
     color: var(--text-tertiary, #666);
 }
 
 .terminal-stats-rich strong {
-    color: var(--text-secondary, #888);
+    color: var(--text, #fff);
+    font-weight: 600;
 }
 
 .terminal-output-rich {
     background: #000;
-    border-radius: 6px;
-    padding: 12px 16px;
+    border-radius: 10px;
+    padding: 16px 20px;
     font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
-    font-size: 0.8rem;
-    line-height: 1.6;
-    max-height: 150px;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    max-height: 180px;
     overflow-y: auto;
-    border: 1px solid var(--border-light, #222);
+    border: 2px solid var(--border-light, #1a1a1a);
 }
 
 .terminal-line {
     color: var(--text-tertiary, #666);
-    padding: 2px 0;
+    padding: 3px 0;
 }
 
 .terminal-line.current {
     color: var(--primary, #c5f82a);
+    font-weight: 500;
 }
 
 .terminal-line.error {
@@ -2553,46 +2577,54 @@
 }
 
 .terminal-footer-rich {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border-light, #222);
-    font-size: 0.8rem;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 2px solid var(--border-light, #1a1a1a);
+    font-size: 0.85rem;
     color: var(--text-tertiary, #666);
     text-align: right;
 }
 
 .terminal-footer-rich strong {
     color: var(--primary, #c5f82a);
+    font-weight: 600;
 }
 
 /* Intent Section */
+.intent-section {
+    background: var(--surface, #161616);
+    border: 2px solid var(--border, #2a2a2a);
+    border-radius: 12px;
+}
+
 .intent-text-rich {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--text-secondary, #888);
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0;
+    padding: 4px 0;
 }
 
 /* Action Buttons */
 .detail-actions-rich {
     display: flex;
-    gap: 10px;
-    padding-top: 8px;
-    border-top: 1px solid var(--border, #2a2a2a);
+    gap: 14px;
     margin-top: auto;
+    padding-top: 20px;
+    border-top: 2px solid var(--border, #2a2a2a);
 }
 
 .btn-action-rich {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: 500;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    border: 1px solid var(--border, #2a2a2a);
+    border: 2px solid var(--border, #2a2a2a);
     background: transparent;
     color: var(--text-secondary, #888);
 }
@@ -2604,30 +2636,39 @@
 
 .btn-action-rich.btn-pause {
     border-color: var(--warning, #f59e0b);
+    border-width: 2px;
     color: var(--warning, #f59e0b);
+    background: rgba(245, 158, 11, 0.08);
 }
 
 .btn-action-rich.btn-pause:hover {
-    background: rgba(245, 158, 11, 0.15);
+    background: rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
 }
 
 .btn-action-rich.btn-cancel {
     border-color: var(--error, #ef4444);
+    border-width: 2px;
     color: var(--error, #ef4444);
+    background: rgba(239, 68, 68, 0.08);
 }
 
 .btn-action-rich.btn-cancel:hover {
-    background: rgba(239, 68, 68, 0.15);
+    background: rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
 }
 
 .btn-action-rich.btn-detailed {
     margin-left: auto;
     border-color: var(--primary, #c5f82a);
+    border-width: 2px;
     color: var(--primary, #c5f82a);
+    background: rgba(197, 248, 42, 0.08);
 }
 
 .btn-action-rich.btn-detailed:hover {
-    background: rgba(197, 248, 42, 0.15);
+    background: rgba(197, 248, 42, 0.2);
+    box-shadow: 0 0 12px rgba(197, 248, 42, 0.3);
 }
 
 /* Scrollbar for rich task detail */
