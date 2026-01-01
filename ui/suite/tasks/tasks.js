@@ -441,15 +441,32 @@ function handleWebSocketMessage(data) {
       break;
 
     case "manifest_update":
-      console.log("[Tasks WS] MANIFEST_UPDATE for task:", data.task_id);
+      console.log(
+        "[Tasks WS] MANIFEST_UPDATE for task:",
+        data.task_id,
+        "selected:",
+        TasksState.selectedTaskId,
+      );
       // Update the progress log section with manifest data
       if (data.details) {
         try {
           const manifestData = JSON.parse(data.details);
+          console.log(
+            "[Tasks WS] Manifest parsed, sections:",
+            manifestData.sections?.length,
+            "status:",
+            manifestData.status,
+          );
           renderManifestProgress(data.task_id, manifestData);
         } catch (e) {
-          console.error("[Tasks WS] Failed to parse manifest:", e);
+          console.error(
+            "[Tasks WS] Failed to parse manifest:",
+            e,
+            data.details?.substring(0, 200),
+          );
         }
+      } else {
+        console.warn("[Tasks WS] manifest_update received but no details");
       }
       break;
   }
@@ -459,8 +476,16 @@ function handleWebSocketMessage(data) {
 const pendingManifestUpdates = new Map();
 
 function renderManifestProgress(taskId, manifest, retryCount = 0) {
+  console.log(
+    "[Manifest] renderManifestProgress called for task:",
+    taskId,
+    "selected:",
+    TasksState.selectedTaskId,
+  );
+
   // Only update if this is the selected task
   if (TasksState.selectedTaskId !== taskId) {
+    console.log("[Manifest] Skipping - not selected task");
     return;
   }
 
@@ -471,6 +496,7 @@ function renderManifestProgress(taskId, manifest, retryCount = 0) {
   }
 
   if (!progressLog) {
+    console.log("[Manifest] No progress log element found, retry:", retryCount);
     // If task is selected but element not yet loaded, retry after a delay
     if (retryCount < 5) {
       pendingManifestUpdates.set(taskId, manifest);
@@ -491,29 +517,28 @@ function renderManifestProgress(taskId, manifest, retryCount = 0) {
   pendingManifestUpdates.delete(taskId);
 
   if (!manifest || !manifest.sections) {
+    console.log("[Manifest] No sections in manifest");
     return;
   }
+
+  console.log("[Manifest] Rendering", manifest.sections.length, "sections");
 
   const totalSteps = manifest.progress?.total || 60;
 
   // Update STATUS section if exists
   updateStatusSection(manifest);
 
-  // Update or create progress tree
-  let tree = progressLog.querySelector(".taskmd-tree");
-  if (!tree) {
-    // First render - create full HTML
-    progressLog.innerHTML = buildProgressTreeHTML(manifest, totalSteps);
-    // Auto-expand running sections
-    progressLog
-      .querySelectorAll(".tree-section.running, .tree-child.running")
-      .forEach((el) => {
-        el.classList.add("expanded");
-      });
-  } else {
-    // Incremental update - only update changed elements
-    updateProgressTree(tree, manifest, totalSteps);
-  }
+  // Always rebuild the tree to ensure children are shown
+  // This is simpler and more reliable than incremental updates
+  const html = buildProgressTreeHTML(manifest, totalSteps);
+  progressLog.innerHTML = html;
+
+  // Auto-expand running sections
+  progressLog
+    .querySelectorAll(".tree-section.running, .tree-child.running")
+    .forEach((el) => {
+      el.classList.add("expanded");
+    });
 
   // Update terminal stats
   updateTerminalStats(taskId, manifest);
@@ -521,69 +546,116 @@ function renderManifestProgress(taskId, manifest, retryCount = 0) {
 
 function updateStatusSection(manifest) {
   const statusContent = document.querySelector(".taskmd-status-content");
-  if (!statusContent) return;
+  if (!statusContent) {
+    console.log("[Manifest] No status content element found");
+    return;
+  }
 
   // Update current action
   const actionText = statusContent.querySelector(
     ".status-current .status-text",
   );
-  if (actionText && manifest.status?.current_action) {
-    actionText.textContent = manifest.status.current_action;
+  const currentAction =
+    manifest.status?.current_action ||
+    manifest.current_status?.current_action ||
+    "Processing...";
+  if (actionText) {
+    actionText.textContent = currentAction;
   }
 
   // Update runtime
   const runtimeEl = statusContent.querySelector(".status-main .status-time");
-  if (runtimeEl && manifest.status?.runtime_display) {
-    runtimeEl.innerHTML = `Runtime: ${manifest.status.runtime_display} <span class="status-indicator"></span>`;
+  const runtime =
+    manifest.status?.runtime_display || manifest.runtime || "Not started";
+  if (runtimeEl) {
+    runtimeEl.innerHTML = `Runtime: ${runtime} <span class="status-indicator"></span>`;
   }
 
   // Update estimated
   const estimatedEl = statusContent.querySelector(
     ".status-current .status-time",
   );
-  if (estimatedEl && manifest.status?.estimated_display) {
-    estimatedEl.innerHTML = `Estimated: ${manifest.status.estimated_display} <span class="status-gear">⚙</span>`;
+  const estimated =
+    manifest.status?.estimated_display ||
+    (manifest.estimated_seconds
+      ? `${manifest.estimated_seconds} sec`
+      : "calculating...");
+  if (estimatedEl) {
+    estimatedEl.innerHTML = `Estimated: ${estimated} <span class="status-gear">⚙</span>`;
   }
+
+  console.log(
+    "[Manifest] Status updated - action:",
+    currentAction,
+    "runtime:",
+    runtime,
+    "estimated:",
+    estimated,
+  );
 }
 
 function buildProgressTreeHTML(manifest, totalSteps) {
   let html = '<div class="taskmd-tree">';
 
   for (const section of manifest.sections) {
-    const statusClass = section.status?.toLowerCase() || "pending";
+    // Normalize status - backend sends "Running", "Completed", etc.
+    const rawStatus = section.status || "Pending";
+    const statusClass = rawStatus.toLowerCase();
     const isRunning = statusClass === "running";
     const globalCurrent =
       section.progress?.global_current || section.progress?.current || 0;
-    const statusText = section.status || "Pending";
+
+    console.log(
+      "[Manifest] Section:",
+      section.name,
+      "status:",
+      rawStatus,
+      "children:",
+      section.children?.length,
+    );
 
     html += `
       <div class="tree-section ${statusClass}${isRunning ? " expanded" : ""}" data-section-id="${section.id}">
         <div class="tree-row tree-level-0" onclick="this.parentElement.classList.toggle('expanded')">
           <span class="tree-name">${escapeHtml(section.name)}</span>
           <span class="tree-step-badge">Step ${globalCurrent}/${totalSteps}</span>
-          <span class="tree-status ${statusClass}">${statusText}</span>
+          <span class="tree-status ${statusClass}">${rawStatus}</span>
           <span class="tree-section-dot ${statusClass}"></span>
         </div>
         <div class="tree-children">`;
 
-    // Children
-    if (section.children?.length > 0) {
+    // Children (e.g., "Database Schema Design" under "Database & Models")
+    if (section.children && section.children.length > 0) {
       for (const child of section.children) {
-        const childStatus = child.status?.toLowerCase() || "pending";
+        const childRawStatus = child.status || "Pending";
+        const childStatus = childRawStatus.toLowerCase();
         const childIsRunning = childStatus === "running";
+
+        console.log(
+          "[Manifest]   Child:",
+          child.name,
+          "status:",
+          childRawStatus,
+          "items:",
+          (child.item_groups?.length || 0) + (child.items?.length || 0),
+        );
+
         html += `
           <div class="tree-child ${childStatus}${childIsRunning ? " expanded" : ""}" data-child-id="${child.id}">
             <div class="tree-row tree-level-1" onclick="this.parentElement.classList.toggle('expanded')">
               <span class="tree-item-dot ${childStatus}"></span>
               <span class="tree-name">${escapeHtml(child.name)}</span>
               <span class="tree-step-badge">Step ${child.progress?.current || 0}/${child.progress?.total || 1}</span>
-              <span class="tree-status ${childStatus}">${child.status || "Pending"}</span>
+              <span class="tree-status ${childStatus}">${childRawStatus}</span>
             </div>
             <div class="tree-items">`;
 
-        // Items
-        const items = [...(child.item_groups || []), ...(child.items || [])];
-        for (const item of items) {
+        // Items within child (e.g., "email, password_hash, email_verified")
+        const childItems = [
+          ...(child.item_groups || []),
+          ...(child.items || []),
+        ];
+        for (const item of childItems) {
           html += buildItemHTML(item);
         }
 
@@ -591,7 +663,7 @@ function buildProgressTreeHTML(manifest, totalSteps) {
       }
     }
 
-    // Section-level items
+    // Section-level items (items directly under section, not in children)
     const sectionItems = [
       ...(section.item_groups || []),
       ...(section.items || []),
