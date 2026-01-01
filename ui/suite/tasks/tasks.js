@@ -10,7 +10,7 @@
 // Prevent duplicate declaration when script is reloaded via HTMX
 if (typeof TasksState === "undefined") {
   var TasksState = {
-    selectedTaskId: 2, // Default selected task
+    selectedTaskId: null, // No task selected initially
     currentFilter: "complete",
     tasks: [],
     wsConnection: null,
