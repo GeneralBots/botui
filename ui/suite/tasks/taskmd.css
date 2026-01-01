@@ -177,16 +177,21 @@
     border-radius: 50%;
     margin-right: 12px;
     flex-shrink: 0;
+    background: var(--accent, #c5f82a);
+    box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.5));
+    animation: dot-pulse 1.5s ease-in-out infinite;
 }
 
 .status-dot.active {
     background: var(--accent, #c5f82a);
     box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.5));
+    animation: dot-pulse 1.5s ease-in-out infinite;
 }
 
 .status-dot.pending {
-    background: transparent;
-    border: 1px dashed var(--text-muted, #444);
+    background: var(--text-muted, #444);
+    box-shadow: none;
+    animation: none;
 }
 
 .status-badge {
@@ -211,6 +216,17 @@
 .taskmd-tree {
     display: flex;
     flex-direction: column;
+}
+
+/* Smooth transitions for all tree elements */
+.tree-section,
+.tree-child,
+.tree-item,
+.tree-item-dot,
+.tree-section-dot,
+.tree-status,
+.tree-step-badge {
+    transition: all 0.2s ease-out;
 }
 
 /* Tree Section (Level 0) - Main sections like "Database & Models" */
@@ -281,12 +297,21 @@
     margin-left: auto;
     margin-right: 12px;
     white-space: nowrap;
+    transition:
+        background 0.2s ease-out,
+        color 0.2s ease-out;
 }
 
 .tree-section.pending .tree-step-badge,
 .tree-child.pending .tree-step-badge {
-    background: var(--surface-active, #2a2a2a);
-    color: var(--text-tertiary, #666);
+    background: var(--surface-active, #333);
+    color: var(--text-secondary, #888);
+}
+
+.tree-section.running .tree-step-badge,
+.tree-child.running .tree-step-badge {
+    background: var(--accent, #c5f82a);
+    color: var(--bg, #0a0a0a);
 }
 
 .tree-status {
@@ -397,8 +422,8 @@
     border-radius: 50%;
     margin-right: 12px;
     flex-shrink: 0;
-    background: var(--text-muted, #333);
-    transition: all 0.2s;
+    background: var(--text-muted, #444);
+    transition: all 0.3s ease-out;
 }
 
 .tree-item-dot.completed {
@@ -423,11 +448,13 @@
     0%,
     100% {
         opacity: 1;
-        box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.6));
+        box-shadow: 0 0 10px var(--accent-glow, rgba(197, 248, 42, 0.8));
+        transform: scale(1);
     }
     50% {
-        opacity: 0.6;
-        box-shadow: 0 0 4px var(--accent-glow, rgba(197, 248, 42, 0.3));
+        opacity: 0.7;
+        box-shadow: 0 0 4px var(--accent-glow, rgba(197, 248, 42, 0.4));
+        transform: scale(0.9);
     }
 }
 

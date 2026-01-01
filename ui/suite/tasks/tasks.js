@@ -521,24 +521,26 @@ function renderManifestProgress(taskId, manifest, retryCount = 0) {
     return;
   }
 
-  console.log("[Manifest] Rendering", manifest.sections.length, "sections");
-
   const totalSteps = manifest.progress?.total || 60;
 
   // Update STATUS section if exists
   updateStatusSection(manifest);
 
-  // Always rebuild the tree to ensure children are shown
-  // This is simpler and more reliable than incremental updates
-  const html = buildProgressTreeHTML(manifest, totalSteps);
-  progressLog.innerHTML = html;
-
-  // Auto-expand running sections
-  progressLog
-    .querySelectorAll(".tree-section.running, .tree-child.running")
-    .forEach((el) => {
-      el.classList.add("expanded");
-    });
+  // Check if tree exists - if not, create it; if yes, update incrementally
+  let tree = progressLog.querySelector(".taskmd-tree");
+  if (!tree) {
+    // First render only - create the tree structure
+    progressLog.innerHTML = buildProgressTreeHTML(manifest, totalSteps);
+    // Auto-expand running sections
+    progressLog
+      .querySelectorAll(".tree-section.running, .tree-child.running")
+      .forEach((el) => {
+        el.classList.add("expanded");
+      });
+  } else {
+    // Incremental update - only update what changed (no flicker)
+    updateProgressTreeInPlace(tree, manifest, totalSteps);
+  }
 
   // Update terminal stats
   updateTerminalStats(taskId, manifest);
@@ -546,12 +548,9 @@ function renderManifestProgress(taskId, manifest, retryCount = 0) {
 
 function updateStatusSection(manifest) {
   const statusContent = document.querySelector(".taskmd-status-content");
-  if (!statusContent) {
-    console.log("[Manifest] No status content element found");
-    return;
-  }
+  if (!statusContent) return;
 
-  // Update current action
+  // Update current action text only if changed
   const actionText = statusContent.querySelector(
     ".status-current .status-text",
   );
@@ -559,19 +558,25 @@ function updateStatusSection(manifest) {
     manifest.status?.current_action ||
     manifest.current_status?.current_action ||
     "Processing...";
-  if (actionText) {
+  if (actionText && actionText.textContent !== currentAction) {
     actionText.textContent = currentAction;
   }
 
-  // Update runtime
+  // Update runtime text only
   const runtimeEl = statusContent.querySelector(".status-main .status-time");
   const runtime =
     manifest.status?.runtime_display || manifest.runtime || "Not started";
   if (runtimeEl) {
-    runtimeEl.innerHTML = `Runtime: ${runtime} <span class="status-indicator"></span>`;
+    // Only update text content, preserve indicator
+    const indicator = runtimeEl.querySelector(".status-indicator");
+    if (!indicator) {
+      runtimeEl.innerHTML = `Runtime: ${runtime} <span class="status-indicator"></span>`;
+    } else {
+      runtimeEl.firstChild.textContent = `Runtime: ${runtime} `;
+    }
   }
 
-  // Update estimated
+  // Update estimated text only
   const estimatedEl = statusContent.querySelector(
     ".status-current .status-time",
   );
@@ -581,17 +586,13 @@ function updateStatusSection(manifest) {
       ? `${manifest.estimated_seconds} sec`
       : "calculating...");
   if (estimatedEl) {
-    estimatedEl.innerHTML = `Estimated: ${estimated} <span class="status-gear">⚙</span>`;
+    const gear = estimatedEl.querySelector(".status-gear");
+    if (!gear) {
+      estimatedEl.innerHTML = `Estimated: ${estimated} <span class="status-gear">⚙</span>`;
+    } else {
+      estimatedEl.firstChild.textContent = `Estimated: ${estimated} `;
+    }
   }
-
-  console.log(
-    "[Manifest] Status updated - action:",
-    currentAction,
-    "runtime:",
-    runtime,
-    "estimated:",
-    estimated,
-  );
 }
 
 function buildProgressTreeHTML(manifest, totalSteps) {
@@ -698,103 +699,182 @@ function buildItemHTML(item) {
     </div>`;
 }
 
-function updateProgressTree(tree, manifest, totalSteps) {
+// Incremental update - only change what's different (prevents flicker)
+function updateProgressTreeInPlace(tree, manifest, totalSteps) {
   for (const section of manifest.sections) {
     const sectionEl = tree.querySelector(`[data-section-id="${section.id}"]`);
     if (!sectionEl) continue;
 
-    const statusClass = section.status?.toLowerCase() || "pending";
+    const rawStatus = section.status || "Pending";
+    const statusClass = rawStatus.toLowerCase();
     const globalCurrent =
       section.progress?.global_current || section.progress?.current || 0;
+    const isExpanded = sectionEl.classList.contains("expanded");
 
-    // Update section class
-    sectionEl.className = `tree-section ${statusClass}${statusClass === "running" ? " expanded" : sectionEl.classList.contains("expanded") ? " expanded" : ""}`;
+    // Update section classes without removing expanded
+    const newClasses = `tree-section ${statusClass}${statusClass === "running" || isExpanded ? " expanded" : ""}`;
+    if (sectionEl.className !== newClasses) {
+      sectionEl.className = newClasses;
+    }
 
-    // Update step badge
+    // Update step badge text only if changed
     const stepBadge = sectionEl.querySelector(
       ":scope > .tree-row .tree-step-badge",
     );
-    if (stepBadge)
-      stepBadge.textContent = `Step ${globalCurrent}/${totalSteps}`;
+    const stepText = `Step ${globalCurrent}/${totalSteps}`;
+    if (stepBadge && stepBadge.textContent !== stepText) {
+      stepBadge.textContent = stepText;
+    }
 
-    // Update status text
+    // Update status text and class only if changed
     const statusEl = sectionEl.querySelector(":scope > .tree-row .tree-status");
     if (statusEl) {
-      statusEl.className = `tree-status ${statusClass}`;
-      statusEl.textContent = section.status || "Pending";
+      if (statusEl.textContent !== rawStatus) {
+        statusEl.textContent = rawStatus;
+      }
+      const statusClasses = `tree-status ${statusClass}`;
+      if (statusEl.className !== statusClasses) {
+        statusEl.className = statusClasses;
+      }
+    }
+
+    // Update section dot
+    const sectionDot = sectionEl.querySelector(
+      ":scope > .tree-row .tree-section-dot",
+    );
+    if (sectionDot) {
+      const dotClasses = `tree-section-dot ${statusClass}`;
+      if (sectionDot.className !== dotClasses) {
+        sectionDot.className = dotClasses;
+      }
     }
 
     // Update children
     if (section.children) {
       for (const child of section.children) {
-        const childEl = sectionEl.querySelector(
-          `[data-child-id="${child.id}"]`,
-        );
-        if (!childEl) continue;
-
-        const childStatus = child.status?.toLowerCase() || "pending";
-        childEl.className = `tree-child ${childStatus}${childStatus === "running" ? " expanded" : childEl.classList.contains("expanded") ? " expanded" : ""}`;
-
-        const childStepBadge = childEl.querySelector(
-          ":scope > .tree-row .tree-step-badge",
-        );
-        if (childStepBadge)
-          childStepBadge.textContent = `Step ${child.progress?.current || 0}/${child.progress?.total || 1}`;
-
-        const childStatusEl = childEl.querySelector(
-          ":scope > .tree-row .tree-status",
-        );
-        if (childStatusEl) {
-          childStatusEl.className = `tree-status ${childStatus}`;
-          childStatusEl.textContent = child.status || "Pending";
-        }
-
-        // Update items
-        updateItems(childEl.querySelector(".tree-items"), [
-          ...(child.item_groups || []),
-          ...(child.items || []),
-        ]);
+        updateChildInPlace(sectionEl, child);
       }
     }
 
     // Update section-level items
-    updateItems(sectionEl.querySelector(".tree-children"), [
-      ...(section.item_groups || []),
-      ...(section.items || []),
+    const childrenContainer = sectionEl.querySelector(".tree-children");
+    if (childrenContainer) {
+      updateItemsInPlace(childrenContainer, [
+        ...(section.item_groups || []),
+        ...(section.items || []),
+      ]);
+    }
+  }
+}
+
+function updateChildInPlace(sectionEl, child) {
+  const childEl = sectionEl.querySelector(`[data-child-id="${child.id}"]`);
+  if (!childEl) return;
+
+  const rawStatus = child.status || "Pending";
+  const statusClass = rawStatus.toLowerCase();
+  const isExpanded = childEl.classList.contains("expanded");
+
+  // Update child classes
+  const newClasses = `tree-child ${statusClass}${statusClass === "running" || isExpanded ? " expanded" : ""}`;
+  if (childEl.className !== newClasses) {
+    childEl.className = newClasses;
+  }
+
+  // Update step badge
+  const stepBadge = childEl.querySelector(
+    ":scope > .tree-row .tree-step-badge",
+  );
+  const stepText = `Step ${child.progress?.current || 0}/${child.progress?.total || 1}`;
+  if (stepBadge && stepBadge.textContent !== stepText) {
+    stepBadge.textContent = stepText;
+  }
+
+  // Update status
+  const statusEl = childEl.querySelector(":scope > .tree-row .tree-status");
+  if (statusEl) {
+    if (statusEl.textContent !== rawStatus) {
+      statusEl.textContent = rawStatus;
+    }
+    const statusClasses = `tree-status ${statusClass}`;
+    if (statusEl.className !== statusClasses) {
+      statusEl.className = statusClasses;
+    }
+  }
+
+  // Update child dot
+  const childDot = childEl.querySelector(":scope > .tree-row .tree-item-dot");
+  if (childDot) {
+    const dotClasses = `tree-item-dot ${statusClass}`;
+    if (childDot.className !== dotClasses) {
+      childDot.className = dotClasses;
+    }
+  }
+
+  // Update items within child
+  const itemsContainer = childEl.querySelector(".tree-items");
+  if (itemsContainer) {
+    updateItemsInPlace(itemsContainer, [
+      ...(child.item_groups || []),
+      ...(child.items || []),
     ]);
   }
 }
 
-function updateItems(container, items) {
+function updateItemsInPlace(container, items) {
   if (!container || !items) return;
 
   for (const item of items) {
     const itemId = item.id || item.name || item.display_name;
-    const itemEl = container.querySelector(`[data-item-id="${itemId}"]`);
+    let itemEl = container.querySelector(`[data-item-id="${itemId}"]`);
+
     if (!itemEl) {
       // New item - append it
       container.insertAdjacentHTML("beforeend", buildItemHTML(item));
       continue;
     }
 
-    const status = item.status?.toLowerCase() || "pending";
-    itemEl.className = `tree-item ${status}`;
+    const rawStatus = item.status || "Pending";
+    const status = rawStatus.toLowerCase();
 
-    const dot = itemEl.querySelector(".tree-item-dot");
-    if (dot) dot.className = `tree-item-dot ${status}`;
-
-    const check = itemEl.querySelector(".tree-item-check");
-    if (check) {
-      check.className = `tree-item-check ${status}`;
-      check.textContent = status === "completed" ? "✓" : "";
+    // Update item class
+    const newClasses = `tree-item ${status}`;
+    if (itemEl.className !== newClasses) {
+      itemEl.className = newClasses;
     }
 
+    // Update dot
+    const dot = itemEl.querySelector(".tree-item-dot");
+    if (dot) {
+      const dotClasses = `tree-item-dot ${status}`;
+      if (dot.className !== dotClasses) {
+        dot.className = dotClasses;
+      }
+    }
+
+    // Update check
+    const check = itemEl.querySelector(".tree-item-check");
+    if (check) {
+      const checkClasses = `tree-item-check ${status}`;
+      if (check.className !== checkClasses) {
+        check.className = checkClasses;
+      }
+      const checkText = status === "completed" ? "✓" : "";
+      if (check.textContent !== checkText) {
+        check.textContent = checkText;
+      }
+    }
+
+    // Update duration
     const durationEl = itemEl.querySelector(".tree-item-duration");
     if (durationEl && item.duration_seconds) {
-      durationEl.textContent =
+      const durationText =
         item.duration_seconds >= 60
           ? `Duration: ${Math.floor(item.duration_seconds / 60)} min`
           : `Duration: ${item.duration_seconds} sec`;
+      if (durationEl.textContent !== durationText) {
+        durationEl.textContent = durationText;
+      }
     }
   }
 }
