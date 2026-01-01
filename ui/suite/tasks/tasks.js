@@ -560,9 +560,9 @@ function buildProgressTreeHTML(manifest, totalSteps) {
       <div class="tree-section ${statusClass}${isRunning ? " expanded" : ""}" data-section-id="${section.id}">
         <div class="tree-row tree-level-0" onclick="this.parentElement.classList.toggle('expanded')">
           <span class="tree-name">${escapeHtml(section.name)}</span>
-          <span class="tree-view-details">View Details ›</span>
           <span class="tree-step-badge">Step ${globalCurrent}/${totalSteps}</span>
           <span class="tree-status ${statusClass}">${statusText}</span>
+          <span class="tree-section-dot ${statusClass}"></span>
         </div>
         <div class="tree-children">`;
 
@@ -574,9 +574,8 @@ function buildProgressTreeHTML(manifest, totalSteps) {
         html += `
           <div class="tree-child ${childStatus}${childIsRunning ? " expanded" : ""}" data-child-id="${child.id}">
             <div class="tree-row tree-level-1" onclick="this.parentElement.classList.toggle('expanded')">
-              <span class="tree-indent"></span>
+              <span class="tree-item-dot ${childStatus}"></span>
               <span class="tree-name">${escapeHtml(child.name)}</span>
-              <span class="tree-view-details">View Details ›</span>
               <span class="tree-step-badge">Step ${child.progress?.current || 0}/${child.progress?.total || 1}</span>
               <span class="tree-status ${childStatus}">${child.status || "Pending"}</span>
             </div>

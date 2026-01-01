@@ -1718,6 +1718,7 @@
 
 /* Section/Child name */
 [data-theme="sentient"] .tree-name {
+    flex: 1;
     font-size: 14px;
     font-weight: 500;
     color: var(--text);
@@ -1728,18 +1729,31 @@
     color: var(--text-secondary);
 }
 
-/* View Details link */
-[data-theme="sentient"] .tree-view-details {
-    font-size: 12px;
-    color: var(--text-tertiary);
-    margin-left: 12px;
-    margin-right: auto;
-    cursor: pointer;
-    transition: color 0.15s;
+/* Section dot indicator on right side */
+[data-theme="sentient"] .tree-section-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--text-muted);
 }
 
-[data-theme="sentient"] .tree-view-details:hover {
-    color: var(--accent);
+[data-theme="sentient"] .tree-section-dot.completed {
+    background: var(--accent);
+}
+
+[data-theme="sentient"] .tree-section-dot.running {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent-glow);
+    animation: sentient-dot-pulse 1.5s ease-in-out infinite;
+}
+
+[data-theme="sentient"] .tree-section-dot.pending {
+    background: var(--text-muted);
+}
+
+[data-theme="sentient"] .tree-section-dot.failed {
+    background: var(--error);
 }
 
 /* Step badge - green pill */
@@ -1750,6 +1764,7 @@
     border-radius: 4px;
     font-size: 11px;
     font-weight: 600;
+    margin-left: auto;
     margin-right: 12px;
     white-space: nowrap;
 }
@@ -1764,8 +1779,9 @@
 [data-theme="sentient"] .tree-status {
     font-size: 12px;
     color: var(--text-tertiary);
-    min-width: 80px;
+    min-width: 70px;
     text-align: right;
+    margin-right: 12px;
 }
 
 [data-theme="sentient"] .tree-status.completed {
@@ -1799,18 +1815,21 @@
     border-bottom: none;
 }
 
-/* Indent line */
-[data-theme="sentient"] .tree-indent {
-    width: 20px;
-    height: 1px;
-    background: var(--border);
+/* Child row with dot */
+[data-theme="sentient"] .tree-level-1 .tree-item-dot {
     margin-right: 12px;
+}
+
+[data-theme="sentient"] .tree-level-1 .tree-name {
+    font-size: 13px;
+    color: var(--text-secondary);
 }
 
 /* Tree items container */
 [data-theme="sentient"] .tree-items {
     display: none;
-    padding: 8px 0 16px 0;
+    padding: 12px 0 16px 0;
+    padding-left: 24px;
     background: var(--bg);
 }
 
@@ -1827,8 +1846,8 @@
 [data-theme="sentient"] .tree-item {
     display: flex;
     align-items: center;
-    padding: 10px 20px 10px 60px;
-    min-height: 36px;
+    padding: 8px 20px 8px 24px;
+    min-height: 32px;
 }
 
 [data-theme="sentient"] .tree-item.running {
@@ -1898,6 +1917,7 @@
 [data-theme="sentient"] .tree-item-duration {
     font-size: 12px;
     color: var(--text-muted);
+    margin-left: auto;
     margin-right: 8px;
     white-space: nowrap;
 }

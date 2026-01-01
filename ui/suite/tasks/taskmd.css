@@ -264,21 +264,8 @@
     color: var(--text-tertiary, #666);
 }
 
-/* View Details link */
-.tree-view-details {
-    font-size: 12px;
-    color: var(--text-tertiary, #666);
-    margin-left: 12px;
-    margin-right: auto;
-    cursor: pointer;
-    transition: color 0.15s;
-}
-
-.tree-view-details:hover {
-    color: var(--accent, #c5f82a);
-}
-
 .tree-name {
+    flex: 1;
     font-size: 14px;
     font-weight: 500;
     color: var(--text, #e0e0e0);
@@ -291,6 +278,7 @@
     border-radius: 4px;
     font-size: 11px;
     font-weight: 600;
+    margin-left: auto;
     margin-right: 12px;
     white-space: nowrap;
 }
@@ -304,8 +292,36 @@
 .tree-status {
     font-size: 12px;
     color: var(--text-tertiary, #666);
-    min-width: 80px;
+    min-width: 70px;
     text-align: right;
+    margin-right: 12px;
+}
+
+/* Section dot indicator on right side */
+.tree-section-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--text-muted, #333);
+}
+
+.tree-section-dot.completed {
+    background: var(--accent, #c5f82a);
+}
+
+.tree-section-dot.running {
+    background: var(--accent, #c5f82a);
+    box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.6));
+    animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+.tree-section-dot.pending {
+    background: var(--text-muted, #333);
+}
+
+.tree-section-dot.failed {
+    background: var(--error, #ef4444);
 }
 
 .tree-status.completed {
@@ -339,17 +355,11 @@
     border-bottom: none;
 }
 
-.tree-indent {
-    width: 20px;
-    height: 1px;
-    background: var(--border, #2a2a2a);
-    margin-right: 12px;
-}
-
 /* Tree Items (Level 2) - Individual items like files */
 .tree-items {
     display: none;
-    padding: 8px 0 16px 0;
+    padding: 12px 0 16px 0;
+    padding-left: 24px;
     background: var(--bg, #080808);
 }
 
@@ -359,7 +369,25 @@
 
 /* Section-level items */
 .tree-children > .tree-item {
-    padding-left: 40px;
+    padding-left: 24px;
+}
+
+/* Child row in tree-level-1 */
+.tree-level-1 {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px 12px 24px;
+    background: transparent;
+    border-top: none;
+}
+
+.tree-level-1 .tree-item-dot {
+    margin-right: 12px;
+}
+
+.tree-level-1 .tree-name {
+    font-size: 13px;
+    color: var(--text-secondary, #ccc);
 }
 
 /* Item Dot Indicator - the colored dots */
@@ -415,6 +443,7 @@
 .tree-item-duration {
     font-size: 12px;
     color: var(--text-muted, #555);
+    margin-left: auto;
     margin-right: 8px;
     white-space: nowrap;
 }
@@ -442,8 +471,8 @@
 .tree-item {
     display: flex;
     align-items: center;
-    padding: 10px 20px 10px 60px;
-    min-height: 36px;
+    padding: 8px 20px 8px 24px;
+    min-height: 32px;
 }
 
 .tree-item.completed .tree-item-name {
