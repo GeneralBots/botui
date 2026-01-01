@@ -378,7 +378,9 @@
         }
 
         taskPollingInterval = setInterval(function () {
-            fetch(`/api/autotask/${taskId}`)
+            fetch(`/api/tasks/${taskId}`, {
+                headers: { Accept: "application/json" },
+            })
                 .then((r) => r.json())
                 .then((task) => {
                     console.log("[TASK] Poll status:", task.status);

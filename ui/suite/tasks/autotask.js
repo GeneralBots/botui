@@ -206,6 +206,11 @@ function initTaskProgressWebSocket() {
 }
 
 function handleTaskProgressMessage(data) {
+  // Forward to ProgressPanel if available
+  if (typeof ProgressPanel !== "undefined" && ProgressPanel.manifest) {
+    ProgressPanel.handleProgressUpdate(data);
+  }
+
   console.log("Task progress:", data);
 
   switch (data.type) {
@@ -394,11 +399,24 @@ function loadIntentDetail(intentId) {
     </div>
   `;
 
-  // Fetch intent details
-  fetch(`/api/autotask/${intentId}`)
-    .then((response) => response.json())
-    .then((data) => {
-      renderIntentDetail(data);
+  // Fetch intent details and manifest in parallel
+  Promise.all([
+    fetch(`/api/autotask/${intentId}`).then((r) => r.json()),
+    fetch(`/api/autotask/${intentId}/manifest`)
+      .then((r) => r.json())
+      .catch(() => null),
+  ])
+    .then(([taskData, manifestData]) => {
+      renderIntentDetail(taskData);
+
+      // If manifest exists, initialize ProgressPanel
+      if (manifestData && manifestData.success && manifestData.manifest) {
+        if (typeof ProgressPanel !== "undefined") {
+          ProgressPanel.manifest = manifestData.manifest;
+          ProgressPanel.init(intentId);
+          ProgressPanel.render();
+        }
+      }
     })
     .catch((error) => {
       console.error("Failed to load intent detail:", error);
@@ -590,6 +608,11 @@ function toggleLogEntry(header) {
 }
 
 function closeDetailPanel() {
+  // Clean up ProgressPanel if active
+  if (typeof ProgressPanel !== "undefined") {
+    ProgressPanel.destroy();
+  }
+
   AutoTaskState.selectedIntentId = null;
 
   document.querySelectorAll(".intent-card").forEach((card) => {

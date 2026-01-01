@@ -56,8 +56,39 @@ function initTasksApp() {
   setupEventListeners();
   setupKeyboardShortcuts();
   setupIntentInputHandlers();
+  setupHtmxListeners();
   scrollAgentLogToBottom();
   console.log("[Tasks] Initialized");
+}
+
+function setupHtmxListeners() {
+  // Listen for HTMX content swaps to apply pending manifest updates
+  document.body.addEventListener("htmx:afterSwap", function (evt) {
+    const target = evt.detail.target;
+    if (
+      target &&
+      (target.id === "task-detail-content" ||
+        target.closest("#task-detail-content"))
+    ) {
+      console.log(
+        "[HTMX] Task detail content loaded, checking for pending manifest updates",
+      );
+      // Check if there's a pending manifest update for the selected task
+      if (
+        TasksState.selectedTaskId &&
+        pendingManifestUpdates.has(TasksState.selectedTaskId)
+      ) {
+        const manifest = pendingManifestUpdates.get(TasksState.selectedTaskId);
+        console.log(
+          "[HTMX] Applying pending manifest for task:",
+          TasksState.selectedTaskId,
+        );
+        setTimeout(() => {
+          renderManifestProgress(TasksState.selectedTaskId, manifest, 0);
+        }, 50);
+      }
+    }
+  });
 }
 
 function setupIntentInputHandlers() {
@@ -181,7 +212,11 @@ function startTaskPolling(taskId) {
     }
 
     try {
-      const response = await fetch(`/api/autotask/tasks/${taskId}`);
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
       if (!response.ok) {
         console.error(`[POLL] Failed to fetch task status: ${response.status}`);
         return;
@@ -400,13 +435,296 @@ function handleWebSocketMessage(data) {
       break;
 
     case "llm_stream":
-      // Stream LLM output to terminal in real-time
-      if (data.text) {
-        addAgentLog("accent", data.text);
-        addLLMStreamOutput(data.text);
+      // Don't show raw LLM stream in terminal - it contains HTML/code garbage
+      // Progress is shown via manifest_update events instead
+      console.log("[Tasks WS] LLM streaming...");
+      break;
+
+    case "manifest_update":
+      console.log("[Tasks WS] MANIFEST_UPDATE for task:", data.task_id);
+      // Update the progress log section with manifest data
+      if (data.details) {
+        try {
+          const manifestData = JSON.parse(data.details);
+          renderManifestProgress(data.task_id, manifestData);
+        } catch (e) {
+          console.error("[Tasks WS] Failed to parse manifest:", e);
+        }
       }
       break;
   }
+}
+
+// Store pending manifest updates for tasks whose elements aren't loaded yet
+const pendingManifestUpdates = new Map();
+
+function renderManifestProgress(taskId, manifest, retryCount = 0) {
+  console.log(
+    "[Manifest] renderManifestProgress called for task:",
+    taskId,
+    "sections:",
+    manifest?.sections?.length,
+    "retry:",
+    retryCount,
+  );
+
+  // Try multiple selectors to find the progress log element
+  let progressLog = document.getElementById(`progress-log-${taskId}`);
+  if (!progressLog) {
+    progressLog = document.querySelector(".taskmd-progress-content");
+  }
+  if (!progressLog) {
+    progressLog = document.querySelector(".progress-summary-content");
+  }
+
+  if (!progressLog) {
+    console.warn("[Manifest] No progress log element found for task:", taskId);
+    // Try to find any visible task detail panel
+    const detailPanel = document.querySelector(".task-detail-rich");
+    if (detailPanel) {
+      const taskDetailId = detailPanel.dataset.taskId;
+      console.log("[Manifest] Found detail panel for task:", taskDetailId);
+      if (taskDetailId === taskId) {
+        progressLog = detailPanel.querySelector(".taskmd-progress-content");
+      }
+    }
+    if (!progressLog) {
+      // If task is selected but element not yet loaded, retry after a delay
+      if (TasksState.selectedTaskId === taskId && retryCount < 5) {
+        console.log(
+          "[Manifest] Element not ready, scheduling retry",
+          retryCount + 1,
+        );
+        pendingManifestUpdates.set(taskId, manifest);
+        setTimeout(
+          () => {
+            const pending = pendingManifestUpdates.get(taskId);
+            if (pending) {
+              renderManifestProgress(taskId, pending, retryCount + 1);
+            }
+          },
+          200 * (retryCount + 1),
+        );
+      }
+      return;
+    }
+  }
+
+  // Clear pending update since we found the element
+  pendingManifestUpdates.delete(taskId);
+
+  if (!manifest || !manifest.sections) {
+    console.log("[Manifest] No sections in manifest");
+    return;
+  }
+
+  console.log("[Manifest] Rendering", manifest.sections.length, "sections");
+
+  // Get total steps from manifest progress
+  const totalSteps = manifest.progress?.total || 60;
+
+  let html = '<div class="taskmd-tree">';
+
+  for (const section of manifest.sections) {
+    const statusClass = section.status
+      ? section.status.toLowerCase()
+      : "pending";
+
+    // Use global step count (e.g., "Step 24/60")
+    const globalCurrent =
+      section.progress?.global_current || section.progress?.current || 0;
+    const globalStart = section.progress?.global_start || 0;
+
+    const statusText = section.status || "Pending";
+
+    // Calculate section progress percentage
+    const sectionCurrent = section.progress?.current || 0;
+    const sectionTotal = section.progress?.total || 1;
+    const sectionPercent = Math.round((sectionCurrent / sectionTotal) * 100);
+    const showProgress = statusClass === "running" && sectionTotal > 1;
+
+    html += `
+      <div class="tree-section ${statusClass}" data-section-id="${section.id}">
+        <div class="tree-row tree-level-0" onclick="this.parentElement.classList.toggle('expanded')">
+          <span class="tree-name">${escapeHtml(section.name)}</span>
+          <span class="tree-view-details">View Details ›</span>
+          <span class="tree-step-badge">Step ${globalCurrent}/${totalSteps}</span>
+          <span class="tree-status ${statusClass}">${statusText}</span>
+        </div>
+        ${
+          showProgress
+            ? `
+        <div class="tree-progress-bar-container">
+          <div class="tree-progress-bar" style="width: ${sectionPercent}%"></div>
+          <span class="tree-progress-percent">${sectionPercent}%</span>
+        </div>`
+            : ""
+        }
+        <div class="tree-children">`;
+
+    // Render children if present
+    if (section.children && section.children.length > 0) {
+      for (const child of section.children) {
+        const childStatus = child.status
+          ? child.status.toLowerCase()
+          : "pending";
+        const childStepCurrent = child.progress?.current || 0;
+        const childStepTotal = child.progress?.total || 1;
+        const childStatusText = child.status || "Pending";
+
+        html += `
+          <div class="tree-child ${childStatus}" onclick="this.classList.toggle('expanded')">
+            <div class="tree-row tree-level-1">
+              <span class="tree-indent"></span>
+              <span class="tree-name">${escapeHtml(child.name)}</span>
+              <span class="tree-view-details">View Details ›</span>
+              <span class="tree-step-badge">Step ${childStepCurrent}/${childStepTotal}</span>
+              <span class="tree-status ${childStatus}">${childStatusText}</span>
+            </div>
+            <div class="tree-items">`;
+
+        // Render item_groups first (grouped fields like "email, password_hash, email_verified")
+        if (child.item_groups && child.item_groups.length > 0) {
+          for (const group of child.item_groups) {
+            const groupStatus = group.status
+              ? group.status.toLowerCase()
+              : "pending";
+            const checkIcon = groupStatus === "completed" ? "✓" : "";
+            const duration = group.duration_seconds
+              ? group.duration_seconds >= 60
+                ? `Duration: ${Math.floor(group.duration_seconds / 60)} min`
+                : `Duration: ${group.duration_seconds} sec`
+              : "";
+
+            html += `
+              <div class="tree-item ${groupStatus}">
+                <span class="tree-item-dot ${groupStatus}"></span>
+                <span class="tree-item-name">${escapeHtml(group.name)}</span>
+                <span class="tree-item-duration">${duration}</span>
+                <span class="tree-item-check ${groupStatus}">${checkIcon}</span>
+              </div>`;
+          }
+        }
+
+        // Then render individual items
+        if (child.items && child.items.length > 0) {
+          for (const item of child.items) {
+            const itemStatus = item.status
+              ? item.status.toLowerCase()
+              : "pending";
+            const checkIcon = itemStatus === "completed" ? "✓" : "";
+            const duration = item.duration_seconds
+              ? item.duration_seconds >= 60
+                ? `Duration: ${Math.floor(item.duration_seconds / 60)} min`
+                : `Duration: ${item.duration_seconds} sec`
+              : "";
+
+            html += `
+              <div class="tree-item ${itemStatus}">
+                <span class="tree-item-dot ${itemStatus}"></span>
+                <span class="tree-item-name">${escapeHtml(item.name)}</span>
+                <span class="tree-item-duration">${duration}</span>
+                <span class="tree-item-check ${itemStatus}">${checkIcon}</span>
+              </div>`;
+          }
+        }
+
+        html += `</div></div>`;
+      }
+    }
+
+    // Render section-level item_groups
+    if (section.item_groups && section.item_groups.length > 0) {
+      for (const group of section.item_groups) {
+        const groupStatus = group.status
+          ? group.status.toLowerCase()
+          : "pending";
+        const checkIcon = groupStatus === "completed" ? "✓" : "";
+        const duration = group.duration_seconds
+          ? group.duration_seconds >= 60
+            ? `Duration: ${Math.floor(group.duration_seconds / 60)} min`
+            : `Duration: ${group.duration_seconds} sec`
+          : "";
+
+        html += `
+          <div class="tree-item ${groupStatus}">
+            <span class="tree-item-dot ${groupStatus}"></span>
+            <span class="tree-item-name">${escapeHtml(group.name)}</span>
+            <span class="tree-item-duration">${duration}</span>
+            <span class="tree-item-check ${groupStatus}">${checkIcon}</span>
+          </div>`;
+      }
+    }
+
+    // Render section-level items
+    if (section.items && section.items.length > 0) {
+      for (const item of section.items) {
+        const itemStatus = item.status ? item.status.toLowerCase() : "pending";
+        const checkIcon = itemStatus === "completed" ? "✓" : "";
+        const duration = item.duration_seconds
+          ? item.duration_seconds >= 60
+            ? `Duration: ${Math.floor(item.duration_seconds / 60)} min`
+            : `Duration: ${item.duration_seconds} sec`
+          : "";
+
+        html += `
+          <div class="tree-item ${itemStatus}">
+            <span class="tree-item-dot ${itemStatus}"></span>
+            <span class="tree-item-name">${escapeHtml(item.name)}</span>
+            <span class="tree-item-duration">${duration}</span>
+            <span class="tree-item-check ${itemStatus}">${checkIcon}</span>
+          </div>`;
+      }
+    }
+
+    html += `</div></div>`;
+  }
+
+  html += "</div>";
+
+  progressLog.innerHTML = html;
+
+  // Also update the STATUS section if it exists
+  const statusSection = document.querySelector(".taskmd-status-content");
+  if (statusSection && manifest.status) {
+    const runtime = manifest.status.runtime_display || "calculating...";
+    const estimated = manifest.status.estimated_display || "calculating...";
+    const currentAction = manifest.status.current_action || "Processing...";
+
+    statusSection.innerHTML = `
+      <div class="status-row status-main">
+        <span class="status-title">${escapeHtml(manifest.status.title || manifest.app_name || "")}</span>
+        <span class="status-time">Runtime: ${runtime}</span>
+      </div>
+      <div class="status-row status-current">
+        <span class="status-dot active"></span>
+        <span class="status-text">${escapeHtml(currentAction)}</span>
+        <span class="status-time">Estimated: ${estimated}</span>
+      </div>
+    `;
+  }
+
+  // Update terminal stats if they exist
+  const processedEl = document.getElementById(`terminal-processed-${taskId}`);
+  if (processedEl && manifest.terminal?.stats) {
+    processedEl.textContent = manifest.terminal.stats.processed || "0";
+  }
+
+  console.log(
+    "[Manifest] Rendered progress for task:",
+    taskId,
+    "completed:",
+    manifest.progress?.current,
+    "/",
+    manifest.progress?.total,
+  );
+}
+
+function escapeHtml(text) {
+  if (!text) return "";
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 function updateActivityMetrics(activity) {
@@ -503,15 +821,70 @@ function updateDetailTerminal(taskId, message, step, activity) {
   addTerminalLine(terminalOutput, message, step, activity);
 }
 
+// Format markdown-like text for terminal display
+function formatTerminalMarkdown(text) {
+  if (!text) return "";
+
+  // Headers (## Header)
+  text = text.replace(
+    /^##\s+(.+)$/gm,
+    '<strong class="terminal-header">$1</strong>',
+  );
+
+  // Bold (**text**)
+  text = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+  // Inline code (`code`)
+  text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
+
+  // Code blocks (```code```)
+  text = text.replace(
+    /```([\s\S]*?)```/g,
+    '<div class="terminal-code">$1</div>',
+  );
+
+  // List items (- item)
+  text = text.replace(/^-\s+(.+)$/gm, "  • $1");
+
+  // Checkmarks
+  text = text.replace(/^✓\s*/gm, '<span class="check-mark">✓</span> ');
+
+  return text;
+}
+
 function addTerminalLine(terminal, message, step, activity) {
   const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
-  const stepClass =
-    step === "error" ? "error" : step === "complete" ? "success" : "";
-  const prefix = step === "error" ? "✗" : step === "complete" ? "✓" : "►";
+  const isLlmStream = step === "llm_stream";
+
+  // Determine line type based on content
+  const isHeader = message && message.startsWith("##");
+  const isSuccess = message && message.startsWith("✓");
+  const isError = step === "error";
+  const isComplete = step === "complete";
+
+  const stepClass = isError
+    ? "error"
+    : isComplete || isSuccess
+      ? "success"
+      : isHeader
+        ? "progress"
+        : isLlmStream
+          ? "llm-stream"
+          : "info";
+
+  // Format the message with markdown
+  const formattedMessage = formatTerminalMarkdown(message);
 
   const line = document.createElement("div");
   line.className = `terminal-line ${stepClass} current`;
-  line.innerHTML = `<span class="term-time">${timestamp}</span> ${prefix} ${message}`;
+
+  if (isLlmStream) {
+    line.innerHTML = `<span class="llm-text">${formattedMessage}</span>`;
+  } else if (isHeader) {
+    line.innerHTML = formattedMessage;
+  } else {
+    line.innerHTML = `<span class="terminal-timestamp">${timestamp}</span>${formattedMessage}`;
+  }
 
   // Remove 'current' class from previous lines
   terminal.querySelectorAll(".terminal-line.current").forEach((el) => {
@@ -818,19 +1191,35 @@ function searchTasks(query) {
 // =============================================================================
 
 function loadTaskDetails(taskId) {
+  if (!taskId) {
+    console.warn("[LOAD] No task ID provided");
+    return;
+  }
+
   addAgentLog("info", `[LOAD] Loading task #${taskId} details`);
 
   // Show detail panel and hide empty state
   const emptyState = document.getElementById("detail-empty");
   const detailContent = document.getElementById("task-detail-content");
 
-  if (emptyState) emptyState.style.display = "none";
-  if (detailContent) detailContent.style.display = "block";
+  if (!detailContent) {
+    console.error("[LOAD] task-detail-content element not found");
+    return;
+  }
 
-  // Fetch task details from API
-  htmx.ajax("GET", `/api/tasks/${taskId}`, {
-    target: "#task-detail-content",
-    swap: "innerHTML",
+  if (emptyState) emptyState.style.display = "none";
+  detailContent.style.display = "block";
+
+  // Fetch task details from API - use requestAnimationFrame to ensure DOM is ready
+  requestAnimationFrame(() => {
+    if (typeof htmx !== "undefined" && htmx.ajax) {
+      htmx.ajax("GET", `/api/tasks/${taskId}`, {
+        target: "#task-detail-content",
+        swap: "innerHTML",
+      });
+    } else {
+      console.error("[LOAD] HTMX not available");
+    }
   });
 }
 
@@ -1065,7 +1454,7 @@ function toggleAgentLogPause() {
 function pauseTask(taskId) {
   addAgentLog("info", `[TASK] Pausing task #${taskId}...`);
 
-  fetch(`/api/autotask/${taskId}/pause`, {
+  fetch(`/api/tasks/${taskId}/pause`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   })
@@ -1099,7 +1488,7 @@ function cancelTask(taskId) {
 
   addAgentLog("info", `[TASK] Cancelling task #${taskId}...`);
 
-  fetch(`/api/autotask/${taskId}/cancel`, {
+  fetch(`/api/tasks/${taskId}/cancel`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
   })

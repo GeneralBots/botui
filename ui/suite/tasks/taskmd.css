@@ -1,0 +1,728 @@
+/* =============================================================================
+   TASK.MD STYLED VIEW - Exact match to design mockup
+   Uses CSS variables for theme compatibility
+   ============================================================================= */
+
+/* Task Detail Panel - Fixed scrolling container */
+.task-detail-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Main Container */
+.task-detail-rich {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    background: var(--bg, #0a0a0a);
+    color: var(--text-secondary, #e0e0e0);
+    font-family: var(
+        --sentient-font-family,
+        "Inter",
+        -apple-system,
+        BlinkMacSystemFont,
+        sans-serif
+    );
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Header */
+.taskmd-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border, #1a1a1a);
+}
+
+.taskmd-url {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-tertiary, #666);
+    margin-bottom: 12px;
+}
+
+.taskmd-url .url-icon {
+    font-size: 14px;
+}
+
+.taskmd-url .url-path {
+    color: var(--text-secondary, #888);
+    font-family: monospace;
+}
+
+.taskmd-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text, #fff);
+    margin: 0 0 12px 0;
+}
+
+.taskmd-status-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.taskmd-status-badge.status-running {
+    background: var(--accent, #c5f82a);
+    color: var(--bg, #0a0a0a);
+}
+
+.taskmd-status-badge.status-completed {
+    background: var(--success, #22c55e);
+    color: #fff;
+}
+
+.taskmd-status-badge.status-error {
+    background: var(--error, #ef4444);
+    color: #fff;
+}
+
+.taskmd-status-badge.status-pending {
+    background: var(--surface-active, #333);
+    color: var(--text-secondary, #888);
+}
+
+/* Section Container */
+.taskmd-section {
+    border-bottom: 1px solid var(--border, #1a1a1a);
+}
+
+.taskmd-section-header {
+    padding: 16px 24px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--text-tertiary, #666);
+    text-transform: uppercase;
+    background: var(--bg-secondary, #0d0d0d);
+}
+
+/* STATUS Section */
+.taskmd-status-content {
+    padding: 16px 24px;
+    background: var(--surface, #111);
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.status-row.status-main {
+    padding-bottom: 12px;
+}
+
+.status-row.status-current {
+    padding-left: 8px;
+}
+
+.status-row.status-decision {
+    padding-left: 8px;
+    opacity: 0.7;
+}
+
+.status-title {
+    flex: 1;
+    font-size: 15px;
+    color: var(--text, #fff);
+}
+
+.status-text {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-secondary, #e0e0e0);
+}
+
+.status-time {
+    font-size: 13px;
+    color: var(--text-tertiary, #666);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.status-dot.active {
+    background: var(--accent, #c5f82a);
+    box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.5));
+}
+
+.status-dot.pending {
+    background: transparent;
+    border: 1px dashed var(--text-muted, #444);
+}
+
+.status-badge {
+    padding: 4px 12px;
+    background: var(--surface-hover, #1a1a1a);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-secondary, #888);
+    margin-left: 12px;
+}
+
+/* PROGRESS LOG Section */
+.taskmd-progress-content {
+    background: var(--bg, #0a0a0a);
+    flex-shrink: 0;
+}
+
+.taskmd-tree {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Tree Section (Level 0) - Main sections like "Database & Models" */
+.tree-section {
+    border: 1px solid var(--border, #1a1a1a);
+    background: var(--surface, #111);
+    border-radius: 8px;
+    margin: 8px 16px;
+    overflow: hidden;
+}
+
+.tree-section:last-child {
+    margin-bottom: 16px;
+}
+
+.tree-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tree-row:hover {
+    background: var(--surface-hover, rgba(255, 255, 255, 0.02));
+}
+
+.tree-level-0 {
+    padding-left: 20px;
+}
+
+.tree-level-1 {
+    padding-left: 40px;
+    background: var(--bg-secondary, #0d0d0d);
+    border-top: 1px solid var(--border, #1a1a1a);
+}
+
+.tree-level-1 .tree-name {
+    font-size: 13px;
+    color: var(--text-secondary, #ccc);
+}
+
+.tree-level-1 .tree-step-badge {
+    background: var(--accent, #c5f82a);
+    font-size: 11px;
+    padding: 3px 10px;
+}
+
+.tree-level-1.pending .tree-step-badge {
+    background: var(--surface-active, #2a2a2a);
+    color: var(--text-tertiary, #666);
+}
+
+/* View Details link */
+.tree-view-details {
+    font-size: 12px;
+    color: var(--text-tertiary, #666);
+    margin-left: 12px;
+    margin-right: auto;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.tree-view-details:hover {
+    color: var(--accent, #c5f82a);
+}
+
+.tree-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text, #e0e0e0);
+}
+
+.tree-step-badge {
+    padding: 4px 12px;
+    background: var(--accent, #c5f82a);
+    color: var(--bg, #0a0a0a);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 12px;
+    white-space: nowrap;
+}
+
+.tree-section.pending .tree-step-badge,
+.tree-child.pending .tree-step-badge {
+    background: var(--surface-active, #2a2a2a);
+    color: var(--text-tertiary, #666);
+}
+
+.tree-status {
+    font-size: 12px;
+    color: var(--text-tertiary, #666);
+    min-width: 80px;
+    text-align: right;
+}
+
+.tree-status.completed {
+    color: var(--text-secondary, #888);
+}
+
+.tree-status.running {
+    color: var(--accent, #c5f82a);
+}
+
+.tree-status.failed {
+    color: var(--error, #ef4444);
+}
+
+/* Tree Children */
+.tree-children {
+    display: none;
+    background: var(--bg, #0a0a0a);
+}
+
+.tree-section.expanded .tree-children {
+    display: block;
+}
+
+/* Tree Child (Level 1) - Sub-sections like "Database Schema Design" */
+.tree-child {
+    border-bottom: 1px solid var(--border-light, #151515);
+}
+
+.tree-child:last-child {
+    border-bottom: none;
+}
+
+.tree-indent {
+    width: 20px;
+    height: 1px;
+    background: var(--border, #2a2a2a);
+    margin-right: 12px;
+}
+
+/* Tree Items (Level 2) - Individual items like files */
+.tree-items {
+    display: none;
+    padding: 8px 0 16px 0;
+    background: var(--bg, #080808);
+}
+
+.tree-child.expanded .tree-items {
+    display: block;
+}
+
+/* Section-level items */
+.tree-children > .tree-item {
+    padding-left: 40px;
+}
+
+/* Item Dot Indicator - the colored dots */
+.tree-item-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 12px;
+    flex-shrink: 0;
+    background: var(--text-muted, #333);
+    transition: all 0.2s;
+}
+
+.tree-item-dot.completed {
+    background: var(--accent, #c5f82a);
+}
+
+.tree-item-dot.running {
+    background: var(--accent, #c5f82a);
+    box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.6));
+    animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+.tree-item-dot.pending {
+    background: var(--text-muted, #333);
+}
+
+.tree-item-dot.failed {
+    background: var(--error, #ef4444);
+}
+
+@keyframes dot-pulse {
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.6));
+    }
+    50% {
+        opacity: 0.6;
+        box-shadow: 0 0 4px var(--accent-glow, rgba(197, 248, 42, 0.3));
+    }
+}
+
+.tree-item-name {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-secondary, #888);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-item-duration {
+    font-size: 12px;
+    color: var(--text-muted, #555);
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.tree-item-check {
+    font-size: 14px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.tree-item-check.completed {
+    color: var(--success, #22c55e);
+}
+
+.tree-item-check.running {
+    color: var(--accent, #c5f82a);
+}
+
+.tree-item-check.pending {
+    color: transparent;
+}
+
+/* Item row with duration and checkmark aligned right */
+.tree-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px 10px 60px;
+    min-height: 36px;
+}
+
+.tree-item.completed .tree-item-name {
+    color: var(--text-tertiary, #888);
+}
+
+.tree-item.running .tree-item-name {
+    color: var(--text, #e0e0e0);
+}
+
+.tree-item.running {
+    background: var(--accent-light, rgba(197, 248, 42, 0.03));
+}
+
+/* TERMINAL Section */
+.taskmd-terminal {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 150px;
+    max-height: 300px;
+    overflow: hidden;
+}
+
+.taskmd-terminal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: var(--bg-secondary, #0d0d0d);
+    border-bottom: 1px solid var(--border, #1a1a1a);
+}
+
+.taskmd-terminal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--text-tertiary, #666);
+    text-transform: uppercase;
+}
+
+.terminal-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted, #333);
+}
+
+.terminal-dot.active {
+    background: var(--accent, #c5f82a);
+    box-shadow: 0 0 8px var(--accent-glow, rgba(197, 248, 42, 0.5));
+    animation: dot-pulse 1.5s infinite;
+}
+
+.taskmd-terminal-stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted, #555);
+}
+
+.taskmd-terminal-stats strong {
+    color: var(--text-secondary, #e0e0e0);
+    font-weight: 500;
+}
+
+.stat-sep {
+    color: var(--text-muted, #333);
+}
+
+.taskmd-terminal-output {
+    flex: 1;
+    padding: 16px 24px;
+    background: var(--bg, #0a0a0a);
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text-secondary, #888);
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.taskmd-terminal-output .terminal-line {
+    padding: 3px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.taskmd-terminal-output .terminal-line.success {
+    color: var(--success, #22c55e);
+}
+
+.taskmd-terminal-output .terminal-line.error {
+    color: var(--error, #ef4444);
+}
+
+.taskmd-terminal-output .terminal-line.progress {
+    color: var(--accent, #c5f82a);
+    font-weight: 600;
+}
+
+/* Markdown-like header styling */
+.taskmd-terminal-output .terminal-line:has-text("##"),
+.taskmd-terminal-output .terminal-line[data-type="header"] {
+    color: #fff;
+    font-weight: 600;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-size: 14px;
+}
+
+/* Code block styling */
+.taskmd-terminal-output .terminal-code {
+    background: #151515;
+    border: 1px solid #252525;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 6px 0;
+    font-size: 12px;
+    color: #aaa;
+    overflow-x: auto;
+}
+
+/* Checkmark items */
+.taskmd-terminal-output .terminal-line.success::before {
+    content: "";
+}
+
+/* List items */
+.taskmd-terminal-output .terminal-line.info {
+    color: #888;
+}
+
+/* Bold text in terminal (markdown **text**) */
+.taskmd-terminal-output strong,
+.taskmd-terminal-output b {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Inline code (markdown `code`) */
+.taskmd-terminal-output code {
+    background: #1a1a1a;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #c5f82a;
+}
+
+/* Timestamp styling */
+.taskmd-terminal-output .terminal-timestamp {
+    color: #444;
+    font-size: 11px;
+    margin-right: 8px;
+}
+
+/* Actions */
+.taskmd-actions {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid var(--border, #1a1a1a);
+    background: var(--bg-secondary, #0d0d0d);
+}
+
+/* Empty State */
+.progress-empty {
+    padding: 40px 24px;
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+}
+
+/* Error Alert */
+.error-alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    margin: 16px 24px;
+}
+
+.error-alert .error-icon {
+    color: #ef4444;
+    font-size: 18px;
+}
+
+.error-alert .error-text {
+    color: #ef4444;
+    font-size: 14px;
+}
+
+/* Scrollbar */
+.task-detail-rich::-webkit-scrollbar,
+.taskmd-terminal-output::-webkit-scrollbar {
+    width: 6px;
+}
+
+.task-detail-rich::-webkit-scrollbar-track,
+.taskmd-terminal-output::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+.task-detail-rich::-webkit-scrollbar-thumb,
+.taskmd-terminal-output::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 3px;
+}
+
+.task-detail-rich::-webkit-scrollbar-thumb:hover,
+.taskmd-terminal-output::-webkit-scrollbar-thumb:hover {
+    background: #333;
+}
+
+/* =============================================================================
+   PROGRESS BAR - Shown under running sections
+   ============================================================================= */
+
+.tree-progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 20px 16px 20px;
+    background: transparent;
+}
+
+.tree-progress-bar-container::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    right: 70px;
+    height: 3px;
+    background: #1a1a1a;
+    border-radius: 2px;
+}
+
+.tree-progress-bar {
+    flex: 1;
+    height: 3px;
+    background: #c5f82a;
+    border-radius: 2px;
+    transition: width 0.3s ease-out;
+    position: relative;
+    z-index: 1;
+}
+
+.tree-progress-percent {
+    font-size: 11px;
+    font-weight: 600;
+    color: #c5f82a;
+    min-width: 36px;
+    text-align: right;
+}
+
+/* =============================================================================
+   PREVENT HEIGHT FLASHING - Stable layout during updates
+   ============================================================================= */
+
+/* STATUS section - fixed height, no collapse */
+.taskmd-section:first-of-type {
+    flex-shrink: 0;
+}
+
+.taskmd-status-content {
+    min-height: 100px;
+}
+
+/* Progress log section - stable container */
+.taskmd-section:has(.taskmd-progress-content) {
+    flex-shrink: 0;
+}
+
+/* Tree sections maintain minimum height */
+.tree-section {
+    min-height: 48px;
+}
+
+.tree-row {
+    min-height: 48px;
+}
+
+/* Prevent layout shift when sections expand/collapse */
+.tree-children {
+    will-change: height;
+}
+
+.tree-items {
+    will-change: height;
+}
+
+/* Smooth transitions for expand/collapse */
+.tree-section .tree-children,
+.tree-child .tree-items {
+    transition: none;
+}
+
+/* Actions bar - always visible at bottom */
+.taskmd-actions {
+    flex-shrink: 0;
+    margin-top: auto;
+}
