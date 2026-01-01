@@ -459,265 +459,285 @@ function handleWebSocketMessage(data) {
 const pendingManifestUpdates = new Map();
 
 function renderManifestProgress(taskId, manifest, retryCount = 0) {
-  console.log(
-    "[Manifest] renderManifestProgress called for task:",
-    taskId,
-    "sections:",
-    manifest?.sections?.length,
-    "retry:",
-    retryCount,
-  );
+  // Only update if this is the selected task
+  if (TasksState.selectedTaskId !== taskId) {
+    return;
+  }
 
   // Try multiple selectors to find the progress log element
   let progressLog = document.getElementById(`progress-log-${taskId}`);
   if (!progressLog) {
     progressLog = document.querySelector(".taskmd-progress-content");
   }
-  if (!progressLog) {
-    progressLog = document.querySelector(".progress-summary-content");
-  }
 
   if (!progressLog) {
-    console.warn("[Manifest] No progress log element found for task:", taskId);
-    // Try to find any visible task detail panel
-    const detailPanel = document.querySelector(".task-detail-rich");
-    if (detailPanel) {
-      const taskDetailId = detailPanel.dataset.taskId;
-      console.log("[Manifest] Found detail panel for task:", taskDetailId);
-      if (taskDetailId === taskId) {
-        progressLog = detailPanel.querySelector(".taskmd-progress-content");
-      }
+    // If task is selected but element not yet loaded, retry after a delay
+    if (retryCount < 5) {
+      pendingManifestUpdates.set(taskId, manifest);
+      setTimeout(
+        () => {
+          const pending = pendingManifestUpdates.get(taskId);
+          if (pending && TasksState.selectedTaskId === taskId) {
+            renderManifestProgress(taskId, pending, retryCount + 1);
+          }
+        },
+        150 * (retryCount + 1),
+      );
     }
-    if (!progressLog) {
-      // If task is selected but element not yet loaded, retry after a delay
-      if (TasksState.selectedTaskId === taskId && retryCount < 5) {
-        console.log(
-          "[Manifest] Element not ready, scheduling retry",
-          retryCount + 1,
-        );
-        pendingManifestUpdates.set(taskId, manifest);
-        setTimeout(
-          () => {
-            const pending = pendingManifestUpdates.get(taskId);
-            if (pending) {
-              renderManifestProgress(taskId, pending, retryCount + 1);
-            }
-          },
-          200 * (retryCount + 1),
-        );
-      }
-      return;
-    }
-  }
-
-  // Clear pending update since we found the element
-  pendingManifestUpdates.delete(taskId);
-
-  if (!manifest || !manifest.sections) {
-    console.log("[Manifest] No sections in manifest");
     return;
   }
 
-  console.log("[Manifest] Rendering", manifest.sections.length, "sections");
+  // Clear pending update
+  pendingManifestUpdates.delete(taskId);
 
-  // Get total steps from manifest progress
+  if (!manifest || !manifest.sections) {
+    return;
+  }
+
   const totalSteps = manifest.progress?.total || 60;
 
+  // Update STATUS section if exists
+  updateStatusSection(manifest);
+
+  // Update or create progress tree
+  let tree = progressLog.querySelector(".taskmd-tree");
+  if (!tree) {
+    // First render - create full HTML
+    progressLog.innerHTML = buildProgressTreeHTML(manifest, totalSteps);
+    // Auto-expand running sections
+    progressLog
+      .querySelectorAll(".tree-section.running, .tree-child.running")
+      .forEach((el) => {
+        el.classList.add("expanded");
+      });
+  } else {
+    // Incremental update - only update changed elements
+    updateProgressTree(tree, manifest, totalSteps);
+  }
+
+  // Update terminal stats
+  updateTerminalStats(taskId, manifest);
+}
+
+function updateStatusSection(manifest) {
+  const statusContent = document.querySelector(".taskmd-status-content");
+  if (!statusContent) return;
+
+  // Update current action
+  const actionText = statusContent.querySelector(
+    ".status-current .status-text",
+  );
+  if (actionText && manifest.status?.current_action) {
+    actionText.textContent = manifest.status.current_action;
+  }
+
+  // Update runtime
+  const runtimeEl = statusContent.querySelector(".status-main .status-time");
+  if (runtimeEl && manifest.status?.runtime_display) {
+    runtimeEl.innerHTML = `Runtime: ${manifest.status.runtime_display} <span class="status-indicator"></span>`;
+  }
+
+  // Update estimated
+  const estimatedEl = statusContent.querySelector(
+    ".status-current .status-time",
+  );
+  if (estimatedEl && manifest.status?.estimated_display) {
+    estimatedEl.innerHTML = `Estimated: ${manifest.status.estimated_display} <span class="status-gear">⚙</span>`;
+  }
+}
+
+function buildProgressTreeHTML(manifest, totalSteps) {
   let html = '<div class="taskmd-tree">';
 
   for (const section of manifest.sections) {
-    const statusClass = section.status
-      ? section.status.toLowerCase()
-      : "pending";
-
-    // Use global step count (e.g., "Step 24/60")
+    const statusClass = section.status?.toLowerCase() || "pending";
+    const isRunning = statusClass === "running";
     const globalCurrent =
       section.progress?.global_current || section.progress?.current || 0;
-    const globalStart = section.progress?.global_start || 0;
-
     const statusText = section.status || "Pending";
 
-    // Calculate section progress percentage
-    const sectionCurrent = section.progress?.current || 0;
-    const sectionTotal = section.progress?.total || 1;
-    const sectionPercent = Math.round((sectionCurrent / sectionTotal) * 100);
-    const showProgress = statusClass === "running" && sectionTotal > 1;
-
     html += `
-      <div class="tree-section ${statusClass}" data-section-id="${section.id}">
+      <div class="tree-section ${statusClass}${isRunning ? " expanded" : ""}" data-section-id="${section.id}">
         <div class="tree-row tree-level-0" onclick="this.parentElement.classList.toggle('expanded')">
           <span class="tree-name">${escapeHtml(section.name)}</span>
           <span class="tree-view-details">View Details ›</span>
           <span class="tree-step-badge">Step ${globalCurrent}/${totalSteps}</span>
           <span class="tree-status ${statusClass}">${statusText}</span>
         </div>
-        ${
-          showProgress
-            ? `
-        <div class="tree-progress-bar-container">
-          <div class="tree-progress-bar" style="width: ${sectionPercent}%"></div>
-          <span class="tree-progress-percent">${sectionPercent}%</span>
-        </div>`
-            : ""
-        }
         <div class="tree-children">`;
 
-    // Render children if present
-    if (section.children && section.children.length > 0) {
+    // Children
+    if (section.children?.length > 0) {
       for (const child of section.children) {
-        const childStatus = child.status
-          ? child.status.toLowerCase()
-          : "pending";
-        const childStepCurrent = child.progress?.current || 0;
-        const childStepTotal = child.progress?.total || 1;
-        const childStatusText = child.status || "Pending";
-
+        const childStatus = child.status?.toLowerCase() || "pending";
+        const childIsRunning = childStatus === "running";
         html += `
-          <div class="tree-child ${childStatus}" onclick="this.classList.toggle('expanded')">
-            <div class="tree-row tree-level-1">
+          <div class="tree-child ${childStatus}${childIsRunning ? " expanded" : ""}" data-child-id="${child.id}">
+            <div class="tree-row tree-level-1" onclick="this.parentElement.classList.toggle('expanded')">
               <span class="tree-indent"></span>
               <span class="tree-name">${escapeHtml(child.name)}</span>
               <span class="tree-view-details">View Details ›</span>
-              <span class="tree-step-badge">Step ${childStepCurrent}/${childStepTotal}</span>
-              <span class="tree-status ${childStatus}">${childStatusText}</span>
+              <span class="tree-step-badge">Step ${child.progress?.current || 0}/${child.progress?.total || 1}</span>
+              <span class="tree-status ${childStatus}">${child.status || "Pending"}</span>
             </div>
             <div class="tree-items">`;
 
-        // Render item_groups first (grouped fields like "email, password_hash, email_verified")
-        if (child.item_groups && child.item_groups.length > 0) {
-          for (const group of child.item_groups) {
-            const groupStatus = group.status
-              ? group.status.toLowerCase()
-              : "pending";
-            const checkIcon = groupStatus === "completed" ? "✓" : "";
-            const duration = group.duration_seconds
-              ? group.duration_seconds >= 60
-                ? `Duration: ${Math.floor(group.duration_seconds / 60)} min`
-                : `Duration: ${group.duration_seconds} sec`
-              : "";
-
-            html += `
-              <div class="tree-item ${groupStatus}">
-                <span class="tree-item-dot ${groupStatus}"></span>
-                <span class="tree-item-name">${escapeHtml(group.name)}</span>
-                <span class="tree-item-duration">${duration}</span>
-                <span class="tree-item-check ${groupStatus}">${checkIcon}</span>
-              </div>`;
-          }
-        }
-
-        // Then render individual items
-        if (child.items && child.items.length > 0) {
-          for (const item of child.items) {
-            const itemStatus = item.status
-              ? item.status.toLowerCase()
-              : "pending";
-            const checkIcon = itemStatus === "completed" ? "✓" : "";
-            const duration = item.duration_seconds
-              ? item.duration_seconds >= 60
-                ? `Duration: ${Math.floor(item.duration_seconds / 60)} min`
-                : `Duration: ${item.duration_seconds} sec`
-              : "";
-
-            html += `
-              <div class="tree-item ${itemStatus}">
-                <span class="tree-item-dot ${itemStatus}"></span>
-                <span class="tree-item-name">${escapeHtml(item.name)}</span>
-                <span class="tree-item-duration">${duration}</span>
-                <span class="tree-item-check ${itemStatus}">${checkIcon}</span>
-              </div>`;
-          }
+        // Items
+        const items = [...(child.item_groups || []), ...(child.items || [])];
+        for (const item of items) {
+          html += buildItemHTML(item);
         }
 
         html += `</div></div>`;
       }
     }
 
-    // Render section-level item_groups
-    if (section.item_groups && section.item_groups.length > 0) {
-      for (const group of section.item_groups) {
-        const groupStatus = group.status
-          ? group.status.toLowerCase()
-          : "pending";
-        const checkIcon = groupStatus === "completed" ? "✓" : "";
-        const duration = group.duration_seconds
-          ? group.duration_seconds >= 60
-            ? `Duration: ${Math.floor(group.duration_seconds / 60)} min`
-            : `Duration: ${group.duration_seconds} sec`
-          : "";
-
-        html += `
-          <div class="tree-item ${groupStatus}">
-            <span class="tree-item-dot ${groupStatus}"></span>
-            <span class="tree-item-name">${escapeHtml(group.name)}</span>
-            <span class="tree-item-duration">${duration}</span>
-            <span class="tree-item-check ${groupStatus}">${checkIcon}</span>
-          </div>`;
-      }
-    }
-
-    // Render section-level items
-    if (section.items && section.items.length > 0) {
-      for (const item of section.items) {
-        const itemStatus = item.status ? item.status.toLowerCase() : "pending";
-        const checkIcon = itemStatus === "completed" ? "✓" : "";
-        const duration = item.duration_seconds
-          ? item.duration_seconds >= 60
-            ? `Duration: ${Math.floor(item.duration_seconds / 60)} min`
-            : `Duration: ${item.duration_seconds} sec`
-          : "";
-
-        html += `
-          <div class="tree-item ${itemStatus}">
-            <span class="tree-item-dot ${itemStatus}"></span>
-            <span class="tree-item-name">${escapeHtml(item.name)}</span>
-            <span class="tree-item-duration">${duration}</span>
-            <span class="tree-item-check ${itemStatus}">${checkIcon}</span>
-          </div>`;
-      }
+    // Section-level items
+    const sectionItems = [
+      ...(section.item_groups || []),
+      ...(section.items || []),
+    ];
+    for (const item of sectionItems) {
+      html += buildItemHTML(item);
     }
 
     html += `</div></div>`;
   }
 
   html += "</div>";
+  return html;
+}
 
-  progressLog.innerHTML = html;
+function buildItemHTML(item) {
+  const status = item.status?.toLowerCase() || "pending";
+  const checkIcon = status === "completed" ? "✓" : "";
+  const duration = item.duration_seconds
+    ? item.duration_seconds >= 60
+      ? `Duration: ${Math.floor(item.duration_seconds / 60)} min`
+      : `Duration: ${item.duration_seconds} sec`
+    : "";
+  const name = item.name || item.display_name || "";
 
-  // Also update the STATUS section if it exists
-  const statusSection = document.querySelector(".taskmd-status-content");
-  if (statusSection && manifest.status) {
-    const runtime = manifest.status.runtime_display || "calculating...";
-    const estimated = manifest.status.estimated_display || "calculating...";
-    const currentAction = manifest.status.current_action || "Processing...";
+  return `
+    <div class="tree-item ${status}" data-item-id="${item.id || name}">
+      <span class="tree-item-dot ${status}"></span>
+      <span class="tree-item-name">${escapeHtml(name)}</span>
+      <span class="tree-item-duration">${duration}</span>
+      <span class="tree-item-check ${status}">${checkIcon}</span>
+    </div>`;
+}
 
-    statusSection.innerHTML = `
-      <div class="status-row status-main">
-        <span class="status-title">${escapeHtml(manifest.status.title || manifest.app_name || "")}</span>
-        <span class="status-time">Runtime: ${runtime}</span>
-      </div>
-      <div class="status-row status-current">
-        <span class="status-dot active"></span>
-        <span class="status-text">${escapeHtml(currentAction)}</span>
-        <span class="status-time">Estimated: ${estimated}</span>
-      </div>
-    `;
+function updateProgressTree(tree, manifest, totalSteps) {
+  for (const section of manifest.sections) {
+    const sectionEl = tree.querySelector(`[data-section-id="${section.id}"]`);
+    if (!sectionEl) continue;
+
+    const statusClass = section.status?.toLowerCase() || "pending";
+    const globalCurrent =
+      section.progress?.global_current || section.progress?.current || 0;
+
+    // Update section class
+    sectionEl.className = `tree-section ${statusClass}${statusClass === "running" ? " expanded" : sectionEl.classList.contains("expanded") ? " expanded" : ""}`;
+
+    // Update step badge
+    const stepBadge = sectionEl.querySelector(
+      ":scope > .tree-row .tree-step-badge",
+    );
+    if (stepBadge)
+      stepBadge.textContent = `Step ${globalCurrent}/${totalSteps}`;
+
+    // Update status text
+    const statusEl = sectionEl.querySelector(":scope > .tree-row .tree-status");
+    if (statusEl) {
+      statusEl.className = `tree-status ${statusClass}`;
+      statusEl.textContent = section.status || "Pending";
+    }
+
+    // Update children
+    if (section.children) {
+      for (const child of section.children) {
+        const childEl = sectionEl.querySelector(
+          `[data-child-id="${child.id}"]`,
+        );
+        if (!childEl) continue;
+
+        const childStatus = child.status?.toLowerCase() || "pending";
+        childEl.className = `tree-child ${childStatus}${childStatus === "running" ? " expanded" : childEl.classList.contains("expanded") ? " expanded" : ""}`;
+
+        const childStepBadge = childEl.querySelector(
+          ":scope > .tree-row .tree-step-badge",
+        );
+        if (childStepBadge)
+          childStepBadge.textContent = `Step ${child.progress?.current || 0}/${child.progress?.total || 1}`;
+
+        const childStatusEl = childEl.querySelector(
+          ":scope > .tree-row .tree-status",
+        );
+        if (childStatusEl) {
+          childStatusEl.className = `tree-status ${childStatus}`;
+          childStatusEl.textContent = child.status || "Pending";
+        }
+
+        // Update items
+        updateItems(childEl.querySelector(".tree-items"), [
+          ...(child.item_groups || []),
+          ...(child.items || []),
+        ]);
+      }
+    }
+
+    // Update section-level items
+    updateItems(sectionEl.querySelector(".tree-children"), [
+      ...(section.item_groups || []),
+      ...(section.items || []),
+    ]);
   }
+}
 
-  // Update terminal stats if they exist
+function updateItems(container, items) {
+  if (!container || !items) return;
+
+  for (const item of items) {
+    const itemId = item.id || item.name || item.display_name;
+    const itemEl = container.querySelector(`[data-item-id="${itemId}"]`);
+    if (!itemEl) {
+      // New item - append it
+      container.insertAdjacentHTML("beforeend", buildItemHTML(item));
+      continue;
+    }
+
+    const status = item.status?.toLowerCase() || "pending";
+    itemEl.className = `tree-item ${status}`;
+
+    const dot = itemEl.querySelector(".tree-item-dot");
+    if (dot) dot.className = `tree-item-dot ${status}`;
+
+    const check = itemEl.querySelector(".tree-item-check");
+    if (check) {
+      check.className = `tree-item-check ${status}`;
+      check.textContent = status === "completed" ? "✓" : "";
+    }
+
+    const durationEl = itemEl.querySelector(".tree-item-duration");
+    if (durationEl && item.duration_seconds) {
+      durationEl.textContent =
+        item.duration_seconds >= 60
+          ? `Duration: ${Math.floor(item.duration_seconds / 60)} min`
+          : `Duration: ${item.duration_seconds} sec`;
+    }
+  }
+}
+
+function updateTerminalStats(taskId, manifest) {
   const processedEl = document.getElementById(`terminal-processed-${taskId}`);
-  if (processedEl && manifest.terminal?.stats) {
-    processedEl.textContent = manifest.terminal.stats.processed || "0";
+  if (processedEl && manifest.terminal?.stats?.processed) {
+    processedEl.textContent = manifest.terminal.stats.processed;
   }
 
-  console.log(
-    "[Manifest] Rendered progress for task:",
-    taskId,
-    "completed:",
-    manifest.progress?.current,
-    "/",
-    manifest.progress?.total,
-  );
+  const etaEl = document.getElementById(`terminal-eta-${taskId}`);
+  if (etaEl && manifest.terminal?.stats?.eta) {
+    etaEl.textContent = manifest.terminal.stats.eta;
+  }
 }
 
 function escapeHtml(text) {

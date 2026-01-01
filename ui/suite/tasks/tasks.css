@@ -275,6 +275,7 @@
     grid-template-columns: 30% 70%;
     flex: 1;
     overflow: hidden;
+    height: 100%;
 }
 
 /* =============================================================================
@@ -286,11 +287,13 @@
     flex-direction: column;
     overflow: hidden;
     border-right: 1px solid var(--border, #2a2a2a);
+    height: 100%;
 }
 
 .tasks-list-scroll {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -811,6 +814,15 @@
     overflow: hidden;
     height: 100%;
     min-height: 0;
+    position: relative;
+}
+
+/* Task detail content - NO scroll on main container */
+#task-detail-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
 /* Detail Header */
@@ -3118,12 +3130,31 @@
 .task-detail-rich {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 24px;
+    gap: 0;
+    padding: 0;
     height: 100%;
     min-height: 0;
+    overflow: hidden;
+}
+
+/* Sections inside task detail - fixed height, no scroll */
+.task-detail-rich .taskmd-header,
+.task-detail-rich .taskmd-section {
+    flex-shrink: 0;
+}
+
+/* Only terminal output scrolls */
+.task-detail-rich .taskmd-terminal-output {
+    flex: 1;
+    min-height: 100px;
+    max-height: none;
     overflow-y: auto;
-    overflow-x: hidden;
+}
+
+/* Progress content has fixed max height with scroll */
+.task-detail-rich .taskmd-progress-content {
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 .detail-section-box {
