@@ -162,21 +162,23 @@ body:has(.tasks-app) {
     justify-content: center;
     gap: 8px;
     padding: 14px 28px;
-    background: var(--primary, #c5f82a);
+    background: #22c55e !important;
     border: none;
     border-radius: 10px;
-    color: #000;
+    color: #fff !important;
     font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
 }
 
 .btn-create-run:hover {
-    background: var(--primary-hover, #d4ff4a);
-    box-shadow: 0 0 20px var(--primary-light, rgba(197, 248, 42, 0.3));
+    background: #16a34a !important;
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+    transform: translateY(-1px);
 }
 
 .btn-create-run:active {
