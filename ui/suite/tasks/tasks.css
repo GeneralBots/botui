@@ -357,13 +357,13 @@ body:has(.tasks-app) {
     background: var(--surface-hover, #141414);
     border: 2px solid var(--border, #2a2a2a);
     border-radius: 12px;
-    padding: 20px 24px;
-    padding-left: 28px;
+    padding: 24px 28px;
+    padding-left: 32px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    min-height: 72px;
+    min-height: 100px;
 }
 
 .task-card::before {
@@ -415,16 +415,16 @@ body:has(.tasks-app) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 0;
 }
 
 .task-card-title {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text, #fff);
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.5;
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -433,9 +433,9 @@ body:has(.tasks-app) {
 }
 
 .task-card-status {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
-    padding: 6px 12px;
+    padding: 8px 16px;
     border-radius: 6px;
     text-transform: uppercase;
     white-space: nowrap;
