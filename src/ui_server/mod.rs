@@ -246,8 +246,6 @@ struct WsQuery {
 
 #[derive(Debug, Default, Deserialize)]
 struct OptionalWsQuery {
-    session_id: Option<String>,
-    user_id: Option<String>,
     task_id: Option<String>,
 }
 
@@ -362,8 +360,23 @@ async fn handle_task_progress_ws_proxy(
         while let Some(msg) = backend_rx.next().await {
             match msg {
                 Ok(TungsteniteMessage::Text(text)) => {
-                    if client_tx.send(AxumMessage::Text(text)).await.is_err() {
-                        break;
+                    // Log manifest_update messages for debugging
+                    let is_manifest = text.contains("manifest_update");
+                    if is_manifest {
+                        info!("[WS_PROXY] Forwarding manifest_update to client: {}...", &text[..text.len().min(200)]);
+                    } else if text.contains("task_progress") {
+                        debug!("[WS_PROXY] Forwarding task_progress to client");
+                    }
+                    match client_tx.send(AxumMessage::Text(text)).await {
+                        Ok(()) => {
+                            if is_manifest {
+                                info!("[WS_PROXY] manifest_update SENT successfully to client");
+                            }
+                        }
+                        Err(e) => {
+                            error!("[WS_PROXY] Failed to send message to client: {:?}", e);
+                            break;
+                        }
                     }
                 }
                 Ok(TungsteniteMessage::Binary(data)) => {
@@ -529,6 +542,18 @@ fn create_ui_router() -> Router<AppState> {
     Router::new().fallback(any(proxy_api))
 }
 
+async fn serve_favicon() -> impl IntoResponse {
+    let favicon_path = PathBuf::from("./ui/suite/public/favicon.ico");
+    match tokio::fs::read(&favicon_path).await {
+        Ok(bytes) => (
+            StatusCode::OK,
+            [("content-type", "image/x-icon")],
+            bytes,
+        ).into_response(),
+        Err(_) => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
 fn add_static_routes(router: Router<AppState>, suite_path: &Path) -> Router<AppState> {
     let mut r = router;
 
@@ -554,7 +579,8 @@ pub fn configure_router() -> Router {
         .nest("/apps", create_apps_router())
         .route("/", get(index))
         .route("/minimal", get(serve_minimal))
-        .route("/suite", get(serve_suite));
+        .route("/suite", get(serve_suite))
+        .route("/favicon.ico", get(serve_favicon));
 
     router = add_static_routes(router, &suite_path);
 

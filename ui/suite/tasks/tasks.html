@@ -124,8 +124,8 @@
                 class="tasks-list-scroll"
                 id="task-list"
                 hx-get="/api/tasks?filter=all"
-                hx-trigger="load, taskCreated from:body"
-                hx-swap="innerHTML"
+                hx-trigger="load, taskCreated from:body throttle:2s"
+                hx-swap="innerHTML transition:false"
             >
                 <!-- Loading state - replaced by HTMX -->
                 <div class="loading-state">
@@ -334,19 +334,12 @@
                                 "quick-intent-input",
                             ).value = "";
 
-                            // Trigger task list refresh
-                            htmx.trigger(document.body, "taskCreated");
-
-                            // After a short delay to let the list reload, select the new task
+                            // Select the task and let tasks.js handle polling
+                            selectTask(response.task_id);
+                            // Hide success message after task is selected
                             setTimeout(function () {
-                                selectTask(response.task_id);
-                                // Start polling for updates
-                                startTaskPolling(response.task_id);
-                                // Hide success message after task is selected
-                                setTimeout(function () {
-                                    intentResult.style.display = "none";
-                                }, 2000);
-                            }, 500);
+                                intentResult.style.display = "none";
+                            }, 2000);
                         } else {
                             intentResult.innerHTML = `<span class="intent-error">✗ ${response.message || "Failed to create task"}</span>`;
                             intentResult.style.display = "block";
@@ -368,55 +361,6 @@
             }
         });
     });
-
-    // Poll for task status updates
-    let taskPollingInterval = null;
-    function startTaskPolling(taskId) {
-        // Clear any existing polling
-        if (taskPollingInterval) {
-            clearInterval(taskPollingInterval);
-        }
-
-        taskPollingInterval = setInterval(function () {
-            fetch(`/api/tasks/${taskId}`, {
-                headers: { Accept: "application/json" },
-            })
-                .then((r) => r.json())
-                .then((task) => {
-                    console.log("[TASK] Poll status:", task.status);
-
-                    // Refresh the detail panel
-                    htmx.ajax("GET", `/api/tasks/${taskId}`, {
-                        target: "#task-detail-content",
-                        swap: "innerHTML",
-                    });
-
-                    // Refresh task list to update status badges
-                    htmx.trigger(document.body, "taskCreated");
-
-                    // Stop polling if task is complete or failed
-                    if (
-                        task.status === "completed" ||
-                        task.status === "failed" ||
-                        task.status === "cancelled"
-                    ) {
-                        clearInterval(taskPollingInterval);
-                        taskPollingInterval = null;
-                        loadTaskStats();
-                    }
-                })
-                .catch((e) => {
-                    console.warn("Failed to poll task:", e);
-                });
-        }, 2000); // Poll every 2 seconds
-    }
-
-    function stopTaskPolling() {
-        if (taskPollingInterval) {
-            clearInterval(taskPollingInterval);
-            taskPollingInterval = null;
-        }
-    }
 
     // Load task statistics
     function loadTaskStats() {

@@ -178,40 +178,36 @@ function initWebSocket() {
 }
 
 function initTaskProgressWebSocket() {
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const wsUrl = `${protocol}//${window.location.host}/ws/task-progress`;
+  // Use the singleton WebSocket from tasks.js instead of creating a duplicate connection
+  // This prevents the "2 receivers" problem where manifest_update events go to one
+  // WebSocket while the browser UI is listening on a different one
 
-  try {
-    AutoTaskState.progressWsConnection = new WebSocket(wsUrl);
+  console.log("[AutoTask] Using singleton WebSocket for task progress");
 
-    AutoTaskState.progressWsConnection.onopen = function () {
-      console.log("Task Progress WebSocket connected");
-    };
+  // Create handler for task progress messages
+  const handler = function (data) {
+    handleTaskProgressMessage(data);
+  };
 
-    AutoTaskState.progressWsConnection.onmessage = function (event) {
-      handleTaskProgressMessage(JSON.parse(event.data));
-    };
+  // Store handler reference for cleanup
+  AutoTaskState._progressHandler = handler;
 
-    AutoTaskState.progressWsConnection.onclose = function () {
-      console.log("Task Progress WebSocket disconnected, reconnecting...");
-      setTimeout(initTaskProgressWebSocket, 3000);
-    };
-
-    AutoTaskState.progressWsConnection.onerror = function (error) {
-      console.error("Task Progress WebSocket error:", error);
-    };
-  } catch (e) {
-    console.warn("Task Progress WebSocket not available");
+  // Register with the global singleton WebSocket from tasks.js
+  if (typeof registerTaskProgressHandler === "function") {
+    registerTaskProgressHandler(handler);
+    console.log("[AutoTask] Registered with singleton WebSocket");
+  } else {
+    // Fallback: wait for tasks.js to load and retry
+    console.log("[AutoTask] Waiting for tasks.js singleton to be available...");
+    setTimeout(initTaskProgressWebSocket, 500);
   }
 }
 
 function handleTaskProgressMessage(data) {
-  // Forward to ProgressPanel if available
-  if (typeof ProgressPanel !== "undefined" && ProgressPanel.manifest) {
-    ProgressPanel.handleProgressUpdate(data);
-  }
+  // Note: ProgressPanel now registers its own handler with the singleton,
+  // so we don't need to forward messages manually here
 
-  console.log("Task progress:", data);
+  console.log("[AutoTask] Task progress:", data.type, data.task_id);
 
   switch (data.type) {
     case "connected":

@@ -16,6 +16,7 @@ if (typeof TasksState === "undefined") {
     wsConnection: null,
     agentLogPaused: false,
     selectedItemType: "task", // task, goal, pending, scheduler, monitor
+    loadingTaskId: null, // Prevent multiple simultaneous loads
   };
 }
 
@@ -61,6 +62,21 @@ function initTasksApp() {
   console.log("[Tasks] Initialized");
 }
 
+// Helper to find pending manifest by normalized ID
+function findPendingManifest(taskId) {
+  if (!taskId) return null;
+  const normalizedId = String(taskId).toLowerCase().trim();
+
+  // Lookup using normalized ID (all storage now uses normalized keys)
+  if (pendingManifestUpdates.has(normalizedId)) {
+    return {
+      key: normalizedId,
+      manifest: pendingManifestUpdates.get(normalizedId),
+    };
+  }
+  return null;
+}
+
 function setupHtmxListeners() {
   // Listen for HTMX content swaps to apply pending manifest updates
   document.body.addEventListener("htmx:afterSwap", function (evt) {
@@ -72,20 +88,29 @@ function setupHtmxListeners() {
     ) {
       console.log(
         "[HTMX] Task detail content loaded, checking for pending manifest updates",
+        "\n  selectedTaskId:",
+        TasksState.selectedTaskId,
+        "\n  pending keys:",
+        Array.from(pendingManifestUpdates.keys()),
       );
       // Check if there's a pending manifest update for the selected task
-      if (
-        TasksState.selectedTaskId &&
-        pendingManifestUpdates.has(TasksState.selectedTaskId)
-      ) {
-        const manifest = pendingManifestUpdates.get(TasksState.selectedTaskId);
+      const pending = findPendingManifest(TasksState.selectedTaskId);
+      if (pending) {
         console.log(
           "[HTMX] Applying pending manifest for task:",
           TasksState.selectedTaskId,
+          "from key:",
+          pending.key,
         );
         setTimeout(() => {
-          renderManifestProgress(TasksState.selectedTaskId, manifest, 0);
+          renderManifestProgress(
+            TasksState.selectedTaskId,
+            pending.manifest,
+            0,
+          );
         }, 50);
+      } else {
+        console.log("[HTMX] No pending manifest found for selected task");
       }
     }
   });
@@ -229,19 +254,31 @@ function startTaskPolling(taskId) {
 
       // Update progress
       const progress = task.progress || 0;
-      const message = task.current_step || task.status || "Processing...";
-      updateFloatingProgressBar(message, progress, task);
+      const currentStep = task.current_step || 0;
+      const totalSteps = task.total_steps || 100;
+      const message = task.status || "Processing...";
+      updateFloatingProgressBar(
+        currentStep,
+        totalSteps,
+        message,
+        "poll",
+        null,
+        null,
+      );
 
       // Check if task is complete
+      // Update the task card in-place without refreshing entire list
+      updateTaskCardFromPoll(taskId, task);
+
       if (task.status === "completed" || task.status === "complete") {
         stopTaskPolling();
         completeFloatingProgress(task);
-        htmx.trigger(document.body, "taskCreated"); // Refresh task list
+        updateFilterCounts(); // Just update counts, not full list
         showToast("Task completed successfully!", "success");
       } else if (task.status === "failed" || task.status === "error") {
         stopTaskPolling();
         errorFloatingProgress(task.error || "Task failed");
-        htmx.trigger(document.body, "taskCreated"); // Refresh task list
+        updateFilterCounts(); // Just update counts, not full list
         showToast(task.error || "Task failed", "error");
       }
     } catch (err) {
@@ -262,14 +299,24 @@ function stopTaskPolling() {
 // WEBSOCKET CONNECTION
 // =============================================================================
 
+// Global singleton WebSocket - shared across all task views
+// This ensures only ONE WebSocket connection exists for task progress
+if (typeof window._taskProgressWsConnection === "undefined") {
+  window._taskProgressWsConnection = null;
+  window._taskProgressWsHandlers = new Set();
+}
+
 function initWebSocket() {
-  // Don't create new connection if one already exists and is open/connecting
-  if (TasksState.wsConnection) {
-    const state = TasksState.wsConnection.readyState;
+  // Use global singleton to prevent multiple connections
+  // Check if global connection already exists and is open/connecting
+  if (window._taskProgressWsConnection) {
+    const state = window._taskProgressWsConnection.readyState;
     if (state === WebSocket.OPEN || state === WebSocket.CONNECTING) {
       console.log(
-        "[Tasks WS] WebSocket already connected/connecting, skipping",
+        "[Tasks WS] Global WebSocket already connected/connecting, reusing",
       );
+      // Just update local reference
+      TasksState.wsConnection = window._taskProgressWsConnection;
       return;
     }
   }
@@ -277,43 +324,74 @@ function initWebSocket() {
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const wsUrl = `${protocol}//${window.location.host}/ws/task-progress`;
 
-  console.log("[Tasks WS] Attempting connection to:", wsUrl);
+  console.log("[Tasks WS] Creating SINGLETON WebSocket connection to:", wsUrl);
 
   try {
-    TasksState.wsConnection = new WebSocket(wsUrl);
+    const ws = new WebSocket(wsUrl);
+    window._taskProgressWsConnection = ws;
+    TasksState.wsConnection = ws;
 
-    TasksState.wsConnection.onopen = function () {
-      console.log("[Tasks WS] WebSocket connected successfully");
+    ws.onopen = function () {
+      console.log("[Tasks WS] WebSocket connected successfully (singleton)");
       addAgentLog("info", "[SYSTEM] Connected to task orchestrator");
     };
 
-    TasksState.wsConnection.onmessage = function (event) {
+    ws.onmessage = function (event) {
       console.log("[Tasks WS] Raw message received:", event.data);
       try {
         const data = JSON.parse(event.data);
         console.log("[Tasks WS] Parsed message:", data.type, data);
         handleWebSocketMessage(data);
+
+        // Also forward to any registered handlers (e.g., ProgressPanel)
+        window._taskProgressWsHandlers.forEach((handler) => {
+          try {
+            handler(data);
+          } catch (e) {
+            console.error("[Tasks WS] Handler error:", e);
+          }
+        });
       } catch (e) {
         console.error("[Tasks WS] Failed to parse message:", e, event.data);
       }
     };
 
-    TasksState.wsConnection.onclose = function (event) {
+    ws.onclose = function (event) {
       console.log(
         "[Tasks WS] WebSocket disconnected, code:",
         event.code,
         "reason:",
         event.reason,
       );
+      window._taskProgressWsConnection = null;
+      TasksState.wsConnection = null;
       setTimeout(initWebSocket, 5000);
     };
 
-    TasksState.wsConnection.onerror = function (error) {
+    ws.onerror = function (error) {
       console.error("[Tasks WS] WebSocket error:", error);
     };
   } catch (e) {
     console.error("[Tasks WS] Failed to create WebSocket:", e);
   }
+}
+
+// Register a handler to receive WebSocket messages (for ProgressPanel etc.)
+function registerTaskProgressHandler(handler) {
+  window._taskProgressWsHandlers.add(handler);
+  console.log(
+    "[Tasks WS] Registered handler, total:",
+    window._taskProgressWsHandlers.size,
+  );
+}
+
+// Unregister a handler
+function unregisterTaskProgressHandler(handler) {
+  window._taskProgressWsHandlers.delete(handler);
+  console.log(
+    "[Tasks WS] Unregistered handler, total:",
+    window._taskProgressWsHandlers.size,
+  );
 }
 
 function handleWebSocketMessage(data) {
@@ -330,12 +408,9 @@ function handleWebSocketMessage(data) {
       addAgentLog("accent", `[TASK] Started: ${data.message}`);
       // Update terminal in detail panel
       updateDetailTerminal(data.task_id, data.message, "started");
-      // Refresh task list
-      if (typeof htmx !== "undefined") {
-        htmx.trigger(document.body, "taskCreated");
-      }
-      // Select the task if not already selected
+      // Add new task card to the list without full refresh
       if (data.task_id) {
+        addTaskCardToList(data.task_id, data.message || "New Task", "running");
         selectTask(data.task_id);
       }
       break;
@@ -348,6 +423,20 @@ function handleWebSocketMessage(data) {
         data.message,
       );
       addAgentLog("info", `[${data.step}] ${data.message}`);
+
+      // Auto-select this task if none selected
+      if (data.task_id && !TasksState.selectedTaskId) {
+        console.log(
+          "[Tasks WS] Auto-selecting task from progress:",
+          data.task_id,
+        );
+        TasksState.selectedTaskId = data.task_id;
+        loadTaskDetails(data.task_id);
+      }
+
+      // Update STATUS section with current action
+      updateStatusFromProgress(data.message, data.step);
+
       // Update terminal in detail panel with real data
       updateDetailTerminal(
         data.task_id,
@@ -395,12 +484,16 @@ function handleWebSocketMessage(data) {
       // Play completion sound
       playCompletionSound();
 
-      // Refresh task list and details
-      if (typeof htmx !== "undefined") {
-        htmx.trigger(document.body, "taskCreated");
-      }
+      // Update task card status in-place, then refresh list once
       if (data.task_id) {
-        setTimeout(() => loadTaskDetails(data.task_id), 500);
+        updateTaskCardStatus(data.task_id, "completed");
+        setTimeout(() => {
+          loadTaskDetails(data.task_id);
+          // Trigger list refresh (throttled to 2s so won't flicker)
+          if (typeof htmx !== "undefined") {
+            htmx.trigger(document.body, "taskCreated");
+          }
+        }, 500);
       }
       break;
 
@@ -440,34 +533,97 @@ function handleWebSocketMessage(data) {
       console.log("[Tasks WS] LLM streaming...");
       break;
 
+    case "llm_generating":
+      console.log("[Tasks WS] LLM_GENERATING:", data.message);
+      addAgentLog("info", `[AI] ${data.message}`);
+      // Update STATUS section with AI progress
+      updateStatusFromProgress(data.message, "llm_generating");
+      // Update terminal
+      updateDetailTerminal(data.task_id, data.message, "llm_generating");
+      break;
+
+    case "llm_complete":
+      console.log("[Tasks WS] LLM_COMPLETE:", data.message);
+      addAgentLog("success", `[AI] ${data.message}`);
+      // Update STATUS section
+      updateStatusFromProgress(data.message, "llm_complete");
+      // Update terminal
+      updateDetailTerminal(data.task_id, `✓ ${data.message}`, "success");
+      break;
+
     case "manifest_update":
       console.log(
-        "[Tasks WS] MANIFEST_UPDATE for task:",
+        "[Tasks WS] *** MANIFEST_UPDATE RECEIVED ***",
+        "\n  task_id:",
         data.task_id,
-        "selected:",
+        "\n  selected:",
         TasksState.selectedTaskId,
+        "\n  has details:",
+        !!data.details,
+        "\n  details length:",
+        data.details?.length,
       );
+      // Visual indicator in console
+      console.warn(
+        "[MANIFEST] Processing manifest_update for task:",
+        data.task_id,
+      );
+      // Auto-select task if none selected or if this is a new running task
+      if (data.task_id && !TasksState.selectedTaskId) {
+        console.log("[Tasks WS] Auto-selecting task:", data.task_id);
+        TasksState.selectedTaskId = data.task_id;
+        loadTaskDetails(data.task_id);
+      }
       // Update the progress log section with manifest data
       if (data.details) {
         try {
           const manifestData = JSON.parse(data.details);
-          console.log(
-            "[Tasks WS] Manifest parsed, sections:",
+          console.warn(
+            "[MANIFEST] Parsed successfully:",
+            "\n  sections:",
             manifestData.sections?.length,
-            "status:",
+            "\n  status:",
             manifestData.status,
+            "\n  section names:",
+            manifestData.sections
+              ?.map((s) => s.name + ":" + s.status)
+              .join(", "),
           );
-          renderManifestProgress(data.task_id, manifestData);
+          // Always render for the task, even if not selected (store for later)
+          try {
+            renderManifestProgress(data.task_id, manifestData, 0, true);
+          } catch (renderError) {
+            console.error(
+              "[Tasks WS] Error in renderManifestProgress:",
+              renderError,
+              "\n  stack:",
+              renderError.stack,
+            );
+          }
         } catch (e) {
           console.error(
             "[Tasks WS] Failed to parse manifest:",
             e,
-            data.details?.substring(0, 200),
+            "\n  details preview:",
+            data.details?.substring(0, 500),
           );
         }
       } else {
-        console.warn("[Tasks WS] manifest_update received but no details");
+        console.warn(
+          "[Tasks WS] manifest_update received but no details field",
+        );
       }
+      break;
+
+    default:
+      console.log(
+        "[Tasks WS] Unhandled message type:",
+        data.type,
+        "\n  step:",
+        data.step,
+        "\n  message:",
+        data.message,
+      );
       break;
   }
 }
@@ -475,35 +631,78 @@ function handleWebSocketMessage(data) {
 // Store pending manifest updates for tasks whose elements aren't loaded yet
 const pendingManifestUpdates = new Map();
 
-function renderManifestProgress(taskId, manifest, retryCount = 0) {
-  console.log(
-    "[Manifest] renderManifestProgress called for task:",
+function renderManifestProgress(
+  taskId,
+  manifest,
+  retryCount = 0,
+  forceStore = false,
+) {
+  // Normalize task IDs for comparison (both to lowercase string)
+  const normalizedTaskId = String(taskId).toLowerCase().trim();
+  const normalizedSelectedId = TasksState.selectedTaskId
+    ? String(TasksState.selectedTaskId).toLowerCase().trim()
+    : null;
+
+  console.warn(
+    "[MANIFEST] *** renderManifestProgress ***",
+    "\n  taskId:",
     taskId,
-    "selected:",
+    "\n  selectedTaskId:",
     TasksState.selectedTaskId,
+    "\n  normalized match:",
+    normalizedTaskId === normalizedSelectedId,
+    "\n  sections:",
+    manifest?.sections?.length,
+    "\n  section statuses:",
+    manifest?.sections?.map((s) => `${s.name}:${s.status}`).join(", "),
+    "\n  retryCount:",
+    retryCount,
   );
 
-  // Only update if this is the selected task
-  if (TasksState.selectedTaskId !== taskId) {
-    console.log("[Manifest] Skipping - not selected task");
+  // Always store the manifest for this task (use normalized ID for consistent lookup)
+  pendingManifestUpdates.set(normalizedTaskId, manifest);
+
+  // Only render UI if this is the selected task (use normalized comparison)
+  if (normalizedSelectedId !== normalizedTaskId) {
+    console.log(
+      "[Manifest] Storing manifest but not rendering - not selected task",
+      "\n  taskId:",
+      normalizedTaskId,
+      "\n  selectedId:",
+      normalizedSelectedId,
+    );
     return;
   }
 
   // Try multiple selectors to find the progress log element
   let progressLog = document.getElementById(`progress-log-${taskId}`);
+  console.log(
+    "[MANIFEST] Looking for progress-log-" + taskId + ", found:",
+    !!progressLog,
+  );
   if (!progressLog) {
     progressLog = document.querySelector(".taskmd-progress-content");
+    console.log(
+      "[MANIFEST] Looking for .taskmd-progress-content, found:",
+      !!progressLog,
+    );
   }
 
   if (!progressLog) {
-    console.log("[Manifest] No progress log element found, retry:", retryCount);
+    console.warn(
+      "[MANIFEST] No progress log element found, retry:",
+      retryCount,
+    );
     // If task is selected but element not yet loaded, retry after a delay
     if (retryCount < 5) {
-      pendingManifestUpdates.set(taskId, manifest);
+      pendingManifestUpdates.set(normalizedTaskId, manifest);
       setTimeout(
         () => {
-          const pending = pendingManifestUpdates.get(taskId);
-          if (pending && TasksState.selectedTaskId === taskId) {
+          const pending = pendingManifestUpdates.get(normalizedTaskId);
+          const currentSelectedNormalized = TasksState.selectedTaskId
+            ? String(TasksState.selectedTaskId).toLowerCase().trim()
+            : null;
+          if (pending && currentSelectedNormalized === normalizedTaskId) {
             renderManifestProgress(taskId, pending, retryCount + 1);
           }
         },
@@ -513,37 +712,170 @@ function renderManifestProgress(taskId, manifest, retryCount = 0) {
     return;
   }
 
-  // Clear pending update
-  pendingManifestUpdates.delete(taskId);
+  // Clear pending update (use normalized ID)
+  pendingManifestUpdates.delete(normalizedTaskId);
 
   if (!manifest || !manifest.sections) {
-    console.log("[Manifest] No sections in manifest");
+    console.log("[Manifest] No sections in manifest, skipping render");
     return;
   }
 
   const totalSteps = manifest.progress?.total || 60;
 
+  console.warn(
+    "[MANIFEST] Rendering progress tree:",
+    "\n  totalSteps:",
+    totalSteps,
+    "\n  sections:",
+    manifest.sections.length,
+    "\n  progressLog element:",
+    progressLog?.id || progressLog?.className,
+  );
+
   // Update STATUS section if exists
   updateStatusSection(manifest);
 
   // Check if tree exists - if not, create it; if yes, update incrementally
+  // Clear any "progress-empty" placeholder first
+  const emptyPlaceholder = progressLog.querySelector(".progress-empty");
+  if (emptyPlaceholder) {
+    console.log("[Manifest] Removing progress-empty placeholder");
+    emptyPlaceholder.remove();
+  }
+
   let tree = progressLog.querySelector(".taskmd-tree");
-  if (!tree) {
-    // First render only - create the tree structure
-    progressLog.innerHTML = buildProgressTreeHTML(manifest, totalSteps);
-    // Auto-expand running sections
-    progressLog
-      .querySelectorAll(".tree-section.running, .tree-child.running")
-      .forEach((el) => {
-        el.classList.add("expanded");
-      });
-  } else {
-    // Incremental update - only update what changed (no flicker)
-    updateProgressTreeInPlace(tree, manifest, totalSteps);
+  console.log("[Manifest] Existing tree found:", !!tree);
+
+  // Check if we need to rebuild the tree (structure changed significantly)
+  let shouldRebuild = !tree;
+  if (tree && manifest.sections) {
+    const existingSections = tree.querySelectorAll(".tree-section");
+    const existingChildren = tree.querySelectorAll(".tree-child");
+    const existingItems = tree.querySelectorAll(".tree-item");
+    const newChildCount = manifest.sections.reduce(
+      (sum, s) => sum + (s.children?.length || 0),
+      0,
+    );
+    const newItemCount = manifest.sections.reduce((sum, s) => {
+      let count = (s.items?.length || 0) + (s.item_groups?.length || 0);
+      for (const child of s.children || []) {
+        count += (child.items?.length || 0) + (child.item_groups?.length || 0);
+      }
+      return sum + count;
+    }, 0);
+
+    // Check if section names match (IDs may change but names should be stable)
+    const existingNames = new Set(
+      Array.from(existingSections).map(
+        (el) => el.querySelector(".tree-name")?.textContent,
+      ),
+    );
+    const newNames = new Set(manifest.sections.map((s) => s.name));
+    const namesMatch =
+      existingNames.size === newNames.size &&
+      [...existingNames].every((n) => newNames.has(n));
+
+    // Rebuild if:
+    // - section count changed
+    // - children appeared where there were none
+    // - items appeared where there were none
+    // - section names don't match (structure completely different)
+    if (
+      existingSections.length !== manifest.sections.length ||
+      (existingChildren.length === 0 && newChildCount > 0) ||
+      (existingItems.length === 0 && newItemCount > 0) ||
+      !namesMatch
+    ) {
+      console.log(
+        "[Manifest] Structure changed significantly, REBUILDING tree",
+        "\n  existing sections:",
+        existingSections.length,
+        "-> new:",
+        manifest.sections.length,
+        "\n  existing children:",
+        existingChildren.length,
+        "-> new:",
+        newChildCount,
+        "\n  existing items:",
+        existingItems.length,
+        "-> new:",
+        newItemCount,
+        "\n  names match:",
+        namesMatch,
+      );
+      shouldRebuild = true;
+    }
+  }
+
+  try {
+    if (shouldRebuild) {
+      // Full rebuild - create the tree structure from scratch
+      console.log("[Manifest] === REBUILDING TREE FROM SCRATCH ===");
+      const treeHTML = buildProgressTreeHTML(manifest, totalSteps);
+      console.log(
+        "[Manifest] Tree HTML length:",
+        treeHTML.length,
+        "sections:",
+        manifest.sections.length,
+        "with children:",
+        manifest.sections.filter((s) => s.children?.length > 0).length,
+      );
+      progressLog.innerHTML = treeHTML;
+      // Auto-expand all sections and children for visibility
+      progressLog
+        .querySelectorAll(".tree-section, .tree-child")
+        .forEach((el) => {
+          el.classList.add("expanded");
+        });
+      const expandedCount = progressLog.querySelectorAll(".expanded").length;
+      const childCount = progressLog.querySelectorAll(".tree-child").length;
+      const itemCount = progressLog.querySelectorAll(".tree-item").length;
+      console.log(
+        "[Manifest] Tree rebuilt:",
+        expandedCount,
+        "expanded,",
+        childCount,
+        "children,",
+        itemCount,
+        "items",
+      );
+    } else {
+      // Incremental update - only update what changed (no flicker)
+      console.log("[Manifest] Updating tree in place");
+      updateProgressTreeInPlace(tree, manifest, totalSteps);
+      console.log("[Manifest] Tree updated successfully");
+    }
+  } catch (treeError) {
+    console.error(
+      "[Manifest] Error building/updating tree:",
+      treeError,
+      "\n  stack:",
+      treeError.stack,
+    );
   }
 
   // Update terminal stats
   updateTerminalStats(taskId, manifest);
+}
+
+// Update STATUS section from task_progress messages
+function updateStatusFromProgress(message, step) {
+  const statusContent = document.querySelector(".taskmd-status-content");
+  if (!statusContent) return;
+
+  // Update current action text
+  const actionText = statusContent.querySelector(
+    ".status-current .status-text",
+  );
+  if (actionText && message) {
+    actionText.textContent = message;
+  }
+
+  // Update the status dot to show activity
+  const statusDot = statusContent.querySelector(".status-dot");
+  if (statusDot) {
+    statusDot.classList.add("active");
+  }
 }
 
 function updateStatusSection(manifest) {
@@ -596,27 +928,59 @@ function updateStatusSection(manifest) {
 }
 
 function buildProgressTreeHTML(manifest, totalSteps) {
+  // Detailed logging to debug children/items
+  const totalChildren = manifest.sections?.reduce(
+    (sum, s) => sum + (s.children?.length || 0),
+    0,
+  );
+  const totalItems = manifest.sections?.reduce((sum, s) => {
+    let count = (s.items?.length || 0) + (s.item_groups?.length || 0);
+    for (const c of s.children || []) {
+      count += (c.items?.length || 0) + (c.item_groups?.length || 0);
+    }
+    return sum + count;
+  }, 0);
+
+  console.warn(
+    "[BUILD_TREE] *** buildProgressTreeHTML ***",
+    "\n  sections:",
+    manifest.sections?.length,
+    "\n  totalChildren:",
+    totalChildren,
+    "\n  totalItems:",
+    totalItems,
+    "\n  totalSteps:",
+    totalSteps,
+  );
+
   let html = '<div class="taskmd-tree">';
 
   for (const section of manifest.sections) {
     // Normalize status - backend sends "Running", "Completed", etc.
     const rawStatus = section.status || "Pending";
     const statusClass = rawStatus.toLowerCase();
-    const isRunning = statusClass === "running";
+    // ALWAYS expand all sections by default for visibility
+    const shouldExpand = true;
     const globalCurrent =
       section.progress?.global_current || section.progress?.current || 0;
 
+    const sectionChildCount = section.children?.length || 0;
+    const sectionItemCount =
+      (section.items?.length || 0) + (section.item_groups?.length || 0);
+
     console.log(
-      "[Manifest] Section:",
+      "[BUILD_TREE] Section:",
       section.name,
-      "status:",
+      "| status:",
       rawStatus,
-      "children:",
-      section.children?.length,
+      "| children:",
+      sectionChildCount,
+      "| items:",
+      sectionItemCount,
     );
 
     html += `
-      <div class="tree-section ${statusClass}${isRunning ? " expanded" : ""}" data-section-id="${section.id}">
+      <div class="tree-section ${statusClass}${shouldExpand ? " expanded" : ""}" data-section-id="${section.id}">
         <div class="tree-row tree-level-0" onclick="this.parentElement.classList.toggle('expanded')">
           <span class="tree-name">${escapeHtml(section.name)}</span>
           <span class="tree-step-badge">Step ${globalCurrent}/${totalSteps}</span>
@@ -627,22 +991,31 @@ function buildProgressTreeHTML(manifest, totalSteps) {
 
     // Children (e.g., "Database Schema Design" under "Database & Models")
     if (section.children && section.children.length > 0) {
+      console.log(
+        "[BUILD_TREE]   -> Adding",
+        section.children.length,
+        "children to section",
+        section.name,
+      );
       for (const child of section.children) {
         const childRawStatus = child.status || "Pending";
         const childStatus = childRawStatus.toLowerCase();
-        const childIsRunning = childStatus === "running";
+        // ALWAYS expand all children by default for visibility
+        const childShouldExpand = true;
 
+        const childItemCount =
+          (child.item_groups?.length || 0) + (child.items?.length || 0);
         console.log(
-          "[Manifest]   Child:",
+          "[BUILD_TREE]     Child:",
           child.name,
-          "status:",
+          "| status:",
           childRawStatus,
-          "items:",
-          (child.item_groups?.length || 0) + (child.items?.length || 0),
+          "| items:",
+          childItemCount,
         );
 
         html += `
-          <div class="tree-child ${childStatus}${childIsRunning ? " expanded" : ""}" data-child-id="${child.id}">
+          <div class="tree-child ${childStatus}${childShouldExpand ? " expanded" : ""}" data-child-id="${child.id}">
             <div class="tree-row tree-level-1" onclick="this.parentElement.classList.toggle('expanded')">
               <span class="tree-item-dot ${childStatus}"></span>
               <span class="tree-name">${escapeHtml(child.name)}</span>
@@ -656,6 +1029,14 @@ function buildProgressTreeHTML(manifest, totalSteps) {
           ...(child.item_groups || []),
           ...(child.items || []),
         ];
+        if (childItems.length > 0) {
+          console.log(
+            "[BUILD_TREE]       -> Adding",
+            childItems.length,
+            "items to child",
+            child.name,
+          );
+        }
         for (const item of childItems) {
           html += buildItemHTML(item);
         }
@@ -677,6 +1058,20 @@ function buildProgressTreeHTML(manifest, totalSteps) {
   }
 
   html += "</div>";
+
+  // Final verification
+  const hasChildren = html.includes("tree-child");
+  const hasItems = html.includes("tree-item");
+  console.warn(
+    "[BUILD_TREE] *** Tree HTML built ***",
+    "\n  length:",
+    html.length,
+    "\n  hasChildren:",
+    hasChildren,
+    "\n  hasItems:",
+    hasItems,
+  );
+
   return html;
 }
 
@@ -702,8 +1097,50 @@ function buildItemHTML(item) {
 // Incremental update - only change what's different (prevents flicker)
 function updateProgressTreeInPlace(tree, manifest, totalSteps) {
   for (const section of manifest.sections) {
-    const sectionEl = tree.querySelector(`[data-section-id="${section.id}"]`);
-    if (!sectionEl) continue;
+    let sectionEl = tree.querySelector(`[data-section-id="${section.id}"]`);
+
+    // If section not found by ID, try to find by name (backend may regenerate IDs)
+    if (!sectionEl) {
+      const allSections = tree.querySelectorAll(".tree-section");
+      for (const el of allSections) {
+        const nameEl = el.querySelector(":scope > .tree-row .tree-name");
+        if (nameEl && nameEl.textContent === section.name) {
+          sectionEl = el;
+          // Update the data-section-id to the new ID for future lookups
+          sectionEl.setAttribute("data-section-id", section.id);
+          console.log(
+            "[Manifest] Found section by name, updated ID:",
+            section.name,
+            "->",
+            section.id,
+          );
+          break;
+        }
+      }
+    }
+
+    // If section still doesn't exist, create it dynamically (new section arrived!)
+    if (!sectionEl) {
+      console.log("[Manifest] Creating new section:", section.name);
+      const rawStatus = section.status || "Pending";
+      const statusClass = rawStatus.toLowerCase();
+      const globalCurrent =
+        section.progress?.global_current || section.progress?.current || 0;
+
+      const sectionHtml = `
+        <div class="tree-section ${statusClass} expanded" data-section-id="${section.id}">
+          <div class="tree-row tree-level-0" onclick="this.parentElement.classList.toggle('expanded')">
+            <span class="tree-name">${escapeHtml(section.name)}</span>
+            <span class="tree-step-badge">Step ${globalCurrent}/${totalSteps}</span>
+            <span class="tree-status ${statusClass}">${rawStatus}</span>
+            <span class="tree-section-dot ${statusClass}"></span>
+          </div>
+          <div class="tree-children"></div>
+        </div>`;
+
+      tree.insertAdjacentHTML("beforeend", sectionHtml);
+      sectionEl = tree.querySelector(`[data-section-id="${section.id}"]`);
+    }
 
     const rawStatus = section.status || "Pending";
     const statusClass = rawStatus.toLowerCase();
@@ -711,8 +1148,9 @@ function updateProgressTreeInPlace(tree, manifest, totalSteps) {
       section.progress?.global_current || section.progress?.current || 0;
     const isExpanded = sectionEl.classList.contains("expanded");
 
-    // Update section classes without removing expanded
-    const newClasses = `tree-section ${statusClass}${statusClass === "running" || isExpanded ? " expanded" : ""}`;
+    // ALWAYS keep sections expanded for visibility
+    const shouldExpand = true;
+    const newClasses = `tree-section ${statusClass}${shouldExpand ? " expanded" : ""}`;
     if (sectionEl.className !== newClasses) {
       sectionEl.className = newClasses;
     }
@@ -768,15 +1206,81 @@ function updateProgressTreeInPlace(tree, manifest, totalSteps) {
 }
 
 function updateChildInPlace(sectionEl, child) {
-  const childEl = sectionEl.querySelector(`[data-child-id="${child.id}"]`);
-  if (!childEl) return;
+  let childEl = sectionEl.querySelector(`[data-child-id="${child.id}"]`);
+
+  // If child not found by ID, try to find by name (backend may regenerate IDs)
+  if (!childEl) {
+    const allChildren = sectionEl.querySelectorAll(".tree-child");
+    for (const el of allChildren) {
+      const nameEl = el.querySelector(":scope > .tree-row .tree-name");
+      if (nameEl && nameEl.textContent === child.name) {
+        childEl = el;
+        // Update the data-child-id to the new ID for future lookups
+        childEl.setAttribute("data-child-id", child.id);
+        console.log(
+          "[Manifest] Found child by name, updated ID:",
+          child.name,
+          "->",
+          child.id,
+        );
+        break;
+      }
+    }
+  }
+
+  // If child still doesn't exist in DOM, create it (and auto-expand new children!)
+  if (!childEl) {
+    const childrenContainer = sectionEl.querySelector(".tree-children");
+    if (!childrenContainer) return;
+
+    const rawStatus = child.status || "Pending";
+    const statusClass = rawStatus.toLowerCase();
+    // NEW: Always expand newly created children so they're visible immediately
+    const childHasItems =
+      (child.item_groups?.length || 0) + (child.items?.length || 0) > 0;
+    const shouldExpand = true; // Always expand new children for visibility
+
+    console.log(
+      "[Manifest] Creating new child:",
+      child.name,
+      "status:",
+      rawStatus,
+      "expanded:",
+      shouldExpand,
+    );
+
+    const childHtml = `
+      <div class="tree-child ${statusClass}${shouldExpand ? " expanded" : ""}" data-child-id="${child.id}">
+        <div class="tree-row tree-level-1" onclick="this.parentElement.classList.toggle('expanded')">
+          <span class="tree-item-dot ${statusClass}"></span>
+          <span class="tree-name">${escapeHtml(child.name)}</span>
+          <span class="tree-step-badge">Step ${child.progress?.current || 0}/${child.progress?.total || 1}</span>
+          <span class="tree-status ${statusClass}">${rawStatus}</span>
+        </div>
+        <div class="tree-items"></div>
+      </div>`;
+
+    childrenContainer.insertAdjacentHTML("beforeend", childHtml);
+    childEl = sectionEl.querySelector(`[data-child-id="${child.id}"]`);
+
+    // Add items to the newly created child
+    const itemsContainer = childEl.querySelector(".tree-items");
+    if (itemsContainer) {
+      const allItems = [...(child.item_groups || []), ...(child.items || [])];
+      for (const item of allItems) {
+        itemsContainer.insertAdjacentHTML("beforeend", buildItemHTML(item));
+      }
+    }
+    return;
+  }
 
   const rawStatus = child.status || "Pending";
   const statusClass = rawStatus.toLowerCase();
   const isExpanded = childEl.classList.contains("expanded");
 
-  // Update child classes
-  const newClasses = `tree-child ${statusClass}${statusClass === "running" || isExpanded ? " expanded" : ""}`;
+  // ALWAYS keep children expanded for visibility
+  const shouldExpand = true;
+  const newClasses = `tree-child ${statusClass}${shouldExpand ? " expanded" : ""}`;
   if (childEl.className !== newClasses) {
     childEl.className = newClasses;
   }
@@ -826,7 +1330,22 @@ function updateItemsInPlace(container, items) {
 
   for (const item of items) {
     const itemId = item.id || item.name || item.display_name;
+    const itemName = item.name || item.display_name;
     let itemEl = container.querySelector(`[data-item-id="${itemId}"]`);
+
+    // If item not found by ID, try to find by name (backend may regenerate IDs)
+    if (!itemEl && itemName) {
+      const allItems = container.querySelectorAll(".tree-item");
+      for (const el of allItems) {
+        const nameEl = el.querySelector(".tree-item-name");
+        if (nameEl && nameEl.textContent === itemName) {
+          itemEl = el;
+          // Update the data-item-id to the new ID for future lookups
+          itemEl.setAttribute("data-item-id", itemId);
+          break;
+        }
+      }
+    }
 
     if (!itemEl) {
       // New item - append it
@@ -980,19 +1499,116 @@ function logFinalStats(activity) {
 
 // Update terminal in the detail panel with real-time data
 function updateDetailTerminal(taskId, message, step, activity) {
-  const terminalOutput = document.getElementById(`terminal-output-${taskId}`);
+  // Try multiple selectors to find the terminal
+  let terminalOutput = document.getElementById(`terminal-output-${taskId}`);
+
+  if (!terminalOutput) {
+    // Try the currently visible terminal output (any task)
+    terminalOutput = document.querySelector(".taskmd-terminal-output");
+  }
+
   if (!terminalOutput) {
     // Try generic terminal output
-    const genericTerminal = document.querySelector(".terminal-output-rich");
-    if (genericTerminal) {
-      addTerminalLine(genericTerminal, message, step);
-    }
+    terminalOutput = document.querySelector(".terminal-output-rich");
+  }
+
+  if (!terminalOutput) {
+    console.log("[Terminal] No terminal element found for task:", taskId);
     return;
   }
-  addTerminalLine(terminalOutput, message, step, activity);
+
+  // Ensure message is a string
+  const messageStr =
+    typeof message === "string" ? message : JSON.stringify(message) || "";
+  console.log(
+    "[Terminal] Adding line to terminal:",
+    messageStr.substring(0, 50),
+  );
+  addTerminalLine(terminalOutput, messageStr, step, activity);
 }
 
-// Format markdown-like text for terminal display
+// Simple markdown parser for terminal/LLM output
+function parseMarkdown(text) {
+  if (!text) return "";
+
+  let html = text;
+
+  // Escape HTML first
+  html = html
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Code blocks (```language\ncode```) - must be before other replacements
+  html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
+    const langClass = lang ? ` data-lang="${lang}"` : "";
+    return `<pre class="terminal-code"${langClass}><code>${code.trim()}</code></pre>`;
+  });
+
+  // Headers (# ## ###)
+  html = html.replace(/^### (.+)$/gm, '<h3 class="terminal-h3">$1</h3>');
+  html = html.replace(/^## (.+)$/gm, '<h2 class="terminal-h2">$1</h2>');
+  html = html.replace(/^# (.+)$/gm, '<h1 class="terminal-h1">$1</h1>');
+
+  // Bold (**text** or __text__)
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/__(.+?)__/g, "<strong>$1</strong>");
+
+  // Italic (*text* or _text_)
+  html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  html = html.replace(/_([^_]+)_/g, "<em>$1</em>");
+
+  // Inline code (`code`)
+  html = html.replace(
+    /`([^`]+)`/g,
+    '<code class="terminal-inline-code">$1</code>',
+  );
+
+  // Links [text](url)
+  html = html.replace(
+    /\[([^\]]+)\]\(([^)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener">$1</a>',
+  );
+
+  // Unordered lists (- item or * item)
+  html = html.replace(/^[-*]\s+(.+)$/gm, '<li class="terminal-li">$1</li>');
+  // Wrap consecutive li elements in ul
+  html = html.replace(
+    /(<li class="terminal-li">.*<\/li>\n?)+/g,
+    (match) => `<ul class="terminal-ul">${match}</ul>`,
+  );
+
+  // Ordered lists (1. item)
+  html = html.replace(/^\d+\.\s+(.+)$/gm, '<li class="terminal-oli">$1</li>');
+  html = html.replace(
+    /(<li class="terminal-oli">.*<\/li>\n?)+/g,
+    (match) => `<ol class="terminal-ol">${match}</ol>`,
+  );
+
+  // Blockquotes (> text)
+  html = html.replace(
+    /^>\s+(.+)$/gm,
+    '<blockquote class="terminal-quote">$1</blockquote>',
+  );
+
+  // Horizontal rule (--- or ***)
+  html = html.replace(/^[-*]{3,}$/gm, '<hr class="terminal-hr">');
+
+  // Checkmarks
+  html = html.replace(/^✓\s*/gm, '<span class="check-mark">✓</span> ');
+  html = html.replace(/^\[x\]/gim, '<span class="check-mark">✓</span>');
+  html = html.replace(/^\[ \]/g, '<span class="check-empty">○</span>');
+
+  // Line breaks - convert double newlines to paragraphs
+  html = html.replace(/\n\n+/g, '</p><p class="terminal-p">');
+  if (!html.startsWith("<")) {
+    html = '<p class="terminal-p">' + html + "</p>";
+  }
+
+  return html;
+}
+
+// Format markdown-like text for terminal display (simple version for status messages)
 function formatTerminalMarkdown(text) {
   if (!text) return "";
 
@@ -1011,7 +1627,7 @@ function formatTerminalMarkdown(text) {
   // Code blocks (```code```)
   text = text.replace(
     /```([\s\S]*?)```/g,
-    '<div class="terminal-code">$1</div>',
+    '<pre class="terminal-code"><code>$1</code></pre>',
   );
 
   // List items (- item)
@@ -1023,9 +1639,44 @@ function formatTerminalMarkdown(text) {
   return text;
 }
 
+// Render full markdown content (for LLM output)
+function renderMarkdownContent(container, markdown) {
+  if (!container || !markdown) return;
+
+  const content = document.createElement("div");
+  content.className = "markdown-content";
+  content.innerHTML = parseMarkdown(markdown);
+
+  // Clear previous content and add new
+  container.innerHTML = "";
+  container.appendChild(content);
+  container.scrollTop = container.scrollHeight;
+}
+
+// Update terminal with LLM markdown content
+function updateTerminalWithMarkdown(taskId, markdown) {
+  const terminalOutput = document.getElementById(`terminal-output-${taskId}`);
+  if (terminalOutput) {
+    renderMarkdownContent(terminalOutput, markdown);
+  } else {
+    const genericTerminal = document.querySelector(".taskmd-terminal-output");
+    if (genericTerminal) {
+      renderMarkdownContent(genericTerminal, markdown);
+    }
+  }
+}
+
 function addTerminalLine(terminal, message, step, activity) {
   const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
   const isLlmStream = step === "llm_stream";
+  const isLlmOutput =
+    step === "llm_output" || (message && message.length > 200);
+
+  // For large LLM output, render as full markdown
+  if (isLlmOutput && message && message.length > 200) {
+    renderMarkdownContent(terminal, message);
+    return;
+  }
 
   // Determine line type based on content
   const isHeader = message && message.startsWith("##");
@@ -1294,6 +1945,21 @@ function selectTask(taskId) {
 
   // Load task details (in real app, this would fetch from API)
   loadTaskDetails(taskId);
+
+  // Check if we have a pending manifest update for this task
+  const pending = findPendingManifest(taskId);
+  if (pending) {
+    console.log(
+      "[selectTask] Found pending manifest for task:",
+      taskId,
+      "from key:",
+      pending.key,
+    );
+    // Wait for detail content to load, then render manifest
+    setTimeout(() => {
+      renderManifestProgress(taskId, pending.manifest, 0, false);
+    }, 300);
+  }
 }
 
 function deselectTask() {
@@ -1367,7 +2033,14 @@ function loadTaskDetails(taskId) {
     return;
   }
 
+  // Prevent multiple simultaneous loads of the same task
+  if (TasksState.loadingTaskId === taskId) {
+    console.log("[LOAD] Already loading task:", taskId);
+    return;
+  }
+
   addAgentLog("info", `[LOAD] Loading task #${taskId} details`);
+  TasksState.loadingTaskId = taskId;
 
   // Show detail panel and hide empty state
   const emptyState = document.getElementById("detail-empty");
@@ -1375,6 +2048,7 @@ function loadTaskDetails(taskId) {
 
   if (!detailContent) {
     console.error("[LOAD] task-detail-content element not found");
+    TasksState.loadingTaskId = null;
     return;
   }
 
@@ -1384,12 +2058,20 @@ function loadTaskDetails(taskId) {
   // Fetch task details from API - use requestAnimationFrame to ensure DOM is ready
   requestAnimationFrame(() => {
     if (typeof htmx !== "undefined" && htmx.ajax) {
-      htmx.ajax("GET", `/api/tasks/${taskId}`, {
-        target: "#task-detail-content",
-        swap: "innerHTML",
-      });
+      htmx
+        .ajax("GET", `/api/tasks/${taskId}`, {
+          target: "#task-detail-content",
+          swap: "innerHTML",
+        })
+        .then(() => {
+          TasksState.loadingTaskId = null;
+        })
+        .catch(() => {
+          TasksState.loadingTaskId = null;
+        });
     } else {
       console.error("[LOAD] HTMX not available");
+      TasksState.loadingTaskId = null;
     }
   });
 }
@@ -1420,6 +2102,122 @@ function updateTaskDetail(task) {
   // Update detail panel with task data
   const detailTitle = document.querySelector(".task-detail-title");
   if (detailTitle) detailTitle.textContent = task.title;
+}
+
+// Update task card from polling without full list refresh
+function updateTaskCardFromPoll(taskId, task) {
+  const card = document.querySelector(`[data-task-id="${taskId}"]`);
+  if (!card) return;
+
+  // Don't update if the list is being swapped by HTMX
+  const taskList = document.getElementById("task-list");
+  if (
+    taskList &&
+    (taskList.classList.contains("htmx-swapping") ||
+      taskList.classList.contains("htmx-settling"))
+  ) {
+    return;
+  }
+
+  // Update progress bar
+  const progressFill = card.querySelector(".task-progress-fill");
+  const progressPercent = card.querySelector(".task-progress-percent");
+  if (progressFill && task.progress !== undefined) {
+    progressFill.style.width = `${task.progress}%`;
+  }
+  if (progressPercent && task.progress !== undefined) {
+    progressPercent.textContent = `${Math.round(task.progress)}%`;
+  }
+
+  // Update status badge
+  const statusBadge = card.querySelector(".task-card-status");
+  if (statusBadge && task.status) {
+    const oldStatus = statusBadge.className
+      .split(" ")
+      .find((c) => c !== "task-card-status");
+    if (oldStatus) statusBadge.classList.remove(oldStatus);
+    statusBadge.classList.add(task.status);
+    statusBadge.textContent = formatStatus(task.status);
+  }
+}
+
+// Add a new task card to the list without full refresh
+function addTaskCardToList(taskId, title, status) {
+  const taskList = document.getElementById("task-list");
+  if (!taskList) return;
+
+  // Check if card already exists
+  if (taskList.querySelector(`[data-task-id="${taskId}"]`)) {
+    return;
+  }
+
+  // Don't insert if task list is currently being swapped by HTMX
+  if (
+    taskList.classList.contains("htmx-swapping") ||
+    taskList.classList.contains("htmx-settling")
+  ) {
+    console.log("[TASK] Skipping card insert - list is being swapped");
+    return;
+  }
+
+  const statusClass = status || "running";
+  const statusText = formatStatus(status) || "Running";
+
+  const cardHtml = `
+    <div class="task-card ${statusClass}" data-task-id="${taskId}" onclick="selectTask('${taskId}')">
+      <div class="task-card-header">
+        <span class="task-card-icon">📋</span>
+        <span class="task-card-title">${escapeHtml(title)}</span>
+      </div>
+      <div class="task-card-meta">
+        <span class="task-card-status ${statusClass}">${statusText}</span>
+        <span class="task-card-priority">normal</span>
+      </div>
+      <div class="task-card-progress">
+        <div class="task-progress-bar">
+          <div class="task-progress-fill" style="width: 0%"></div>
+        </div>
+        <span class="task-progress-percent">0%</span>
+      </div>
+      <div class="task-card-actions">
+        <button class="task-action-btn" title="Star">★</button>
+        <button class="task-action-btn" title="Delete">🗑</button>
+      </div>
+    </div>
+  `;
+
+  // Insert at the top of the list
+  taskList.insertAdjacentHTML("afterbegin", cardHtml);
+}
+
+// Update just the status of a task card
+function updateTaskCardStatus(taskId, status) {
+  const card = document.querySelector(`[data-task-id="${taskId}"]`);
+  if (!card) return;
+
+  // Don't update if the list is being swapped by HTMX
+  const taskList = document.getElementById("task-list");
+  if (
+    taskList &&
+    (taskList.classList.contains("htmx-swapping") ||
+      taskList.classList.contains("htmx-settling"))
+  ) {
+    return;
+  }
+
+  const statusBadge = card.querySelector(".task-card-status");
+  if (statusBadge) {
+    statusBadge.className = `task-card-status ${status}`;
+    statusBadge.textContent = formatStatus(status);
+  }
+
+  // Update progress to 100% for completed
+  if (status === "completed") {
+    const progressFill = card.querySelector(".task-progress-fill");
+    const progressPercent = card.querySelector(".task-progress-percent");
+    if (progressFill) progressFill.style.width = "100%";
+    if (progressPercent) progressPercent.textContent = "100%";
+  }
 }
 
 // =============================================================================
