@@ -65,7 +65,15 @@
     font-family: var(--sentient-font);
     font-size: 14px;
     line-height: 1.5;
-    overflow: hidden;
+    overflow: hidden !important;
+}
+
+/* Disable global scrollbar on html/body when in tasks view */
+html:has(.autotask-container),
+body:has(.autotask-container) {
+    overflow: hidden !important;
+    height: 100vh;
+    max-height: 100vh;
 }
 
 .autotask-container * {
@@ -367,7 +375,7 @@
     display: grid;
     grid-template-columns: 320px 1fr;
     flex: 1;
-    overflow: hidden;
+    overflow: hidden !important;
     height: calc(100vh - 120px);
     max-height: calc(100vh - 120px);
 }
@@ -379,30 +387,33 @@
 .intent-list-panel {
     background: var(--sentient-bg-secondary);
     border-right: 1px solid var(--sentient-border);
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
     padding: 12px;
+    padding-right: 4px;
     height: 100%;
     max-height: 100%;
-    scrollbar-width: thin;
-    scrollbar-color: var(--sentient-border) transparent;
+    scrollbar-width: auto;
+    scrollbar-color: var(--sentient-accent) var(--sentient-bg-tertiary);
 }
 
 .intent-list-panel::-webkit-scrollbar {
-    width: 6px;
+    width: 10px;
 }
 
 .intent-list-panel::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--sentient-bg-tertiary);
+    border-radius: 5px;
 }
 
 .intent-list-panel::-webkit-scrollbar-thumb {
-    background: var(--sentient-border);
-    border-radius: 3px;
+    background: var(--sentient-border-light);
+    border-radius: 5px;
+    border: 2px solid var(--sentient-bg-tertiary);
 }
 
 .intent-list-panel::-webkit-scrollbar-thumb:hover {
-    background: var(--sentient-border-light);
+    background: var(--sentient-accent);
 }
 
 .intent-list {
@@ -670,7 +681,7 @@
 
 .intent-detail-panel {
     background: var(--sentient-bg-primary);
-    overflow: hidden;
+    overflow: hidden !important;
     padding: 0;
     height: 100%;
     max-height: 100%;

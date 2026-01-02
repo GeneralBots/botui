@@ -253,33 +253,35 @@
     margin-left: 12px;
 }
 
-/* PROGRESS LOG Section - maximized with auto-scroll */
+/* PROGRESS LOG Section - maximized with always-visible scrollbar */
 .taskmd-progress-content {
     background: var(--bg, #0a0a0a);
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
     scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border, #2a2a2a) transparent;
+    scrollbar-width: auto;
+    scrollbar-color: var(--accent, #c5f82a) var(--surface, #1a1a1a);
 }
 
 .taskmd-progress-content::-webkit-scrollbar {
-    width: 6px;
+    width: 12px;
 }
 
 .taskmd-progress-content::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--surface, #1a1a1a);
+    border-radius: 6px;
 }
 
 .taskmd-progress-content::-webkit-scrollbar-thumb {
-    background: var(--border, #2a2a2a);
-    border-radius: 3px;
+    background: var(--border-light, #3a3a3a);
+    border-radius: 6px;
+    border: 3px solid var(--surface, #1a1a1a);
 }
 
 .taskmd-progress-content::-webkit-scrollbar-thumb:hover {
-    background: var(--border-light, #3a3a3a);
+    background: var(--accent, #c5f82a);
 }
 
 .taskmd-tree {
