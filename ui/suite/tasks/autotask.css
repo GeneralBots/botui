@@ -58,12 +58,14 @@
 .autotask-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    height: 100vh;
+    max-height: 100vh;
     background: var(--sentient-bg-primary);
     color: var(--sentient-text-primary);
     font-family: var(--sentient-font);
     font-size: 14px;
     line-height: 1.5;
+    overflow: hidden;
 }
 
 .autotask-container * {
@@ -366,6 +368,8 @@
     grid-template-columns: 320px 1fr;
     flex: 1;
     overflow: hidden;
+    height: calc(100vh - 120px);
+    max-height: calc(100vh - 120px);
 }
 
 /* =============================================================================
@@ -378,6 +382,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 12px;
+    height: 100%;
     max-height: 100%;
     scrollbar-width: thin;
     scrollbar-color: var(--sentient-border) transparent;
@@ -665,8 +670,12 @@
 
 .intent-detail-panel {
     background: var(--sentient-bg-primary);
-    overflow-y: auto;
-    padding: 24px;
+    overflow: hidden;
+    padding: 0;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .detail-placeholder {

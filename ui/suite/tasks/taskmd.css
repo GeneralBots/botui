@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    max-height: 100vh;
+    max-height: 100%;
     min-height: 0;
     overflow: hidden;
 }
@@ -31,7 +31,7 @@
     background: var(--border-light, #3a3a3a);
 }
 
-/* Main Container */
+/* Main Container - no scroll here, children handle their own scroll */
 .task-detail-rich {
     display: flex;
     flex-direction: column;
@@ -47,8 +47,7 @@
         BlinkMacSystemFont,
         sans-serif
     );
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 /* Header - compact */
@@ -119,26 +118,28 @@
     flex-shrink: 0;
 }
 
-/* Status section - compact */
+/* Status section - fixed height, no scroll */
 .taskmd-section-status {
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    max-height: 100px;
+    overflow: hidden;
 }
 
-/* Progress log section - takes maximum space, scrollable */
+/* Progress log section - takes ALL remaining space, scrollable */
 .taskmd-section-progress {
     flex: 1 1 auto;
-    min-height: 200px;
+    min-height: 150px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-/* Terminal section - fixed at bottom, smaller */
+/* Terminal section - fixed at bottom, fixed height */
 .taskmd-section-terminal {
-    flex: 0 0 auto;
-    height: 140px;
+    flex: 0 0 120px;
+    height: 120px;
     min-height: 120px;
-    max-height: 180px;
+    max-height: 120px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -584,12 +585,12 @@
 
 /* TERMINAL Section */
 .taskmd-terminal {
-    flex: 0 0 auto;
+    flex: 0 0 120px;
     display: flex;
     flex-direction: column;
-    height: 140px;
+    height: 120px;
     min-height: 120px;
-    max-height: 180px;
+    max-height: 120px;
     overflow: hidden;
 }
 
