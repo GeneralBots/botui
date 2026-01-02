@@ -128,18 +128,18 @@
 /* Progress log section - takes ALL remaining space, content scrolls */
 .taskmd-section-progress {
     flex: 1 1 auto;
-    min-height: 150px;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     overflow: hidden !important;
 }
 
-/* Terminal section - fixed at bottom, fixed height */
+/* Terminal section - fixed at bottom, compact */
 .taskmd-section-terminal {
-    flex: 0 0 120px;
-    height: 120px;
-    min-height: 120px;
-    max-height: 120px;
+    flex: 0 0 100px;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
     display: flex;
     flex-direction: column;
     overflow: hidden !important;
@@ -434,7 +434,7 @@
     color: var(--error, #ef4444);
 }
 
-/* Tree Children */
+/* Tree Children - visible when expanded (default state) */
 .tree-children {
     display: none;
     background: var(--bg, #0a0a0a);
@@ -456,7 +456,7 @@
 /* Tree Items (Level 2) - Individual items like files */
 .tree-items {
     display: none;
-    padding: 12px 0 16px 0;
+    padding: 8px 0 12px 0;
     padding-left: 24px;
     background: var(--bg, #080808);
 }
@@ -564,7 +564,25 @@
 }
 
 .tree-item-check.pending {
-    color: transparent;
+    color: var(--text-tertiary, #444);
+}
+
+/* Completed items styling */
+.tree-item.completed .tree-item-name {
+    color: var(--text-secondary, #888);
+}
+
+.tree-item.completed .tree-item-dot {
+    background: var(--success, #22c55e);
+}
+
+/* Parent section completed when all children done */
+.tree-section.completed .tree-name {
+    color: var(--text-secondary, #888);
+}
+
+.tree-child.completed .tree-name {
+    color: var(--text-secondary, #888);
 }
 
 /* Item row with duration and checkmark aligned right */
@@ -587,15 +605,15 @@
     background: var(--accent-light, rgba(197, 248, 42, 0.03));
 }
 
-/* TERMINAL Section */
+/* TERMINAL Section - fixed at bottom */
 .taskmd-terminal {
-    flex: 0 0 120px;
+    flex: 0 0 100px;
     display: flex;
     flex-direction: column;
-    height: 120px;
-    min-height: 120px;
-    max-height: 120px;
-    overflow: hidden;
+    height: 100px;
+    min-height: 100px;
+    max-height: 100px;
+    overflow: hidden !important;
 }
 
 .taskmd-terminal-header {
