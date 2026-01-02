@@ -2526,6 +2526,11 @@ function onTaskCompleted(data, appUrl) {
   const title = data.title || data.message || "Task";
   const taskId = data.task_id || data.id;
 
+  // Add to bell notifications using global GBAlerts infrastructure
+  if (window.GBAlerts) {
+    window.GBAlerts.taskCompleted(title, appUrl);
+  }
+
   if (appUrl) {
     showToast(`App ready! Click to open: ${appUrl}`, "success", 10000, () => {
       window.open(appUrl, "_blank");

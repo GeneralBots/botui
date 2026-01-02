@@ -333,6 +333,62 @@
                     </nav>
                 </div>
 
+                <!-- Notifications Bell -->
+                <div class="notifications-menu">
+                    <button
+                        class="header-btn notifications-btn"
+                        id="notifications-btn"
+                        aria-label="Notifications"
+                        aria-expanded="false"
+                        onclick="toggleNotificationsPanel()"
+                    >
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path
+                                d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+                            />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        <span
+                            class="notifications-badge"
+                            id="notifications-badge"
+                            style="display: none"
+                            >0</span
+                        >
+                    </button>
+                    <div
+                        class="notifications-panel"
+                        id="notifications-panel"
+                        role="menu"
+                    >
+                        <div class="notifications-panel-header">
+                            <span class="notifications-panel-title"
+                                >Notifications</span
+                            >
+                            <button
+                                class="notifications-clear-btn"
+                                onclick="clearAllNotifications()"
+                            >
+                                Clear all
+                            </button>
+                        </div>
+                        <div class="notifications-list" id="notifications-list">
+                            <div class="notifications-empty">
+                                <span>🔔</span>
+                                <p>No new notifications</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Settings Panel (Gear Icon) -->
                 <div class="settings-menu">
                     <button
@@ -931,6 +987,192 @@
                 if (duration > 0) {
                     setTimeout(() => notification.remove(), duration);
                 }
+            };
+
+            // ========== NOTIFICATIONS BELL INFRASTRUCTURE ==========
+            // Global alert system - use from any app (drive, chat, email, tasks, etc.)
+
+            window.GBAlerts = {
+                notifications: [],
+                sound: new Audio('/assets/sounds/notification.mp3'),
+
+                // Add a notification to the bell
+                add: function(title, message, type = 'info', appIcon = '🔔') {
+                    const notification = {
+                        id: Date.now(),
+                        title: title,
+                        message: message,
+                        type: type,
+                        appIcon: appIcon,
+                        timestamp: new Date(),
+                        read: false
+                    };
+
+                    this.notifications.unshift(notification);
+                    this.updateBadge();
+                    this.renderNotifications();
+                    this.playSound();
+
+                    // Also show toast notification
+                    window.showNotification(`${appIcon} ${title}: ${message}`, type, 5000);
+
+                    return notification.id;
+                },
+
+                // App-specific shortcuts
+                taskCompleted: function(taskName, appUrl) {
+                    this.add('Task Completed', `"${taskName}" is ready`, 'success', '✅');
+                    if (appUrl) {
+                        // Store app URL for quick access
+                        this.notifications[0].actionUrl = appUrl;
+                        this.notifications[0].actionLabel = 'Open App';
+                    }
+                },
+
+                newEmail: function(from, subject) {
+                    this.add('New Email', `From ${from}: ${subject}`, 'info', '📧');
+                },
+
+                newChat: function(from, preview) {
+                    this.add('New Message', `${from}: ${preview}`, 'info', '💬');
+                },
+
+                driveSync: function(filename, action) {
+                    this.add('Drive', `${filename} ${action}`, 'info', '📁');
+                },
+
+                calendarReminder: function(event, time) {
+                    this.add('Reminder', `${event} in ${time}`, 'warning', '📅');
+                },
+
+                error: function(source, message) {
+                    this.add(`Error in ${source}`, message, 'error', '⚠️');
+                },
+
+                // Update badge count
+                updateBadge: function() {
+                    const badge = document.getElementById('notifications-badge');
+                    const unreadCount = this.notifications.filter(n => !n.read).length;
+
+                    if (badge) {
+                        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                        badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+                    }
+                },
+
+                // Render notifications list
+                renderNotifications: function() {
+                    const list = document.getElementById('notifications-list');
+                    if (!list) return;
+
+                    if (this.notifications.length === 0) {
+                        list.innerHTML = `
+                            <div class="notifications-empty">
+                                <span>🔔</span>
+                                <p>No new notifications</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    list.innerHTML = this.notifications.slice(0, 20).map(n => `
+                        <div class="notification-item ${n.read ? 'read' : 'unread'} ${n.type}" data-id="${n.id}" onclick="GBAlerts.markAsRead(${n.id})">
+                            <div class="notification-item-icon">${n.appIcon}</div>
+                            <div class="notification-item-content">
+                                <div class="notification-item-title">${n.title}</div>
+                                <div class="notification-item-message">${n.message}</div>
+                                <div class="notification-item-time">${this.formatTime(n.timestamp)}</div>
+                            </div>
+                            ${n.actionUrl ? `<a href="${n.actionUrl}" class="notification-item-action" onclick="event.stopPropagation()">${n.actionLabel || 'Open'}</a>` : ''}
+                            <button class="notification-item-dismiss" onclick="event.stopPropagation(); GBAlerts.remove(${n.id})">×</button>
+                        </div>
+                    `).join('');
+                },
+
+                // Format timestamp
+                formatTime: function(date) {
+                    const now = new Date();
+                    const diff = now - date;
+
+                    if (diff < 60000) return 'Just now';
+                    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+                    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+                    return date.toLocaleDateString();
+                },
+
+                // Mark as read
+                markAsRead: function(id) {
+                    const notification = this.notifications.find(n => n.id === id);
+                    if (notification) {
+                        notification.read = true;
+                        this.updateBadge();
+                        this.renderNotifications();
+
+                        if (notification.actionUrl) {
+                            window.location.href = notification.actionUrl;
+                        }
+                    }
+                },
+
+                // Remove notification
+                remove: function(id) {
+                    this.notifications = this.notifications.filter(n => n.id !== id);
+                    this.updateBadge();
+                    this.renderNotifications();
+                },
+
+                // Clear all
+                clearAll: function() {
+                    this.notifications = [];
+                    this.updateBadge();
+                    this.renderNotifications();
+                },
+
+                // Play notification sound
+                playSound: function() {
+                    const soundEnabled = localStorage.getItem('gb-sound') !== 'false';
+                    if (soundEnabled && this.sound) {
+                        this.sound.volume = 0.3;
+                        this.sound.play().catch(() => {});
+                    }
+                }
+            };
+
+            // Toggle notifications panel
+            function toggleNotificationsPanel() {
+                const panel = document.getElementById('notifications-panel');
+                const btn = document.getElementById('notifications-btn');
+
+                if (panel.classList.contains('show')) {
+                    panel.classList.remove('show');
+                    btn.setAttribute('aria-expanded', 'false');
+                } else {
+                    // Close other panels first
+                    document.getElementById('settings-panel')?.classList.remove('show');
+                    document.getElementById('apps-dropdown')?.classList.remove('show');
+
+                    panel.classList.add('show');
+                    btn.setAttribute('aria-expanded', 'true');
+
+                    // Render latest notifications
+                    window.GBAlerts.renderNotifications();
+                }
+            }
+
+            function clearAllNotifications() {
+                window.GBAlerts.clearAll();
+            }
+
+            // Close notifications panel when clicking outside
+            document.addEventListener('click', function(e) {
+                const panel = document.getElementById('notifications-panel');
+                const btn = document.getElementById('notifications-btn');
+
+                if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
+                    panel.classList.remove('show');
+                    btn?.setAttribute('aria-expanded', 'false');
+                }
+            });
             };
 
             // Global HTMX error handling with retry mechanism

@@ -877,6 +877,35 @@ When creating a new screen, ensure it has:
 - [ ] Fixed terminal/status panels at bottom
 - [ ] Variable content area with internal scroll
 
+### Alert Infrastructure (Bell Notifications)
+
+Use `window.GBAlerts` for app notifications that appear in the global bell icon:
+
+```javascript
+// Task completed (with optional app URL)
+window.GBAlerts.taskCompleted("My App", "/apps/my-app/");
+
+// Email notification
+window.GBAlerts.newEmail("john@example.com", "Meeting tomorrow");
+
+// Chat message
+window.GBAlerts.newChat("John", "Hey, are you there?");
+
+// Drive sync
+window.GBAlerts.driveSync("report.pdf", "uploaded");
+
+// Calendar reminder
+window.GBAlerts.calendarReminder("Team Meeting", "15 minutes");
+
+// Error
+window.GBAlerts.error("Drive", "Failed to sync file");
+
+// Generic notification
+window.GBAlerts.add("Title", "Message", "success", "🎉");
+```
+
+All notifications appear in the bell dropdown with sound (if enabled).
+
 ---
 
 ## Remember
