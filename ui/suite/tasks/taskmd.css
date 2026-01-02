@@ -52,14 +52,15 @@
 
 /* Header - visible and prominent */
 .taskmd-header {
-    padding: 20px 24px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border, #2a2a2a);
     flex-shrink: 0;
     background: var(--surface, #111);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
+    gap: 12px;
+    min-width: 0;
 }
 
 .taskmd-url {
@@ -81,22 +82,28 @@
 }
 
 .taskmd-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     color: var(--text, #fff);
     margin: 0;
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .taskmd-status-badge {
-    display: inline-block;
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .taskmd-status-badge.status-running {

@@ -586,7 +586,8 @@
 
             const diff = e.clientX - startX;
             const newWidth = Math.max(200, Math.min(600, startWidth + diff));
-            main.style.gridTemplateColumns = `${newWidth}px 6px 1fr`;
+            leftPanel.style.flex = `0 0 ${newWidth}px`;
+            leftPanel.style.width = `${newWidth}px`;
         });
 
         document.addEventListener("mouseup", function () {

@@ -294,22 +294,28 @@ body:has(.tasks-app) {
    ============================================================================= */
 
 .tasks-main {
-    display: grid;
-    grid-template-columns: 320px 6px 1fr;
+    display: flex;
+    flex-direction: row;
     flex: 1;
-    overflow: hidden !important;
+    overflow: hidden;
     height: 100%;
     max-height: 100%;
     min-height: 0;
+    width: 100%;
+    position: relative;
 }
 
 /* Splitter between panels */
 .tasks-splitter {
     width: 6px;
+    min-width: 6px;
+    max-width: 6px;
+    flex: 0 0 6px;
     background: var(--border, #2a2a2a);
     cursor: col-resize;
     transition: background 0.2s;
     position: relative;
+    z-index: 10;
 }
 
 .tasks-splitter:hover {
@@ -339,22 +345,25 @@ body:has(.tasks-app) {
 .tasks-list-panel {
     display: flex;
     flex-direction: column;
-    overflow: hidden !important;
-    border-right: 1px solid var(--border, #2a2a2a);
+    overflow: hidden;
+    border-right: none;
     height: 100%;
     max-height: 100%;
     min-height: 0;
+    flex: 0 0 280px;
+    width: 280px;
+    background: var(--bg, #0a0a0a);
 }
 
 .tasks-list-scroll {
     flex: 1;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px;
-    padding-right: 4px;
+    padding: 12px;
+    padding-right: 6px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 /* ============================================ */
@@ -412,15 +421,16 @@ body:has(.tasks-app) {
 
 .task-card {
     background: var(--surface-hover, #141414);
-    border: 2px solid var(--border, #2a2a2a);
-    border-radius: 12px;
-    padding: 32px 32px;
-    padding-left: 40px;
+    border: 1px solid var(--border, #2a2a2a);
+    border-radius: 8px;
+    padding: 16px 14px;
+    padding-left: 18px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
-    min-height: 200px;
+    min-height: 60px;
+    height: auto;
 }
 
 .task-card::before {
@@ -428,7 +438,7 @@ body:has(.tasks-app) {
     position: absolute;
     top: 0;
     left: 0;
-    width: 5px;
+    width: 3px;
     height: 100%;
     background: var(--text-secondary, #666);
     transition: background 0.2s ease;
@@ -465,23 +475,23 @@ body:has(.tasks-app) {
 
 .task-card.selected {
     border-color: var(--primary, #c5f82a);
-    box-shadow: 0 0 0 2px var(--primary, #c5f82a);
+    box-shadow: 0 0 0 1px var(--primary, #c5f82a);
 }
 
 .task-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
-    margin-bottom: 0;
+    gap: 10px;
+    margin-bottom: 8px;
 }
 
 .task-card-title {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text, #fff);
     margin: 0;
-    line-height: 1.5;
+    line-height: 1.4;
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -490,10 +500,10 @@ body:has(.tasks-app) {
 }
 
 .task-card-status {
-    font-size: 13px;
+    font-size: 10px;
     font-weight: 700;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 4px 8px;
+    border-radius: 4px;
     text-transform: uppercase;
     white-space: nowrap;
     background: var(--surface, #1a1a1a);
@@ -558,17 +568,18 @@ body:has(.tasks-app) {
 .task-card-footer {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    padding-top: 14px;
-    border-top: 2px solid var(--border, #2a2a2a);
+    gap: 6px;
+    padding-top: 8px;
+    margin-top: 8px;
+    border-top: 1px solid var(--border, #2a2a2a);
 }
 
 .task-action-btn {
     background: transparent;
     border: none;
-    padding: 4px 8px;
+    padding: 2px 6px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.5;
     transition: opacity 0.2s ease;
 }
@@ -579,24 +590,24 @@ body:has(.tasks-app) {
 
 /* Task Card Progress */
 .task-card-progress {
-    margin-bottom: 18px;
+    margin-bottom: 8px;
 }
 
 .progress-bar {
-    height: 10px;
+    height: 4px;
     background: var(--surface, #1a1a1a);
-    border-radius: 6px;
+    border-radius: 2px;
     overflow: hidden;
-    margin-bottom: 10px;
-    border: 2px solid var(--border, #2a2a2a);
+    margin-bottom: 6px;
+    border: none;
 }
 
 .progress-fill {
     height: 100%;
     background: var(--primary, #c5f82a);
-    border-radius: 4px;
+    border-radius: 2px;
     transition: width 0.3s ease;
-    box-shadow: 0 0 8px rgba(197, 248, 42, 0.4);
+    box-shadow: none;
 }
 
 .task-card.awaiting .progress-fill {
@@ -610,24 +621,24 @@ body:has(.tasks-app) {
 }
 
 .progress-steps {
-    font-size: 14px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-secondary, #a1a1a1);
 }
 
 .progress-percent {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--primary, #c5f82a);
-    background: var(--primary-light, rgba(197, 248, 42, 0.15));
-    padding: 4px 12px;
-    border-radius: 6px;
-    border: 2px solid var(--primary, #c5f82a);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    border: none;
 }
 
 .task-card.awaiting .progress-percent {
     color: var(--warning, #f59e0b);
-    background: rgba(245, 158, 11, 0.15);
+    background: transparent;
 }
 
 /* Task Card Status */
@@ -751,7 +762,9 @@ body:has(.tasks-app) {
     font-weight: 600;
     color: var(--text, #fff);
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.3;
+    flex: 1;
+    min-width: 200px;
 }
 
 .task-detail-header .task-status {
@@ -912,10 +925,13 @@ body:has(.tasks-app) {
     display: flex;
     flex-direction: column;
     background: var(--surface, #111);
-    overflow: hidden !important;
+    overflow-y: auto;
+    overflow-x: hidden;
     height: 100%;
     max-height: 100%;
     min-height: 0;
+    min-width: 0;
+    flex: 1 1 0%;
     position: relative;
 }
 
@@ -1400,6 +1416,10 @@ body:has(.tasks-app) {
     justify-content: center;
     padding: 60px 24px;
     text-align: center;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--surface, #111);
 }
 
 .empty-icon {
@@ -1688,8 +1708,9 @@ body:has(.tasks-app) {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-    .tasks-main {
-        grid-template-columns: 35% 65%;
+    .tasks-list-panel {
+        flex: 0 0 250px;
+        width: 250px;
     }
 
     .terminal-stats {
@@ -1699,7 +1720,18 @@ body:has(.tasks-app) {
 
 @media (max-width: 1024px) {
     .tasks-main {
-        grid-template-columns: 1fr;
+        flex-direction: column;
+    }
+
+    .tasks-list-panel {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: none;
+        max-height: 40vh;
+    }
+
+    .tasks-splitter {
+        display: none;
     }
 
     .task-detail-panel {
@@ -3220,14 +3252,8 @@ body:has(.tasks-app) {
 }
 
 /* =============================================================================
-   TASK DETAIL PANEL - LARGER & MORE PROMINENT
+   TASK DETAIL RICH VIEW OVERRIDES
    ============================================================================= */
-
-.task-detail-panel {
-    flex: 1;
-    min-width: 0;
-    max-width: none;
-}
 
 .task-detail-rich {
     display: flex;
