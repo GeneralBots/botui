@@ -545,6 +545,340 @@ ui/minimal/index.html # Minimal chat UI
 
 ---
 
+---
+
+## Design System - UI Standards
+
+**The `tasks.css` file defines the standard patterns for ALL screens in General Bots.**
+
+All themes MUST implement these core components consistently.
+
+### Layout Standards
+
+```css
+/* Full-height container - no global scroll */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+}
+
+/* Two-column layout - list + detail */
+.main-content {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    flex: 1;
+    overflow: hidden;
+    height: calc(100vh - 120px);
+}
+
+/* Scrollable list panel (LEFT) */
+.list-panel {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 100%;
+    scrollbar-width: auto;
+    scrollbar-color: var(--border-light) var(--surface);
+}
+
+/* Fixed detail panel (RIGHT) - no scroll */
+.detail-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+}
+```
+
+### Scrollbar Standards
+
+```css
+/* Visible scrollbar - 10px width */
+.scrollable::-webkit-scrollbar {
+    width: 10px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+    background: var(--surface);
+    border-radius: 5px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 5px;
+    border: 2px solid var(--surface);
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+/* Firefox */
+.scrollable {
+    scrollbar-width: auto;
+    scrollbar-color: var(--border-light) var(--surface);
+}
+```
+
+### Card Standards
+
+```css
+/* Base card - used in task lists, items, etc. */
+.card {
+    background: var(--surface-hover);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.card:hover {
+    border-color: var(--border-hover);
+    background: var(--surface);
+}
+
+.card.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* Card status indicator (left bar) */
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: var(--text-secondary);
+    transition: background 0.2s ease;
+}
+
+.card.status-running::before { background: var(--primary); }
+.card.status-complete::before { background: var(--success); }
+.card.status-error::before { background: var(--error); }
+.card.status-pending::before { background: var(--text-secondary); }
+```
+
+### Progress/Tree Indicators
+
+```css
+/* Dot indicator - shows status */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.status-dot.running {
+    background: var(--primary);
+    box-shadow: 0 0 8px var(--primary-light);
+    animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+.status-dot.completed {
+    background: var(--primary);
+}
+
+.status-dot.pending {
+    background: var(--text-secondary);
+}
+
+@keyframes dot-pulse {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 0 0 10px var(--primary-light);
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        box-shadow: 0 0 4px var(--primary-light);
+        transform: scale(0.9);
+    }
+}
+
+/* Step badge */
+.step-badge {
+    padding: 4px 12px;
+    background: var(--primary);
+    color: var(--bg);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.step-badge.pending {
+    background: var(--surface);
+    color: var(--text-secondary);
+}
+```
+
+### Tree/List with Children
+
+```css
+/* Parent-child expandable tree */
+.tree-section {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 8px;
+    margin: 8px 16px;
+    overflow: hidden;
+}
+
+.tree-row {
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.tree-row:hover {
+    background: var(--surface-hover);
+}
+
+.tree-children {
+    display: none;
+    background: var(--bg);
+}
+
+.tree-section.expanded .tree-children {
+    display: block;
+}
+
+.tree-child {
+    border-bottom: 1px solid var(--border);
+    padding-left: 24px;
+}
+
+.tree-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 20px 8px 40px;
+    min-height: 32px;
+}
+```
+
+### Fixed Panels (Terminal, Status)
+
+```css
+/* Fixed-height panel at bottom */
+.fixed-panel {
+    flex: 0 0 120px;
+    height: 120px;
+    min-height: 120px;
+    max-height: 120px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+}
+
+/* Variable-height panel with scroll */
+.variable-panel {
+    flex: 1 1 auto;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.variable-panel-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: scroll;
+}
+```
+
+### Status Badges
+
+```css
+.status-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.status-badge.running {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary);
+}
+
+.status-badge.completed {
+    background: rgba(var(--success-rgb), 0.15);
+    color: var(--success);
+}
+
+.status-badge.error {
+    background: rgba(var(--error-rgb), 0.15);
+    color: var(--error);
+}
+
+.status-badge.pending {
+    background: var(--surface);
+    color: var(--text-secondary);
+}
+```
+
+### Theme Variables Required
+
+Every theme MUST define these CSS variables:
+
+```css
+[data-theme="your-theme"] {
+    /* Backgrounds */
+    --bg: #0a0a0a;
+    --surface: #161616;
+    --surface-hover: #1e1e1e;
+    
+    /* Borders */
+    --border: #2a2a2a;
+    --border-light: #3a3a3a;
+    --border-hover: #4a4a4a;
+    
+    /* Text */
+    --text: #ffffff;
+    --text-secondary: #888888;
+    --text-tertiary: #666666;
+    
+    /* Primary (accent) */
+    --primary: #c5f82a;
+    --primary-hover: #d4ff3a;
+    --primary-light: rgba(197, 248, 42, 0.15);
+    
+    /* Status colors */
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+}
+```
+
+### Component Checklist for New Screens
+
+When creating a new screen, ensure it has:
+
+- [ ] Full-height container with `overflow: hidden`
+- [ ] No global page scroll
+- [ ] List panel with visible scrollbar (if applicable)
+- [ ] Detail panel with fixed layout
+- [ ] Cards with status indicator bar
+- [ ] Status dots/badges using standard classes
+- [ ] Tree sections if showing parent-child relationships
+- [ ] Fixed terminal/status panels at bottom
+- [ ] Variable content area with internal scroll
+
+---
+
 ## Remember
 
 - **ZERO WARNINGS** - Every clippy warning must be fixed

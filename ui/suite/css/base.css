@@ -14,8 +14,11 @@
     --surface: #1e293b;
     --surface-hover: #334155;
     --border: #334155;
+    --border-light: #475569;
+    --border-hover: #64748b;
     --text: #f8fafc;
     --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
     --success: #22c55e;
     --warning: #f59e0b;
     --error: #ef4444;
@@ -30,8 +33,11 @@
     --surface: #1e293b;
     --surface-hover: #334155;
     --border: #334155;
+    --border-light: #475569;
+    --border-hover: #64748b;
     --text: #f8fafc;
     --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
 }
 
 [data-theme="light"] {
@@ -39,8 +45,11 @@
     --surface: #ffffff;
     --surface-hover: #f1f5f9;
     --border: #e2e8f0;
+    --border-light: #cbd5e1;
+    --border-hover: #94a3b8;
     --text: #1e293b;
     --text-secondary: #64748b;
+    --text-tertiary: #94a3b8;
 }
 
 [data-theme="blue"] {
@@ -51,6 +60,11 @@
     --surface: #1a2f47;
     --surface-hover: #254063;
     --border: #2d4a6f;
+    --border-light: #3d5a7f;
+    --border-hover: #4d6a8f;
+    --text: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
 }
 
 [data-theme="purple"] {
@@ -61,6 +75,11 @@
     --surface: #2d1b4e;
     --surface-hover: #3d2566;
     --border: #4c2f7e;
+    --border-light: #5c3f8e;
+    --border-hover: #6c4f9e;
+    --text: #f8fafc;
+    --text-secondary: #c4b5fd;
+    --text-tertiary: #8b5cf6;
 }
 
 [data-theme="green"] {
@@ -71,6 +90,11 @@
     --surface: #14332a;
     --surface-hover: #1e4a3d;
     --border: #28604f;
+    --border-light: #38705f;
+    --border-hover: #48806f;
+    --text: #f8fafc;
+    --text-secondary: #86efac;
+    --text-tertiary: #4ade80;
 }
 
 [data-theme="orange"] {
@@ -81,6 +105,11 @@
     --surface: #2d1c0f;
     --surface-hover: #442a16;
     --border: #5c3a1e;
+    --border-light: #6c4a2e;
+    --border-hover: #7c5a3e;
+    --text: #f8fafc;
+    --text-secondary: #fdba74;
+    --text-tertiary: #fb923c;
 }
 
 [data-theme="sentient"] {
@@ -91,8 +120,11 @@
     --surface: #161616;
     --surface-hover: #1e1e1e;
     --border: #2a2a2a;
+    --border-light: #3a3a3a;
+    --border-hover: #4a4a4a;
     --text: #ffffff;
     --text-secondary: #888888;
+    --text-tertiary: #666666;
     --success: #22c55e;
     --warning: #f59e0b;
     --error: #ef4444;
@@ -108,8 +140,11 @@
     --surface: #1a0a3e;
     --surface-hover: #2a1a5e;
     --border: #ff00ff33;
+    --border-light: #ff00ff55;
+    --border-hover: #ff00ff77;
     --text: #00ffff;
     --text-secondary: #ff6ec7;
+    --text-tertiary: #cc5aa0;
 }
 
 [data-theme="retrowave"] {
@@ -120,8 +155,11 @@
     --surface: #2d1b4e;
     --surface-hover: #3d2b6e;
     --border: #ff6b9d33;
+    --border-light: #ff6b9d55;
+    --border-hover: #ff6b9d77;
     --text: #ffeaa7;
     --text-secondary: #a29bfe;
+    --text-tertiary: #817bce;
 }
 
 [data-theme="vapordream"] {
@@ -132,8 +170,11 @@
     --surface: #636e72;
     --surface-hover: #74b9ff;
     --border: #a29bfe33;
+    --border-light: #a29bfe55;
+    --border-hover: #a29bfe77;
     --text: #ffeaa7;
     --text-secondary: #fd79a8;
+    --text-tertiary: #cd6188;
 }
 
 [data-theme="y2kglow"] {
@@ -144,8 +185,11 @@
     --surface: #000066;
     --surface-hover: #000099;
     --border: #00ff0033;
+    --border-light: #00ff0055;
+    --border-hover: #00ff0077;
     --text: #ffffff;
     --text-secondary: #00ffff;
+    --text-tertiary: #00cccc;
 }
 
 [data-theme="arcadeflash"] {
@@ -156,8 +200,11 @@
     --surface: #1a1a1a;
     --surface-hover: #333333;
     --border: #ffff0033;
+    --border-light: #ffff0055;
+    --border-hover: #ffff0077;
     --text: #ff0000;
     --text-secondary: #00ff00;
+    --text-tertiary: #00cc00;
 }
 
 [data-theme="discofever"] {
@@ -168,8 +215,11 @@
     --surface: #2d1a2d;
     --surface-hover: #4a2a4a;
     --border: #ff149333;
+    --border-light: #ff149355;
+    --border-hover: #ff149377;
     --text: #ffd700;
     --text-secondary: #00ced1;
+    --text-tertiary: #00a5a5;
 }
 
 [data-theme="grungeera"] {
@@ -180,8 +230,11 @@
     --surface: #2d2d1a;
     --surface-hover: #3d3d2a;
     --border: #8b451333;
+    --border-light: #8b451355;
+    --border-hover: #8b451377;
     --text: #daa520;
     --text-secondary: #808000;
+    --text-tertiary: #606000;
 }
 
 /* Classic Themes */
@@ -193,8 +246,11 @@
     --surface: #16213e;
     --surface-hover: #0f3460;
     --border: #d4af3733;
+    --border-light: #d4af3755;
+    --border-hover: #d4af3777;
     --text: #eee8aa;
     --text-secondary: #cd853f;
+    --text-tertiary: #a06530;
 }
 
 [data-theme="mellowgold"] {

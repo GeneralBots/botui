@@ -11,10 +11,20 @@
 .tasks-app {
     display: flex;
     flex-direction: column;
-    min-height: 100%;
+    height: 100vh;
+    max-height: 100vh;
     background: var(--bg, #0a0a0a);
     color: var(--text, #ffffff);
     font-family: var(--font-family, system-ui, -apple-system, sans-serif);
+    overflow: hidden;
+}
+
+/* Disable global scroll when tasks app is active */
+html:has(.tasks-app),
+body:has(.tasks-app) {
+    overflow: hidden !important;
+    height: 100vh;
+    max-height: 100vh;
 }
 
 .tasks-app *,
@@ -272,10 +282,11 @@
 
 .tasks-main {
     display: grid;
-    grid-template-columns: 30% 70%;
+    grid-template-columns: 320px 1fr;
     flex: 1;
     overflow: hidden;
-    height: 100%;
+    height: calc(100vh - 140px);
+    max-height: calc(100vh - 140px);
 }
 
 /* =============================================================================
@@ -288,16 +299,39 @@
     overflow: hidden;
     border-right: 1px solid var(--border, #2a2a2a);
     height: 100%;
+    max-height: 100%;
 }
 
 .tasks-list-scroll {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
-    padding: 20px;
+    padding: 16px;
+    padding-right: 8px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    scrollbar-width: auto;
+    scrollbar-color: var(--border-light, #3a3a3a) var(--surface, #1a1a1a);
+}
+
+.tasks-list-scroll::-webkit-scrollbar {
+    width: 10px;
+}
+
+.tasks-list-scroll::-webkit-scrollbar-track {
+    background: var(--surface, #1a1a1a);
+    border-radius: 5px;
+}
+
+.tasks-list-scroll::-webkit-scrollbar-thumb {
+    background: var(--border-light, #3a3a3a);
+    border-radius: 5px;
+    border: 2px solid var(--surface, #1a1a1a);
+}
+
+.tasks-list-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--primary, #c5f82a);
 }
 
 /* =============================================================================
