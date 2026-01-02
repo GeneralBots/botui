@@ -13,6 +13,24 @@
     overflow: hidden;
 }
 
+/* Scrollbar styling for detail panel */
+.task-detail-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.task-detail-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.task-detail-panel::-webkit-scrollbar-thumb {
+    background: var(--border, #2a2a2a);
+    border-radius: 3px;
+}
+
+.task-detail-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--border-light, #3a3a3a);
+}
+
 /* Main Container */
 .task-detail-rich {
     display: flex;
@@ -33,10 +51,11 @@
     overflow-x: hidden;
 }
 
-/* Header */
+/* Header - compact */
 .taskmd-header {
-    padding: 20px 24px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--border, #1a1a1a);
+    flex-shrink: 0;
 }
 
 .taskmd-url {
@@ -58,10 +77,10 @@
 }
 
 .taskmd-title {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 500;
     color: var(--text, #fff);
-    margin: 0 0 12px 0;
+    margin: 0 0 8px 0;
 }
 
 .taskmd-status-badge {
@@ -105,38 +124,41 @@
     flex-shrink: 0;
 }
 
-/* Progress log section - scrollable */
+/* Progress log section - takes maximum space, scrollable */
 .taskmd-section-progress {
-    flex: 0 1 auto;
-    min-height: 100px;
-    max-height: 40%;
+    flex: 1 1 auto;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-/* Terminal section - takes remaining space */
+/* Terminal section - fixed at bottom, smaller */
 .taskmd-section-terminal {
-    flex: 1 1 auto;
-    min-height: 150px;
+    flex: 0 0 auto;
+    height: 140px;
+    min-height: 120px;
+    max-height: 180px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    border-top: 1px solid var(--border, #1a1a1a);
 }
 
 .taskmd-section-header {
-    padding: 16px 24px;
-    font-size: 11px;
+    padding: 10px 20px;
+    font-size: 10px;
     font-weight: 600;
     letter-spacing: 1.5px;
     color: var(--text-tertiary, #666);
     text-transform: uppercase;
     background: var(--bg-secondary, #0d0d0d);
+    flex-shrink: 0;
 }
 
-/* STATUS Section */
+/* STATUS Section - more compact */
 .taskmd-status-content {
-    padding: 16px 24px;
+    padding: 10px 20px;
     background: var(--surface, #111);
 }
 
@@ -230,14 +252,33 @@
     margin-left: 12px;
 }
 
-/* PROGRESS LOG Section */
+/* PROGRESS LOG Section - maximized with auto-scroll */
 .taskmd-progress-content {
     background: var(--bg, #0a0a0a);
     flex: 1 1 auto;
     min-height: 0;
-    max-height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border, #2a2a2a) transparent;
+}
+
+.taskmd-progress-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.taskmd-progress-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.taskmd-progress-content::-webkit-scrollbar-thumb {
+    background: var(--border, #2a2a2a);
+    border-radius: 3px;
+}
+
+.taskmd-progress-content::-webkit-scrollbar-thumb:hover {
+    background: var(--border-light, #3a3a3a);
 }
 
 .taskmd-tree {
@@ -543,10 +584,12 @@
 
 /* TERMINAL Section */
 .taskmd-terminal {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
+    height: 140px;
     min-height: 120px;
+    max-height: 180px;
     overflow: hidden;
 }
 
@@ -554,9 +597,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
+    padding: 8px 16px;
     background: var(--bg-secondary, #0d0d0d);
     border-bottom: 1px solid var(--border, #1a1a1a);
+    flex-shrink: 0;
 }
 
 .taskmd-terminal-title {
@@ -602,15 +646,17 @@
 
 .taskmd-terminal-output {
     flex: 1 1 auto;
-    padding: 16px 24px;
+    padding: 8px 16px;
     background: var(--bg, #0a0a0a);
     font-family: "JetBrains Mono", "Fira Code", monospace;
-    font-size: 13px;
-    line-height: 1.7;
+    font-size: 12px;
+    line-height: 1.5;
     color: var(--text-secondary, #888);
     overflow-y: auto;
     overflow-x: hidden;
     min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border, #2a2a2a) transparent;
 }
 
 /* Markdown content in terminal */

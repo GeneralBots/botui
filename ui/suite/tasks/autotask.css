@@ -363,7 +363,7 @@
 
 .main-content {
     display: grid;
-    grid-template-columns: 400px 1fr;
+    grid-template-columns: 320px 1fr;
     flex: 1;
     overflow: hidden;
 }
@@ -376,7 +376,28 @@
     background: var(--sentient-bg-secondary);
     border-right: 1px solid var(--sentient-border);
     overflow-y: auto;
-    padding: 16px;
+    overflow-x: hidden;
+    padding: 12px;
+    max-height: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sentient-border) transparent;
+}
+
+.intent-list-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.intent-list-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.intent-list-panel::-webkit-scrollbar-thumb {
+    background: var(--sentient-border);
+    border-radius: 3px;
+}
+
+.intent-list-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--sentient-border-light);
 }
 
 .intent-list {
@@ -1620,7 +1641,7 @@
 
 @media (max-width: 1200px) {
     .main-content {
-        grid-template-columns: 350px 1fr;
+        grid-template-columns: 280px 1fr;
     }
 }
 

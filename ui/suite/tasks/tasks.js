@@ -839,11 +839,15 @@ function renderManifestProgress(
         itemCount,
         "items",
       );
+      // Auto-scroll to running item
+      scrollToRunningItem(progressLog);
     } else {
       // Incremental update - only update what changed (no flicker)
       console.log("[Manifest] Updating tree in place");
       updateProgressTreeInPlace(tree, manifest, totalSteps);
       console.log("[Manifest] Tree updated successfully");
+      // Auto-scroll to running item
+      scrollToRunningItem(progressLog);
     }
   } catch (treeError) {
     console.error(
@@ -856,6 +860,27 @@ function renderManifestProgress(
 
   // Update terminal stats
   updateTerminalStats(taskId, manifest);
+}
+
+// Auto-scroll progress log to show the currently running item
+function scrollToRunningItem(progressLog) {
+  if (!progressLog) return;
+
+  // Find the running item (highest priority) or running section
+  const runningItem = progressLog.querySelector(".tree-item.running");
+  const runningSection = progressLog.querySelector(".tree-section.running");
+  const runningChild = progressLog.querySelector(".tree-child.running");
+
+  const targetElement = runningItem || runningChild || runningSection;
+
+  if (targetElement) {
+    // Scroll the target into view within the progress log container
+    targetElement.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "nearest",
+    });
+  }
 }
 
 // Update STATUS section from task_progress messages
