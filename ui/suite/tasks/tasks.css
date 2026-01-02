@@ -11,20 +11,31 @@
 .tasks-app {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    max-height: 100vh;
+    height: calc(100vh - 64px);
+    max-height: calc(100vh - 64px);
     background: var(--bg, #0a0a0a);
     color: var(--text, #ffffff);
     font-family: var(--font-family, system-ui, -apple-system, sans-serif);
     overflow: hidden;
 }
 
-/* Disable global scroll when tasks app is active */
+/* Disable ALL scrollbars when tasks app is active - scroll only in task list and progress log */
 html:has(.tasks-app),
 body:has(.tasks-app) {
     overflow: hidden !important;
     height: 100vh;
     max-height: 100vh;
+}
+
+/* Override #main-content scroll when tasks-app is inside */
+#main-content:has(.tasks-app) {
+    overflow: hidden !important;
+    height: calc(100vh - 64px) !important;
+    max-height: calc(100vh - 64px) !important;
+}
+
+.app-main:has(.tasks-app) {
+    overflow: hidden !important;
 }
 
 .tasks-app *,
@@ -284,9 +295,10 @@ body:has(.tasks-app) {
     display: grid;
     grid-template-columns: 320px 1fr;
     flex: 1;
-    overflow: hidden;
-    height: calc(100vh - 140px);
-    max-height: calc(100vh - 140px);
+    overflow: hidden !important;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
 }
 
 /* =============================================================================
@@ -296,10 +308,11 @@ body:has(.tasks-app) {
 .tasks-list-panel {
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden !important;
     border-right: 1px solid var(--border, #2a2a2a);
     height: 100%;
     max-height: 100%;
+    min-height: 0;
 }
 
 .tasks-list-scroll {
@@ -845,8 +858,9 @@ body:has(.tasks-app) {
     display: flex;
     flex-direction: column;
     background: var(--surface, #111);
-    overflow: hidden;
+    overflow: hidden !important;
     height: 100%;
+    max-height: 100%;
     min-height: 0;
     position: relative;
 }

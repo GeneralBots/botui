@@ -3,14 +3,14 @@
    Uses CSS variables for theme compatibility
    ============================================================================= */
 
-/* Task Detail Panel - Fixed scrolling container */
+/* Task Detail Panel - NO scroll here, only children scroll */
 .task-detail-panel {
     display: flex;
     flex-direction: column;
     height: 100%;
     max-height: 100%;
     min-height: 0;
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 /* Scrollbar styling for detail panel */
@@ -31,7 +31,7 @@
     background: var(--border-light, #3a3a3a);
 }
 
-/* Main Container - no scroll here, children handle their own scroll */
+/* Main Container - NO scroll here, only progress-content scrolls */
 .task-detail-rich {
     display: flex;
     flex-direction: column;
@@ -47,7 +47,7 @@
         BlinkMacSystemFont,
         sans-serif
     );
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 /* Header - compact */
@@ -122,16 +122,16 @@
 .taskmd-section-status {
     flex: 0 0 auto;
     max-height: 100px;
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
-/* Progress log section - takes ALL remaining space, scrollable */
+/* Progress log section - takes ALL remaining space, content scrolls */
 .taskmd-section-progress {
     flex: 1 1 auto;
     min-height: 150px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden !important;
 }
 
 /* Terminal section - fixed at bottom, fixed height */
@@ -142,7 +142,7 @@
     max-height: 120px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden !important;
     border-top: 1px solid var(--border, #1a1a1a);
 }
 
@@ -253,35 +253,37 @@
     margin-left: 12px;
 }
 
-/* PROGRESS LOG Section - maximized with always-visible scrollbar */
+/* PROGRESS LOG Section - THE ONLY SCROLLABLE AREA in detail panel */
 .taskmd-progress-content {
     background: var(--bg, #0a0a0a);
     flex: 1 1 auto;
     min-height: 0;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
     scroll-behavior: smooth;
     scrollbar-width: auto;
-    scrollbar-color: var(--accent, #c5f82a) var(--surface, #1a1a1a);
+    scrollbar-color: var(--primary, #c5f82a) var(--surface, #1a1a1a);
 }
 
 .taskmd-progress-content::-webkit-scrollbar {
-    width: 12px;
+    width: 14px;
 }
 
 .taskmd-progress-content::-webkit-scrollbar-track {
     background: var(--surface, #1a1a1a);
-    border-radius: 6px;
+    border-radius: 7px;
+    margin: 4px 0;
 }
 
 .taskmd-progress-content::-webkit-scrollbar-thumb {
     background: var(--border-light, #3a3a3a);
-    border-radius: 6px;
+    border-radius: 7px;
     border: 3px solid var(--surface, #1a1a1a);
+    min-height: 40px;
 }
 
 .taskmd-progress-content::-webkit-scrollbar-thumb:hover {
-    background: var(--accent, #c5f82a);
+    background: var(--primary, #c5f82a);
 }
 
 .taskmd-tree {
