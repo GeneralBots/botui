@@ -116,7 +116,7 @@
         <div id="intent-result-hidden" style="display: none"></div>
     </div>
 
-    <!-- Main Two-Column Layout -->
+    <!-- Main Two-Column Layout with Splitter -->
     <main class="tasks-main">
         <!-- Left Panel: Task Cards List -->
         <section class="tasks-list-panel">
@@ -134,6 +134,9 @@
                 </div>
             </div>
         </section>
+
+        <!-- Splitter -->
+        <div class="tasks-splitter" id="tasks-splitter"></div>
 
         <!-- Right Panel: Task Detail -->
         <aside class="task-detail-panel" id="task-detail-panel">
@@ -557,6 +560,43 @@
         const dot = panel.querySelector(".progress-dot");
         if (dot) dot.classList.remove("completed", "error");
     }
+
+    // Splitter drag functionality
+    (function initSplitter() {
+        const splitter = document.getElementById("tasks-splitter");
+        const main = document.querySelector(".tasks-main");
+        const leftPanel = document.querySelector(".tasks-list-panel");
+
+        if (!splitter || !main || !leftPanel) return;
+
+        let isDragging = false;
+        let startX, startWidth;
+
+        splitter.addEventListener("mousedown", function (e) {
+            isDragging = true;
+            startX = e.clientX;
+            startWidth = leftPanel.offsetWidth;
+            document.body.style.cursor = "col-resize";
+            document.body.style.userSelect = "none";
+            e.preventDefault();
+        });
+
+        document.addEventListener("mousemove", function (e) {
+            if (!isDragging) return;
+
+            const diff = e.clientX - startX;
+            const newWidth = Math.max(200, Math.min(600, startWidth + diff));
+            main.style.gridTemplateColumns = `${newWidth}px 6px 1fr`;
+        });
+
+        document.addEventListener("mouseup", function () {
+            if (isDragging) {
+                isDragging = false;
+                document.body.style.cursor = "";
+                document.body.style.userSelect = "";
+            }
+        });
+    })();
 
     // Listen for HTMX events to refresh stats
     document.body.addEventListener("htmx:afterSwap", function (e) {
