@@ -5,7 +5,7 @@
         <div class="sidebar-header">
             <h2>Paper</h2>
             <button class="btn-icon" title="New Note"
-                    hx-post="/api/paper/new"
+                    hx-post="/api/ui/paper/new"
                     hx-target="#paper-list"
                     hx-swap="afterbegin">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -20,7 +20,7 @@
             <input type="text"
                    placeholder="Search notes..."
                    name="q"
-                   hx-get="/api/paper/search"
+                   hx-get="/api/ui/paper/search"
                    hx-trigger="keyup changed delay:300ms"
                    hx-target="#paper-list">
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -31,7 +31,7 @@
 
         <!-- Notes List -->
         <div class="paper-list" id="paper-list"
-             hx-get="/api/paper/list"
+             hx-get="/api/ui/paper/list"
              hx-trigger="load"
              hx-swap="innerHTML">
             <!-- Notes loaded here -->
@@ -41,19 +41,19 @@
         <div class="sidebar-section">
             <h3>Quick Start</h3>
             <div class="template-grid">
-                <button class="template-btn" hx-post="/api/paper/template/blank" hx-target="#editor-content">
+                <button class="template-btn" hx-post="/api/ui/paper/template/blank" hx-target="#editor-content">
                     <span class="template-icon">📄</span>
                     <span>Blank</span>
                 </button>
-                <button class="template-btn" hx-post="/api/paper/template/meeting" hx-target="#editor-content">
+                <button class="template-btn" hx-post="/api/ui/paper/template/meeting" hx-target="#editor-content">
                     <span class="template-icon">📋</span>
                     <span>Meeting</span>
                 </button>
-                <button class="template-btn" hx-post="/api/paper/template/todo" hx-target="#editor-content">
+                <button class="template-btn" hx-post="/api/ui/paper/template/todo" hx-target="#editor-content">
                     <span class="template-icon">✓</span>
                     <span>To-Do</span>
                 </button>
-                <button class="template-btn" hx-post="/api/paper/template/research" hx-target="#editor-content">
+                <button class="template-btn" hx-post="/api/ui/paper/template/research" hx-target="#editor-content">
                     <span class="template-icon">🔬</span>
                     <span>Research</span>
                 </button>
@@ -239,7 +239,7 @@
                     </svg>
                     <span>AI</span>
                 </button>
-                <button class="btn-icon" hx-post="/api/paper/save" hx-include="#editor-content" title="Save">
+                <button class="btn-icon" hx-post="/api/ui/paper/save" hx-include="#editor-content" title="Save">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
                         <polyline points="17 21 17 13 7 13 7 21"></polyline>
@@ -270,7 +270,7 @@
                      id="editor-content"
                      contenteditable="true"
                      data-placeholder="Start writing, or type / for commands..."
-                     hx-post="/api/paper/autosave"
+                     hx-post="/api/ui/paper/autosave"
                      hx-trigger="keyup changed delay:2000ms"
                      hx-swap="none"></div>
             </div>
@@ -426,16 +426,16 @@
             <div class="ai-panel-content">
                 <!-- Quick Actions -->
                 <div class="ai-quick-actions">
-                    <button class="ai-action-btn" hx-post="/api/paper/ai/summarize" hx-include="[name='selected-text']">
+                    <button class="ai-action-btn" hx-post="/api/ui/paper/ai/summarize" hx-include="[name='selected-text']">
                         <span>📝</span> Summarize
                     </button>
-                    <button class="ai-action-btn" hx-post="/api/paper/ai/expand" hx-include="[name='selected-text']">
+                    <button class="ai-action-btn" hx-post="/api/ui/paper/ai/expand" hx-include="[name='selected-text']">
                         <span>📖</span> Expand
                     </button>
-                    <button class="ai-action-btn" hx-post="/api/paper/ai/improve" hx-include="[name='selected-text']">
+                    <button class="ai-action-btn" hx-post="/api/ui/paper/ai/improve" hx-include="[name='selected-text']">
                         <span>✏️</span> Improve
                     </button>
-                    <button class="ai-action-btn" hx-post="/api/paper/ai/simplify" hx-include="[name='selected-text']">
+                    <button class="ai-action-btn" hx-post="/api/ui/paper/ai/simplify" hx-include="[name='selected-text']">
                         <span>🎯</span> Simplify
                     </button>
                 </div>
@@ -463,7 +463,7 @@
                         <option value="zh">Chinese</option>
                         <option value="ja">Japanese</option>
                     </select>
-                    <button class="ai-action-btn" hx-post="/api/paper/ai/translate" hx-include="#translate-lang, [name='selected-text']">
+                    <button class="ai-action-btn" hx-post="/api/ui/paper/ai/translate" hx-include="#translate-lang, [name='selected-text']">
                         Translate
                     </button>
                 </div>
@@ -472,7 +472,7 @@
                 <div class="ai-custom-section">
                     <label>Custom</label> AI Command</label>
                     <textarea id="ai-custom-prompt" placeholder="Tell AI what to do with selected text..."></textarea>
-                    <button class="btn-primary" hx-post="/api/paper/ai/custom" hx-include="#ai-custom-prompt, [name='selected-text']">
+                    <button class="btn-primary" hx-post="/api/ui/paper/ai/custom" hx-include="#ai-custom-prompt, [name='selected-text']">
                         Run Command
                     </button>
                 </div>
@@ -543,23 +543,23 @@
             </div>
             <div class="modal-body">
                 <div class="export-options">
-                    <button class="export-option" hx-get="/api/paper/export/pdf" hx-swap="none">
+                    <button class="export-option" hx-get="/api/ui/paper/export/pdf" hx-swap="none">
                         <span class="export-icon">📄</span>
                         <span class="export-label">PDF</span>
                     </button>
-                    <button class="export-option" hx-get="/api/paper/export/docx" hx-swap="none">
+                    <button class="export-option" hx-get="/api/ui/paper/export/docx" hx-swap="none">
                         <span class="export-icon">📝</span>
                         <span class="export-label">Word (.docx)</span>
                     </button>
-                    <button class="export-option" hx-get="/api/paper/export/md" hx-swap="none">
+                    <button class="export-option" hx-get="/api/ui/paper/export/md" hx-swap="none">
                         <span class="export-icon">📑</span>
                         <span class="export-label">Markdown</span>
                     </button>
-                    <button class="export-option" hx-get="/api/paper/export/html" hx-swap="none">
+                    <button class="export-option" hx-get="/api/ui/paper/export/html" hx-swap="none">
                         <span class="export-icon">🌐</span>
                         <span class="export-label">HTML</span>
                     </button>
-                    <button class="export-option" hx-get="/api/paper/export/txt" hx-swap="none">
+                    <button class="export-option" hx-get="/api/ui/paper/export/txt" hx-swap="none">
                         <span class="export-icon">📋</span>
                         <span class="export-label">Plain Text</span>
                     </button>
@@ -1534,7 +1534,7 @@
         status.textContent = 'Saving...';
         status.className = 'status-item save-status saving';
 
-        htmx.ajax('POST', '/api/paper/save', {
+        htmx.ajax('POST', '/api/ui/paper/save', {
             target: 'none',
             values: {
                 title: title.innerText,
@@ -1681,7 +1681,7 @@
             const tone = this.dataset.tone;
             const selectedText = document.getElementById('selected-text-input').value;
 
-            htmx.ajax('POST', '/api/paper/ai/tone', {
+            htmx.ajax('POST', '/api/ui/paper/ai/tone', {
                 target: '#ai-response-content',
                 values: {
                     tone: tone,

@@ -1,227 +1,11 @@
 <link rel="stylesheet" href="chat/chat.css" />
-<script>
-    // WebSocket URL - use relative path to go through botui proxy
-    const WS_BASE_URL =
-        window.location.protocol === "https:" ? "wss://" : "ws://";
-    const WS_URL = `${WS_BASE_URL}${window.location.host}`;
-
-    // Message Type Constants
-    const MessageType = {
-        EXTERNAL: 0,
-        USER: 1,
-        BOT_RESPONSE: 2,
-        CONTINUE: 3,
-        SUGGESTION: 4,
-        CONTEXT_CHANGE: 5,
-    };
-
-    // State
-    let ws = null,
-        currentSessionId = null,
-        currentUserId = null,
-        currentBotId = "default";
-    let isStreaming = false,
-        streamingMessageId = null,
-        currentStreamingContent = "";
-    let reconnectAttempts = 0;
-    const maxReconnectAttempts = 5;
-
-    // Initialize auth and WebSocket
-    async function initChat() {
-        try {
-            updateConnectionStatus("connecting");
-            const botName = "default";
-            // Use the botui proxy for auth (handles SSL cert issues)
-            const response = await fetch(
-                `/api/auth?bot_name=${encodeURIComponent(botName)}`,
-            );
-            const auth = await response.json();
-            currentUserId = auth.user_id;
-            currentSessionId = auth.session_id;
-            currentBotId = auth.bot_id || "default";
-            console.log("Auth:", {
-                currentUserId,
-                currentSessionId,
-                currentBotId,
-            });
-            connectWebSocket();
-        } catch (e) {
-            console.error("Auth failed:", e);
-            updateConnectionStatus("disconnected");
-            setTimeout(initChat, 3000);
-        }
-    }
-
-    function connectWebSocket() {
-        if (ws) ws.close();
-        // Use the botui proxy for WebSocket (handles SSL cert issues)
-        const url = `${WS_URL}/ws?session_id=${currentSessionId}&user_id=${currentUserId}`;
-        ws = new WebSocket(url);
-
-        ws.onopen = () => {
-            console.log("WebSocket connected");
-            updateConnectionStatus("connected");
-            reconnectAttempts = 0;
-        };
-
-        ws.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.type === "connected") return;
-                if (data.message_type === MessageType.BOT_RESPONSE) {
-                    processMessage(data);
-                }
-            } catch (e) {
-                console.error("WS message error:", e);
-            }
-        };
-
-        ws.onclose = () => {
-            updateConnectionStatus("disconnected");
-            if (reconnectAttempts < maxReconnectAttempts) {
-                reconnectAttempts++;
-                setTimeout(connectWebSocket, 1000 * reconnectAttempts);
-            }
-        };
-
-        ws.onerror = (e) => console.error("WebSocket error:", e);
-    }
-
-    function processMessage(data) {
-        if (data.is_complete) {
-            if (isStreaming) {
-                finalizeStreaming();
-            } else {
-                addMessage("bot", data.content);
-            }
-            isStreaming = false;
-        } else {
-            if (!isStreaming) {
-                isStreaming = true;
-                streamingMessageId = "streaming-" + Date.now();
-                currentStreamingContent = data.content || "";
-                addMessage("bot", currentStreamingContent, streamingMessageId);
-            } else {
-                currentStreamingContent += data.content || "";
-                updateStreaming(currentStreamingContent);
-            }
-        }
-    }
-
-    function addMessage(sender, content, msgId = null) {
-        const messages = document.getElementById("messages");
-        const div = document.createElement("div");
-        div.className = `message ${sender}`;
-        if (msgId) div.id = msgId;
-
-        if (sender === "user") {
-            div.innerHTML = `<div class="message-content user-message">${escapeHtml(content)}</div>`;
-        } else {
-            div.innerHTML = `<div class="message-content bot-message">${marked.parse(content)}</div>`;
-        }
-        messages.appendChild(div);
-        messages.scrollTop = messages.scrollHeight;
-    }
-
-    function updateStreaming(content) {
-        const el = document.getElementById(streamingMessageId);
-        if (el)
-            el.querySelector(".message-content").innerHTML =
-                marked.parse(content);
-    }
-
-    function finalizeStreaming() {
-        const el = document.getElementById(streamingMessageId);
-        if (el) {
-            el.querySelector(".message-content").innerHTML = marked.parse(
-                currentStreamingContent,
-            );
-            el.removeAttribute("id");
-        }
-        streamingMessageId = null;
-        currentStreamingContent = "";
-    }
-
-    function sendMessage() {
-        const input = document.getElementById("messageInput");
-        const content = input.value.trim();
-        if (!content || !ws || ws.readyState !== WebSocket.OPEN) return;
-
-        addMessage("user", content);
-
-        ws.send(
-            JSON.stringify({
-                bot_id: currentBotId,
-                user_id: currentUserId,
-                session_id: currentSessionId,
-                channel: "web",
-                content: content,
-                message_type: MessageType.USER,
-                timestamp: new Date().toISOString(),
-            }),
-        );
-
-        input.value = "";
-        input.focus();
-    }
-
-    function updateConnectionStatus(status) {
-        const el = document.getElementById("connectionStatus");
-        if (el) el.className = `connection-status ${status}`;
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Initialize chat - runs immediately when script is executed
-    // (works both on full page load and HTMX partial load)
-    function setupChat() {
-        const input = document.getElementById("messageInput");
-        const sendBtn = document.getElementById("sendBtn");
-
-        if (sendBtn) sendBtn.onclick = sendMessage;
-        if (input) {
-            input.addEventListener("keypress", (e) => {
-                if (e.key === "Enter") sendMessage();
-            });
-        }
-
-        initChat();
-    }
-
-    // Initialize after a micro-delay to ensure DOM is ready
-    // This works for both full page loads and HTMX partial loads
-    setTimeout(() => {
-        if (
-            document.getElementById("messageInput") &&
-            !window.chatInitialized
-        ) {
-            window.chatInitialized = true;
-            setupChat();
-        }
-    }, 0);
-
-    // Fallback for full page load
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", () => {
-            if (!window.chatInitialized) {
-                window.chatInitialized = true;
-                setupChat();
-            }
-        });
-    }
-</script>
 
 <div class="chat-layout" id="chat-app">
-    <div id="connectionStatus" class="connection-status disconnected"></div>
     <main id="messages"></main>
 
     <footer>
         <div class="suggestions-container" id="suggestions"></div>
-        <div class="input-container">
+        <form class="input-container" id="chatForm">
             <input
                 name="content"
                 id="messageInput"
@@ -230,8 +14,299 @@
                 autofocus
             />
             <button type="button" id="voiceBtn" title="Voice">🎤</button>
-            <button type="button" id="sendBtn" title="Send">↑</button>
-        </div>
+            <button type="submit" id="sendBtn" title="Send">↑</button>
+        </form>
     </footer>
     <button class="scroll-to-bottom" id="scrollToBottom">↓</button>
 </div>
+
+<script>
+    (function () {
+        "use strict";
+
+        // ==========================================================================
+        // NOTIFICATION HELPER - Uses GBAlerts bell system
+        // ==========================================================================
+        function notify(message, type) {
+            type = type || "info";
+            if (window.GBAlerts) {
+                if (type === "success") {
+                    window.GBAlerts.info("Chat", message);
+                } else if (type === "error") {
+                    window.GBAlerts.warning("Chat", message);
+                } else {
+                    window.GBAlerts.info("Chat", message);
+                }
+            }
+        }
+
+        // ==========================================================================
+        // CONFIGURATION
+        // ==========================================================================
+        var WS_BASE_URL =
+            window.location.protocol === "https:" ? "wss://" : "ws://";
+        var WS_URL = WS_BASE_URL + window.location.host;
+
+        var MessageType = {
+            EXTERNAL: 0,
+            USER: 1,
+            BOT_RESPONSE: 2,
+            CONTINUE: 3,
+            SUGGESTION: 4,
+            CONTEXT_CHANGE: 5,
+        };
+
+        // ==========================================================================
+        // STATE
+        // ==========================================================================
+        var ws = null;
+        var currentSessionId = null;
+        var currentUserId = null;
+        var currentBotId = "default";
+        var isStreaming = false;
+        var streamingMessageId = null;
+        var currentStreamingContent = "";
+        var reconnectAttempts = 0;
+        var maxReconnectAttempts = 5;
+
+        // ==========================================================================
+        // MESSAGE FUNCTIONS
+        // ==========================================================================
+        function escapeHtml(text) {
+            var div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function addMessage(sender, content, msgId) {
+            var messages = document.getElementById("messages");
+            if (!messages) return;
+
+            var div = document.createElement("div");
+            div.className = "message " + sender;
+            if (msgId) div.id = msgId;
+
+            if (sender === "user") {
+                div.innerHTML =
+                    '<div class="message-content user-message">' +
+                    escapeHtml(content) +
+                    "</div>";
+            } else {
+                var parsed =
+                    typeof marked !== "undefined" && marked.parse
+                        ? marked.parse(content)
+                        : escapeHtml(content);
+                div.innerHTML =
+                    '<div class="message-content bot-message">' +
+                    parsed +
+                    "</div>";
+            }
+
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function updateStreaming(content) {
+            var el = document.getElementById(streamingMessageId);
+            if (el) {
+                var parsed =
+                    typeof marked !== "undefined" && marked.parse
+                        ? marked.parse(content)
+                        : escapeHtml(content);
+                el.querySelector(".message-content").innerHTML = parsed;
+            }
+        }
+
+        function finalizeStreaming() {
+            var el = document.getElementById(streamingMessageId);
+            if (el) {
+                var parsed =
+                    typeof marked !== "undefined" && marked.parse
+                        ? marked.parse(currentStreamingContent)
+                        : escapeHtml(currentStreamingContent);
+                el.querySelector(".message-content").innerHTML = parsed;
+                el.removeAttribute("id");
+            }
+            streamingMessageId = null;
+            currentStreamingContent = "";
+        }
+
+        function processMessage(data) {
+            if (data.is_complete) {
+                if (isStreaming) {
+                    finalizeStreaming();
+                } else {
+                    addMessage("bot", data.content);
+                }
+                isStreaming = false;
+            } else {
+                if (!isStreaming) {
+                    isStreaming = true;
+                    streamingMessageId = "streaming-" + Date.now();
+                    currentStreamingContent = data.content || "";
+                    addMessage(
+                        "bot",
+                        currentStreamingContent,
+                        streamingMessageId,
+                    );
+                } else {
+                    currentStreamingContent += data.content || "";
+                    updateStreaming(currentStreamingContent);
+                }
+            }
+        }
+
+        // ==========================================================================
+        // SEND MESSAGE - GLOBAL FUNCTION
+        // ==========================================================================
+        function sendMessage() {
+            var input = document.getElementById("messageInput");
+            if (!input) {
+                console.error("Chat input not found");
+                return;
+            }
+
+            var content = input.value.trim();
+            if (!content) {
+                return;
+            }
+
+            // Always show user message locally
+            addMessage("user", content);
+            input.value = "";
+            input.focus();
+
+            // Try to send via WebSocket if connected
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(
+                    JSON.stringify({
+                        bot_id: currentBotId,
+                        user_id: currentUserId,
+                        session_id: currentSessionId,
+                        channel: "web",
+                        content: content,
+                        message_type: MessageType.USER,
+                        timestamp: new Date().toISOString(),
+                    }),
+                );
+            } else {
+                notify("Not connected to server. Message not sent.", "warning");
+            }
+        }
+
+        // Make sendMessage globally available immediately
+        window.sendMessage = sendMessage;
+
+        // ==========================================================================
+        // WEBSOCKET CONNECTION
+        // ==========================================================================
+        function connectWebSocket() {
+            if (ws) {
+                ws.close();
+            }
+
+            var url =
+                WS_URL +
+                "/ws?session_id=" +
+                currentSessionId +
+                "&user_id=" +
+                currentUserId;
+            ws = new WebSocket(url);
+
+            ws.onopen = function () {
+                console.log("WebSocket connected");
+                reconnectAttempts = 0;
+            };
+
+            ws.onmessage = function (event) {
+                try {
+                    var data = JSON.parse(event.data);
+                    if (data.type === "connected") return;
+                    if (data.message_type === MessageType.BOT_RESPONSE) {
+                        processMessage(data);
+                    }
+                } catch (e) {
+                    console.error("WS message error:", e);
+                }
+            };
+
+            ws.onclose = function () {
+                notify("Disconnected from chat server", "error");
+                if (reconnectAttempts < maxReconnectAttempts) {
+                    reconnectAttempts++;
+                    setTimeout(connectWebSocket, 1000 * reconnectAttempts);
+                }
+            };
+
+            ws.onerror = function (e) {
+                console.error("WebSocket error:", e);
+            };
+        }
+
+        // ==========================================================================
+        // INITIALIZATION
+        // ==========================================================================
+        function initChat() {
+            var botName = "default";
+            fetch("/api/auth?bot_name=" + encodeURIComponent(botName))
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (auth) {
+                    currentUserId = auth.user_id;
+                    currentSessionId = auth.session_id;
+                    currentBotId = auth.bot_id || "default";
+                    console.log("Auth:", {
+                        currentUserId: currentUserId,
+                        currentSessionId: currentSessionId,
+                        currentBotId: currentBotId,
+                    });
+                    connectWebSocket();
+                })
+                .catch(function (e) {
+                    console.error("Auth failed:", e);
+                    notify("Failed to connect to chat server", "error");
+                    setTimeout(initChat, 3000);
+                });
+        }
+
+        function setupEventHandlers() {
+            var form = document.getElementById("chatForm");
+            var input = document.getElementById("messageInput");
+            var sendBtn = document.getElementById("sendBtn");
+
+            if (form) {
+                form.onsubmit = function (e) {
+                    e.preventDefault();
+                    sendMessage();
+                    return false;
+                };
+            }
+
+            if (input) {
+                input.onkeydown = function (e) {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                };
+            }
+
+            if (sendBtn) {
+                sendBtn.onclick = function (e) {
+                    e.preventDefault();
+                    sendMessage();
+                };
+            }
+        }
+
+        // Run setup immediately
+        setupEventHandlers();
+        initChat();
+
+        console.log(
+            "Chat module initialized, sendMessage is:",
+            typeof window.sendMessage,
+        );
+    })();
+</script>

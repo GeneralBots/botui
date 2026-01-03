@@ -85,11 +85,9 @@ document.addEventListener("keydown", (e) => {
 
 document.body.addEventListener("htmx:afterSwap", (e) => {
   if (e.detail.target.id === "main-content") {
-    const hash = window.location.hash || "#chat";
-    document.querySelectorAll(".app-item").forEach((item) => {
-      item.classList.toggle("active", item.getAttribute("href") === hash);
-    });
+    // Close settings panel on navigation
     if (settingsPanel) settingsPanel.classList.remove("show");
+    // Note: Active class handling is done in htmx-app.js updateActiveNav()
   }
 });
 

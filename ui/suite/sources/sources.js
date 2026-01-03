@@ -271,7 +271,7 @@
     const collectionName = prompt("Enter collection name:");
     if (collectionName && typeof htmx !== "undefined") {
       htmx
-        .ajax("POST", "/api/sources/prompts/save", {
+        .ajax("POST", "/api/ui/sources/prompts/save", {
           values: {
             promptId,
             collection: collectionName,
@@ -652,7 +652,7 @@
         .then(() => {
           showToast("Repository connected");
           // Refresh the repo card
-          htmx.ajax("GET", "/api/sources/repositories", {
+          htmx.ajax("GET", "/api/ui/sources/repositories", {
             target: "#content-area",
             swap: "innerHTML",
           });
@@ -672,7 +672,7 @@
           })
           .then(() => {
             showToast("Repository disconnected");
-            htmx.ajax("GET", "/api/sources/repositories", {
+            htmx.ajax("GET", "/api/ui/sources/repositories", {
               target: "#content-area",
               swap: "innerHTML",
             });
@@ -780,6 +780,46 @@
   }
 
   /**
+   * Filter MCP catalog by category
+   */
+  function filterMcpCategory(btn, category) {
+    document
+      .querySelectorAll("#mcp-category-filter .category-btn")
+      .forEach((b) => {
+        b.classList.remove("active");
+        b.style.background = "#f5f5f5";
+        b.style.color = "#333";
+      });
+    btn.classList.add("active");
+    btn.style.background = "#2196F3";
+    btn.style.color = "white";
+
+    document.querySelectorAll(".server-card").forEach((card) => {
+      if (category === "all" || card.dataset.category === category) {
+        card.style.display = "";
+      } else {
+        card.style.display = "none";
+      }
+    });
+  }
+
+  /**
+   * Add MCP server from catalog
+   */
+  function addCatalogServer(id, name) {
+    if (confirm('Add "' + name + '" to your MCP configuration?')) {
+      if (typeof htmx !== "undefined") {
+        htmx.ajax("POST", "/api/ui/sources/mcp/add-from-catalog", {
+          values: { server_id: id },
+          target: "#mcp-grid",
+          swap: "innerHTML",
+        });
+        showToast('Server "' + name + '" added to configuration');
+      }
+    }
+  }
+
+  /**
    * Show toast notification
    */
   function showToast(message, type = "success") {
@@ -823,7 +863,13 @@
     openApp,
     editApp,
     insertMention,
+    filterMcpCategory,
+    addCatalogServer,
     getTaskContext: window.getTaskContext,
     clearTaskContext: window.clearTaskContext,
   };
+
+  // Expose globally for inline onclick handlers
+  window.filterMcpCategory = filterMcpCategory;
+  window.addCatalogServer = addCatalogServer;
 })();

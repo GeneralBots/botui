@@ -1,54 +1,80 @@
-{% extends "suite/base.html" %}
-
-{% block title %}Sources - General Bots Suite{% endblock %}
-
-{% block content %}
 <div class="sources-container">
     <!-- Header -->
     <header class="sources-header">
         <div class="header-left">
             <h1>Sources</h1>
-            <p class="header-subtitle">Repositories, Apps, Prompts, Templates & MCP Servers</p>
+            <p class="header-subtitle">
+                Repositories, Apps, Prompts, Templates & MCP Servers
+            </p>
         </div>
         <div class="header-right">
             <div class="search-box">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text"
-                       placeholder="Search sources..."
-                       name="q"
-                       hx-get="/api/sources/search"
-                       hx-trigger="keyup changed delay:300ms"
-                       hx-target="#content-area"
-                       hx-swap="innerHTML">
+                <input
+                    type="text"
+                    placeholder="Search sources..."
+                    name="q"
+                    hx-get="/api/ui/sources/search"
+                    hx-trigger="keyup changed delay:300ms"
+                    hx-target="#content-area"
+                    hx-swap="innerHTML"
+                />
             </div>
         </div>
     </header>
 
     <!-- Tab Navigation -->
     <nav class="tab-nav" role="tablist">
-        <button class="tab-btn active"
-                role="tab"
-                aria-selected="true"
-                hx-get="/api/sources/repositories"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+        <button
+            class="tab-btn active"
+            role="tab"
+            aria-selected="true"
+            hx-get="/api/ui/sources/repositories"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+                ></path>
             </svg>
             Repositories
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/apps"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/apps"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <rect x="3" y="3" width="7" height="7"></rect>
                 <rect x="14" y="3" width="7" height="7"></rect>
                 <rect x="14" y="14" width="7" height="7"></rect>
@@ -56,27 +82,49 @@
             </svg>
             Apps
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/prompts"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/prompts"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                ></path>
             </svg>
             Prompts
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/templates"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/templates"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                ></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
                 <line x1="16" y1="13" x2="8" y2="13"></line>
                 <line x1="16" y1="17" x2="8" y2="17"></line>
@@ -84,26 +132,46 @@
             </svg>
             Templates
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/news"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"></path>
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/news"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"
+                ></path>
             </svg>
             News
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/mcp-servers"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/mcp-servers"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
                 <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
                 <line x1="6" y1="6" x2="6.01" y2="6"></line>
@@ -111,26 +179,46 @@
             </svg>
             MCP Servers
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/llm-tools"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/llm-tools"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                ></path>
             </svg>
             LLM Tools
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/models"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/models"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
                 <rect x="9" y="9" width="6" height="6"></rect>
                 <line x1="9" y1="1" x2="9" y2="4"></line>
@@ -144,15 +232,26 @@
             </svg>
             Models
         </button>
-        <button class="tab-btn"
-                role="tab"
-                aria-selected="false"
-                hx-get="/api/sources/accounts"
-                hx-target="#content-area"
-                hx-swap="innerHTML"
-                onclick="setActiveTab(this)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+        <button
+            class="tab-btn"
+            role="tab"
+            aria-selected="false"
+            hx-get="/api/ui/sources/accounts"
+            hx-target="#content-area"
+            hx-swap="innerHTML"
+            onclick="setActiveTab(this)"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                ></path>
                 <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
             Accounts
@@ -160,7 +259,13 @@
     </nav>
 
     <!-- Main Content Area -->
-    <main class="content-area" id="content-area" hx-get="/api/sources/repositories" hx-trigger="load" hx-swap="innerHTML">
+    <main
+        class="content-area"
+        id="content-area"
+        hx-get="/api/ui/sources/repositories"
+        hx-trigger="load"
+        hx-swap="innerHTML"
+    >
         <!-- Content loaded via HTMX -->
         <div class="loading-spinner">
             <div class="spinner"></div>
@@ -168,64 +273,6 @@
         </div>
     </main>
 </div>
-
-<!-- Prompts Panel Template (loaded via HTMX) -->
-<template id="prompts-template">
-    <div class="panel-layout">
-        <!-- Categories Sidebar -->
-        <aside class="categories-sidebar">
-            <h3>Categories</h3>
-            <div class="category-list">
-                <button class="category-item active"
-                        hx-get="/api/sources/prompts?category=all"
-                        hx-target="#prompts-grid"
-                        hx-swap="innerHTML">
-                    <span class="category-icon" style="background: var(--primary);">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                    </span>
-                    <span class="category-name">All Prompts</span>
-                    <span class="category-count">42</span>
-                </button>
-                <!-- Categories loaded dynamically -->
-            </div>
-        </aside>
-
-        <!-- Prompts Grid -->
-        <section class="prompts-section">
-            <div class="section-header">
-                <h2>Featured Prompts</h2>
-                <div class="view-controls">
-                    <button class="view-btn active" title="Grid view">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="3" width="7" height="7"></rect>
-                            <rect x="14" y="14" width="7" height="7"></rect>
-                            <rect x="3" y="14" width="7" height="7"></rect>
-                        </svg>
-                    </button>
-                    <button class="view-btn" title="List view">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="8" y1="6" x2="21" y2="6"></line>
-                            <line x1="8" y1="12" x2="21" y2="12"></line>
-                            <line x1="8" y1="18" x2="21" y2="18"></line>
-                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div class="prompts-grid" id="prompts-grid">
-                <!-- Prompts loaded dynamically -->
-            </div>
-        </section>
-    </div>
-</template>
 
 <style>
     .sources-container {
@@ -248,43 +295,46 @@
 
     .sources-header h1 {
         font-size: 24px;
-        font-weight: 700;
+        font-weight: 600;
+        color: var(--text);
         margin: 0;
     }
 
     .header-subtitle {
         font-size: 14px;
         color: var(--text-secondary);
-        margin: 4px 0 0 0;
+        margin-top: 4px;
     }
 
     .search-box {
+        position: relative;
         display: flex;
         align-items: center;
-        gap: 10px;
-        background: var(--surface-hover);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 10px 16px;
-        min-width: 300px;
     }
 
     .search-box svg {
+        position: absolute;
+        left: 12px;
         color: var(--text-secondary);
-        flex-shrink: 0;
     }
 
     .search-box input {
-        flex: 1;
-        background: transparent;
-        border: none;
-        outline: none;
+        padding: 10px 16px 10px 40px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
         color: var(--text);
         font-size: 14px;
+        width: 280px;
     }
 
     .search-box input::placeholder {
         color: var(--text-secondary);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary);
     }
 
     /* Tab Navigation */
@@ -302,25 +352,25 @@
         align-items: center;
         gap: 8px;
         padding: 10px 16px;
-        background: transparent;
         border: none;
-        border-radius: 8px;
+        background: transparent;
         color: var(--text-secondary);
         font-size: 14px;
         font-weight: 500;
+        border-radius: 8px;
         cursor: pointer;
-        transition: all 0.15s;
+        transition: all 0.2s;
         white-space: nowrap;
     }
 
     .tab-btn:hover {
-        background: var(--surface-hover);
+        background: var(--hover);
         color: var(--text);
     }
 
     .tab-btn.active {
         background: var(--primary);
-        color: white;
+        color: var(--primary-text, #000);
     }
 
     .tab-btn svg {
@@ -337,7 +387,7 @@
     /* Panel Layout */
     .panel-layout {
         display: grid;
-        grid-template-columns: 260px 1fr;
+        grid-template-columns: 240px 1fr;
         gap: 24px;
         height: 100%;
     }
@@ -345,20 +395,19 @@
     /* Categories Sidebar */
     .categories-sidebar {
         background: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 12px;
         padding: 16px;
         height: fit-content;
-        position: sticky;
-        top: 0;
     }
 
     .categories-sidebar h3 {
         font-size: 12px;
         font-weight: 600;
-        text-transform: uppercase;
         color: var(--text-secondary);
         margin: 0 0 12px 0;
-        padding: 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .category-list {
@@ -371,24 +420,24 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        width: 100%;
         padding: 10px 12px;
-        background: transparent;
         border: none;
+        background: transparent;
         border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+        width: 100%;
         color: var(--text);
         font-size: 14px;
-        text-align: left;
-        cursor: pointer;
-        transition: all 0.15s;
     }
 
     .category-item:hover {
-        background: var(--surface-hover);
+        background: var(--hover);
     }
 
     .category-item.active {
-        background: var(--primary-light);
+        background: var(--primary-light, rgba(212, 245, 5, 0.1));
     }
 
     .category-icon {
@@ -398,11 +447,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        background: var(--surface-alt, var(--hover));
+        font-size: 16px;
     }
 
     .category-icon svg {
-        color: white;
+        color: var(--text);
     }
 
     .category-name {
@@ -412,9 +462,9 @@
     .category-count {
         font-size: 12px;
         color: var(--text-secondary);
-        background: var(--surface-hover);
+        background: var(--hover);
         padding: 2px 8px;
-        border-radius: 10px;
+        border-radius: 12px;
     }
 
     /* Section Header */
@@ -422,12 +472,13 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
 
     .section-header h2 {
         font-size: 18px;
         font-weight: 600;
+        color: var(--text);
         margin: 0;
     }
 
@@ -435,59 +486,185 @@
         display: flex;
         gap: 4px;
         background: var(--surface);
-        border-radius: 8px;
         padding: 4px;
+        border-radius: 8px;
     }
 
     .view-btn {
-        width: 32px;
-        height: 32px;
+        padding: 8px;
         border: none;
-        border-radius: 6px;
         background: transparent;
-        color: var(--text-secondary);
+        border-radius: 6px;
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.15s;
+        color: var(--text-secondary);
+        transition: all 0.2s;
     }
 
     .view-btn:hover {
-        color: var(--text);
+        background: var(--hover);
     }
 
     .view-btn.active {
-        background: var(--surface-hover);
+        background: var(--primary);
+        color: var(--primary-text, #000);
+    }
+
+    /* Grid Layouts */
+    .repos-grid,
+    .apps-grid,
+    .prompts-grid,
+    .templates-grid,
+    .servers-grid,
+    .models-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+    }
+
+    /* Repository Card */
+    .repo-card {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+    }
+
+    .repo-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .repo-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .repo-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-light, rgba(212, 245, 5, 0.1));
+    }
+
+    .repo-icon svg {
+        color: var(--primary);
+    }
+
+    .repo-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .repo-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 0;
+    }
+
+    .repo-owner {
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    .repo-description {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin: 12px 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .repo-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    .repo-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .repo-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .repo-status.connected {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
+    }
+
+    .repo-status.disconnected {
+        background: rgba(158, 158, 158, 0.1);
+        color: #9e9e9e;
+    }
+
+    .repo-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .repo-actions button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-connect {
+        background: var(--primary);
+        color: var(--primary-text, #000);
+    }
+
+    .btn-disconnect {
+        background: var(--hover);
         color: var(--text);
     }
 
-    /* Prompts Grid */
-    .prompts-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
+    .btn-browse {
+        background: transparent;
+        border: 1px solid var(--border) !important;
+        color: var(--text);
     }
 
     /* Prompt Card */
     .prompt-card {
         background: var(--surface);
-        border: 1px solid var(--border);
         border-radius: 12px;
         padding: 20px;
-        cursor: pointer;
+        border: 1px solid var(--border);
         transition: all 0.2s;
     }
 
     .prompt-card:hover {
         border-color: var(--primary);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .prompt-card-header {
+    .prompt-header {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         gap: 12px;
         margin-bottom: 12px;
     }
@@ -499,11 +676,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        background: var(--primary-light, rgba(212, 245, 5, 0.1));
+        font-size: 20px;
     }
 
     .prompt-icon svg {
-        color: white;
+        color: var(--primary);
     }
 
     .prompt-info {
@@ -512,12 +690,13 @@
     }
 
     .prompt-name {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 600;
+        color: var(--text);
         margin: 0 0 4px 0;
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .prompt-category {
@@ -526,10 +705,10 @@
     }
 
     .prompt-description {
-        font-size: 13px;
+        font-size: 14px;
         color: var(--text-secondary);
         line-height: 1.5;
-        margin-bottom: 16px;
+        margin: 0;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -540,19 +719,22 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+        margin-top: 16px;
     }
 
     .prompt-rating {
         display: flex;
         align-items: center;
         gap: 4px;
-        font-size: 13px;
         color: var(--text-secondary);
+        font-size: 14px;
     }
 
     .prompt-rating svg {
-        color: #eab308;
-        fill: #eab308;
+        width: 16px;
+        height: 16px;
+        color: #ffc107;
+        fill: #ffc107;
     }
 
     .prompt-actions {
@@ -561,30 +743,27 @@
     }
 
     .prompt-action-btn {
-        width: 32px;
-        height: 32px;
+        padding: 6px 12px;
         border: none;
+        background: var(--hover);
         border-radius: 6px;
-        background: var(--surface-hover);
-        color: var(--text-secondary);
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.15s;
+        font-size: 12px;
+        color: var(--text);
+        transition: all 0.2s;
     }
 
     .prompt-action-btn:hover {
         background: var(--primary);
-        color: white;
+        color: var(--primary-text, #000);
     }
 
-    /* MCP Server Card */
+    /* Server Card */
     .server-card {
         background: var(--surface);
-        border: 1px solid var(--border);
         border-radius: 12px;
         padding: 20px;
+        border: 1px solid var(--border);
         transition: all 0.2s;
     }
 
@@ -594,19 +773,19 @@
 
     .server-header {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         gap: 12px;
         margin-bottom: 12px;
     }
 
     .server-icon {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
         border-radius: 10px;
-        background: var(--surface-hover);
         display: flex;
         align-items: center;
         justify-content: center;
+        background: var(--primary-light, rgba(212, 245, 5, 0.1));
     }
 
     .server-icon svg {
@@ -618,33 +797,29 @@
     }
 
     .server-name {
-        font-size: 15px;
+        font-size: 16px;
         font-weight: 600;
-        margin: 0 0 4px 0;
+        color: var(--text);
     }
 
     .server-type {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+        font-size: 12px;
+        color: var(--text-secondary);
         padding: 2px 8px;
-        background: var(--primary-light);
-        color: var(--primary);
-        font-size: 11px;
-        font-weight: 500;
+        background: var(--hover);
         border-radius: 4px;
+        display: inline-block;
+        margin-top: 4px;
     }
 
     .server-description {
-        font-size: 13px;
+        font-size: 14px;
         color: var(--text-secondary);
-        line-height: 1.5;
-        margin-bottom: 12px;
+        margin: 12px 0;
     }
 
     .server-meta {
         display: flex;
-        align-items: center;
         gap: 16px;
         font-size: 12px;
         color: var(--text-secondary);
@@ -659,9 +834,9 @@
     /* Model Card */
     .model-card {
         background: var(--surface);
-        border: 1px solid var(--border);
         border-radius: 12px;
         padding: 20px;
+        border: 1px solid var(--border);
         transition: all 0.2s;
     }
 
@@ -673,55 +848,219 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
     }
 
     .model-name {
         font-size: 16px;
         font-weight: 600;
+        color: var(--text);
     }
 
     .model-status {
-        padding: 4px 10px;
-        border-radius: 12px;
         font-size: 11px;
-        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 4px;
     }
 
     .model-status.active {
-        background: rgba(34, 197, 94, 0.1);
-        color: #22c55e;
+        background: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
     }
 
     .model-status.coming-soon {
-        background: rgba(234, 179, 8, 0.1);
-        color: #eab308;
+        background: rgba(255, 152, 0, 0.1);
+        color: #ff9800;
     }
 
     .model-provider {
         font-size: 12px;
         color: var(--text-secondary);
-        margin-bottom: 8px;
+        margin-bottom: 12px;
     }
 
     .model-description {
-        font-size: 13px;
+        font-size: 14px;
         color: var(--text-secondary);
-        line-height: 1.5;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
     }
 
     .model-tags {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
+        gap: 8px;
     }
 
     .model-tag {
-        padding: 4px 10px;
-        background: var(--surface-hover);
-        border-radius: 6px;
         font-size: 11px;
+        padding: 4px 8px;
+        background: var(--hover);
+        border-radius: 4px;
+        color: var(--text-secondary);
+    }
+
+    /* App Card */
+    .app-card {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+    }
+
+    .app-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .app-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .app-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-light, rgba(212, 245, 5, 0.1));
+        font-size: 24px;
+    }
+
+    .app-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .app-type {
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    .app-description {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+    }
+
+    .app-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .app-actions button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-open {
+        background: var(--primary);
+        color: var(--primary-text, #000);
+    }
+
+    .btn-edit {
+        background: var(--hover);
+        color: var(--text);
+    }
+
+    /* Template Card */
+    .template-card {
+        background: var(--surface);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+    }
+
+    .template-card:hover {
+        border-color: var(--primary);
+    }
+
+    .template-preview {
+        height: 120px;
+        background: var(--hover);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .template-preview svg {
+        width: 48px;
+        height: 48px;
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    .template-content {
+        padding: 16px;
+    }
+
+    .template-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .template-meta {
+        font-size: 12px;
+        color: var(--text-secondary);
+    }
+
+    /* News Card */
+    .news-card {
+        background: var(--surface);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+    }
+
+    .news-card:hover {
+        border-color: var(--primary);
+    }
+
+    .news-image {
+        height: 160px;
+        background: var(--hover);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .news-content {
+        padding: 16px;
+    }
+
+    .news-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
+    }
+
+    .news-excerpt {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .news-meta {
+        font-size: 12px;
         color: var(--text-secondary);
     }
 
@@ -741,12 +1080,14 @@
         border: 3px solid var(--border);
         border-top-color: var(--primary);
         border-radius: 50%;
-        animation: spin 1s linear infinite;
+        animation: spin 0.8s linear infinite;
         margin-bottom: 16px;
     }
 
     @keyframes spin {
-        to { transform: rotate(360deg); }
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* Empty State */
@@ -770,105 +1111,14 @@
     .empty-state h3 {
         font-size: 18px;
         font-weight: 600;
+        color: var(--text);
         margin: 0 0 8px 0;
     }
 
     .empty-state p {
+        font-size: 14px;
         color: var(--text-secondary);
         margin: 0;
-    }
-
-    /* Template Card */
-    .template-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        overflow: hidden;
-        transition: all 0.2s;
-    }
-
-    .template-card:hover {
-        border-color: var(--primary);
-        transform: translateY(-2px);
-    }
-
-    .template-preview {
-        height: 120px;
-        background: var(--surface-hover);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .template-preview svg {
-        width: 48px;
-        height: 48px;
-        color: var(--text-secondary);
-        opacity: 0.5;
-    }
-
-    .template-content {
-        padding: 16px;
-    }
-
-    .template-name {
-        font-size: 14px;
-        font-weight: 600;
-        margin: 0 0 4px 0;
-    }
-
-    .template-meta {
-        font-size: 12px;
-        color: var(--text-secondary);
-    }
-
-    /* News Card */
-    .news-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px;
-        display: flex;
-        gap: 16px;
-        transition: all 0.2s;
-    }
-
-    .news-card:hover {
-        border-color: var(--primary);
-    }
-
-    .news-image {
-        width: 100px;
-        height: 80px;
-        border-radius: 8px;
-        background: var(--surface-hover);
-        flex-shrink: 0;
-    }
-
-    .news-content {
-        flex: 1;
-    }
-
-    .news-title {
-        font-size: 15px;
-        font-weight: 600;
-        margin: 0 0 8px 0;
-        line-height: 1.4;
-    }
-
-    .news-excerpt {
-        font-size: 13px;
-        color: var(--text-secondary);
-        line-height: 1.5;
-        margin-bottom: 8px;
-    }
-
-    .news-meta {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 12px;
-        color: var(--text-secondary);
     }
 
     /* Responsive */
@@ -890,11 +1140,16 @@
         }
 
         .search-box {
-            min-width: auto;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
         }
 
         .tab-nav {
             padding: 12px 16px;
+            overflow-x: auto;
         }
 
         .tab-btn span:not(.tab-icon) {
@@ -905,7 +1160,12 @@
             padding: 16px;
         }
 
-        .prompts-grid {
+        .repos-grid,
+        .apps-grid,
+        .prompts-grid,
+        .templates-grid,
+        .servers-grid,
+        .models-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -914,63 +1174,52 @@
 <script>
     // Tab switching
     function setActiveTab(btn) {
-        document.querySelectorAll('.tab-btn').forEach(t => {
-            t.classList.remove('active');
-            t.setAttribute('aria-selected', 'false');
+        document.querySelectorAll(".tab-btn").forEach((t) => {
+            t.classList.remove("active");
+            t.setAttribute("aria-selected", "false");
         });
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
+        btn.classList.add("active");
+        btn.setAttribute("aria-selected", "true");
     }
 
-    // Category switching</script>
-    document.addEventListener('click', function(e) {
-        const categoryItem = e.target.closest('.category-item');
+    // Category switching
+    document.addEventListener("click", function (e) {
+        const categoryItem = e.target.closest(".category-item");
         if (categoryItem) {
-            document.querySelectorAll('.category-item').forEach(c => c.classList.remove('active'));
-            categoryItem.classList.add('active');
+            document
+                .querySelectorAll(".category-item")
+                .forEach((c) => c.classList.remove("active"));
+            categoryItem.classList.add("active");
         }
     });
 
     // View toggle
-    document.addEventListener('click', function(e) {
-        const viewBtn = e.target.closest('.view-btn');
+    document.addEventListener("click", function (e) {
+        const viewBtn = e.target.closest(".view-btn");
         if (viewBtn) {
-            const controls = viewBtn.closest('.view-controls');
-            controls.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-            viewBtn.classList.add('active');
-
-            const grid = document.querySelector('.prompts-grid, .templates-grid, .servers-grid, .models-grid');
-            if (grid) {
-                if (viewBtn.title === 'List view') {
-                    grid.classList.add('list-view');
-                } else {
-                    grid.classList.remove('list-view');
-                }
-            }
+            const controls = viewBtn.closest(".view-controls");
+            controls
+                .querySelectorAll(".view-btn")
+                .forEach((b) => b.classList.remove("active"));
+            viewBtn.classList.add("active");
         }
     });
 
     // Keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener("keydown", function (e) {
         // Ctrl+K to focus search
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        if ((e.ctrlKey || e.metaKey) && e.key === "k") {
             e.preventDefault();
-            document.querySelector('.search-box input').focus();
-        }
-
-        // Tab navigation with number keys
-        if (!e.ctrlKey && !e.metaKey && !e.altKey) {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const num = parseInt(e.key);
-            if (num >= 1 && num <= tabs.length) {
-                tabs[num - 1].click();
-            }
+            const searchInput = document.querySelector(
+                ".sources-container .search-box input",
+            );
+            if (searchInput) searchInput.focus();
         }
     });
 
-    // HTMX events
-    document.body.addEventListener('htmx:beforeRequest', function(e) {
-        if (e.detail.target.id === 'content-area') {
+    // HTMX loading indicator
+    document.body.addEventListener("htmx:beforeRequest", function (e) {
+        if (e.detail.target.id === "content-area") {
             e.detail.target.innerHTML = `
                 <div class="loading-spinner">
                     <div class="spinner"></div>
@@ -980,4 +1229,3 @@
         }
     });
 </script>
-{% endblock %}

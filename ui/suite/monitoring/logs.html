@@ -18,7 +18,7 @@
             <div class="filter-group">
                 <label for="service-filter">Service</label>
                 <select id="service-filter" onchange="applyLogFilters()"
-                        hx-get="/api/monitoring/logs/services"
+                        hx-get="/api/ui/monitoring/logs/services"
                         hx-trigger="load"
                         hx-swap="innerHTML">
                     <option value="all">All Services</option>

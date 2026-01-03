@@ -257,7 +257,7 @@
             if (exportBtn) {
                 const content = document.getElementById('answer-content');
                 if (content && typeof htmx !== 'undefined') {
-                    htmx.ajax('POST', '/api/paper/import', {
+                    htmx.ajax('POST', '/api/ui/paper/import', {
                         values: {
                             content: content.innerHTML,
                             title: elements.searchInput?.value || 'Research Export'
@@ -287,7 +287,7 @@
      */
     function updateSourceCounts() {
         if (typeof htmx !== 'undefined') {
-            htmx.ajax('GET', '/api/research/source-counts', {
+            htmx.ajax('GET', '/api/ui/research/source-counts', {
                 swap: 'none'
             }).then(response => {
                 // Update counts in sidebar if response contains them
@@ -304,7 +304,7 @@
         const collectionName = prompt('Enter collection name:');
         if (collectionName && typeof htmx !== 'undefined') {
             const content = document.getElementById('answer-content');
-            htmx.ajax('POST', '/api/research/collections/save', {
+            htmx.ajax('POST', '/api/ui/research/collections/save', {
                 values: {
                     collection: collectionName,
                     content: content?.innerHTML || '',

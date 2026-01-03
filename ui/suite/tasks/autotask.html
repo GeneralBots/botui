@@ -97,7 +97,7 @@
             <div
                 class="intent-list"
                 id="intent-list"
-                hx-get="/api/autotask/list"
+                hx-get="/api/ui/autotask/list"
                 hx-trigger="load, every 10s"
                 hx-swap="innerHTML"
             >
@@ -130,7 +130,7 @@
             <div class="modal-body">
                 <form
                     id="new-intent-form"
-                    hx-post="/api/autotask/create"
+                    hx-post="/api/ui/autotask/create"
                     hx-ext="json-enc"
                     hx-target="#intent-list"
                     hx-swap="afterbegin"

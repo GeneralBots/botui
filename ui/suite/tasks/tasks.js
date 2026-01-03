@@ -2196,7 +2196,7 @@ function addTaskCardToList(taskId, title, status) {
       </div>
       <div class="task-card-meta">
         <span class="task-card-status ${statusClass}">${statusText}</span>
-        <span class="task-card-priority">normal</span>
+        <span class="task-card-priority">medium</span>
       </div>
       <div class="task-card-progress">
         <div class="task-progress-bar">

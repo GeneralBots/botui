@@ -1,5 +1,84 @@
 /* Chat module styles - including chat layout and projector component */
 
+/* Toast Notifications */
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10002;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--surface, #1a1a24);
+    border: 1px solid var(--border, #2a2a2a);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    animation: toast-in 0.3s ease;
+}
+
+.toast-success {
+    border-color: var(--success, #22c55e);
+}
+
+.toast-error {
+    border-color: var(--error, #ef4444);
+}
+
+.toast-warning {
+    border-color: var(--warning, #f59e0b);
+}
+
+.toast-info {
+    border-color: var(--accent, #3b82f6);
+}
+
+.toast-icon {
+    font-size: 16px;
+}
+
+.toast-message {
+    font-size: 13px;
+    color: #ffffff;
+}
+
+.toast-close {
+    background: transparent;
+    border: none;
+    color: #888888;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.toast-close:hover {
+    color: #ffffff;
+}
+
+.toast-fade-out {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 /* Chat Layout */
 .chat-layout {
     display: flex;
@@ -15,30 +94,7 @@
     box-sizing: border-box;
 }
 
-/* Connection Status */
-.connection-status {
-    position: fixed;
-    top: 80px;
-    right: 20px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    z-index: 1000;
-    transition: all 0.3s;
-}
-
-.connection-status.connecting {
-    background: #f59e0b;
-    animation: pulse 1.5s infinite;
-}
-
-.connection-status.connected {
-    background: #10b981;
-}
-
-.connection-status.disconnected {
-    background: #ef4444;
-}
+/* Connection Status - use shared styles from app.css */
 
 @keyframes pulse {
     0%,
@@ -96,21 +152,95 @@
 }
 
 .user-message {
-    background: var(--accent-color, #3b82f6);
-    color: white;
+    background: var(--accent, var(--primary, #3b82f6));
+    color: #ffffff !important;
     border-bottom-right-radius: 4px;
 }
 
+/* Light accent themes need dark text on user messages */
+[data-theme="sentient"] .user-message,
+[data-theme="y2kglow"] .user-message,
+[data-theme="arcadeflash"] .user-message,
+[data-theme="green"] .user-message,
+[data-theme="jazzage"] .user-message,
+[data-theme="mellowgold"] .user-message,
+[data-theme="polaroidmemories"] .user-message,
+[data-theme="seasidepostcard"] .user-message,
+[data-theme="saturdaycartoons"] .user-message,
+[data-theme="light"] .user-message,
+[data-theme="typewriter"] .user-message,
+[data-theme="3dbevel"] .user-message {
+    color: #000000 !important;
+}
+
 .bot-message {
-    background: var(--secondary-bg, #f3f4f6);
-    color: var(--text-primary, #1f2937);
+    background: var(--surface, var(--card, #2a2a2a));
+    color: #ffffff !important;
     border-bottom-left-radius: 4px;
 }
 
-/* Dark theme adjustments */
-[data-theme="dark"] .bot-message {
-    background: #374151;
-    color: #f9fafb;
+.bot-message,
+.bot-message p,
+.bot-message span,
+.bot-message li,
+.bot-message a,
+.bot-message strong,
+.bot-message em,
+.bot-message h1,
+.bot-message h2,
+.bot-message h3,
+.bot-message h4 {
+    color: #ffffff !important;
+}
+
+/* Light background themes need dark bot message text */
+[data-theme="light"] .bot-message,
+[data-theme="light"] .bot-message p,
+[data-theme="light"] .bot-message span,
+[data-theme="light"] .bot-message li,
+[data-theme="light"] .bot-message a,
+[data-theme="light"] .bot-message strong,
+[data-theme="light"] .bot-message em,
+[data-theme="light"] .bot-message h1,
+[data-theme="light"] .bot-message h2,
+[data-theme="light"] .bot-message h3,
+[data-theme="light"] .bot-message h4,
+[data-theme="polaroidmemories"] .bot-message,
+[data-theme="polaroidmemories"] .bot-message p,
+[data-theme="polaroidmemories"] .bot-message span,
+[data-theme="polaroidmemories"] .bot-message li,
+[data-theme="polaroidmemories"] .bot-message a,
+[data-theme="polaroidmemories"] .bot-message h1,
+[data-theme="polaroidmemories"] .bot-message h2,
+[data-theme="seasidepostcard"] .bot-message,
+[data-theme="seasidepostcard"] .bot-message p,
+[data-theme="seasidepostcard"] .bot-message span,
+[data-theme="seasidepostcard"] .bot-message li,
+[data-theme="seasidepostcard"] .bot-message a,
+[data-theme="seasidepostcard"] .bot-message h1,
+[data-theme="seasidepostcard"] .bot-message h2,
+[data-theme="saturdaycartoons"] .bot-message,
+[data-theme="saturdaycartoons"] .bot-message p,
+[data-theme="saturdaycartoons"] .bot-message span,
+[data-theme="saturdaycartoons"] .bot-message li,
+[data-theme="saturdaycartoons"] .bot-message a,
+[data-theme="saturdaycartoons"] .bot-message h1,
+[data-theme="saturdaycartoons"] .bot-message h2,
+[data-theme="typewriter"] .bot-message,
+[data-theme="typewriter"] .bot-message p,
+[data-theme="typewriter"] .bot-message span,
+[data-theme="typewriter"] .bot-message li,
+[data-theme="typewriter"] .bot-message a,
+[data-theme="typewriter"] .bot-message h1,
+[data-theme="typewriter"] .bot-message h2,
+[data-theme="3dbevel"] .bot-message,
+[data-theme="3dbevel"] .bot-message p,
+[data-theme="3dbevel"] .bot-message span,
+[data-theme="3dbevel"] .bot-message li,
+[data-theme="3dbevel"] .bot-message a,
+[data-theme="3dbevel"] .bot-message h1,
+[data-theme="3dbevel"] .bot-message h2 {
+    color: #000000 !important;
 }
 
 /* Markdown content in bot messages */
@@ -123,7 +253,7 @@
 }
 
 .bot-message code {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.1);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: "Monaco", "Menlo", monospace;
@@ -131,7 +261,7 @@
 }
 
 .bot-message pre {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.2);
     padding: 12px;
     border-radius: 8px;
     overflow-x: auto;
@@ -146,8 +276,8 @@
 /* Footer */
 footer {
     padding: 16px 0;
-    border-top: 1px solid var(--border-color, #e5e7eb);
-    background: var(--primary-bg, #ffffff);
+    border-top: 1px solid var(--border, var(--border-color, #2a2a2a));
+    background: transparent;
 }
 
 /* Suggestions */
@@ -176,20 +306,16 @@ footer {
 }
 
 /* Input Container */
-.input-container {
+.input-container,
+form.input-container {
     display: flex;
     gap: 12px;
     align-items: center;
     padding: 8px 12px;
-    background: var(--surface, var(--secondary-bg, #f9fafb));
-    border: 1px solid var(--border, var(--border-color, #e5e7eb));
+    background: var(--surface, var(--card, #1a1a24));
+    border: 1px solid var(--border, var(--border-color, #2a2a2a));
     border-radius: 28px;
-}
-
-[data-theme="dark"] .input-container,
-[data-theme="sentient"] .input-container {
-    background: var(--surface, #1a1a24);
-    border-color: var(--border, #2a2a3a);
+    margin: 0;
 }
 
 .input-container:focus-within {
@@ -203,15 +329,10 @@ footer {
     border-radius: 20px;
     border: none;
     background: transparent;
-    color: var(--text-primary, #1f2937);
+    color: #ffffff;
     font-size: 15px;
     outline: none;
     transition: all 0.2s;
-}
-
-[data-theme="dark"] #messageInput,
-[data-theme="sentient"] #messageInput {
-    color: var(--text-primary, #ffffff);
 }
 
 #messageInput:focus {
@@ -219,7 +340,7 @@ footer {
 }
 
 #messageInput::placeholder {
-    color: var(--text-muted, #9ca3af);
+    color: #888888;
 }
 
 #voiceBtn,

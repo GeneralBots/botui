@@ -6,7 +6,7 @@
 <div class="tasks-app">
     <!-- Hidden element to load stats on page load -->
     <div
-        hx-get="/api/tasks/stats"
+        hx-get="/api/ui/tasks/stats"
         hx-trigger="load, taskCreated from:body"
         hx-swap="innerHTML"
         style="display: none"
@@ -17,7 +17,7 @@
         <button
             class="filter-pill"
             data-filter="complete"
-            hx-get="/api/tasks?filter=complete"
+            hx-get="/api/ui/tasks?filter=complete"
             hx-target="#task-list"
             hx-swap="innerHTML"
         >
@@ -28,7 +28,7 @@
         <button
             class="filter-pill active"
             data-filter="all"
-            hx-get="/api/tasks?filter=all"
+            hx-get="/api/ui/tasks?filter=all"
             hx-target="#task-list"
             hx-swap="innerHTML"
         >
@@ -39,7 +39,7 @@
         <button
             class="filter-pill"
             data-filter="active"
-            hx-get="/api/tasks?filter=active"
+            hx-get="/api/ui/tasks?filter=active"
             hx-target="#task-list"
             hx-swap="innerHTML"
         >
@@ -50,7 +50,7 @@
         <button
             class="filter-pill"
             data-filter="awaiting"
-            hx-get="/api/tasks?filter=awaiting"
+            hx-get="/api/ui/tasks?filter=awaiting"
             hx-target="#task-list"
             hx-swap="innerHTML"
         >
@@ -61,7 +61,7 @@
         <button
             class="filter-pill"
             data-filter="paused"
-            hx-get="/api/tasks?filter=paused"
+            hx-get="/api/ui/tasks?filter=paused"
             hx-target="#task-list"
             hx-swap="innerHTML"
         >
@@ -72,7 +72,7 @@
         <button
             class="filter-pill"
             data-filter="blocked"
-            hx-get="/api/tasks?filter=blocked"
+            hx-get="/api/ui/tasks?filter=blocked"
             hx-target="#task-list"
             hx-swap="innerHTML"
         >
@@ -100,7 +100,7 @@
             <button
                 id="quick-intent-btn"
                 class="btn-create-run"
-                hx-post="/api/autotask/create"
+                hx-post="/api/ui/autotask/create"
                 hx-ext="json-enc"
                 hx-include="#quick-intent-input"
                 hx-target="#intent-result-hidden"
@@ -123,7 +123,7 @@
             <div
                 class="tasks-list-scroll"
                 id="task-list"
-                hx-get="/api/tasks?filter=all"
+                hx-get="/api/ui/tasks?filter=all"
                 hx-trigger="load, taskCreated from:body throttle:2s"
                 hx-swap="innerHTML transition:false"
             >
@@ -242,9 +242,10 @@
                     <div class="form-group">
                         <label for="intent-priority">Priority</label>
                         <select id="intent-priority" name="priority">
-                            <option value="normal">Normal</option>
-                            <option value="high">High</option>
                             <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
                         </select>
                     </div>
                     <div class="form-group">

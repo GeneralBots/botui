@@ -67,7 +67,7 @@
         <aside class="metrics-sidebar">
             <div
                 class="metric-card"
-                hx-get="/api/analytics/messages/count"
+                hx-get="/api/ui/analytics/messages/count"
                 hx-trigger="load, every 30s"
                 hx-swap="innerHTML"
             >
@@ -90,7 +90,7 @@
 
             <div
                 class="metric-card"
-                hx-get="/api/analytics/sessions/active"
+                hx-get="/api/ui/analytics/sessions/active"
                 hx-trigger="load, every 10s"
                 hx-swap="innerHTML"
             >
@@ -127,7 +127,7 @@
 
             <div
                 class="metric-card"
-                hx-get="/api/analytics/response/avg"
+                hx-get="/api/ui/analytics/response/avg"
                 hx-trigger="load, every 30s"
                 hx-swap="innerHTML"
             >
@@ -150,7 +150,7 @@
 
             <div
                 class="metric-card"
-                hx-get="/api/analytics/llm/tokens"
+                hx-get="/api/ui/analytics/llm/tokens"
                 hx-trigger="load, every 60s"
                 hx-swap="innerHTML"
             >
@@ -187,7 +187,7 @@
 
             <div
                 class="metric-card"
-                hx-get="/api/analytics/storage/usage"
+                hx-get="/api/ui/analytics/storage/usage"
                 hx-trigger="load, every 120s"
                 hx-swap="innerHTML"
             >
@@ -221,7 +221,7 @@
 
             <div
                 class="metric-card"
-                hx-get="/api/analytics/errors/count"
+                hx-get="/api/ui/analytics/errors/count"
                 hx-trigger="load, every 30s"
                 hx-swap="innerHTML"
             >
@@ -289,7 +289,7 @@
                     <div
                         class="chart-container"
                         id="messagesChart"
-                        hx-get="/api/analytics/timeseries/messages"
+                        hx-get="/api/ui/analytics/timeseries/messages"
                         hx-trigger="load, every 60s"
                         hx-swap="innerHTML"
                     >
@@ -324,7 +324,7 @@
                     <div
                         class="chart-container"
                         id="responseChart"
-                        hx-get="/api/analytics/timeseries/response_time"
+                        hx-get="/api/ui/analytics/timeseries/response_time"
                         hx-trigger="load, every 60s"
                         hx-swap="innerHTML"
                     >
@@ -343,7 +343,7 @@
                     <div
                         class="chart-container"
                         id="channelChart"
-                        hx-get="/api/analytics/channels/distribution"
+                        hx-get="/api/ui/analytics/channels/distribution"
                         hx-trigger="load, every 120s"
                         hx-swap="innerHTML"
                     >
@@ -362,7 +362,7 @@
                     <div
                         class="chart-container"
                         id="botChart"
-                        hx-get="/api/analytics/bots/performance"
+                        hx-get="/api/ui/analytics/bots/performance"
                         hx-trigger="load, every 60s"
                         hx-swap="innerHTML"
                     >
@@ -504,7 +504,7 @@
             <div
                 class="activity-feed"
                 id="activityFeed"
-                hx-get="/api/analytics/activity/recent"
+                hx-get="/api/ui/analytics/activity/recent"
                 hx-trigger="load, every 15s"
                 hx-swap="innerHTML"
             >
@@ -514,7 +514,7 @@
             <h3 class="mt-4">Top Queries</h3>
             <div
                 class="top-queries"
-                hx-get="/api/analytics/queries/top"
+                hx-get="/api/ui/analytics/queries/top"
                 hx-trigger="load, every 60s"
                 hx-swap="innerHTML"
             >
@@ -598,7 +598,7 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
             try {
-                const response = await fetch("/api/analytics/query", {
+                const response = await fetch("/api/ui/analytics/chat", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

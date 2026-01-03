@@ -473,7 +473,7 @@
                 const selectedText = document.getElementById('selected-text-input')?.value || '';
 
                 if (typeof htmx !== 'undefined') {
-                    htmx.ajax('POST', '/api/paper/ai/tone', {
+                    htmx.ajax('POST', '/api/ui/paper/ai/tone', {
                         target: '#ai-response-content',
                         values: { tone, text: selectedText }
                     }).then(() => {
@@ -609,7 +609,7 @@
         const content = elements.editor?.innerHTML || '';
 
         if (typeof htmx !== 'undefined') {
-            htmx.ajax('POST', '/api/paper/save', {
+            htmx.ajax('POST', '/api/ui/paper/save', {
                 swap: 'none',
                 values: { title, content }
             }).then(() => {

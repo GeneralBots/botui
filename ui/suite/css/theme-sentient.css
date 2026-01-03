@@ -154,6 +154,12 @@
     border-color: var(--border);
 }
 
+[data-theme="sentient"] .icon-button.active {
+    color: var(--accent);
+    background: var(--accent-dim);
+    border-color: var(--accent);
+}
+
 /* Notification Badge */
 [data-theme="sentient"] .notification-badge {
     background: var(--accent);
@@ -756,10 +762,22 @@
 }
 
 [data-theme="sentient"] .app-item {
-    color: var(--text-secondary);
+    color: var(--text);
     padding: 12px;
     border-radius: 8px;
     transition: all 0.2s ease;
+}
+
+[data-theme="sentient"] .app-item span {
+    color: var(--text);
+}
+
+[data-theme="sentient"] .app-item .app-icon {
+    color: var(--text);
+}
+
+[data-theme="sentient"] .app-item .app-icon svg {
+    stroke: var(--text);
 }
 
 [data-theme="sentient"] .app-item:hover {
@@ -767,9 +785,23 @@
     color: var(--text);
 }
 
+[data-theme="sentient"] .app-item:hover span,
+[data-theme="sentient"] .app-item:hover .app-icon {
+    color: var(--text);
+}
+
 [data-theme="sentient"] .app-item.active {
     background: var(--accent-light);
     color: var(--accent);
+}
+
+[data-theme="sentient"] .app-item.active span,
+[data-theme="sentient"] .app-item.active .app-icon {
+    color: var(--accent);
+}
+
+[data-theme="sentient"] .app-item.active .app-icon svg {
+    stroke: var(--accent);
 }
 
 /* ============================================ */

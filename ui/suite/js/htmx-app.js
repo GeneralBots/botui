@@ -214,22 +214,112 @@
       updateActiveNav(path);
     });
 
+    // Also listen for htmx:afterSwap to catch all navigation
+    document.addEventListener("htmx:afterSwap", (event) => {
+      setTimeout(() => {
+        const path = window.location.hash || window.location.pathname;
+        updateActiveNav(path);
+      }, 10);
+    });
+
+    // Handle hash change
+    window.addEventListener("hashchange", (event) => {
+      updateActiveNav(window.location.hash);
+    });
+
     // Handle browser back/forward
     window.addEventListener("popstate", (event) => {
-      updateActiveNav(window.location.pathname);
+      updateActiveNav(window.location.hash || window.location.pathname);
+    });
+
+    // Handle direct clicks on app tabs and app items
+    document.addEventListener("click", (event) => {
+      const appTab = event.target.closest(".app-tab");
+      const appItem = event.target.closest(".app-item");
+
+      if (appTab || appItem) {
+        const element = appTab || appItem;
+        const href = element.getAttribute("href");
+        if (href) {
+          // Immediately update active state on click
+          updateActiveNav(href);
+        }
+      }
     });
   }
 
-  // Update active navigation item
+  // Get current section from URL
+  function getCurrentSection() {
+    const hash = window.location.hash;
+    if (hash && hash.length > 1) {
+      // Handle both #section and /#section formats
+      return hash.replace(/^#\/?/, "").split("/")[0].split("?")[0];
+    }
+    return "chat";
+  }
+
+  // Update active navigation item and page title
   function updateActiveNav(path) {
-    document.querySelectorAll(".nav-item, .app-item").forEach((item) => {
+    // Extract section name from path
+    // Handles: "/#chat", "#chat", "/chat", "chat", "/#paper", "#paper"
+    let section;
+    if (path && path.length > 0) {
+      // Remove leading /, #, or /# combinations
+      section = path
+        .replace(/^[/#]+/, "")
+        .split("/")[0]
+        .split("?")[0];
+    }
+
+    // Fallback to current URL hash if section is empty
+    if (!section) {
+      section = getCurrentSection();
+    }
+
+    // First, remove ALL active classes from all tabs, items, and apps button
+    document.querySelectorAll(".app-tab.active").forEach((item) => {
+      item.classList.remove("active");
+    });
+    document.querySelectorAll(".app-item.active").forEach((item) => {
+      item.classList.remove("active");
+    });
+
+    // Remove active from apps button
+    const appsButton = document.getElementById("appsButton");
+    if (appsButton) {
+      appsButton.classList.remove("active");
+    }
+
+    // Check if section exists in the main header tabs
+    let foundInHeaderTabs = false;
+    document.querySelectorAll(".app-tab").forEach((item) => {
+      const dataSection = item.getAttribute("data-section");
       const href = item.getAttribute("href");
-      if (href === path || (path === "/" && href === "/chat")) {
+      const itemSection = dataSection || (href ? href.replace(/^#/, "") : "");
+      if (itemSection === section) {
         item.classList.add("active");
-      } else {
-        item.classList.remove("active");
+        foundInHeaderTabs = true;
       }
     });
+
+    // Update app items in launcher dropdown (always mark the current section)
+    document.querySelectorAll(".app-item").forEach((item) => {
+      const href = item.getAttribute("href");
+      const dataSection = item.getAttribute("data-section");
+      const itemSection = dataSection || (href ? href.replace(/^#/, "") : "");
+      if (itemSection === section) {
+        item.classList.add("active");
+      }
+    });
+
+    // If section is NOT in header tabs, select the apps button instead
+    if (!foundInHeaderTabs && appsButton) {
+      appsButton.classList.add("active");
+    }
+
+    // Update page title
+    const sectionName = section.charAt(0).toUpperCase() + section.slice(1);
+    document.title = sectionName + " - General Bots";
   }
 
   // Initialize keyboard shortcuts
@@ -314,8 +404,8 @@
     // Initialize theme
     initTheme();
 
-    // Set initial active nav
-    updateActiveNav(window.location.pathname);
+    // Set initial active nav based on hash or default to chat
+    updateActiveNav(window.location.hash || "#chat");
 
     console.log("HTMX application initialized");
   }

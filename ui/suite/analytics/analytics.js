@@ -73,7 +73,7 @@ async function sendAnalyticsQuery() {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-        const response = await fetch("/api/analytics/query", {
+        const response = await fetch("/api/ui/analytics/chat", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

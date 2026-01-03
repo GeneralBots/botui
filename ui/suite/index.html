@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>General Bots</title>
+        <title>Chat - General Bots</title>
         <meta name="viewport" content="width=device-width,initial-scale=1.0" />
         <meta
             name="description"
@@ -60,11 +60,50 @@
                     title="General Bots"
                     aria-label="General Bots - Home"
                 >
-                    <div
+                    <svg
                         class="logo-icon"
-                        role="img"
-                        aria-label="General Bots logo"
-                    ></div>
+                        width="32"
+                        height="20"
+                        viewBox="0 0 140 80"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <!-- Left antenna -->
+                        <line x1="5" y1="40" x2="25" y2="40" />
+                        <line x1="25" y1="28" x2="25" y2="52" />
+                        <!-- Left gear (outer) -->
+                        <circle cx="50" cy="40" r="16" />
+                        <!-- Left gear (inner) -->
+                        <circle cx="50" cy="40" r="6" />
+                        <!-- Left gear teeth -->
+                        <line x1="50" y1="20" x2="50" y2="26" />
+                        <line x1="50" y1="54" x2="50" y2="60" />
+                        <line x1="30" y1="40" x2="36" y2="40" />
+                        <line x1="64" y1="40" x2="70" y2="40" />
+                        <line x1="38" y1="28" x2="42" y2="32" />
+                        <line x1="58" y1="48" x2="62" y2="52" />
+                        <line x1="38" y1="52" x2="42" y2="48" />
+                        <line x1="58" y1="32" x2="62" y2="28" />
+                        <!-- Right gear (outer) -->
+                        <circle cx="90" cy="40" r="16" />
+                        <!-- Right gear (inner) -->
+                        <circle cx="90" cy="40" r="6" />
+                        <!-- Right gear teeth -->
+                        <line x1="90" y1="20" x2="90" y2="26" />
+                        <line x1="90" y1="54" x2="90" y2="60" />
+                        <line x1="70" y1="40" x2="76" y2="40" />
+                        <line x1="104" y1="40" x2="110" y2="40" />
+                        <line x1="78" y1="28" x2="82" y2="32" />
+                        <line x1="98" y1="48" x2="102" y2="52" />
+                        <line x1="78" y1="52" x2="82" y2="48" />
+                        <line x1="98" y1="32" x2="102" y2="28" />
+                        <!-- Right antenna -->
+                        <line x1="115" y1="40" x2="135" y2="40" />
+                        <line x1="115" y1="28" x2="115" y2="52" />
+                    </svg>
                 </button>
 
                 <!-- Main App Tabs -->
@@ -72,6 +111,7 @@
                     <a
                         class="app-tab active"
                         href="#chat"
+                        data-section="chat"
                         hx-get="/suite/chat/chat.html"
                         hx-target="#main-content"
                         hx-push-url="/#chat"
@@ -92,7 +132,33 @@
                     </a>
                     <a
                         class="app-tab"
+                        href="#paper"
+                        data-section="paper"
+                        hx-get="/suite/paper/paper.html"
+                        hx-target="#main-content"
+                        hx-push-url="/#paper"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                            />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                        <span>Paper</span>
+                    </a>
+                    <a
+                        class="app-tab"
                         href="#mail"
+                        data-section="mail"
                         hx-get="/suite/mail/mail.html"
                         hx-target="#main-content"
                         hx-push-url="/#mail"
@@ -110,11 +176,12 @@
                             />
                             <polyline points="22,6 12,13 2,6" />
                         </svg>
-                        <span>Email</span>
+                        <span>Mail</span>
                     </a>
                     <a
                         class="app-tab"
                         href="#calendar"
+                        data-section="calendar"
                         hx-get="/suite/calendar/calendar.html"
                         hx-target="#main-content"
                         hx-push-url="/#calendar"
@@ -143,7 +210,30 @@
                     </a>
                     <a
                         class="app-tab"
+                        href="#drive"
+                        data-section="drive"
+                        hx-get="/suite/drive/drive.html"
+                        hx-target="#main-content"
+                        hx-push-url="/#drive"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                            />
+                        </svg>
+                        <span>Drive</span>
+                    </a>
+                    <a
+                        class="app-tab"
                         href="#tasks"
+                        data-section="tasks"
                         hx-get="/suite/tasks/tasks.html"
                         hx-target="#main-content"
                         hx-push-url="/#tasks"
@@ -165,33 +255,347 @@
                     </a>
                 </nav>
 
-                <!-- Apps menu button (launcher for all apps) -->
-                <button
-                    class="icon-button apps-button"
-                    id="appsButton"
-                    title="All Applications"
-                    aria-label="Open applications menu"
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                >
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        aria-hidden="true"
+                <!-- Apps menu container (button + dropdown) -->
+                <div class="apps-menu-container" style="position: relative">
+                    <button
+                        class="icon-button apps-button"
+                        id="appsButton"
+                        title="All Applications"
+                        aria-label="Open applications menu"
+                        aria-expanded="false"
+                        aria-haspopup="true"
                     >
-                        <circle cx="5" cy="5" r="2"></circle>
-                        <circle cx="12" cy="5" r="2"></circle>
-                        <circle cx="19" cy="5" r="2"></circle>
-                        <circle cx="5" cy="12" r="2"></circle>
-                        <circle cx="12" cy="12" r="2"></circle>
-                        <circle cx="19" cy="12" r="2"></circle>
-                        <circle cx="5" cy="19" r="2"></circle>
-                        <circle cx="12" cy="19" r="2"></circle>
-                        <circle cx="19" cy="19" r="2"></circle>
-                    </svg>
-                </button>
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
+                            <circle cx="5" cy="5" r="2"></circle>
+                            <circle cx="12" cy="5" r="2"></circle>
+                            <circle cx="19" cy="5" r="2"></circle>
+                            <circle cx="5" cy="12" r="2"></circle>
+                            <circle cx="12" cy="12" r="2"></circle>
+                            <circle cx="19" cy="12" r="2"></circle>
+                            <circle cx="5" cy="19" r="2"></circle>
+                            <circle cx="12" cy="19" r="2"></circle>
+                            <circle cx="19" cy="19" r="2"></circle>
+                        </svg>
+                    </button>
+
+                    <!-- Apps dropdown menu -->
+                    <nav
+                        class="apps-dropdown"
+                        id="appsDropdown"
+                        role="menu"
+                        aria-label="Applications"
+                    >
+                        <div class="apps-dropdown-title">All Applications</div>
+                        <div class="app-grid" role="group">
+                            <!-- Chat -->
+                            <a
+                                class="app-item active"
+                                href="#chat"
+                                data-section="chat"
+                                role="menuitem"
+                                aria-label="Chat application"
+                                hx-get="/suite/chat/chat.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#chat"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Chat</span>
+                            </a>
+
+                            <!-- Research -->
+                            <a
+                                class="app-item"
+                                href="#research"
+                                data-section="research"
+                                role="menuitem"
+                                aria-label="Research application"
+                                hx-get="/suite/research/research.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#research"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <circle cx="11" cy="11" r="8" />
+                                        <path d="m21 21-4.35-4.35" />
+                                        <path d="M11 8v6M8 11h6" />
+                                    </svg>
+                                </div>
+                                <span>Research</span>
+                            </a>
+
+                            <!-- Paper -->
+                            <a
+                                class="app-item"
+                                href="#paper"
+                                data-section="paper"
+                                role="menuitem"
+                                aria-label="Paper - Notes & Writing"
+                                hx-get="/suite/paper/paper.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#paper"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                                        />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <line x1="16" y1="13" x2="8" y2="13" />
+                                        <line x1="16" y1="17" x2="8" y2="17" />
+                                    </svg>
+                                </div>
+                                <span>Paper</span>
+                            </a>
+
+                            <!-- Drive -->
+                            <a
+                                class="app-item"
+                                href="#drive"
+                                data-section="drive"
+                                role="menuitem"
+                                aria-label="Drive application"
+                                hx-get="/suite/drive/drive.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#drive"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Drive</span>
+                            </a>
+
+                            <!-- Calendar -->
+                            <a
+                                class="app-item"
+                                href="#calendar"
+                                data-section="calendar"
+                                role="menuitem"
+                                aria-label="Calendar application"
+                                hx-get="/suite/calendar/calendar.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#calendar"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="4"
+                                            width="18"
+                                            height="18"
+                                            rx="2"
+                                            ry="2"
+                                        />
+                                        <line x1="16" y1="2" x2="16" y2="6" />
+                                        <line x1="8" y1="2" x2="8" y2="6" />
+                                        <line x1="3" y1="10" x2="21" y2="10" />
+                                    </svg>
+                                </div>
+                                <span>Calendar</span>
+                            </a>
+
+                            <!-- Tasks -->
+                            <a
+                                class="app-item"
+                                href="#tasks"
+                                data-section="tasks"
+                                role="menuitem"
+                                aria-label="Tasks application"
+                                hx-get="/suite/tasks/tasks.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#tasks"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M9 11l3 3L22 4" />
+                                        <path
+                                            d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Tasks</span>
+                            </a>
+
+                            <!-- Mail -->
+                            <a
+                                class="app-item"
+                                href="#mail"
+                                data-section="mail"
+                                role="menuitem"
+                                aria-label="Mail application"
+                                hx-get="/suite/mail/mail.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#mail"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                                        />
+                                        <polyline points="22,6 12,13 2,6" />
+                                    </svg>
+                                </div>
+                                <span>Mail</span>
+                            </a>
+
+                            <!-- Meet -->
+                            <a
+                                class="app-item"
+                                href="#meet"
+                                data-section="meet"
+                                role="menuitem"
+                                aria-label="Meet application"
+                                hx-get="/suite/meet/meet.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#meet"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polygon
+                                            points="23 7 16 12 23 17 23 7"
+                                        />
+                                        <rect
+                                            x="1"
+                                            y="5"
+                                            width="15"
+                                            height="14"
+                                            rx="2"
+                                            ry="2"
+                                        />
+                                    </svg>
+                                </div>
+                                <span>Meet</span>
+                            </a>
+
+                            <!-- Analytics -->
+                            <a
+                                class="app-item"
+                                href="#analytics"
+                                data-section="analytics"
+                                role="menuitem"
+                                aria-label="Analytics Dashboard"
+                                hx-get="/suite/analytics/analytics.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#analytics"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <line x1="18" y1="20" x2="18" y2="10" />
+                                        <line x1="12" y1="20" x2="12" y2="4" />
+                                        <line x1="6" y1="20" x2="6" y2="14" />
+                                    </svg>
+                                </div>
+                                <span>Analytics</span>
+                            </a>
+
+                            <!-- Monitoring -->
+                            <a
+                                class="app-item"
+                                href="#monitoring"
+                                data-section="monitoring"
+                                role="menuitem"
+                                aria-label="System Monitoring"
+                                hx-get="/suite/monitoring/monitoring.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#monitoring"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <circle cx="12" cy="12" r="6" />
+                                        <circle cx="12" cy="12" r="2" />
+                                    </svg>
+                                </div>
+                                <span>Monitoring</span>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
             </div>
 
             <!-- Center: Search -->
@@ -220,20 +624,54 @@
 
             <!-- Right: Notifications + User -->
             <div class="header-right">
-                <button class="icon-button" title="Notifications">
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
+                <!-- Notifications Bell -->
+                <div class="notifications-menu">
+                    <button
+                        class="icon-button"
+                        id="notificationsBtn"
+                        title="Notifications"
+                        aria-expanded="false"
                     >
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                    </svg>
-                    <span class="notification-badge">3</span>
-                </button>
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+                            />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        <span
+                            class="notifications-badge"
+                            id="notificationsBadge"
+                            style="display: none"
+                            >0</span
+                        >
+                    </button>
+                    <div class="notifications-panel" id="notificationsPanel">
+                        <div class="notifications-panel-header">
+                            <span class="notifications-panel-title"
+                                >Notifications</span
+                            >
+                            <button
+                                class="notifications-clear-btn"
+                                id="clearNotificationsBtn"
+                            >
+                                Clear all
+                            </button>
+                        </div>
+                        <div class="notifications-list" id="notificationsList">
+                            <div class="notifications-empty">
+                                <span>🔔</span>
+                                <p>No notifications</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <button
                     class="icon-button"
                     id="settingsBtn"
@@ -636,317 +1074,29 @@
                             <span class="theme-option-name">📁 XTree Gold</span>
                         </button>
                     </div>
+                    <a
+                        class="settings-link"
+                        href="#settings"
+                        hx-get="/suite/settings/index.html"
+                        hx-target="#main-content"
+                        hx-push-url="/#settings"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                            />
+                        </svg>
+                        <span>Settings</span>
+                    </a>
                 </div>
-
-                <!-- Apps dropdown menu -->
-                <nav
-                    class="apps-dropdown"
-                    id="appsDropdown"
-                    role="menu"
-                    aria-label="Applications"
-                >
-                    <div class="apps-dropdown-title">All Applications</div>
-                    <div class="app-grid" role="group">
-                        <!-- Chat -->
-                        <a
-                            class="app-item active"
-                            href="#chat"
-                            data-section="chat"
-                            role="menuitem"
-                            aria-label="Chat application"
-                            hx-get="/suite/chat/chat.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#chat"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                                    />
-                                </svg>
-                            </div>
-                            <span>Chat</span>
-                        </a>
-
-                        <!-- Research</span> -->
-                        <a
-                            class="app-item"
-                            href="#research"
-                            data-section="research"
-                            role="menuitem"
-                            aria-label="Research application"
-                            hx-get="/suite/research/research.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#research"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <circle cx="11" cy="11" r="8" />
-                                    <path d="m21 21-4.35-4.35" />
-                                    <path d="M11 8v6M8 11h6" />
-                                </svg>
-                            </div>
-                            <span>Research</span>
-                        </a>
-
-                        <!-- Paper -->
-                        <a
-                            class="app-item"
-                            href="#paper"
-                            data-section="paper"
-                            role="menuitem"
-                            aria-label="Paper - Notes & Writing"
-                            hx-get="/suite/paper/paper.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#paper"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                                    />
-                                    <polyline points="14 2 14 8 20 8" />
-                                    <line x1="16" y1="13" x2="8" y2="13" />
-                                    <line x1="16" y1="17" x2="8" y2="17" />
-                                </svg>
-                            </div>
-                            <span>Paper</span>
-                        </a>
-
-                        <!-- Drive -->
-                        <a
-                            class="app-item"
-                            href="#drive"
-                            data-section="drive"
-                            role="menuitem"
-                            aria-label="Drive application"
-                            hx-get="/suite/drive/drive.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#drive"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-                                    />
-                                </svg>
-                            </div>
-                            <span>Drive</span>
-                        </a>
-
-                        <!-- Calendar -->
-                        <a
-                            class="app-item"
-                            href="#calendar"
-                            data-section="calendar"
-                            role="menuitem"
-                            aria-label="Calendar application"
-                            hx-get="/suite/calendar/calendar.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#calendar"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="4"
-                                        width="18"
-                                        height="18"
-                                        rx="2"
-                                        ry="2"
-                                    />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                            </div>
-                            <span>Calendar</span>
-                        </a>
-
-                        <!-- Tasks -->
-                        <a
-                            class="app-item"
-                            href="#tasks"
-                            data-section="tasks"
-                            role="menuitem"
-                            aria-label="Tasks application"
-                            hx-get="/suite/tasks/tasks.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#tasks"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path d="M9 11l3 3L22 4" />
-                                    <path
-                                        d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
-                                    />
-                                </svg>
-                            </div>
-                            <span>Tasks</span>
-                        </a>
-
-                        <!-- Mail -->
-                        <a
-                            class="app-item"
-                            href="#mail"
-                            data-section="mail"
-                            role="menuitem"
-                            aria-label="Mail application"
-                            hx-get="/suite/mail/mail.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#mail"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                                    />
-                                    <polyline points="22,6 12,13 2,6" />
-                                </svg>
-                            </div>
-                            <span>Mail</span>
-                        </a>
-
-                        <!-- Meet -->
-                        <a
-                            class="app-item"
-                            href="#meet"
-                            data-section="meet"
-                            role="menuitem"
-                            aria-label="Meet application"
-                            hx-get="/suite/meet/meet.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#meet"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <polygon points="23 7 16 12 23 17 23 7" />
-                                    <rect
-                                        x="1"
-                                        y="5"
-                                        width="15"
-                                        height="14"
-                                        rx="2"
-                                        ry="2"
-                                    />
-                                </svg>
-                            </div>
-                            <span>Meet</span>
-                        </a>
-
-                        <!-- Analytics -->
-                        <a
-                            class="app-item"
-                            href="#analytics"
-                            data-section="analytics"
-                            role="menuitem"
-                            aria-label="Analytics Dashboard"
-                            hx-get="/suite/analytics/analytics.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#analytics"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <line x1="18" y1="20" x2="18" y2="10" />
-                                    <line x1="12" y1="20" x2="12" y2="4" />
-                                    <line x1="6" y1="20" x2="6" y2="14" />
-                                </svg>
-                            </div>
-                            <span>Analytics</span>
-                        </a>
-
-                        <!-- Monitoring -->
-                        <a
-                            class="app-item"
-                            href="#monitoring"
-                            data-section="monitoring"
-                            role="menuitem"
-                            aria-label="System Monitoring"
-                            hx-get="/suite/monitoring/monitoring.html"
-                            hx-target="#main-content"
-                            hx-push-url="/#monitoring"
-                        >
-                            <div class="app-icon" aria-hidden="true">
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <circle cx="12" cy="12" r="10" />
-                                    <circle cx="12" cy="12" r="6" />
-                                    <circle cx="12" cy="12" r="2" />
-                                </svg>
-                            </div>
-                            <span>Monitoring</span>
-                        </a>
-                    </div>
-                </nav>
 
                 <!-- User avatar -->
                 <button
@@ -972,215 +1122,8 @@
 
         <!-- Application initialization -->
         <script>
-            // Chat initialization function (called after HTMX loads chat content)
-            function initChatModule() {
-                if (window.chatModuleInitialized) return;
-                const messageInput = document.getElementById("messageInput");
-                const sendBtn = document.getElementById("sendBtn");
-                if (!messageInput || !sendBtn) return;
-
-                window.chatModuleInitialized = true;
-                console.log("Initializing chat module...");
-
-                // WebSocket URL
-                const WS_BASE_URL =
-                    window.location.protocol === "https:" ? "wss://" : "ws://";
-                const WS_URL = `${WS_BASE_URL}${window.location.host}`;
-
-                // Message Type Constants
-                const MessageType = {
-                    EXTERNAL: 0,
-                    USER: 1,
-                    BOT_RESPONSE: 2,
-                    CONTINUE: 3,
-                    SUGGESTION: 4,
-                    CONTEXT_CHANGE: 5,
-                };
-
-                // State
-                let ws = null,
-                    currentSessionId = null,
-                    currentUserId = null,
-                    currentBotId = "default";
-                let isStreaming = false,
-                    streamingMessageId = null,
-                    currentStreamingContent = "";
-                let reconnectAttempts = 0;
-                const maxReconnectAttempts = 5;
-
-                // Initialize auth and WebSocket
-                async function initChat() {
-                    try {
-                        updateConnectionStatus("connecting");
-                        const response = await fetch(
-                            `/api/auth?bot_name=default`,
-                        );
-                        const auth = await response.json();
-                        currentUserId = auth.user_id;
-                        currentSessionId = auth.session_id;
-                        currentBotId = auth.bot_id || "default";
-                        console.log("Auth:", {
-                            currentUserId,
-                            currentSessionId,
-                            currentBotId,
-                        });
-                        connectWebSocket();
-                    } catch (e) {
-                        console.error("Auth failed:", e);
-                        updateConnectionStatus("disconnected");
-                        setTimeout(initChat, 3000);
-                    }
-                }
-
-                function connectWebSocket() {
-                    if (ws) ws.close();
-                    const url = `${WS_URL}/ws?session_id=${currentSessionId}&user_id=${currentUserId}`;
-                    ws = new WebSocket(url);
-
-                    ws.onopen = () => {
-                        console.log("WebSocket connected");
-                        updateConnectionStatus("connected");
-                        reconnectAttempts = 0;
-                    };
-
-                    ws.onmessage = (event) => {
-                        try {
-                            const data = JSON.parse(event.data);
-                            if (data.type === "connected") return;
-                            if (
-                                data.message_type === MessageType.BOT_RESPONSE
-                            ) {
-                                processMessage(data);
-                            }
-                        } catch (e) {
-                            console.error("WS message error:", e);
-                        }
-                    };
-
-                    ws.onclose = () => {
-                        updateConnectionStatus("disconnected");
-                        if (reconnectAttempts < maxReconnectAttempts) {
-                            reconnectAttempts++;
-                            setTimeout(
-                                connectWebSocket,
-                                1000 * reconnectAttempts,
-                            );
-                        }
-                    };
-
-                    ws.onerror = (e) => console.error("WebSocket error:", e);
-                }
-
-                function processMessage(data) {
-                    if (data.is_complete) {
-                        if (isStreaming) finalizeStreaming();
-                        else addMessage("bot", data.content);
-                        isStreaming = false;
-                    } else {
-                        if (!isStreaming) {
-                            isStreaming = true;
-                            streamingMessageId = "streaming-" + Date.now();
-                            currentStreamingContent = data.content || "";
-                            addMessage(
-                                "bot",
-                                currentStreamingContent,
-                                streamingMessageId,
-                            );
-                        } else {
-                            currentStreamingContent += data.content || "";
-                            updateStreaming(currentStreamingContent);
-                        }
-                    }
-                }
-
-                function addMessage(sender, content, msgId = null) {
-                    const messages = document.getElementById("messages");
-                    if (!messages) return;
-                    const div = document.createElement("div");
-                    div.className = `message ${sender}`;
-                    if (msgId) div.id = msgId;
-
-                    if (sender === "user") {
-                        div.innerHTML = `<div class="message-content user-message">${escapeHtml(content)}</div>`;
-                    } else {
-                        div.innerHTML = `<div class="message-content bot-message">${marked.parse(content)}</div>`;
-                    }
-                    messages.appendChild(div);
-                    messages.scrollTop = messages.scrollHeight;
-                }
-
-                function updateStreaming(content) {
-                    const el = document.getElementById(streamingMessageId);
-                    if (el)
-                        el.querySelector(".message-content").innerHTML =
-                            marked.parse(content);
-                }
-
-                function finalizeStreaming() {
-                    const el = document.getElementById(streamingMessageId);
-                    if (el) {
-                        el.querySelector(".message-content").innerHTML =
-                            marked.parse(currentStreamingContent);
-                        el.removeAttribute("id");
-                    }
-                    streamingMessageId = null;
-                    currentStreamingContent = "";
-                }
-
-                function sendMessage() {
-                    const input = document.getElementById("messageInput");
-                    const content = input.value.trim();
-                    if (!content || !ws || ws.readyState !== WebSocket.OPEN)
-                        return;
-
-                    addMessage("user", content);
-
-                    ws.send(
-                        JSON.stringify({
-                            bot_id: currentBotId,
-                            user_id: currentUserId,
-                            session_id: currentSessionId,
-                            channel: "web",
-                            content: content,
-                            message_type: MessageType.USER,
-                            timestamp: new Date().toISOString(),
-                        }),
-                    );
-
-                    input.value = "";
-                    input.focus();
-                }
-
-                function updateConnectionStatus(status) {
-                    const el = document.getElementById("connectionStatus");
-                    if (el) el.className = `connection-status ${status}`;
-                }
-
-                function escapeHtml(text) {
-                    const div = document.createElement("div");
-                    div.textContent = text;
-                    return div.innerHTML;
-                }
-
-                // Setup event handlers
-                sendBtn.onclick = sendMessage;
-                messageInput.addEventListener("keypress", (e) => {
-                    if (e.key === "Enter") sendMessage();
-                });
-
-                // Start chat
-                initChat();
-            }
-
-            // Listen for HTMX content swaps to initialize chat
-            document.addEventListener("htmx:afterSettle", (e) => {
-                if (document.getElementById("messageInput")) {
-                    window.chatModuleInitialized = false; // Reset flag for reinitialization
-                    initChatModule();
-                }
-            });
-
             // Simple initialization for HTMX app
+            // Note: Chat module is self-contained in chat.html
             document.addEventListener("DOMContentLoaded", () => {
                 console.log("🚀 Initializing General Bots with HTMX...");
 
@@ -1283,31 +1226,80 @@
                     });
                 });
 
+                // List of sections that appear in header tabs
+                const headerTabSections = [
+                    "chat",
+                    "paper",
+                    "mail",
+                    "calendar",
+                    "drive",
+                    "tasks",
+                ];
+
+                // Update active states for navigation (single selection only)
+                function updateNavigationActive(section) {
+                    // Remove all active states first
+                    document
+                        .querySelectorAll(".app-tab")
+                        .forEach((t) => t.classList.remove("active"));
+                    document
+                        .querySelectorAll(".app-item")
+                        .forEach((i) => i.classList.remove("active"));
+                    appsBtn.classList.remove("active");
+
+                    // Check if section is in header tabs
+                    const isInHeaderTabs = headerTabSections.includes(section);
+
+                    // Activate the matching app-tab if in header
+                    if (isInHeaderTabs) {
+                        const headerTab = document.querySelector(
+                            `.app-tab[data-section="${section}"]`,
+                        );
+                        if (headerTab) {
+                            headerTab.classList.add("active");
+                        }
+                    } else {
+                        // Section is NOT in header tabs, activate apps button
+                        appsBtn.classList.add("active");
+                    }
+
+                    // Always mark the app-item in dropdown as active
+                    const appItem = document.querySelector(
+                        `.app-item[data-section="${section}"]`,
+                    );
+                    if (appItem) {
+                        appItem.classList.add("active");
+                    }
+                }
+
                 // Handle app item clicks - update active state
                 document.querySelectorAll(".app-item").forEach((item) => {
                     item.addEventListener("click", function () {
-                        document
-                            .querySelectorAll(".app-item")
-                            .forEach((i) => i.classList.remove("active"));
-                        this.classList.add("active");
+                        const section = this.getAttribute("data-section");
+                        updateNavigationActive(section);
                         appsDropdown.classList.remove("show");
                         appsBtn.setAttribute("aria-expanded", "false");
+                    });
+                });
+
+                // Handle app tab clicks
+                document.querySelectorAll(".app-tab").forEach((tab) => {
+                    tab.addEventListener("click", function () {
+                        const section = this.getAttribute("data-section");
+                        updateNavigationActive(section);
                     });
                 });
 
                 // Handle hash navigation
                 function handleHashChange() {
                     const hash = window.location.hash.slice(1) || "chat";
+                    updateNavigationActive(hash);
+
+                    // Trigger HTMX load if not already loaded
                     const appItem = document.querySelector(
-                        `[data-section="${hash}"]`,
+                        `.app-item[data-section="${hash}"]`,
                     );
                     if (appItem) {
-                        document
-                            .querySelectorAll(".app-item")
-                            .forEach((i) => i.classList.remove("active"));
-                        appItem.classList.add("active");
-
-                        // Trigger HTMX load if not already loaded
                         const hxGet = appItem.getAttribute("hx-get");
                         if (hxGet) {
                             htmx.ajax("GET", hxGet, {
@@ -1324,6 +1316,183 @@
                 setTimeout(() => {
                     handleHashChange();
                 }, 100);
+
+                // ==========================================================================
+                // GBAlerts - Global Notification System
+                // ==========================================================================
+                window.GBAlerts = (function () {
+                    const notifications = [];
+                    const badge = document.getElementById("notificationsBadge");
+                    const list = document.getElementById("notificationsList");
+                    const btn = document.getElementById("notificationsBtn");
+                    const panel = document.getElementById("notificationsPanel");
+                    const clearBtn = document.getElementById(
+                        "clearNotificationsBtn",
+                    );
+
+                    function updateBadge() {
+                        if (badge) {
+                            if (notifications.length > 0) {
+                                badge.textContent =
+                                    notifications.length > 99
+                                        ? "99+"
+                                        : notifications.length;
+                                badge.style.display = "flex";
+                            } else {
+                                badge.style.display = "none";
+                            }
+                        }
+                    }
+
+                    function renderList() {
+                        if (!list) return;
+                        if (notifications.length === 0) {
+                            list.innerHTML =
+                                '<div class="notifications-empty"><span>🔔</span><p>No notifications</p></div>';
+                        } else {
+                            list.innerHTML = notifications
+                                .map(
+                                    (n, i) => `
+                                <div class="notification-item notification-${n.type}" data-index="${i}">
+                                    <div class="notification-icon">${n.icon || "📢"}</div>
+                                    <div class="notification-content">
+                                        <div class="notification-title">${n.title}</div>
+                                        <div class="notification-message">${n.message || ""}</div>
+                                        <div class="notification-time">${n.time}</div>
+                                    </div>
+                                    ${n.action ? `<button class="notification-action" onclick="GBAlerts.handleAction(${i})">${n.actionText || "Open"}</button>` : ""}
+                                    <button class="notification-dismiss" onclick="GBAlerts.dismiss(${i})">×</button>
+                                </div>
+                            `,
+                                )
+                                .join("");
+                        }
+                    }
+
+                    function add(notification) {
+                        notifications.unshift({
+                            ...notification,
+                            time: new Date().toLocaleTimeString(),
+                        });
+                        updateBadge();
+                        renderList();
+                        // Auto-open panel when new notification arrives
+                        if (panel) {
+                            panel.classList.add("show");
+                            if (btn) btn.setAttribute("aria-expanded", "true");
+                        }
+                    }
+
+                    function dismiss(index) {
+                        notifications.splice(index, 1);
+                        updateBadge();
+                        renderList();
+                    }
+
+                    function clearAll() {
+                        notifications.length = 0;
+                        updateBadge();
+                        renderList();
+                    }
+
+                    function handleAction(index) {
+                        const n = notifications[index];
+                        if (n && n.action) {
+                            if (typeof n.action === "function") {
+                                n.action();
+                            } else if (typeof n.action === "string") {
+                                window.open(n.action, "_blank");
+                            }
+                        }
+                        dismiss(index);
+                    }
+
+                    // Toggle panel
+                    if (btn && panel) {
+                        btn.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            const isOpen = panel.classList.toggle("show");
+                            btn.setAttribute("aria-expanded", isOpen);
+                        });
+
+                        document.addEventListener("click", (e) => {
+                            if (
+                                !panel.contains(e.target) &&
+                                !btn.contains(e.target)
+                            ) {
+                                panel.classList.remove("show");
+                                btn.setAttribute("aria-expanded", "false");
+                            }
+                        });
+                    }
+
+                    if (clearBtn) {
+                        clearBtn.addEventListener("click", clearAll);
+                    }
+
+                    // Convenience methods for common notifications
+                    return {
+                        add,
+                        dismiss,
+                        clearAll,
+                        handleAction,
+                        taskCompleted: function (title, url) {
+                            add({
+                                type: "success",
+                                icon: "✅",
+                                title: "Task Completed",
+                                message: title,
+                                action: url,
+                                actionText: "Open App",
+                            });
+                        },
+                        taskFailed: function (title, error) {
+                            add({
+                                type: "error",
+                                icon: "❌",
+                                title: "Task Failed",
+                                message: title + (error ? ": " + error : ""),
+                            });
+                        },
+                        info: function (title, message) {
+                            add({
+                                type: "info",
+                                icon: "ℹ️",
+                                title: title,
+                                message: message,
+                            });
+                        },
+                        warning: function (title, message) {
+                            add({
+                                type: "warning",
+                                icon: "⚠️",
+                                title: title,
+                                message: message,
+                            });
+                        },
+                        connectionStatus: function (status, message) {
+                            add({
+                                type:
+                                    status === "connected"
+                                        ? "success"
+                                        : status === "disconnected"
+                                          ? "error"
+                                          : "warning",
+                                icon:
+                                    status === "connected"
+                                        ? "🟢"
+                                        : status === "disconnected"
+                                          ? "🔴"
+                                          : "🟡",
+                                title:
+                                    "Connection " +
+                                    status.charAt(0).toUpperCase() +
+                                    status.slice(1),
+                                message: message || "",
+                            });
+                        },
+                    };
+                })();
 
                 // Keyboard shortcuts
                 document.addEventListener("keydown", (e) => {

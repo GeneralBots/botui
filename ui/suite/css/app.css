@@ -126,7 +126,7 @@
     /* Header */
     --header-bg: hsla(var(--background) / 0.8);
     --header-border: hsla(var(--border) / 0.8);
-    --header-height: 64px;
+    --header-height: 40px;
 
     /* Input Fields */
     --input-bg: hsl(var(--input));
@@ -296,11 +296,11 @@ body {
 /* LAYOUT STRUCTURE                             */
 /* ============================================ */
 #main-content {
-    height: calc(100vh - 64px);
+    height: calc(100vh - var(--header-height));
     width: 100%;
     overflow: hidden;
     position: relative;
-    margin-top: 64px;
+    margin-top: var(--header-height);
 }
 
 .section {
@@ -323,14 +323,14 @@ body {
     left: 0;
     right: 0;
     height: var(--header-height);
-    background: var(--header-bg);
+    background: var(--bg, var(--surface, #0a0a0a));
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid var(--header-border);
+    border-bottom: 1px solid var(--border, var(--border-color, #2a2a2a));
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--space-lg);
+    padding: 0 var(--space-md);
     z-index: var(--z-sticky);
     box-shadow: var(--shadow-sm);
     transition: all var(--transition-smooth);
@@ -370,29 +370,31 @@ body {
 .app-tab {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
+    gap: 4px;
+    padding: 6px 10px;
     border-radius: var(--radius-md);
-    color: var(--text-secondary);
+    color: var(--text-secondary, #888888);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     transition: all var(--transition-fast);
     border: 1px solid transparent;
 }
 
 .app-tab:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
+    background: var(--surface-hover, var(--bg-hover, rgba(255, 255, 255, 0.1)));
+    color: var(--text, var(--text-primary, #ffffff));
 }
 
 .app-tab.active {
-    background: var(--accent-light);
-    color: var(--accent-color);
-    border-color: var(--accent-color);
+    background: var(--primary-light, rgba(212, 245, 5, 0.15));
+    color: var(--primary, var(--accent-color, #d4f505));
+    border-color: var(--primary, var(--accent-color, #d4f505));
 }
 
 .app-tab svg {
+    width: 14px;
+    height: 14px;
     opacity: 0.7;
 }
 
@@ -406,10 +408,11 @@ body {
 .header-search {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: 8px 14px;
-    background: var(--glass-bg);
-    border: 1px solid var(--border-color);
+    gap: var(--space-xs);
+    padding: 4px 12px;
+    height: 28px;
+    background: var(--surface, var(--glass-bg, rgba(255, 255, 255, 0.05)));
+    border: 1px solid var(--border, var(--border-color, #2a2a2a));
     border-radius: var(--radius-full);
     width: 100%;
     transition: all var(--transition-fast);
@@ -430,7 +433,7 @@ body {
     border: none;
     background: transparent;
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 12px;
     outline: none;
 }
 
@@ -439,11 +442,11 @@ body {
 }
 
 .search-shortcut {
-    padding: 2px 6px;
+    padding: 2px 5px;
     background: var(--bg-hover);
     border: 1px solid var(--border-color);
-    border-radius: 4px;
-    font-size: 11px;
+    border-radius: 3px;
+    font-size: 10px;
     color: var(--text-secondary);
     font-family: inherit;
 }
@@ -475,13 +478,13 @@ body {
 .logo-wrapper {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
+    gap: var(--space-xs);
     cursor: pointer;
-    padding: var(--space-sm);
-    border-radius: var(--radius-md);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background: transparent;
+    border: none;
 }
 
 .logo-wrapper:hover {
@@ -491,11 +494,10 @@ body {
 }
 
 .logo-icon {
-    width: 36px;
-    height: 36px;
-    background: url("https://pragmatismo.com.br/icons/general-bots.svg")
-        center/contain no-repeat;
-    border-radius: var(--radius-sm);
+    width: 32px;
+    height: 20px;
+    color: var(--text, var(--text-primary, #ffffff));
+    flex-shrink: 0;
 }
 
 .logo-text {
@@ -509,16 +511,16 @@ body {
 /* ICON BUTTONS (Apps, Theme, User)            */
 /* ============================================ */
 .icon-button {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border: 1px solid var(--border-color);
-    background: var(--glass-bg);
-    color: var(--text-primary);
+    border: 1px solid var(--border, var(--border-color, #2a2a2a));
+    background: var(--surface, var(--glass-bg, rgba(255, 255, 255, 0.05)));
+    color: var(--text, var(--text-primary, #ffffff));
     transition: all var(--transition-fast);
     backdrop-filter: blur(10px);
 }
@@ -534,9 +536,15 @@ body {
     transform: translateY(0);
 }
 
+.icon-button.active {
+    background: var(--accent-dim, rgba(212, 245, 5, 0.15));
+    border-color: var(--accent, var(--accent-color, #d4f505));
+    color: var(--accent, var(--accent-color, #d4f505));
+}
+
 .icon-button svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
 }
 
 /* ============================================ */
@@ -579,12 +587,12 @@ body {
 .apps-dropdown {
     position: absolute;
     top: calc(100% + 8px);
-    right: 60px;
+    right: 0;
     width: 280px;
-    background: var(--glass-bg);
+    background: var(--surface, var(--bg, #0a0a0a));
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--border, var(--border-color, #2a2a2a));
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-xl);
     padding: var(--space-md);
@@ -625,21 +633,21 @@ body {
     padding: var(--space-md);
     border-radius: var(--radius-lg);
     text-decoration: none;
-    color: var(--text-primary);
+    color: var(--text, var(--text-primary, #ffffff));
     transition: all var(--transition-fast);
     cursor: pointer;
     border: 1px solid transparent;
 }
 
 .app-item:hover {
-    background: var(--bg-hover);
-    border-color: var(--border-color);
+    background: var(--surface-hover, var(--bg-hover, rgba(255, 255, 255, 0.1)));
+    border-color: var(--border, var(--border-color, #2a2a2a));
     transform: translateY(-2px);
 }
 
 .app-item.active {
-    background: var(--accent-light);
-    border-color: var(--accent-color);
+    background: var(--primary-light, rgba(212, 245, 5, 0.15));
+    border-color: var(--primary, var(--accent-color, #d4f505));
 }
 
 .app-icon {
@@ -650,15 +658,53 @@ body {
 .app-item span {
     font-size: 13px;
     font-weight: 500;
-    color: var(--text-primary);
+    color: var(--text, var(--text-primary, #ffffff));
+}
+
+/* ============================================ */
+/* SETTINGS LINK                                */
+/* ============================================ */
+.settings-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-top: 1px solid var(--border, var(--border-color, #2a2a2a));
+    color: var(--text, var(--text-primary, #ffffff));
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+}
+
+.settings-link:hover {
+    background: var(--surface-hover, var(--bg-hover, rgba(255, 255, 255, 0.1)));
+}
+
+.settings-link svg {
+    opacity: 0.7;
+}
+
+.settings-link:hover svg {
+    opacity: 1;
+}
+
+/* ============================================ */
+/* SETTINGS PANEL THEME FIX                     */
+/* ============================================ */
+.settings-panel {
+    background: var(--surface, var(--bg, #0a0a0a)) !important;
+    border-color: var(--border, var(--border-color, #2a2a2a)) !important;
 }
 
 /* ============================================ */
 /* USER AVATAR                                  */
 /* ============================================ */
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--radius-full);
     background: var(--accent-gradient);
     display: flex;
@@ -666,7 +712,7 @@ body {
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 12px;
     cursor: pointer;
     transition: all var(--transition-fast);
     box-shadow: var(--shadow-sm);
@@ -1032,14 +1078,105 @@ body {
     border-bottom: 1px solid var(--border, #2a2a2a);
     cursor: pointer;
     transition: background 0.2s;
+    position: relative;
 }
 
 .notification-item:hover {
     background: var(--surface-hover, #1e1e1e);
 }
 
+.notification-item:last-child {
+    border-bottom: none;
+}
+
 .notification-item.unread {
     background: rgba(197, 248, 42, 0.05);
+}
+
+.notification-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text, #fff);
+    margin-bottom: 2px;
+}
+
+.notification-message {
+    font-size: 12px;
+    color: var(--text-secondary, #888);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.notification-time {
+    font-size: 11px;
+    color: var(--text-muted, #666);
+}
+
+.notification-action {
+    background: var(--primary, #c5f82a);
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.notification-action:hover {
+    background: var(--primary-hover, #b5e520);
+}
+
+.notification-dismiss {
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #666);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.notification-dismiss:hover {
+    color: var(--text, #fff);
+}
+
+.notification-item.notification-success {
+    border-left: 3px solid var(--success, #22c55e);
+}
+
+.notification-item.notification-error {
+    border-left: 3px solid var(--error, #ef4444);
+}
+
+.notification-item.notification-warning {
+    border-left: 3px solid var(--warning, #f59e0b);
+}
+
+.notification-item.notification-info {
+    border-left: 3px solid var(--primary, #c5f82a);
 }
 
 .notification-item.success .notification-item-icon {

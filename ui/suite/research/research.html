@@ -50,7 +50,7 @@
             <div class="section-header">
                 <h3>Collections</h3>
                 <button class="btn-icon-sm" title="New Collection"
-                        hx-post="/api/research/collections/new"
+                        hx-post="/api/ui/research/collections/new"
                         hx-target="#collections-list"
                         hx-swap="afterbegin">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -60,7 +60,7 @@
                 </button>
             </div>
             <div class="collections-list" id="collections-list"
-                 hx-get="/api/research/collections"
+                 hx-get="/api/ui/research/collections"
                  hx-trigger="load"
                  hx-swap="innerHTML">
                 <!-- Collections loaded here -->
@@ -71,7 +71,7 @@
         <div class="sidebar-section">
             <h3>Recent</h3>
             <div class="recent-list" id="recent-searches"
-                 hx-get="/api/research/recent"
+                 hx-get="/api/ui/research/recent"
                  hx-trigger="load"
                  hx-swap="innerHTML">
                 <!-- Recent searches loaded here -->
@@ -83,7 +83,7 @@
             <div class="section-header">
                 <h3>Prompts</h3>
                 <button class="btn-icon-sm" title="Browse All"
-                        hx-get="/api/research/prompts"
+                        hx-get="/api/ui/research/prompts"
                         hx-target="#main-results">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
@@ -133,7 +133,7 @@
         <!-- Search Header -->
         <div class="search-header">
             <form class="search-form" id="research-form"
-                  hx-post="/api/research/search"
+                  hx-post="/api/ui/research/search"
                   hx-target="#main-results"
                   hx-indicator="#search-indicator">
                 <div class="search-input-wrapper">
@@ -217,7 +217,7 @@
             <div class="trending-section">
                 <h3>Trending</h3>
                 <div class="trending-tags" id="trending-tags"
-                     hx-get="/api/research/trending"
+                     hx-get="/api/ui/research/trending"
                      hx-trigger="load"
                      hx-swap="innerHTML">
                     <!-- Trending tags loaded here -->
@@ -237,7 +237,7 @@
             <h3>Sources</h3>
             <div class="sources-actions">
                 <button class="btn-icon-sm" title="Export Citations"
-                        hx-get="/api/research/export-citations"
+                        hx-get="/api/ui/research/export-citations"
                         hx-swap="none">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
@@ -1386,7 +1386,7 @@
             const content = document.getElementById('answer-content');
             if (content) {
                 // Send to Paper via HTMX
-                htmx.ajax('POST', '/api/paper/import', {
+                htmx.ajax('POST', '/api/ui/paper/import', {
                     values: {
                         content: content.innerHTML,
                         title: searchInput.value
@@ -1422,7 +1422,7 @@
     function updateSourceCounts() {
         // This would typically come from the API response
         // For now, we'll use placeholder logic
-        htmx.ajax('GET', '/api/research/source-counts', {
+        htmx.ajax('GET', '/api/ui/research/source-counts', {
             swap: 'none'
         }).then(response => {
             // Update counts in sidebar
