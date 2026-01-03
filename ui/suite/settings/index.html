@@ -246,7 +246,7 @@
                     <button class="btn-primary"
                             hx-post="/api/user/security/2fa/enable"
                             hx-target="#2fa-modal-content"
-                            hx-on::after-request="document.getElementById('2fa-modal').showModal()"
+                            hx-on::after-request="openModal('2fa-modal')"
                             onclick="event.stopPropagation()">
                         Enable 2FA
                     </button>
@@ -662,7 +662,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>API Keys</h2>
-                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('create-api-key-modal').showModal()">
+                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); openModal('create-api-key-modal')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -684,7 +684,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>Webhooks</h2>
-                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('add-webhook-modal').showModal()">
+                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); openModal('add-webhook-modal')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -833,7 +833,7 @@
                 </div>
                 <div class="danger-content">
                     <p>Once you delete your account, there is no going back. Please be certain.</p>
-                    <button class="btn-danger" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('delete-account-modal').showModal()">
+                    <button class="btn-danger" onclick="event.stopPropagation(); openModal('delete-account-modal')">
                         Delete My Account
                     </button>
                 </div>
@@ -874,7 +874,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>Payment Method</h2>
-                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('add-payment-modal').showModal()">
+                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); openModal('add-payment-modal')">
                         Add Method
                     </button>
                 </div>
@@ -941,11 +941,11 @@
 </div>
 
 <!-- 2FA Modal -->
-<dialog id="2fa-modal" class="modal">
+<div id="2fa-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Enable Two-Factor Authentication</h2>
-            <button type="button" class="close-btn" onclick="document.getElementById('2fa-modal').close()">
+            <button type="button" class="close-btn" onclick="closeModal('2fa-modal')">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -956,14 +956,14 @@
             <!-- Content loaded via HTMX -->
         </div>
     </div>
-</dialog>
+</div>
 
 <!-- Create API Key Modal -->
-<dialog id="create-api-key-modal" class="modal">
+<div id="create-api-key-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Create API Key</h2>
-            <button type="button" class="close-btn" onclick="document.getElementById('create-api-key-modal').close()">
+            <button type="button" class="close-btn" onclick="closeModal('create-api-key-modal')">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -996,19 +996,19 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('create-api-key-modal').close()">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('create-api-key-modal')">Cancel</button>
                 <button type="submit" class="btn-primary">Create Key</button>
             </div>
         </form>
     </div>
-</dialog>
+</div>
 
 <!-- Add Webhook Modal -->
-<dialog id="add-webhook-modal" class="modal">
+<div id="add-webhook-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Add Webhook</h2>
-            <button type="button" class="close-btn" onclick="document.getElementById('add-webhook-modal').close()">
+            <button type="button" class="close-btn" onclick="closeModal('add-webhook-modal')">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1041,19 +1041,19 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('add-webhook-modal').close()">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('add-webhook-modal')">Cancel</button>
                 <button type="submit" class="btn-primary">Add Webhook</button>
             </div>
         </form>
     </div>
-</dialog>
+</div>
 
 <!-- Delete Account Modal -->
-<dialog id="delete-account-modal" class="modal">
+<div id="delete-account-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Delete Account</h2>
-            <button type="button" class="close-btn" onclick="document.getElementById('delete-account-modal').close()">
+            <button type="button" class="close-btn" onclick="closeModal('delete-account-modal')">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1081,20 +1081,20 @@
                     <input type="password" name="password" required>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('delete-account-modal').close()">Cancel</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('delete-account-modal')">Cancel</button>
                     <button type="submit" class="btn-danger">Delete My Account</button>
                 </div>
             </form>
         </div>
     </div>
-</dialog>
+</div>
 
 <!-- Add Payment Method Modal -->
-<dialog id="add-payment-modal" class="modal">
+<div id="add-payment-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Add Payment Method</h2>
-            <button type="button" class="close-btn" onclick="document.getElementById('add-payment-modal').close()">
+            <button type="button" class="close-btn" onclick="closeModal('add-payment-modal')">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1104,7 +1104,7 @@
         <form hx-post="/api/user/billing/payment-methods"
               hx-target="#payment-methods"
               hx-swap="innerHTML"
-              hx-on::after-request="document.getElementById('add-payment-modal').close()">
+              hx-on::after-request="closeModal('add-payment-modal')">
             <div class="form-group">
                 <label>Card Number</label>
                 <input type="text" name="card_number" required placeholder="1234 5678 9012 3456" maxlength="19">
@@ -1126,12 +1126,12 @@
                 </label>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('add-payment-modal').close()">Cancel</button>
+                <button type="button" class="btn-secondary" onclick="closeModal('add-payment-modal')">Cancel</button>
                 <button type="submit" class="btn-primary">Add Card</button>
             </div>
         </form>
     </div>
-</dialog>
+</div>
 
 <style>
     .settings-layout {
@@ -1709,9 +1709,7 @@
         bottom: 0;
         width: 100%;
         height: 100%;
-        max-width: 100%;
-        max-height: 100%;
-        background: transparent;
+        background: rgba(0, 0, 0, 0.7);
         border: none;
         padding: 0;
         margin: 0;
@@ -1721,12 +1719,8 @@
         justify-content: center;
     }
 
-    .modal[open] {
+    .modal.open {
         display: flex;
-    }
-
-    .modal::backdrop {
-        background: rgba(0, 0, 0, 0.7);
     }
 
     .modal-content {
@@ -1936,49 +1930,42 @@
 </button>
 
 <script>
+    // Open a modal by ID
+    function openModal(id) {
+        closeAllModals();
+        var modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('open');
+        }
+    }
+
+    // Close a modal by ID
+    function closeModal(id) {
+        var modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.remove('open');
+        }
+    }
+
     // Close all open modals
     function closeAllModals() {
-        document.querySelectorAll('dialog.modal').forEach(modal => {
-            if (modal.open) {
-                modal.close();
-            }
+        document.querySelectorAll('.modal').forEach(function(modal) {
+            modal.classList.remove('open');
         });
     }
 
-    // Force close all modals immediately on script load
-    (function() {
-        document.querySelectorAll('dialog.modal').forEach(modal => {
-            modal.removeAttribute('open');
-            if (modal.open) {
-                modal.close();
-            }
-        });
-    })();
-
     // Initialize modal behavior
     document.addEventListener('DOMContentLoaded', function() {
-        // Force close all modals on page load
+        // Close all modals on page load
         closeAllModals();
 
         // Close modal when clicking on backdrop (outside modal-content)
-        document.querySelectorAll('dialog.modal').forEach(modal => {
-            // Ensure modal is closed initially
-            modal.removeAttribute('open');
-
+        document.querySelectorAll('.modal').forEach(function(modal) {
             modal.addEventListener('click', function(e) {
-                // Only close if clicking directly on the dialog backdrop, not on modal-content
                 if (e.target === modal) {
-                    modal.close();
+                    modal.classList.remove('open');
                 }
             });
-
-            // Prevent clicks inside modal-content from closing
-            const modalContent = modal.querySelector('.modal-content');
-            if (modalContent) {
-                modalContent.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                });
-            }
         });
 
         // Close modals with Escape key
@@ -1987,24 +1974,6 @@
                 closeAllModals();
             }
         });
-    });
-
-    // Also close modals after HTMX requests complete (in case server returns something weird)
-    document.addEventListener('htmx:afterRequest', function(e) {
-        // Don't auto-close if the request was specifically meant to open a modal
-        if (!e.detail.elt.hasAttribute('data-opens-modal')) {
-            // Small delay to let intentional modal opens happen first
-            setTimeout(function() {
-                // Check if more than one modal is open and close extras
-                const openModals = document.querySelectorAll('dialog.modal[open]');
-                if (openModals.length > 1) {
-                    // Keep only the last one open
-                    for (let i = 0; i < openModals.length - 1; i++) {
-                        openModals[i].close();
-                    }
-                }
-            }, 100);
-        }
     });
 
     function showSection(sectionId, element) {
