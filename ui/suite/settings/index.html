@@ -246,7 +246,8 @@
                     <button class="btn-primary"
                             hx-post="/api/user/security/2fa/enable"
                             hx-target="#2fa-modal-content"
-                            hx-on::after-request="document.getElementById('2fa-modal').showModal()">
+                            hx-on::after-request="document.getElementById('2fa-modal').showModal()"
+                            onclick="event.stopPropagation()">
                         Enable 2FA
                     </button>
                 </div>
@@ -661,7 +662,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>API Keys</h2>
-                    <button class="btn-primary btn-sm" onclick="document.getElementById('create-api-key-modal').showModal()">
+                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('create-api-key-modal').showModal()">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -683,7 +684,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>Webhooks</h2>
-                    <button class="btn-primary btn-sm" onclick="document.getElementById('add-webhook-modal').showModal()">
+                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('add-webhook-modal').showModal()">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -832,7 +833,7 @@
                 </div>
                 <div class="danger-content">
                     <p>Once you delete your account, there is no going back. Please be certain.</p>
-                    <button class="btn-danger" onclick="document.getElementById('delete-account-modal').showModal()">
+                    <button class="btn-danger" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('delete-account-modal').showModal()">
                         Delete My Account
                     </button>
                 </div>
@@ -873,7 +874,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>Payment Method</h2>
-                    <button class="btn-primary btn-sm" onclick="document.getElementById('add-payment-modal').showModal()">
+                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); closeAllModals(); document.getElementById('add-payment-modal').showModal()">
                         Add Method
                     </button>
                 </div>
@@ -1935,6 +1936,43 @@
 </button>
 
 <script>
+    // Close all open modals
+    function closeAllModals() {
+        document.querySelectorAll('dialog.modal').forEach(modal => {
+            if (modal.open) {
+                modal.close();
+            }
+        });
+    }
+
+    // Initialize modal behavior
+    document.addEventListener('DOMContentLoaded', function() {
+        // Close modal when clicking on backdrop (outside modal-content)
+        document.querySelectorAll('dialog.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                // Only close if clicking directly on the dialog backdrop, not on modal-content
+                if (e.target === modal) {
+                    modal.close();
+                }
+            });
+
+            // Prevent clicks inside modal-content from closing
+            const modalContent = modal.querySelector('.modal-content');
+            if (modalContent) {
+                modalContent.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAllModals();
+            }
+        });
+    });
+
     function showSection(sectionId, element) {
         // Hide all sections
         document.querySelectorAll('.settings-section').forEach(section => {
