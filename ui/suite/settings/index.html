@@ -941,7 +941,7 @@
 </div>
 
 <!-- 2FA Modal -->
-<div id="2fa-modal" class="modal">
+<div id="2fa-modal" class="settings-modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Enable Two-Factor Authentication</h2>
@@ -959,7 +959,7 @@
 </div>
 
 <!-- Create API Key Modal -->
-<div id="create-api-key-modal" class="modal">
+<div id="create-api-key-modal" class="settings-modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Create API Key</h2>
@@ -1004,7 +1004,7 @@
 </div>
 
 <!-- Add Webhook Modal -->
-<div id="add-webhook-modal" class="modal">
+<div id="add-webhook-modal" class="settings-modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Add Webhook</h2>
@@ -1049,7 +1049,7 @@
 </div>
 
 <!-- Delete Account Modal -->
-<div id="delete-account-modal" class="modal">
+<div id="delete-account-modal" class="settings-modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Delete Account</h2>
@@ -1090,7 +1090,7 @@
 </div>
 
 <!-- Add Payment Method Modal -->
-<div id="add-payment-modal" class="modal">
+<div id="add-payment-modal" class="settings-modal">
     <div class="modal-content">
         <div class="modal-header">
             <h2>Add Payment Method</h2>
@@ -1700,8 +1700,8 @@
         color: var(--text);
     }
 
-    /* Modal Styles */
-    .modal {
+    /* Settings Modal Styles */
+    .settings-modal {
         position: fixed;
         top: 0;
         left: 0;
@@ -1714,13 +1714,13 @@
         padding: 0;
         margin: 0;
         z-index: 10000;
-        display: none;
+        display: none !important;
         align-items: center;
         justify-content: center;
     }
 
-    .modal.open {
-        display: flex;
+    .settings-modal.open {
+        display: flex !important;
     }
 
     .modal-content {
@@ -1949,7 +1949,7 @@
 
     // Close all open modals
     function closeAllModals() {
-        document.querySelectorAll('.modal').forEach(function(modal) {
+        document.querySelectorAll('.settings-modal').forEach(function(modal) {
             modal.classList.remove('open');
         });
     }
@@ -1960,7 +1960,7 @@
         closeAllModals();
 
         // Close modal when clicking on backdrop (outside modal-content)
-        document.querySelectorAll('.modal').forEach(function(modal) {
+        document.querySelectorAll('.settings-modal').forEach(function(modal) {
             modal.addEventListener('click', function(e) {
                 if (e.target === modal) {
                     modal.classList.remove('open');
