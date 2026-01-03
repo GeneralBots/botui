@@ -245,9 +245,7 @@
                     </div>
                     <button class="btn-primary"
                             hx-post="/api/user/security/2fa/enable"
-                            hx-target="#2fa-modal-content"
-                            hx-on::after-request="openModal('2fa-modal')"
-                            onclick="event.stopPropagation()">
+                            hx-swap="none">
                         Enable 2FA
                     </button>
                 </div>
@@ -662,7 +660,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>API Keys</h2>
-                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); openModal('create-api-key-modal')">
+                    <button class="btn-primary btn-sm" disabled title="Coming soon">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -684,7 +682,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>Webhooks</h2>
-                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); openModal('add-webhook-modal')">
+                    <button class="btn-primary btn-sm" disabled title="Coming soon">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -833,7 +831,7 @@
                 </div>
                 <div class="danger-content">
                     <p>Once you delete your account, there is no going back. Please be certain.</p>
-                    <button class="btn-danger" onclick="event.stopPropagation(); openModal('delete-account-modal')">
+                    <button class="btn-danger" disabled title="Contact support to delete account">
                         Delete My Account
                     </button>
                 </div>
@@ -874,7 +872,7 @@
             <div class="setting-card">
                 <div class="card-header">
                     <h2>Payment Method</h2>
-                    <button class="btn-primary btn-sm" onclick="event.stopPropagation(); openModal('add-payment-modal')">
+                    <button class="btn-primary btn-sm" disabled title="Coming soon">
                         Add Method
                     </button>
                 </div>
@@ -940,198 +938,7 @@
     </main>
 </div>
 
-<!-- 2FA Modal -->
-<div id="2fa-modal" class="settings-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Enable Two-Factor Authentication</h2>
-            <button type="button" class="close-btn" onclick="closeModal('2fa-modal')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        <div id="2fa-modal-content" class="modal-body">
-            <!-- Content loaded via HTMX -->
-        </div>
-    </div>
-</div>
 
-<!-- Create API Key Modal -->
-<div id="create-api-key-modal" class="settings-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Create API Key</h2>
-            <button type="button" class="close-btn" onclick="closeModal('create-api-key-modal')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        <form hx-post="/api/user/api-keys"
-              hx-target="#api-keys-list"
-              hx-swap="innerHTML"
-              hx-on::after-request="document.getElementById('create-api-key-modal').close()">
-            <div class="form-group">
-                <label>Key Name</label>
-                <input type="text" name="name" required placeholder="My API Key">
-            </div>
-            <div class="form-group">
-                <label>Permissions</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="permissions[]" value="read" checked>
-                        <span>Read</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="permissions[]" value="write">
-                        <span>Write</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="permissions[]" value="delete">
-                        <span>Delete</span>
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModal('create-api-key-modal')">Cancel</button>
-                <button type="submit" class="btn-primary">Create Key</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Add Webhook Modal -->
-<div id="add-webhook-modal" class="settings-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Add Webhook</h2>
-            <button type="button" class="close-btn" onclick="closeModal('add-webhook-modal')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        <form hx-post="/api/user/webhooks"
-              hx-target="#webhooks-list"
-              hx-swap="innerHTML"
-              hx-on::after-request="document.getElementById('add-webhook-modal').close()">
-            <div class="form-group">
-                <label>Webhook URL</label>
-                <input type="url" name="url" required placeholder="https://example.com/webhook">
-            </div>
-            <div class="form-group">
-                <label>Events</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="events[]" value="message.created" checked>
-                        <span>Message Created</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="events[]" value="file.uploaded">
-                        <span>File Uploaded</span>
-                    </label>
-                    <label class="checkbox-item">
-                        <input type="checkbox" name="events[]" value="task.completed">
-                        <span>Task Completed</span>
-                    </label>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModal('add-webhook-modal')">Cancel</button>
-                <button type="submit" class="btn-primary">Add Webhook</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Delete Account Modal -->
-<div id="delete-account-modal" class="settings-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Delete Account</h2>
-            <button type="button" class="close-btn" onclick="closeModal('delete-account-modal')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="danger-alert">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <p>This action cannot be undone. All your data will be permanently deleted.</p>
-            </div>
-            <form hx-delete="/api/user/account"
-                  hx-swap="none"
-                  hx-confirm="Are you absolutely sure?">
-                <div class="form-group">
-                    <label>Type "DELETE" to confirm</label>
-                    <input type="text" name="confirmation" required pattern="DELETE" placeholder="DELETE">
-                </div>
-                <div class="form-group">
-                    <label>Enter your password</label>
-                    <input type="password" name="password" required>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal('delete-account-modal')">Cancel</button>
-                    <button type="submit" class="btn-danger">Delete My Account</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Add Payment Method Modal -->
-<div id="add-payment-modal" class="settings-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Add Payment Method</h2>
-            <button type="button" class="close-btn" onclick="closeModal('add-payment-modal')">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-        <form hx-post="/api/user/billing/payment-methods"
-              hx-target="#payment-methods"
-              hx-swap="innerHTML"
-              hx-on::after-request="closeModal('add-payment-modal')">
-            <div class="form-group">
-                <label>Card Number</label>
-                <input type="text" name="card_number" required placeholder="1234 5678 9012 3456" maxlength="19">
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Expiry Date</label>
-                    <input type="text" name="expiry" required placeholder="MM/YY" maxlength="5">
-                </div>
-                <div class="form-group">
-                    <label>CVC</label>
-                    <input type="text" name="cvc" required placeholder="123" maxlength="4">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="checkbox-item">
-                    <input type="checkbox" name="default" checked>
-                    <span>Set as default payment method</span>
-                </label>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeModal('add-payment-modal')">Cancel</button>
-                <button type="submit" class="btn-primary">Add Card</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <style>
     .settings-layout {
@@ -1700,28 +1507,7 @@
         color: var(--text);
     }
 
-    /* Settings Modal Styles */
-    .settings-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        border: none;
-        padding: 0;
-        margin: 0;
-        z-index: 10000;
-        display: none !important;
-        align-items: center;
-        justify-content: center;
-    }
 
-    .settings-modal.open {
-        display: flex !important;
-    }
 
     .modal-content {
         background: var(--surface, #1a1a24);
@@ -1930,52 +1716,6 @@
 </button>
 
 <script>
-    // Open a modal by ID
-    function openModal(id) {
-        closeAllModals();
-        var modal = document.getElementById(id);
-        if (modal) {
-            modal.classList.add('open');
-        }
-    }
-
-    // Close a modal by ID
-    function closeModal(id) {
-        var modal = document.getElementById(id);
-        if (modal) {
-            modal.classList.remove('open');
-        }
-    }
-
-    // Close all open modals
-    function closeAllModals() {
-        document.querySelectorAll('.settings-modal').forEach(function(modal) {
-            modal.classList.remove('open');
-        });
-    }
-
-    // Initialize modal behavior
-    document.addEventListener('DOMContentLoaded', function() {
-        // Close all modals on page load
-        closeAllModals();
-
-        // Close modal when clicking on backdrop (outside modal-content)
-        document.querySelectorAll('.settings-modal').forEach(function(modal) {
-            modal.addEventListener('click', function(e) {
-                if (e.target === modal) {
-                    modal.classList.remove('open');
-                }
-            });
-        });
-
-        // Close modals with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeAllModals();
-            }
-        });
-    });
-
     function showSection(sectionId, element) {
         // Hide all sections
         document.querySelectorAll('.settings-section').forEach(section => {
