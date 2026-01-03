@@ -1945,10 +1945,26 @@
         });
     }
 
+    // Force close all modals immediately on script load
+    (function() {
+        document.querySelectorAll('dialog.modal').forEach(modal => {
+            modal.removeAttribute('open');
+            if (modal.open) {
+                modal.close();
+            }
+        });
+    })();
+
     // Initialize modal behavior
     document.addEventListener('DOMContentLoaded', function() {
+        // Force close all modals on page load
+        closeAllModals();
+
         // Close modal when clicking on backdrop (outside modal-content)
         document.querySelectorAll('dialog.modal').forEach(modal => {
+            // Ensure modal is closed initially
+            modal.removeAttribute('open');
+
             modal.addEventListener('click', function(e) {
                 // Only close if clicking directly on the dialog backdrop, not on modal-content
                 if (e.target === modal) {
@@ -1971,6 +1987,24 @@
                 closeAllModals();
             }
         });
+    });
+
+    // Also close modals after HTMX requests complete (in case server returns something weird)
+    document.addEventListener('htmx:afterRequest', function(e) {
+        // Don't auto-close if the request was specifically meant to open a modal
+        if (!e.detail.elt.hasAttribute('data-opens-modal')) {
+            // Small delay to let intentional modal opens happen first
+            setTimeout(function() {
+                // Check if more than one modal is open and close extras
+                const openModals = document.querySelectorAll('dialog.modal[open]');
+                if (openModals.length > 1) {
+                    // Keep only the last one open
+                    for (let i = 0; i < openModals.length - 1; i++) {
+                        openModals[i].close();
+                    }
+                }
+            }, 100);
+        }
     });
 
     function showSection(sectionId, element) {
