@@ -43,6 +43,21 @@
       // If target doesn't exist or response is 404, prevent the swap
       if (!target || status === 404) {
         event.detail.shouldSwap = false;
+        console.warn("HTMX swap prevented: target not found or 404 response");
+        return;
+      }
+
+      // Check if target is actually in the DOM (prevents insertBefore errors)
+      if (!document.body.contains(target)) {
+        event.detail.shouldSwap = false;
+        console.warn("HTMX swap prevented: target not in DOM");
+        return;
+      }
+
+      // Check if target has a parent (required for most swap operations)
+      if (!target.parentNode) {
+        event.detail.shouldSwap = false;
+        console.warn("HTMX swap prevented: target has no parent");
         return;
       }
 
@@ -53,6 +68,17 @@
       ) {
         event.detail.serverResponse = "<!-- empty -->";
       }
+    });
+
+    // Handle swap errors gracefully
+    document.body.addEventListener("htmx:swapError", (event) => {
+      console.error("HTMX swap error:", event.detail);
+      // Don't show notification for swap errors - they're usually timing issues
+    });
+
+    // Handle HTMX errors more gracefully
+    document.body.addEventListener("htmx:onLoadError", (event) => {
+      console.error("HTMX load error:", event.detail);
     });
 
     // Handle successful swaps
