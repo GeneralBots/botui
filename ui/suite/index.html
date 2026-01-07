@@ -2918,9 +2918,11 @@
                 });
             });
 
-            // User Profile Loading - Integrates with GBAuth service
+            // User Profile Loading
             (function () {
                 function updateUserUI(user) {
+                    if (!user) return;
+
                     const userName = document.getElementById("userName");
                     const userEmail = document.getElementById("userEmail");
                     const userAvatar = document.getElementById("userAvatar");
@@ -2930,86 +2932,102 @@
                     const authText = document.getElementById("authText");
                     const authIcon = document.getElementById("authIcon");
 
-                    if (user && user.email) {
-                        const displayName =
-                            user.display_name ||
-                            user.first_name ||
-                            user.username ||
-                            "User";
-                        const email = user.email || "";
-                        const initial = (
-                            displayName.charAt(0) || "U"
-                        ).toUpperCase();
+                    const displayName =
+                        user.display_name ||
+                        user.first_name ||
+                        user.username ||
+                        "User";
+                    const email = user.email || "";
+                    const initial = (
+                        displayName.charAt(0) || "U"
+                    ).toUpperCase();
 
-                        if (userName) userName.textContent = displayName;
-                        if (userEmail) userEmail.textContent = email;
-                        if (userAvatar) {
-                            const avatarSpan = userAvatar.querySelector("span");
-                            if (avatarSpan) avatarSpan.textContent = initial;
-                        }
-                        if (userAvatarLarge)
-                            userAvatarLarge.textContent = initial;
+                    console.log("Updating user UI:", displayName, email);
 
-                        if (authAction) {
-                            authAction.href = "#";
-                            authAction.onclick = function (e) {
-                                e.preventDefault();
-                                if (window.GBAuth) {
-                                    window.GBAuth.logout();
-                                }
-                            };
-                            authAction.style.color = "var(--error)";
-                        }
-                        if (authText) authText.textContent = "Sign out";
-                        if (authIcon) {
-                            authIcon.innerHTML =
-                                '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>';
-                        }
+                    if (userName) userName.textContent = displayName;
+                    if (userEmail) userEmail.textContent = email;
+                    if (userAvatar) {
+                        const avatarSpan = userAvatar.querySelector("span");
+                        if (avatarSpan) avatarSpan.textContent = initial;
+                    }
+                    if (userAvatarLarge) userAvatarLarge.textContent = initial;
+
+                    if (authAction) {
+                        authAction.href = "#";
+                        authAction.onclick = function (e) {
+                            e.preventDefault();
+                            fetch("/api/auth/logout", {
+                                method: "POST",
+                            }).finally(function () {
+                                localStorage.removeItem("gb-access-token");
+                                localStorage.removeItem("gb-refresh-token");
+                                localStorage.removeItem("gb-user-data");
+                                sessionStorage.removeItem("gb-access-token");
+                                window.location.href = "/auth/login.html";
+                            });
+                        };
+                        authAction.style.color = "var(--error)";
+                    }
+                    if (authText) authText.textContent = "Sign out";
+                    if (authIcon) {
+                        authIcon.innerHTML =
+                            '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>';
                     }
                 }
 
-                // Listen for auth service events
-                if (window.GBAuth) {
-                    window.GBAuth.on("userUpdated", updateUserUI);
-                    window.GBAuth.on("login", function () {
-                        const user = window.GBAuth.getCurrentUser();
-                        if (user) updateUserUI(user);
-                    });
-                    window.GBAuth.on("logout", function () {
-                        window.location.href = "/auth/login.html";
-                    });
+                function loadUserProfile() {
+                    var token =
+                        localStorage.getItem("gb-access-token") ||
+                        sessionStorage.getItem("gb-access-token");
+                    if (!token) {
+                        console.log("No auth token found");
+                        return;
+                    }
 
-                    // Load current user on page load
-                    if (window.GBAuth.isAuthenticated()) {
-                        const user = window.GBAuth.getCurrentUser();
+                    console.log(
+                        "Loading user profile with token:",
+                        token.substring(0, 10) + "...",
+                    );
+
+                    fetch("/api/auth/me", {
+                        headers: { Authorization: "Bearer " + token },
+                    })
+                        .then(function (res) {
+                            if (!res.ok) throw new Error("Not authenticated");
+                            return res.json();
+                        })
+                        .then(function (user) {
+                            console.log("User profile loaded:", user);
+                            updateUserUI(user);
+                            localStorage.setItem(
+                                "gb-user-data",
+                                JSON.stringify(user),
+                            );
+                        })
+                        .catch(function (err) {
+                            console.log("Failed to load user profile:", err);
+                        });
+                }
+
+                // Try to load cached user first
+                var cachedUser = localStorage.getItem("gb-user-data");
+                if (cachedUser) {
+                    try {
+                        var user = JSON.parse(cachedUser);
                         if (user && user.email) {
                             updateUserUI(user);
-                        } else {
-                            // Fetch from API if not cached
-                            window.AuthService.fetchCurrentUser().then(
-                                updateUserUI,
-                            );
                         }
-                    }
+                    } catch (e) {}
+                }
+
+                // Always fetch fresh user data
+                if (document.readyState === "loading") {
+                    document.addEventListener(
+                        "DOMContentLoaded",
+                        loadUserProfile,
+                    );
                 } else {
-                    // Fallback: wait for GBAuth to be available
-                    document.addEventListener("DOMContentLoaded", function () {
-                        setTimeout(function () {
-                            if (
-                                window.GBAuth &&
-                                window.GBAuth.isAuthenticated()
-                            ) {
-                                const user = window.GBAuth.getCurrentUser();
-                                if (user) {
-                                    updateUserUI(user);
-                                } else {
-                                    window.AuthService.fetchCurrentUser().then(
-                                        updateUserUI,
-                                    );
-                                }
-                            }
-                        }, 100);
-                    });
+                    loadUserProfile();
                 }
             })();
         </script>
