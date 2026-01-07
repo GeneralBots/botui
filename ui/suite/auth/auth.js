@@ -334,13 +334,32 @@ function initHtmxHandlers() {
           return;
         }
 
-        // Save token on successful login
+        // Save token using GBAuth service if available
         if (response.access_token) {
           const rememberMe = document.getElementById("remember");
-          if (rememberMe && rememberMe.checked) {
-            localStorage.setItem("access_token", response.access_token);
+          const remember = rememberMe && rememberMe.checked;
+
+          if (window.AuthService && window.AuthService.storeTokens) {
+            window.AuthService.storeTokens(
+              response.access_token,
+              response.refresh_token,
+              response.expires_in,
+              remember,
+            );
+            if (response.user_id) {
+              window.AuthService.currentUser = { id: response.user_id };
+            }
           } else {
-            sessionStorage.setItem("access_token", response.access_token);
+            // Fallback to direct storage with correct keys
+            const storage = remember ? localStorage : sessionStorage;
+            storage.setItem("gb-access-token", response.access_token);
+            if (response.refresh_token) {
+              storage.setItem("gb-refresh-token", response.refresh_token);
+            }
+            if (response.expires_in) {
+              const expiresAt = Date.now() + response.expires_in * 1000;
+              storage.setItem("gb-token-expires", expiresAt.toString());
+            }
           }
         }
 
