@@ -10,6 +10,9 @@
         <script src="/js/vendor/htmx-ws.js"></script>
         <script src="/js/vendor/htmx-json-enc.js"></script>
 
+        <!-- i18n -->
+        <script src="/js/i18n.js"></script>
+
         <!-- Styles -->
         <link rel="stylesheet" href="/css/base.css" />
         <link rel="stylesheet" href="/css/app.css" />
@@ -285,28 +288,7 @@
                                 </div>
                                 <span>Analytics</span>
                             </a>
-                            <a
-                                href="#admin"
-                                class="app-item"
-                                role="menuitem"
-                                hx-get="/admin/index.html"
-                                hx-target="#main-content"
-                                hx-push-url="true"
-                            >
-                                <div
-                                    class="app-item-icon"
-                                    style="
-                                        background: linear-gradient(
-                                            135deg,
-                                            #f43f5e,
-                                            #e11d48
-                                        );
-                                    "
-                                >
-                                    ⚙️
-                                </div>
-                                <span>Admin</span>
-                            </a>
+
                             <a
                                 href="#monitoring"
                                 class="app-item"
@@ -559,35 +541,7 @@
                                 </div>
                                 <span class="settings-shortcut-arrow">→</span>
                             </a>
-                            <a
-                                href="#admin"
-                                class="settings-shortcut"
-                                hx-get="/admin/index.html"
-                                hx-target="#main-content"
-                                hx-push-url="true"
-                            >
-                                <div class="settings-shortcut-icon">
-                                    <svg
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <path d="M12 4.5v15m7.5-7.5h-15" />
-                                    </svg>
-                                </div>
-                                <div class="settings-shortcut-text">
-                                    <div class="settings-shortcut-title">
-                                        Admin Console
-                                    </div>
-                                    <div class="settings-shortcut-desc">
-                                        Bot management & configuration
-                                    </div>
-                                </div>
-                                <span class="settings-shortcut-arrow">→</span>
-                            </a>
+
                             <a
                                 href="#monitoring"
                                 class="settings-shortcut"

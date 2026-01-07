@@ -3,75 +3,196 @@
     <div class="panel mail-sidebar">
         <div class="compose-section">
             <button class="compose-btn" onclick="openCompose()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M12 5v14M5 12h14" />
                 </svg>
-                Compose
+                <span data-i18n="email-compose">Compose</span>
             </button>
         </div>
 
         <!-- Folder List -->
         <div class="folders-section">
-            <div class="nav-item active" data-folder="inbox" hx-get="/api/ui/email/list?folder=inbox" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
-                    <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            <div
+                class="nav-item active"
+                data-folder="inbox"
+                hx-get="/api/ui/email/list?folder=inbox"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+                    <path
+                        d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+                    />
                 </svg>
-                <span>Inbox</span>
+                <span data-i18n="email-inbox">Inbox</span>
                 <span class="folder-badge unread" id="inbox-count">0</span>
             </div>
-            <div class="nav-item" data-folder="starred" hx-get="/api/ui/email/list?folder=starred" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            <div
+                class="nav-item"
+                data-folder="starred"
+                hx-get="/api/ui/email/list?folder=starred"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    />
                 </svg>
-                <span>Starred</span>
+                <span data-i18n="email-starred">Starred</span>
             </div>
-            <div class="nav-item" data-folder="sent" hx-get="/api/ui/email/list?folder=sent" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="22" y1="2" x2="11" y2="13"/>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            <div
+                class="nav-item"
+                data-folder="sent"
+                hx-get="/api/ui/email/list?folder=sent"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
                 </svg>
-                <span>Sent</span>
+                <span data-i18n="email-sent">Sent</span>
             </div>
-            <div class="nav-item" data-folder="scheduled" hx-get="/api/ui/email/list?folder=scheduled" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12 6 12 12 16 14"/>
+            <div
+                class="nav-item"
+                data-folder="scheduled"
+                hx-get="/api/ui/email/list?folder=scheduled"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
                 </svg>
-                <span>Scheduled</span>
+                <span data-i18n="email-scheduled">Scheduled</span>
                 <span class="folder-badge" id="scheduled-count">0</span>
             </div>
-            <div class="nav-item" data-folder="drafts" hx-get="/api/ui/email/list?folder=drafts" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
+            <div
+                class="nav-item"
+                data-folder="drafts"
+                hx-get="/api/ui/email/list?folder=drafts"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    />
+                    <polyline points="14 2 14 8 20 8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
                 </svg>
-                <span>Drafts</span>
+                <span data-i18n="email-drafts">Drafts</span>
                 <span class="folder-badge" id="drafts-count">0</span>
             </div>
-            <div class="nav-item" data-folder="tracking" hx-get="/api/email/tracking/list" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
+            <div
+                class="nav-item"
+                data-folder="tracking"
+                hx-get="/api/email/tracking/list"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
                 </svg>
-                <span>Tracking</span>
+                <span data-i18n="email-tracking">Tracking</span>
             </div>
-            <div class="nav-item" data-folder="spam" hx-get="/api/ui/email/list?folder=spam" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                    <line x1="12" y1="9" x2="12" y2="13"/>
-                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+            <div
+                class="nav-item"
+                data-folder="spam"
+                hx-get="/api/ui/email/list?folder=spam"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                    />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
                 </svg>
-                <span>Spam</span>
+                <span data-i18n="email-spam">Spam</span>
             </div>
-            <div class="nav-item" data-folder="trash" hx-get="/api/ui/email/list?folder=trash" hx-target="#mail-list" hx-swap="innerHTML">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            <div
+                class="nav-item"
+                data-folder="trash"
+                hx-get="/api/ui/email/list?folder=trash"
+                hx-target="#mail-list"
+                hx-swap="innerHTML"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    />
                 </svg>
-                <span>Trash</span>
+                <span data-i18n="email-trash">Trash</span>
             </div>
         </div>
 
@@ -79,17 +200,30 @@
         <div class="labels-section">
             <div class="section-header">
                 <span>Accounts</span>
-                <button class="icon-btn" onclick="document.getElementById('add-account-modal').showModal()" title="Add account">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"/>
-                        <line x1="5" y1="12" x2="19" y2="12"/>
+                <button
+                    class="icon-btn"
+                    onclick="document.getElementById('add-account-modal').showModal()"
+                    title="Add account"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
                 </button>
             </div>
-            <div id="accounts-list"
-                 hx-get="/api/ui/email/accounts"
-                 hx-trigger="load"
-                 hx-swap="innerHTML">
+            <div
+                id="accounts-list"
+                hx-get="/api/ui/email/accounts"
+                hx-trigger="load"
+                hx-swap="innerHTML"
+            >
                 <!-- Accounts loaded here -->
             </div>
         </div>
@@ -98,23 +232,39 @@
         <div class="labels-section">
             <div class="section-header">
                 <span>Labels</span>
-                <button class="icon-btn" onclick="openLabelManager()" title="Manage labels">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"/>
-                        <line x1="5" y1="12" x2="19" y2="12"/>
+                <button
+                    class="icon-btn"
+                    onclick="openLabelManager()"
+                    title="Manage labels"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
                 </button>
             </div>
-            <div id="labels-list" hx-get="/api/ui/email/labels" hx-trigger="load" hx-swap="innerHTML">
-                <div class="label-item" style="--label-color: #ef4444;">
+            <div
+                id="labels-list"
+                hx-get="/api/ui/email/labels"
+                hx-trigger="load"
+                hx-swap="innerHTML"
+            >
+                <div class="label-item" style="--label-color: #ef4444">
                     <span class="label-dot"></span>
                     <span>Important</span>
                 </div>
-                <div class="label-item" style="--label-color: #f59e0b;">
+                <div class="label-item" style="--label-color: #f59e0b">
                     <span class="label-dot"></span>
                     <span>Work</span>
                 </div>
-                <div class="label-item" style="--label-color: #22c55e;">
+                <div class="label-item" style="--label-color: #22c55e">
                     <span class="label-dot"></span>
                     <span>Personal</span>
                 </div>
@@ -123,32 +273,80 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-            <button class="quick-action-btn" onclick="openTemplates()" title="Email Templates">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="3" y1="9" x2="21" y2="9"/>
-                    <line x1="9" y1="21" x2="9" y2="9"/>
+            <button
+                class="quick-action-btn"
+                onclick="openTemplates()"
+                title="Email Templates"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <line x1="3" y1="9" x2="21" y2="9" />
+                    <line x1="9" y1="21" x2="9" y2="9" />
                 </svg>
                 <span>Templates</span>
             </button>
-            <button class="quick-action-btn" onclick="openSignatures()" title="Signatures">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+            <button
+                class="quick-action-btn"
+                onclick="openSignatures()"
+                title="Signatures"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+                    />
                 </svg>
                 <span>Signatures</span>
             </button>
-            <button class="quick-action-btn" onclick="openRules()" title="Email Rules">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+            <button
+                class="quick-action-btn"
+                onclick="openRules()"
+                title="Email Rules"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polygon
+                        points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+                    />
                 </svg>
                 <span>Rules</span>
             </button>
-            <button class="quick-action-btn" onclick="openAutoResponder()" title="Out of Office">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-                    <line x1="9" y1="9" x2="9.01" y2="9"/>
-                    <line x1="15" y1="9" x2="15.01" y2="9"/>
+            <button
+                class="quick-action-btn"
+                onclick="openAutoResponder()"
+                title="Out of Office"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                    <line x1="9" y1="9" x2="9.01" y2="9" />
+                    <line x1="15" y1="9" x2="15.01" y2="9" />
                 </svg>
                 <span>Auto-reply</span>
             </button>
@@ -159,60 +357,145 @@
     <div class="panel mail-list">
         <div class="list-header">
             <div class="list-header-left">
-                <input type="checkbox" class="select-all" onchange="toggleSelectAll(this)" title="Select all"/>
+                <input
+                    type="checkbox"
+                    class="select-all"
+                    onchange="toggleSelectAll(this)"
+                    title="Select all"
+                />
                 <h3 id="folder-title">Inbox</h3>
             </div>
             <div class="list-header-right">
                 <div class="search-box">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
                     </svg>
-                    <input type="text" placeholder="Search emails..." id="email-search"
-                           hx-get="/api/ui/email/search" hx-trigger="keyup changed delay:300ms"
-                           hx-target="#mail-list" hx-include="this" name="q"/>
+                    <input
+                        type="text"
+                        placeholder="Search emails..."
+                        id="email-search"
+                        hx-get="/api/ui/email/search"
+                        hx-trigger="keyup changed delay:300ms"
+                        hx-target="#mail-list"
+                        hx-include="this"
+                        name="q"
+                    />
                 </div>
-                <button class="icon-btn" onclick="refreshMailList()" title="Refresh">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="23 4 23 10 17 10"/>
-                        <polyline points="1 20 1 14 7 14"/>
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                <button
+                    class="icon-btn"
+                    onclick="refreshMailList()"
+                    title="Refresh"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polyline points="23 4 23 10 17 10" />
+                        <polyline points="1 20 1 14 7 14" />
+                        <path
+                            d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                        />
                     </svg>
                 </button>
             </div>
         </div>
 
         <!-- Bulk Actions Bar (hidden by default) -->
-        <div class="bulk-actions" id="bulk-actions" style="display: none;">
+        <div class="bulk-actions" id="bulk-actions" style="display: none">
             <span class="selected-count">0 selected</span>
-            <button class="bulk-btn" onclick="archiveSelected()" title="Archive">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="21 8 21 21 3 21 3 8"/>
-                    <rect x="1" y="3" width="22" height="5"/>
-                    <line x1="10" y1="12" x2="14" y2="12"/>
+            <button
+                class="bulk-btn"
+                onclick="archiveSelected()"
+                title="Archive"
+            >
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polyline points="21 8 21 21 3 21 3 8" />
+                    <rect x="1" y="3" width="22" height="5" />
+                    <line x1="10" y1="12" x2="14" y2="12" />
                 </svg>
             </button>
-            <button class="bulk-btn" onclick="markAsRead()" title="Mark as read">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
+            <button
+                class="bulk-btn"
+                onclick="markAsRead()"
+                title="Mark as read"
+            >
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
             </button>
-            <button class="bulk-btn" onclick="addLabelToSelected()" title="Add label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                    <line x1="7" y1="7" x2="7.01" y2="7"/>
+            <button
+                class="bulk-btn"
+                onclick="addLabelToSelected()"
+                title="Add label"
+            >
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                    />
+                    <line x1="7" y1="7" x2="7.01" y2="7" />
                 </svg>
             </button>
-            <button class="bulk-btn danger" onclick="deleteSelected()" title="Delete">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            <button
+                class="bulk-btn danger"
+                onclick="deleteSelected()"
+                title="Delete"
+            >
+                <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    />
                 </svg>
             </button>
         </div>
 
-        <div id="mail-list" hx-get="/api/ui/email/list?folder=inbox" hx-trigger="load" hx-swap="innerHTML">
+        <div
+            id="mail-list"
+            hx-get="/api/ui/email/list?folder=inbox"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
             <div class="loading-state">
                 <div class="spinner"></div>
                 <p>Loading emails...</p>
@@ -224,9 +507,18 @@
     <div class="panel mail-content">
         <div id="mail-content">
             <div class="empty-state">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <polyline points="22,6 12,13 2,6"/>
+                <svg
+                    width="64"
+                    height="64"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                >
+                    <path
+                        d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                    />
+                    <polyline points="22,6 12,13 2,6" />
                 </svg>
                 <h3>Select an email to read</h3>
                 <p>Choose an email from the list to view its contents</p>
@@ -241,100 +533,291 @@
         <div class="modal-header">
             <h2>New Message</h2>
             <div class="compose-actions-top">
-                <button class="icon-btn" onclick="minimizeCompose()" title="Minimize">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="5" y1="12" x2="19" y2="12"/>
+                <button
+                    class="icon-btn"
+                    onclick="minimizeCompose()"
+                    title="Minimize"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
                 </button>
                 <button class="icon-btn" onclick="closeCompose()" title="Close">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                 </button>
             </div>
         </div>
-        <form id="compose-form" hx-post="/api/email/send" hx-target="#mail-content" hx-swap="innerHTML">
+        <form
+            id="compose-form"
+            hx-post="/api/email/send"
+            hx-target="#mail-content"
+            hx-swap="innerHTML"
+        >
             <div class="compose-fields">
                 <div class="field-row">
                     <label>To:</label>
-                    <input type="text" name="to" id="compose-to" placeholder="Recipients" required autocomplete="email"/>
-                    <button type="button" class="field-toggle" onclick="toggleCcBcc()">Cc/Bcc</button>
+                    <input
+                        type="text"
+                        name="to"
+                        id="compose-to"
+                        placeholder="Recipients"
+                        required
+                        autocomplete="email"
+                    />
+                    <button
+                        type="button"
+                        class="field-toggle"
+                        onclick="toggleCcBcc()"
+                    >
+                        Cc/Bcc
+                    </button>
                 </div>
-                <div class="field-row cc-bcc" style="display: none;">
+                <div class="field-row cc-bcc" style="display: none">
                     <label>Cc:</label>
-                    <input type="text" name="cc" id="compose-cc" placeholder="Carbon copy"/>
+                    <input
+                        type="text"
+                        name="cc"
+                        id="compose-cc"
+                        placeholder="Carbon copy"
+                    />
                 </div>
-                <div class="field-row cc-bcc" style="display: none;">
+                <div class="field-row cc-bcc" style="display: none">
                     <label>Bcc:</label>
-                    <input type="text" name="bcc" id="compose-bcc" placeholder="Blind carbon copy"/>
+                    <input
+                        type="text"
+                        name="bcc"
+                        id="compose-bcc"
+                        placeholder="Blind carbon copy"
+                    />
                 </div>
                 <div class="field-row">
                     <label>Subject:</label>
-                    <input type="text" name="subject" id="compose-subject" placeholder="Subject"/>
+                    <input
+                        type="text"
+                        name="subject"
+                        id="compose-subject"
+                        placeholder="Subject"
+                    />
                 </div>
             </div>
             <div class="compose-toolbar">
-                <button type="button" class="toolbar-btn" title="Bold" onclick="formatText('bold')"><b>B</b></button>
-                <button type="button" class="toolbar-btn" title="Italic" onclick="formatText('italic')"><i>I</i></button>
-                <button type="button" class="toolbar-btn" title="Underline" onclick="formatText('underline')"><u>U</u></button>
-                <span class="toolbar-divider"></span>
-                <button type="button" class="toolbar-btn" title="Bullet list" onclick="formatText('insertUnorderedList')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
-                        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-                    </svg>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Bold"
+                    onclick="formatText('bold')"
+                >
+                    <b>B</b>
                 </button>
-                <button type="button" class="toolbar-btn" title="Numbered list" onclick="formatText('insertOrderedList')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/>
-                        <path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>
-                    </svg>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Italic"
+                    onclick="formatText('italic')"
+                >
+                    <i>I</i>
                 </button>
-                <span class="toolbar-divider"></span>
-                <button type="button" class="toolbar-btn" title="Attach file" onclick="attachFile()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                    </svg>
-                </button>
-                <button type="button" class="toolbar-btn" title="Insert link" onclick="insertLink()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                    </svg>
-                </button>
-                <button type="button" class="toolbar-btn" title="Insert image" onclick="insertImage()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <circle cx="8.5" cy="8.5" r="1.5"/>
-                        <polyline points="21 15 16 10 5 21"/>
-                    </svg>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Underline"
+                    onclick="formatText('underline')"
+                >
+                    <u>U</u>
                 </button>
                 <span class="toolbar-divider"></span>
-                <button type="button" class="toolbar-btn" title="Insert template" onclick="showTemplateSelector()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                        <line x1="3" y1="9" x2="21" y2="9"/>
-                        <line x1="9" y1="21" x2="9" y2="9"/>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Bullet list"
+                    onclick="formatText('insertUnorderedList')"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="8" y1="6" x2="21" y2="6" />
+                        <line x1="8" y1="12" x2="21" y2="12" />
+                        <line x1="8" y1="18" x2="21" y2="18" />
+                        <line x1="3" y1="6" x2="3.01" y2="6" />
+                        <line x1="3" y1="12" x2="3.01" y2="12" />
+                        <line x1="3" y1="18" x2="3.01" y2="18" />
                     </svg>
                 </button>
-                <button type="button" class="toolbar-btn" title="Insert signature" onclick="insertSignature()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Numbered list"
+                    onclick="formatText('insertOrderedList')"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="10" y1="6" x2="21" y2="6" />
+                        <line x1="10" y1="12" x2="21" y2="12" />
+                        <line x1="10" y1="18" x2="21" y2="18" />
+                        <path d="M4 6h1v4" />
+                        <path d="M4 10h2" />
+                        <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1" />
+                    </svg>
+                </button>
+                <span class="toolbar-divider"></span>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Attach file"
+                    onclick="attachFile()"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+                        />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Insert link"
+                    onclick="insertLink()"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                        />
+                        <path
+                            d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                        />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Insert image"
+                    onclick="insertImage()"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                </button>
+                <span class="toolbar-divider"></span>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Insert template"
+                    onclick="showTemplateSelector()"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        />
+                        <line x1="3" y1="9" x2="21" y2="9" />
+                        <line x1="9" y1="21" x2="9" y2="9" />
+                    </svg>
+                </button>
+                <button
+                    type="button"
+                    class="toolbar-btn"
+                    title="Insert signature"
+                    onclick="insertSignature()"
+                >
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+                        />
                     </svg>
                 </button>
             </div>
-            <div class="compose-body" contenteditable="true" id="compose-body" placeholder="Write your message..."></div>
-            <input type="hidden" name="body" id="compose-body-hidden"/>
+            <div
+                class="compose-body"
+                contenteditable="true"
+                id="compose-body"
+                placeholder="Write your message..."
+            ></div>
+            <input type="hidden" name="body" id="compose-body-hidden" />
             <div class="compose-attachments" id="compose-attachments"></div>
             <div class="compose-footer">
                 <div class="compose-options">
                     <label class="option-checkbox">
-                        <input type="checkbox" name="track_opens" checked/>
+                        <input type="checkbox" name="track_opens" checked />
                         <span>Track opens</span>
                     </label>
                     <label class="option-checkbox">
-                        <input type="checkbox" name="request_receipt"/>
+                        <input type="checkbox" name="request_receipt" />
                         <span>Request read receipt</span>
                     </label>
                     <select name="priority" class="priority-select">
@@ -344,60 +827,156 @@
                     </select>
                 </div>
                 <div class="compose-actions">
-                    <button type="button" class="btn-secondary"
-                            hx-post="/api/email/draft"
-                            hx-include="#compose-form"
-                            hx-swap="none"
-                            onclick="prepareSubmit()">Save Draft</button>
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        hx-post="/api/email/draft"
+                        hx-include="#compose-form"
+                        hx-swap="none"
+                        onclick="prepareSubmit()"
+                    >
+                        Save Draft
+                    </button>
                     <div class="send-group">
-                        <button type="submit" class="btn-primary" onclick="prepareSubmit()">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="22" y1="2" x2="11" y2="13"/>
-                                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        <button
+                            type="submit"
+                            class="btn-primary"
+                            onclick="prepareSubmit()"
+                        >
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <line x1="22" y1="2" x2="11" y2="13" />
+                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
                             </svg>
                             Send
                         </button>
-                        <button type="button" class="btn-primary dropdown-toggle" onclick="toggleScheduleMenu()">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6 9 12 15 18 9"/>
+                        <button
+                            type="button"
+                            class="btn-primary dropdown-toggle"
+                            onclick="toggleScheduleMenu()"
+                        >
+                            <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <polyline points="6 9 12 15 18 9" />
                             </svg>
                         </button>
                         <div class="schedule-menu" id="schedule-menu">
-                            <div class="schedule-option" onclick="scheduleSend('tomorrow-morning')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="5"/>
-                                    <line x1="12" y1="1" x2="12" y2="3"/>
-                                    <line x1="12" y1="21" x2="12" y2="23"/>
-                                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                                    <line x1="1" y1="12" x2="3" y2="12"/>
-                                    <line x1="21" y1="12" x2="23" y2="12"/>
-                                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                            <div
+                                class="schedule-option"
+                                onclick="scheduleSend('tomorrow-morning')"
+                            >
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="5" />
+                                    <line x1="12" y1="1" x2="12" y2="3" />
+                                    <line x1="12" y1="21" x2="12" y2="23" />
+                                    <line
+                                        x1="4.22"
+                                        y1="4.22"
+                                        x2="5.64"
+                                        y2="5.64"
+                                    />
+                                    <line
+                                        x1="18.36"
+                                        y1="18.36"
+                                        x2="19.78"
+                                        y2="19.78"
+                                    />
+                                    <line x1="1" y1="12" x2="3" y2="12" />
+                                    <line x1="21" y1="12" x2="23" y2="12" />
+                                    <line
+                                        x1="4.22"
+                                        y1="19.78"
+                                        x2="5.64"
+                                        y2="18.36"
+                                    />
+                                    <line
+                                        x1="18.36"
+                                        y1="5.64"
+                                        x2="19.78"
+                                        y2="4.22"
+                                    />
                                 </svg>
                                 <span>Tomorrow morning (8:00 AM)</span>
                             </div>
-                            <div class="schedule-option" onclick="scheduleSend('tomorrow-afternoon')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <polyline points="12 6 12 12 16 14"/>
+                            <div
+                                class="schedule-option"
+                                onclick="scheduleSend('tomorrow-afternoon')"
+                            >
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="10" />
+                                    <polyline points="12 6 12 12 16 14" />
                                 </svg>
                                 <span>Tomorrow afternoon (1:00 PM)</span>
                             </div>
-                            <div class="schedule-option" onclick="scheduleSend('monday')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                    <line x1="16" y1="2" x2="16" y2="6"/>
-                                    <line x1="8" y1="2" x2="8" y2="6"/>
-                                    <line x1="3" y1="10" x2="21" y2="10"/>
+                            <div
+                                class="schedule-option"
+                                onclick="scheduleSend('monday')"
+                            >
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <rect
+                                        x="3"
+                                        y="4"
+                                        width="18"
+                                        height="18"
+                                        rx="2"
+                                        ry="2"
+                                    />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
                                 </svg>
                                 <span>Monday morning (8:00 AM)</span>
                             </div>
                             <div class="schedule-divider"></div>
-                            <div class="schedule-option" onclick="openCustomSchedule()">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                            <div
+                                class="schedule-option"
+                                onclick="openCustomSchedule()"
+                            >
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                                    />
                                 </svg>
                                 <span>Pick date & time...</span>
                             </div>
@@ -415,18 +994,35 @@
         <div class="modal-header">
             <h2>Email Templates</h2>
             <button class="icon-btn" onclick="closeTemplates()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
         </div>
-        <div class="templates-list" id="templates-list" hx-get="/api/ui/email/templates" hx-trigger="load" hx-swap="innerHTML">
+        <div
+            class="templates-list"
+            id="templates-list"
+            hx-get="/api/ui/email/templates"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
             <div class="loading-state"><div class="spinner"></div></div>
         </div>
         <div class="modal-footer">
-            <button class="btn-secondary" onclick="closeTemplates()">Cancel</button>
-            <button class="btn-primary" onclick="createNewTemplate()">+ New Template</button>
+            <button class="btn-secondary" onclick="closeTemplates()">
+                Cancel
+            </button>
+            <button class="btn-primary" onclick="createNewTemplate()">
+                + New Template
+            </button>
         </div>
     </div>
 </dialog>
@@ -437,18 +1033,35 @@
         <div class="modal-header">
             <h2>Email Signatures</h2>
             <button class="icon-btn" onclick="closeSignatures()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
         </div>
-        <div class="signatures-list" id="signatures-list" hx-get="/api/ui/email/signatures" hx-trigger="load" hx-swap="innerHTML">
+        <div
+            class="signatures-list"
+            id="signatures-list"
+            hx-get="/api/ui/email/signatures"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
             <div class="loading-state"><div class="spinner"></div></div>
         </div>
         <div class="modal-footer">
-            <button class="btn-secondary" onclick="closeSignatures()">Cancel</button>
-            <button class="btn-primary" onclick="createNewSignature()">+ New Signature</button>
+            <button class="btn-secondary" onclick="closeSignatures()">
+                Cancel
+            </button>
+            <button class="btn-primary" onclick="createNewSignature()">
+                + New Signature
+            </button>
         </div>
     </div>
 </dialog>
@@ -459,18 +1072,33 @@
         <div class="modal-header">
             <h2>Email Rules</h2>
             <button class="icon-btn" onclick="closeRules()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
         </div>
-        <div class="rules-list" id="rules-list" hx-get="/api/ui/email/rules" hx-trigger="load" hx-swap="innerHTML">
+        <div
+            class="rules-list"
+            id="rules-list"
+            hx-get="/api/ui/email/rules"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
             <div class="loading-state"><div class="spinner"></div></div>
         </div>
         <div class="modal-footer">
             <button class="btn-secondary" onclick="closeRules()">Cancel</button>
-            <button class="btn-primary" onclick="createNewRule()">+ New Rule</button>
+            <button class="btn-primary" onclick="createNewRule()">
+                + New Rule
+            </button>
         </div>
     </div>
 </dialog>
@@ -481,46 +1109,82 @@
         <div class="modal-header">
             <h2>Automatic Replies</h2>
             <button class="icon-btn" onclick="closeAutoResponder()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
         </div>
-        <form id="autoresponder-form" hx-post="/api/ui/email/auto-responder" hx-swap="none">
+        <form
+            id="autoresponder-form"
+            hx-post="/api/ui/email/auto-responder"
+            hx-swap="none"
+        >
             <div class="form-group">
                 <label class="toggle-label">
-                    <input type="checkbox" name="enabled" id="autoresponder-enabled"/>
+                    <input
+                        type="checkbox"
+                        name="enabled"
+                        id="autoresponder-enabled"
+                    />
                     <span class="toggle-switch"></span>
                     <span>Send automatic replies</span>
                 </label>
             </div>
             <div class="form-group">
                 <label>Start date</label>
-                <input type="datetime-local" name="start_date" id="autoresponder-start"/>
+                <input
+                    type="datetime-local"
+                    name="start_date"
+                    id="autoresponder-start"
+                />
             </div>
             <div class="form-group">
                 <label>End date</label>
-                <input type="datetime-local" name="end_date" id="autoresponder-end"/>
+                <input
+                    type="datetime-local"
+                    name="end_date"
+                    id="autoresponder-end"
+                />
             </div>
             <div class="form-group">
                 <label>Subject</label>
-                <input type="text" name="subject" value="Out of Office" placeholder="Reply subject"/>
+                <input
+                    type="text"
+                    name="subject"
+                    value="Out of Office"
+                    placeholder="Reply subject"
+                />
             </div>
             <div class="form-group">
                 <label>Message</label>
-                <textarea name="body" rows="6" placeholder="Your automatic reply message..."></textarea>
+                <textarea
+                    name="body"
+                    rows="6"
+                    placeholder="Your automatic reply message..."
+                ></textarea>
             </div>
             <div class="form-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" name="internal_only"/>
+                    <input type="checkbox" name="internal_only" />
                     <span>Send only to people in my organization</span>
                 </label>
             </div>
         </form>
         <div class="modal-footer">
-            <button class="btn-secondary" onclick="closeAutoResponder()">Cancel</button>
-            <button class="btn-primary" onclick="saveAutoResponder()">Save</button>
+            <button class="btn-secondary" onclick="closeAutoResponder()">
+                Cancel
+            </button>
+            <button class="btn-primary" onclick="saveAutoResponder()">
+                Save
+            </button>
         </div>
     </div>
 </dialog>
@@ -531,57 +1195,106 @@
     <div class="modal-content">
         <div class="modal-header">
             <h2>Add Email Account</h2>
-            <button class="icon-btn" onclick="document.getElementById('add-account-modal').close()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+            <button
+                class="icon-btn"
+                onclick="document.getElementById('add-account-modal').close()"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
         </div>
-        <form hx-post="/api/email/accounts/add"
-              hx-target="#accounts-list"
-              hx-swap="innerHTML"
-              hx-on::after-request="if(event.detail.successful) document.getElementById('add-account-modal').close()">
+        <form
+            hx-post="/api/email/accounts/add"
+            hx-target="#accounts-list"
+            hx-swap="innerHTML"
+            hx-on::after-request="if(event.detail.successful) document.getElementById('add-account-modal').close()"
+        >
             <div class="form-group">
                 <label>Account Name</label>
-                <input type="text" name="name" placeholder="Work, Personal, etc." required>
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Work, Personal, etc."
+                    required
+                />
             </div>
             <div class="form-group">
                 <label>Email Address</label>
-                <input type="email" name="email" placeholder="you@example.com" required>
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label>IMAP Server</label>
-                <input type="text" name="imap_server" placeholder="imap.example.com" required>
+                <input
+                    type="text"
+                    name="imap_server"
+                    placeholder="imap.example.com"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label>IMAP Port</label>
-                <input type="number" name="imap_port" value="993" required>
+                <input type="number" name="imap_port" value="993" required />
             </div>
             <div class="form-group">
                 <label>SMTP Server</label>
-                <input type="text" name="smtp_server" placeholder="smtp.example.com" required>
+                <input
+                    type="text"
+                    name="smtp_server"
+                    placeholder="smtp.example.com"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label>SMTP Port</label>
-                <input type="number" name="smtp_port" value="587" required>
+                <input type="number" name="smtp_port" value="587" required />
             </div>
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" name="username" placeholder="username or email" required>
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="username or email"
+                    required
+                />
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" name="password" placeholder="••••••••" required>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="••••••••"
+                    required
+                    autocomplete="current-password"
+                />
             </div>
             <div class="form-group">
                 <label class="checkbox-label">
-                    <input type="checkbox" name="use_ssl" checked>
+                    <input type="checkbox" name="use_ssl" checked />
                     <span>Use SSL/TLS</span>
                 </label>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="document.getElementById('add-account-modal').close()">Cancel</button>
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    onclick="document.getElementById('add-account-modal').close()"
+                >
+                    Cancel
+                </button>
                 <button type="submit" class="btn-primary">Add Account</button>
             </div>
         </form>
@@ -593,25 +1306,36 @@
         <div class="modal-header">
             <h2>Schedule Send</h2>
             <button class="icon-btn" onclick="closeScheduleModal()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
             </button>
         </div>
         <div class="schedule-form">
             <div class="form-group">
                 <label>Date</label>
-                <input type="date" id="schedule-date" min=""/>
+                <input type="date" id="schedule-date" min="" />
             </div>
             <div class="form-group">
                 <label>Time</label>
-                <input type="time" id="schedule-time" value="09:00"/>
+                <input type="time" id="schedule-time" value="09:00" />
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-secondary" onclick="closeScheduleModal()">Cancel</button>
-            <button class="btn-primary" onclick="confirmSchedule()">Schedule</button>
+            <button class="btn-secondary" onclick="closeScheduleModal()">
+                Cancel
+            </button>
+            <button class="btn-primary" onclick="confirmSchedule()">
+                Schedule
+            </button>
         </div>
     </div>
 </dialog>
@@ -1010,7 +1734,9 @@
     }
 
     @keyframes spin {
-        to { transform: rotate(360deg); }
+        to {
+            transform: rotate(360deg);
+        }
     }
 
     /* Modals - dialog elements are hidden by default */
@@ -1236,7 +1962,7 @@
     .send-group .dropdown-toggle {
         padding: 0.625rem 0.5rem;
         border-radius: 0 6px 6px 0;
-        border-left: 1px solid rgba(255,255,255,0.2);
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .schedule-menu {
@@ -1248,7 +1974,7 @@
         border-radius: 8px;
         padding: 0.5rem 0;
         min-width: 240px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         display: none;
         z-index: 10;
         margin-bottom: 0.5rem;
@@ -1371,7 +2097,7 @@
     }
 
     .toggle-switch::after {
-        content: '';
+        content: "";
         position: absolute;
         top: 2px;
         left: 2px;
@@ -1436,14 +2162,14 @@
 
 <script>
     let selectedEmails = new Set();
-    let currentFolder = 'inbox';
+    let currentFolder = "inbox";
 
     function openCompose() {
-        document.getElementById('compose-modal').showModal();
+        document.getElementById("compose-modal").showModal();
     }
 
     function closeCompose() {
-        document.getElementById('compose-modal').close();
+        document.getElementById("compose-modal").close();
     }
 
     function minimizeCompose() {
@@ -1451,27 +2177,27 @@
     }
 
     function toggleCcBcc() {
-        document.querySelectorAll('.cc-bcc').forEach(el => {
-            el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+        document.querySelectorAll(".cc-bcc").forEach((el) => {
+            el.style.display = el.style.display === "none" ? "flex" : "none";
         });
     }
 
     function toggleScheduleMenu() {
-        document.getElementById('schedule-menu').classList.toggle('show');
+        document.getElementById("schedule-menu").classList.toggle("show");
     }
 
     function scheduleSend(option) {
         let date = new Date();
-        switch(option) {
-            case 'tomorrow-morning':
+        switch (option) {
+            case "tomorrow-morning":
                 date.setDate(date.getDate() + 1);
                 date.setHours(8, 0, 0, 0);
                 break;
-            case 'tomorrow-afternoon':
+            case "tomorrow-afternoon":
                 date.setDate(date.getDate() + 1);
                 date.setHours(13, 0, 0, 0);
                 break;
-            case 'monday':
+            case "monday":
                 const daysUntilMonday = (8 - date.getDay()) % 7 || 7;
                 date.setDate(date.getDate() + daysUntilMonday);
                 date.setHours(8, 0, 0, 0);
@@ -1483,29 +2209,29 @@
 
     function openCustomSchedule() {
         toggleScheduleMenu();
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('schedule-date').min = today;
-        document.getElementById('schedule-date').value = today;
-        document.getElementById('schedule-modal').showModal();
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("schedule-date").min = today;
+        document.getElementById("schedule-date").value = today;
+        document.getElementById("schedule-modal").showModal();
     }
 
     function closeScheduleModal() {
-        document.getElementById('schedule-modal').close();
+        document.getElementById("schedule-modal").close();
     }
 
     function confirmSchedule() {
-        const date = document.getElementById('schedule-date').value;
-        const time = document.getElementById('schedule-time').value;
+        const date = document.getElementById("schedule-date").value;
+        const time = document.getElementById("schedule-time").value;
         const scheduledDate = new Date(`${date}T${time}`);
         confirmScheduleSend(scheduledDate);
         closeScheduleModal();
     }
 
     function confirmScheduleSend(date) {
-        const form = document.getElementById('compose-form');
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'scheduled_at';
+        const form = document.getElementById("compose-form");
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "scheduled_at";
         input.value = date.toISOString();
         form.appendChild(input);
         prepareSubmit();
@@ -1513,60 +2239,62 @@
     }
 
     function prepareSubmit() {
-        const body = document.getElementById('compose-body').innerHTML;
-        document.getElementById('compose-body-hidden').value = body;
+        const body = document.getElementById("compose-body").innerHTML;
+        document.getElementById("compose-body-hidden").value = body;
     }
 
     function formatText(command) {
         document.execCommand(command, false, null);
-        document.getElementById('compose-body').focus();
+        document.getElementById("compose-body").focus();
     }
 
     function openTemplates() {
-        document.getElementById('templates-modal').showModal();
+        document.getElementById("templates-modal").showModal();
     }
 
     function closeTemplates() {
-        document.getElementById('templates-modal').close();
+        document.getElementById("templates-modal").close();
     }
 
     function openSignatures() {
-        document.getElementById('signatures-modal').showModal();
+        document.getElementById("signatures-modal").showModal();
     }
 
     function closeSignatures() {
-        document.getElementById('signatures-modal').close();
+        document.getElementById("signatures-modal").close();
     }
 
     function openRules() {
-        document.getElementById('rules-modal').showModal();
+        document.getElementById("rules-modal").showModal();
     }
 
     function closeRules() {
-        document.getElementById('rules-modal').close();
+        document.getElementById("rules-modal").close();
     }
 
     function openAutoResponder() {
-        document.getElementById('autoresponder-modal').showModal();
+        document.getElementById("autoresponder-modal").showModal();
     }
 
     function closeAutoResponder() {
-        document.getElementById('autoresponder-modal').close();
+        document.getElementById("autoresponder-modal").close();
     }
 
     function saveAutoResponder() {
-        htmx.trigger('#autoresponder-form', 'submit');
+        htmx.trigger("#autoresponder-form", "submit");
         closeAutoResponder();
-        window.showNotification('Auto-reply settings saved', 'success');
+        window.showNotification("Auto-reply settings saved", "success");
     }
 
     function openLabelManager() {
-        window.showNotification('Label manager coming soon', 'info');
+        window.showNotification("Label manager coming soon", "info");
     }
 
     function toggleSelectAll(checkbox) {
-        const items = document.querySelectorAll('.mail-item input[type="checkbox"]');
-        items.forEach(item => {
+        const items = document.querySelectorAll(
+            '.mail-item input[type="checkbox"]',
+        );
+        items.forEach((item) => {
             item.checked = checkbox.checked;
             if (checkbox.checked) {
                 selectedEmails.add(item.dataset.id);
@@ -1578,26 +2306,27 @@
     }
 
     function updateBulkActions() {
-        const bulkBar = document.getElementById('bulk-actions');
+        const bulkBar = document.getElementById("bulk-actions");
         if (selectedEmails.size > 0) {
-            bulkBar.style.display = 'flex';
-            bulkBar.querySelector('.selected-count').textContent = `${selectedEmails.size} selected`;
+            bulkBar.style.display = "flex";
+            bulkBar.querySelector(".selected-count").textContent =
+                `${selectedEmails.size} selected`;
         } else {
-            bulkBar.style.display = 'none';
+            bulkBar.style.display = "none";
         }
     }
 
     function refreshMailList() {
-        htmx.trigger(`[data-folder="${currentFolder}"]`, 'click');
+        htmx.trigger(`[data-folder="${currentFolder}"]`, "click");
     }
 
     function insertSignature() {
-        fetch('/api/email/signatures/default')
-            .then(r => r.json())
-            .then(sig => {
+        fetch("/api/email/signatures/default")
+            .then((r) => r.json())
+            .then((sig) => {
                 if (sig.content_html) {
-                    const body = document.getElementById('compose-body');
-                    body.innerHTML += '<br><br>' + sig.content_html;
+                    const body = document.getElementById("compose-body");
+                    body.innerHTML += "<br><br>" + sig.content_html;
                 }
             });
     }
@@ -1607,14 +2336,16 @@
     }
 
     function attachFile() {
-        const input = document.createElement('input');
-        input.type = 'file';
+        const input = document.createElement("input");
+        input.type = "file";
         input.multiple = true;
         input.onchange = (e) => {
-            Array.from(e.target.files).forEach(file => {
-                const container = document.getElementById('compose-attachments');
-                const chip = document.createElement('div');
-                chip.className = 'attachment-chip';
+            Array.from(e.target.files).forEach((file) => {
+                const container = document.getElementById(
+                    "compose-attachments",
+                );
+                const chip = document.createElement("div");
+                chip.className = "attachment-chip";
                 chip.innerHTML = `
                     <span>${file.name}</span>
                     <button type="button" onclick="this.parentElement.remove()">×</button>
@@ -1626,64 +2357,111 @@
     }
 
     function insertLink() {
-        const url = prompt('Enter URL:');
+        const url = prompt("Enter URL:");
         if (url) {
-            document.execCommand('createLink', false, url);
+            document.execCommand("createLink", false, url);
         }
     }
 
     function insertImage() {
-        const url = prompt('Enter image URL:');
+        const url = prompt("Enter image URL:");
         if (url) {
-            document.execCommand('insertImage', false, url);
+            document.execCommand("insertImage", false, url);
         }
     }
 
     function saveDraft() {
         prepareSubmit();
-        const form = document.getElementById('compose-form');
+        const form = document.getElementById("compose-form");
         const formData = new FormData(form);
-        fetch('/api/email/draft', {
-            method: 'POST',
-            body: formData
+        fetch("/api/email/draft", {
+            method: "POST",
+            body: formData,
         }).then(() => {
-            window.showNotification('Draft saved', 'success');
+            window.showNotification("Draft saved", "success");
         });
     }
 
     function createNewTemplate() {
-        window.showNotification('Template editor coming soon', 'info');
+        window.showNotification("Template editor coming soon", "info");
     }
 
     function createNewSignature() {
-        window.showNotification('Signature editor coming soon', 'info');
+        window.showNotification("Signature editor coming soon", "info");
     }
 
     function createNewRule() {
-        window.showNotification('Rule editor coming soon', 'info');
+        window.showNotification("Rule editor coming soon", "info");
     }
 
     function archiveSelected() {
-        window.showNotification(`${selectedEmails.size} emails archived`, 'success');
+        window.showNotification(
+            `${selectedEmails.size} emails archived`,
+            "success",
+        );
         selectedEmails.clear();
         updateBulkActions();
         refreshMailList();
     }
 
     function markAsRead() {
-        window.showNotification(`${selectedEmails.size} emails marked as read`, 'success');
+        window.showNotification(
+            `${selectedEmails.size} emails marked as read`,
+            "success",
+        );
         selectedEmails.clear();
         updateBulkActions();
         refreshMailList();
     }
 
     function addLabelToSelected() {
-        window.showNotification('Label picker coming soon', 'info');
+        window.showNotification("Label picker coming soon", "info");
     }
 
     function deleteSelected() {
         if (confirm(`Delete ${selectedEmails.size} emails?`)) {
-            window.showNotification(`${selectedEmails.size} emails deleted`, 'success');
+            window.showNotification(
+                `${selectedEmails.size} emails deleted`,
+                "success",
+            );
             selectedEmails.clear();
             updateBulkActions();
-            refreshMailList
+            refreshMailList();
+        }
+    }
+
+    function openAddAccount() {
+        document.getElementById("account-modal").showModal();
+    }
+
+    function closeAddAccount() {
+        document.getElementById("account-modal").close();
+    }
+
+    function saveAccount() {
+        htmx.trigger("#account-form", "submit");
+        closeAddAccount();
+        window.showNotification("Email account added", "success");
+    }
+
+    // Initialize folder click handlers
+    document.querySelectorAll(".nav-item[data-folder]").forEach((item) => {
+        item.addEventListener("click", function () {
+            document
+                .querySelectorAll(".nav-item")
+                .forEach((i) => i.classList.remove("active"));
+            this.classList.add("active");
+            currentFolder = this.dataset.folder;
+        });
+    });
+
+    // Load inbox on init
+    document.addEventListener("DOMContentLoaded", function () {
+        const inboxItem = document.querySelector(
+            '.nav-item[data-folder="inbox"]',
+        );
+        if (inboxItem) {
+            htmx.trigger(inboxItem, "click");
+        }
+    });
+</script>

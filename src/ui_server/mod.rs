@@ -32,6 +32,9 @@ const SUITE_DIRS: &[&str] = &[
     "calendar",
     "meet",
     "paper",
+    "sheet",
+    "slides",
+    "docs",
     "research",
     "analytics",
     "monitoring",
@@ -530,7 +533,7 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
 fn create_ws_router() -> Router<AppState> {
     Router::new()
         .route("/task-progress", get(ws_task_progress_proxy))
-        .route("/task-progress/{task_id}", get(ws_task_progress_proxy))
+        .route("/task-progress/:task_id", get(ws_task_progress_proxy))
         .fallback(any(ws_proxy))
 }
 

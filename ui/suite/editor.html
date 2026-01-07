@@ -1,45 +1,13 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Editor - General Bots</title>
-        <link rel="stylesheet" href="css/app.css" />
-        <script src="js/vendor/htmx.min.js"></script>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            :root {
-                --bg-primary: #0f172a;
-                --bg-secondary: #1e293b;
-                --bg-tertiary: #334155;
-                --text-primary: #f1f5f9;
-                --text-secondary: #94a3b8;
-                --accent-color: #3b82f6;
-                --accent-hover: #2563eb;
-                --border-color: #475569;
-                --success: #22c55e;
-                --warning: #f59e0b;
-                --error: #ef4444;
-            }
-
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                    Roboto, sans-serif;
-                background: var(--bg-primary);
-                color: var(--text-primary);
-                height: 100vh;
-                overflow: hidden;
-            }
+<!-- Editor - General Bots (Code & Text Editor) -->
+<style>
+            /* Editor uses global theme variables from base.css */
 
             .editor-container {
                 display: flex;
                 flex-direction: column;
-                height: 100vh;
+                height: calc(100vh - 64px);
+                background: var(--bg, #0f172a);
+                color: var(--text, #f8fafc);
             }
 
             .editor-header {
@@ -47,8 +15,8 @@
                 align-items: center;
                 justify-content: space-between;
                 padding: 12px 20px;
-                background: var(--bg-secondary);
-                border-bottom: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-bottom: 1px solid var(--border, #334155);
             }
 
             .editor-title {
@@ -68,7 +36,7 @@
 
             .editor-path {
                 font-size: 12px;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .editor-toolbar {
@@ -76,8 +44,8 @@
                 align-items: center;
                 gap: 8px;
                 padding: 8px 20px;
-                background: var(--bg-secondary);
-                border-bottom: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-bottom: 1px solid var(--border, #334155);
             }
 
             .toolbar-group {
@@ -85,7 +53,7 @@
                 align-items: center;
                 gap: 4px;
                 padding-right: 12px;
-                border-right: 1px solid var(--border-color);
+                border-right: 1px solid var(--border, #334155);
             }
 
             .toolbar-group:last-child {
@@ -103,21 +71,21 @@
                 font-weight: 500;
                 cursor: pointer;
                 transition: all 0.2s;
-                background: var(--bg-tertiary);
-                color: var(--text-primary);
+                background: var(--surface-hover, #334155);
+                color: var(--text, #f8fafc);
             }
 
             .btn:hover {
-                background: var(--border-color);
+                background: var(--border-light, #475569);
             }
 
             .btn-primary {
-                background: var(--accent-color);
+                background: var(--primary, #3b82f6);
                 color: white;
             }
 
             .btn-primary:hover {
-                background: var(--accent-hover);
+                background: var(--primary-hover, #2563eb);
             }
 
             .btn-magic {
@@ -137,8 +105,8 @@
                 bottom: 60px;
                 width: 400px;
                 max-height: 500px;
-                background: var(--bg-secondary);
-                border: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border: 1px solid var(--border, #334155);
                 border-radius: 12px;
                 box-shadow: 0 8px 32px rgba(0,0,0,0.4);
                 z-index: 1000;
@@ -153,7 +121,7 @@
 
             .magic-header {
                 padding: 16px;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border, #334155);
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -171,7 +139,7 @@
             .magic-close {
                 background: none;
                 border: none;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
                 cursor: pointer;
                 font-size: 18px;
             }
@@ -185,11 +153,11 @@
             .magic-loading {
                 text-align: center;
                 padding: 40px;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .magic-result {
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
                 border-radius: 8px;
                 padding: 12px;
                 margin-bottom: 12px;
@@ -231,8 +199,8 @@
 
             .line-numbers {
                 width: 50px;
-                background: var(--bg-secondary);
-                border-right: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-right: 1px solid var(--border, #334155);
                 padding: 16px 8px;
                 overflow: hidden;
                 text-align: right;
@@ -240,13 +208,13 @@
                 font-family: "Consolas", monospace;
                 font-size: 13px;
                 line-height: 1.6;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .text-editor {
                 flex: 1;
-                background: var(--bg-primary);
-                color: var(--text-primary);
+                background: var(--bg, #0f172a);
+                color: var(--text, #f8fafc);
                 border: none;
                 padding: 16px;
                 font-family: "Consolas", monospace;
@@ -273,21 +241,21 @@
 
             .csv-table th,
             .csv-table td {
-                border: 1px solid var(--border-color);
+                border: 1px solid var(--border, #334155);
                 padding: 0;
                 min-width: 120px;
             }
 
             .csv-table th {
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
                 font-weight: 600;
             }
 
             .csv-table .row-num {
                 width: 40px;
                 min-width: 40px;
-                background: var(--bg-secondary);
-                color: var(--text-secondary);
+                background: var(--surface, #1e293b);
+                color: var(--text-secondary, #94a3b8);
                 text-align: center;
                 padding: 8px 4px;
                 font-size: 12px;
@@ -297,14 +265,14 @@
                 width: 100%;
                 background: transparent;
                 border: none;
-                color: var(--text-primary);
+                color: var(--text, #f8fafc);
                 padding: 8px 12px;
                 font-size: 13px;
                 outline: none;
             }
 
             .csv-input:focus {
-                background: var(--bg-secondary);
+                background: var(--surface, #1e293b);
             }
 
             .status-bar {
@@ -312,10 +280,10 @@
                 align-items: center;
                 justify-content: space-between;
                 padding: 6px 16px;
-                background: var(--bg-secondary);
-                border-top: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-top: 1px solid var(--border, #334155);
                 font-size: 12px;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .status-left,
@@ -359,10 +327,10 @@
                 bottom: 60px;
                 right: 20px;
                 padding: 12px 20px;
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
                 border-radius: 8px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                border-left: 4px solid var(--accent-color);
+                border-left: 4px solid var(--primary, #3b82f6);
                 opacity: 0;
                 transform: translateX(100%);
                 transition: all 0.3s ease;
@@ -380,10 +348,9 @@
             .notification.error {
                 border-left-color: var(--error);
             }
-        </style>
-    </head>
-    <body>
-        <div class="editor-container">
+    </style>
+
+    <div class="editor-container">
             <!-- Header -->
             <div class="editor-header">
                 <div class="editor-title">
@@ -637,7 +604,7 @@
             const code = document.getElementById('text-editor').value;
 
             if (!code.trim()) {
-                content.innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:40px;">No code to analyze. Start typing or open a file.</p>';
+                content.innerHTML = '<p style="color:var(--text-secondary, #94a3b8);text-align:center;padding:40px;">No code to analyze. Start typing or open a file.</p>';
                 return;
             }
 
@@ -667,7 +634,7 @@
                 content.innerHTML = `
                     <div class="magic-result">
                         <p><strong>Suggested improvements:</strong></p>
-                        <p style="color:var(--text-secondary);margin:8px 0;">${result.explanation || 'Improved code structure and patterns.'}</p>
+                        <p style="color:var(--text-secondary, #94a3b8);margin:8px 0;">${result.explanation || 'Improved code structure and patterns.'}</p>
                         <pre>${escapeHtml(result.improved_code)}</pre>
                         <button class="magic-apply-btn" onclick="applyMagicCode()">Apply Changes</button>
                     </div>
@@ -677,7 +644,7 @@
                 content.innerHTML = result.suggestions.map(s => `
                     <div class="magic-result">
                         <p><strong>${s.title}</strong></p>
-                        <p style="color:var(--text-secondary);">${s.description}</p>
+                        <p style="color:var(--text-secondary, #94a3b8);">${s.description}</p>
                     </div>
                 `).join('');
             } else {
@@ -705,5 +672,3 @@
             }
         });
         </script>
-    </body>
-</html>

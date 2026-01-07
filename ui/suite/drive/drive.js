@@ -871,6 +871,28 @@
     }
   }
 
+  function isBasicFile(path) {
+    const ext = "." + (path.split(".").pop() || "").toLowerCase();
+    return ext === ".bas";
+  }
+
+  function openInDesigner(path) {
+    const params = new URLSearchParams({
+      bucket: currentBucket,
+      path: path,
+    });
+
+    if (window.htmx) {
+      htmx.ajax("GET", `/designer.html?${params.toString()}`, {
+        target: "#main-content",
+        swap: "innerHTML",
+      });
+      window.history.pushState({}, "", `/#designer?${params.toString()}`);
+    } else {
+      window.location.href = `/designer.html?${params.toString()}`;
+    }
+  }
+
   function isEditableFile(path) {
     const editableExtensions = [
       ".txt",
@@ -885,7 +907,6 @@
       ".yaml",
       ".yml",
       ".csv",
-      ".bas",
       ".vbs",
       ".sql",
       ".sh",
@@ -927,6 +948,15 @@
   async function openInlineEditor(path) {
     const fileName = path.split("/").pop() || "file";
     console.log("openInlineEditor called with path:", path);
+
+    const isBas = isBasicFile(path);
+    console.log("isBasicFile check:", path, "->", isBas);
+
+    if (isBas) {
+      console.log("Opening .bas file in designer:", path);
+      openInDesigner(path);
+      return;
+    }
 
     if (!isEditableFile(path)) {
       console.log("File not editable, downloading instead");

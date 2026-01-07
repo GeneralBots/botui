@@ -1,48 +1,14 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Attendant Console - General Bots</title>
-        <style>
-            :root {
-                --bg-primary: #0f172a;
-                --bg-secondary: #1e293b;
-                --bg-tertiary: #334155;
-                --bg-quaternary: #475569;
-                --text-primary: #f1f5f9;
-                --text-secondary: #94a3b8;
-                --text-muted: #64748b;
-                --border-color: #334155;
-                --accent-color: #3b82f6;
-                --accent-hover: #2563eb;
-                --success-color: #10b981;
-                --warning-color: #f59e0b;
-                --error-color: #ef4444;
-                --info-color: #06b6d4;
-            }
-
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family:
-                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                    Oxygen, Ubuntu, Cantarell, sans-serif;
-                background: var(--bg-primary);
-                color: var(--text-primary);
-                height: 100vh;
-                overflow: hidden;
-            }
+<!-- Attendant Console - General Bots -->
+<style>
+            /* Attendant uses global theme variables from base.css directly */
 
             /* Main Layout */
             .attendant-layout {
                 display: grid;
                 grid-template-columns: 320px 1fr 380px;
-                height: 100vh;
+                height: calc(100vh - 64px);
+                background: var(--bg, #0f172a);
+                color: var(--text, #f1f5f9);
             }
 
             /* CRM Disabled State */
@@ -51,9 +17,11 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                height: 100vh;
+                height: calc(100vh - 64px);
                 text-align: center;
                 padding: 40px;
+                background: var(--bg, #0f172a);
+                color: var(--text, #f1f5f9);
             }
 
             .crm-disabled.active {
@@ -72,7 +40,7 @@
             }
 
             .crm-disabled p {
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
                 max-width: 500px;
                 line-height: 1.6;
                 margin-bottom: 24px;
@@ -80,7 +48,7 @@
 
             .crm-disabled code {
                 display: block;
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
                 padding: 16px 24px;
                 border-radius: 8px;
                 font-family: "Monaco", "Menlo", monospace;
@@ -90,8 +58,8 @@
 
             /* Left Sidebar - Queue */
             .queue-sidebar {
-                background: var(--bg-secondary);
-                border-right: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-right: 1px solid var(--border, #334155);
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
@@ -99,7 +67,7 @@
 
             .queue-header {
                 padding: 20px;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border, #334155);
             }
 
             .queue-title {
@@ -122,7 +90,7 @@
                 align-items: center;
                 gap: 12px;
                 padding: 12px;
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
                 border-radius: 8px;
                 cursor: pointer;
                 position: relative;
@@ -132,21 +100,21 @@
                 width: 12px;
                 height: 12px;
                 border-radius: 50%;
-                background: var(--success-color);
+                background: var(--success, #10b981);
                 transition: background 0.3s;
             }
 
             .status-indicator.online {
-                background: var(--success-color);
+                background: var(--success, #10b981);
             }
             .status-indicator.busy {
-                background: var(--warning-color);
+                background: var(--warning, #f59e0b);
             }
             .status-indicator.away {
-                background: var(--text-muted);
+                background: var(--text-tertiary, #64748b);
             }
             .status-indicator.offline {
-                background: var(--error-color);
+                background: var(--error, #ef4444);
             }
 
             @keyframes pulse {
@@ -170,13 +138,13 @@
             }
 
             .status-name {
-                font-weight: 500;
+                font-weight: 600;
                 font-size: 14px;
             }
 
             .status-text {
                 font-size: 12px;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .status-dropdown {
@@ -184,13 +152,13 @@
                 top: 100%;
                 left: 0;
                 right: 0;
-                background: var(--bg-tertiary);
+                background: var(--surface, #1e293b);
+                border: 1px solid var(--border, #334155);
                 border-radius: 8px;
                 margin-top: 4px;
-                overflow: hidden;
+                padding: 8px;
                 display: none;
                 z-index: 100;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             }
 
             .status-dropdown.show {
@@ -200,30 +168,31 @@
             .status-option {
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                padding: 12px;
+                gap: 8px;
+                padding: 8px 12px;
+                border-radius: 6px;
                 cursor: pointer;
                 transition: background 0.2s;
             }
 
             .status-option:hover {
-                background: var(--bg-quaternary);
+                background: var(--surface-hover, #334155);
             }
 
             /* Queue Stats */
             .queue-stats {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
+                display: flex;
                 gap: 8px;
                 padding: 16px 20px;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border, #334155);
             }
 
             .stat-item {
+                flex: 1;
                 text-align: center;
                 padding: 8px;
-                background: var(--bg-tertiary);
-                border-radius: 6px;
+                background: var(--surface-hover, #334155);
+                border-radius: 8px;
             }
 
             .stat-value {
@@ -250,10 +219,10 @@
 
             .filter-btn {
                 padding: 6px 12px;
-                border: none;
-                border-radius: 6px;
-                background: var(--bg-tertiary);
-                color: var(--text-secondary);
+                background: var(--surface-hover, #334155);
+                border: 1px solid transparent;
+                border-radius: 20px;
+                color: var(--text-secondary, #94a3b8);
                 font-size: 12px;
                 cursor: pointer;
                 transition: all 0.2s;
@@ -263,11 +232,11 @@
             }
 
             .filter-btn:hover {
-                background: var(--bg-quaternary);
+                background: var(--border-light, #475569);
             }
 
             .filter-btn.active {
-                background: var(--accent-color);
+                background: var(--primary, #3b82f6);
                 color: white;
             }
 
@@ -311,19 +280,19 @@
             .conversation-item.unread::before {
                 content: "";
                 position: absolute;
-                left: 4px;
+                left: 8px;
                 top: 50%;
                 transform: translateY(-50%);
                 width: 8px;
                 height: 8px;
-                background: var(--accent-color);
+                background: var(--primary, #3b82f6);
                 border-radius: 50%;
             }
 
             .conversation-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-start;
+                align-items: center;
                 margin-bottom: 6px;
             }
 
@@ -334,12 +303,12 @@
 
             .conversation-time {
                 font-size: 11px;
-                color: var(--text-muted);
+                color: var(--text-tertiary, #64748b);
             }
 
             .conversation-preview {
                 font-size: 13px;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -353,11 +322,11 @@
             }
 
             .channel-tag {
-                font-size: 11px;
+                font-size: 10px;
                 padding: 2px 8px;
-                border-radius: 4px;
-                background: var(--bg-quaternary);
-                color: var(--text-secondary);
+                border-radius: 12px;
+                background: var(--border-light, #475569);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .channel-whatsapp {
@@ -414,11 +383,11 @@
 
             .waiting-time {
                 font-size: 11px;
-                color: var(--text-muted);
+                color: var(--text-tertiary, #64748b);
             }
 
             .waiting-time.long {
-                color: var(--warning-color);
+                color: var(--error, #ef4444);
             }
 
             /* Empty Queue State */
@@ -429,7 +398,7 @@
                 justify-content: center;
                 padding: 40px 20px;
                 text-align: center;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .empty-queue svg {
@@ -443,8 +412,7 @@
             .chat-area {
                 display: flex;
                 flex-direction: column;
-                background: var(--bg-primary);
-                position: relative;
+                background: var(--bg, #0f172a);
             }
 
             .no-conversation {
@@ -453,7 +421,7 @@
                 align-items: center;
                 justify-content: center;
                 height: 100%;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
                 text-align: center;
             }
 
@@ -466,8 +434,8 @@
 
             .chat-header {
                 padding: 16px 20px;
-                background: var(--bg-secondary);
-                border-bottom: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-bottom: 1px solid var(--border, #334155);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -480,15 +448,15 @@
             }
 
             .customer-avatar {
-                width: 40px;
-                height: 40px;
+                width: 48px;
+                height: 48px;
                 border-radius: 50%;
-                background: var(--accent-color);
+                background: var(--primary, #3b82f6);
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-weight: 600;
-                font-size: 16px;
+                font-size: 18px;
             }
 
             .customer-details h3 {
@@ -505,16 +473,16 @@
             }
 
             .typing-indicator {
-                display: inline-flex;
-                gap: 3px;
+                display: flex;
+                gap: 4px;
             }
 
             .typing-indicator span {
                 width: 6px;
                 height: 6px;
-                background: var(--text-secondary);
+                background: var(--text-tertiary, #64748b);
                 border-radius: 50%;
-                animation: typing 1.4s infinite;
+                animation: typing 1s infinite;
             }
 
             .typing-indicator span:nth-child(2) {
@@ -575,6 +543,7 @@
             }
 
             /* Chat Messages */
+            /* Messages Area */
             .chat-messages {
                 flex: 1;
                 overflow-y: auto;
@@ -582,6 +551,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 16px;
+                background: var(--bg, #0f172a);
             }
 
             .message {
@@ -595,8 +565,8 @@
             }
 
             .message.attendant {
-                align-self: flex-end;
                 flex-direction: row-reverse;
+                align-self: flex-end;
             }
 
             .message.bot {
@@ -605,19 +575,18 @@
 
             .message.system {
                 align-self: center;
-                max-width: 100%;
+                max-width: none;
             }
 
             .message-avatar {
-                width: 32px;
-                height: 32px;
+                width: 36px;
+                height: 36px;
                 border-radius: 50%;
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 12px;
-                font-weight: 500;
+                font-size: 14px;
                 flex-shrink: 0;
             }
 
@@ -633,19 +602,18 @@
 
             .message-bubble {
                 padding: 12px 16px;
-                border-radius: 12px;
-                background: var(--bg-tertiary);
-                line-height: 1.5;
-                font-size: 14px;
+                border-radius: 16px;
+                background: var(--surface-hover, #334155);
+                max-width: 100%;
             }
 
             .message.customer .message-bubble {
-                border-bottom-left-radius: 4px;
+                background: var(--surface-hover, #334155);
             }
 
             .message.attendant .message-bubble {
-                background: var(--accent-color);
-                border-bottom-right-radius: 4px;
+                background: var(--primary, #3b82f6);
+                color: white;
             }
 
             .message.bot .message-bubble {
@@ -684,10 +652,11 @@
             }
 
             /* Chat Input */
+            /* Input Area */
             .chat-input-area {
                 padding: 16px 20px;
-                background: var(--bg-secondary);
-                border-top: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-top: 1px solid var(--border, #334155);
             }
 
             .quick-responses {
@@ -698,19 +667,20 @@
             }
 
             .quick-response-btn {
-                padding: 6px 12px;
-                border: 1px solid var(--border-color);
-                border-radius: 16px;
-                background: transparent;
-                color: var(--text-secondary);
+                padding: 8px 12px;
+                background: var(--surface-hover, #334155);
+                border: 1px solid var(--border, #334155);
+                border-radius: 8px;
+                color: var(--text-secondary, #94a3b8);
                 font-size: 12px;
                 cursor: pointer;
                 transition: all 0.2s;
+                white-space: nowrap;
             }
 
             .quick-response-btn:hover {
-                background: var(--bg-tertiary);
-                color: var(--text-primary);
+                background: var(--border-light, #475569);
+                color: var(--text, #f1f5f9);
             }
 
             .input-wrapper {
@@ -729,8 +699,8 @@
                 height: 36px;
                 border: none;
                 border-radius: 8px;
-                background: var(--bg-tertiary);
-                color: var(--text-secondary);
+                background: var(--surface-hover, #334155);
+                color: var(--text-secondary, #94a3b8);
                 cursor: pointer;
                 display: flex;
                 align-items: center;
@@ -739,17 +709,17 @@
             }
 
             .input-action-btn:hover {
-                background: var(--bg-quaternary);
-                color: var(--text-primary);
+                background: var(--border-light, #475569);
+                color: var(--text, #f1f5f9);
             }
 
             .chat-input {
                 flex: 1;
                 padding: 12px 16px;
-                border: 1px solid var(--border-color);
+                border: 1px solid var(--border, #334155);
                 border-radius: 12px;
-                background: var(--bg-tertiary);
-                color: var(--text-primary);
+                background: var(--surface-hover, #334155);
+                color: var(--text, #f1f5f9);
                 font-size: 14px;
                 resize: none;
                 min-height: 44px;
@@ -759,11 +729,11 @@
 
             .chat-input:focus {
                 outline: none;
-                border-color: var(--accent-color);
+                border-color: var(--primary, #3b82f6);
             }
 
             .chat-input::placeholder {
-                color: var(--text-muted);
+                color: var(--text-tertiary, #64748b);
             }
 
             .send-btn {
@@ -771,7 +741,7 @@
                 height: 44px;
                 border: none;
                 border-radius: 12px;
-                background: var(--accent-color);
+                background: var(--primary, #3b82f6);
                 color: white;
                 cursor: pointer;
                 display: flex;
@@ -781,7 +751,7 @@
             }
 
             .send-btn:hover {
-                background: var(--accent-hover);
+                background: var(--primary-hover, #2563eb);
             }
 
             .send-btn:disabled {
@@ -791,8 +761,8 @@
 
             /* Right Sidebar - Insights */
             .insights-sidebar {
-                background: var(--bg-secondary);
-                border-left: 1px solid var(--border-color);
+                background: var(--surface, #1e293b);
+                border-left: 1px solid var(--border, #334155);
                 overflow-y: auto;
                 display: flex;
                 flex-direction: column;
@@ -800,15 +770,15 @@
 
             .sidebar-section {
                 padding: 20px;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border, #334155);
             }
 
             .section-title {
-                font-size: 12px;
+                font-size: 11px;
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
                 margin-bottom: 16px;
                 display: flex;
                 align-items: center;
@@ -817,12 +787,8 @@
 
             /* AI Insights */
             .ai-insight {
-                background: linear-gradient(
-                    135deg,
-                    rgba(102, 126, 234, 0.1),
-                    rgba(118, 75, 162, 0.1)
-                );
-                border: 1px solid rgba(102, 126, 234, 0.2);
+                background: var(--primary-light, rgba(59, 130, 246, 0.1));
+                border: 1px solid var(--border, #334155);
                 border-radius: 8px;
                 padding: 12px;
                 margin-bottom: 12px;
@@ -842,7 +808,7 @@
 
             .insight-label {
                 font-size: 12px;
-                color: var(--text-secondary);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .insight-value {
@@ -861,7 +827,7 @@
             }
 
             .suggested-reply:hover {
-                background: var(--bg-quaternary);
+                background: var(--border-light, #475569);
             }
 
             .suggested-reply-text {
@@ -873,17 +839,17 @@
             .suggestion-meta {
                 display: flex;
                 justify-content: space-between;
-                align-items: center;
+                margin-top: 8px;
             }
 
             .suggestion-confidence {
                 font-size: 11px;
-                color: var(--success-color);
+                color: var(--success, #10b981);
             }
 
             .suggestion-source {
                 font-size: 11px;
-                color: var(--text-muted);
+                color: var(--text-tertiary, #64748b);
             }
 
             /* Customer Details */
@@ -893,9 +859,9 @@
 
             .detail-label {
                 font-size: 11px;
-                color: var(--text-muted);
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+                color: var(--text-tertiary, #64748b);
                 margin-bottom: 4px;
             }
 
@@ -905,7 +871,7 @@
             }
 
             .detail-value a {
-                color: var(--accent-color);
+                color: var(--primary, #3b82f6);
                 text-decoration: none;
             }
 
@@ -916,7 +882,7 @@
             /* Conversation History */
             .history-item {
                 padding: 12px;
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
                 border-radius: 8px;
                 margin-bottom: 8px;
                 cursor: pointer;
@@ -924,7 +890,7 @@
             }
 
             .history-item:hover {
-                background: var(--bg-quaternary);
+                background: var(--border-light, #475569);
             }
 
             .history-header {
@@ -942,7 +908,7 @@
                 font-size: 11px;
                 padding: 2px 6px;
                 border-radius: 4px;
-                background: var(--success-color);
+                background: var(--success, #10b981);
                 color: white;
             }
 
@@ -963,17 +929,17 @@
 
             .sentiment-positive {
                 background: rgba(16, 185, 129, 0.2);
-                color: var(--success-color);
+                color: var(--success, #10b981);
             }
 
             .sentiment-neutral {
-                background: rgba(148, 163, 184, 0.2);
-                color: var(--text-secondary);
+                background: var(--border-light, #475569);
+                color: var(--text-secondary, #94a3b8);
             }
 
             .sentiment-negative {
                 background: rgba(239, 68, 68, 0.2);
-                color: var(--error-color);
+                color: var(--error, #ef4444);
             }
 
             /* Tags */
@@ -984,11 +950,11 @@
             }
 
             .tag {
-                padding: 4px 10px;
-                background: var(--bg-tertiary);
-                border-radius: 12px;
-                font-size: 12px;
-                color: var(--text-secondary);
+                font-size: 11px;
+                padding: 4px 8px;
+                background: var(--border-light, #475569);
+                border-radius: 4px;
+                color: var(--text-secondary, #94a3b8);
             }
 
             /* Transfer Modal */
@@ -1010,17 +976,18 @@
             }
 
             .modal {
-                background: var(--bg-secondary);
-                border-radius: 12px;
+                background: var(--surface, #1e293b);
+                border: 1px solid var(--border, #334155);
+                border-radius: 16px;
                 width: 100%;
-                max-width: 480px;
-                max-height: 90vh;
-                overflow-y: auto;
+                max-width: 400px;
+                max-height: 80vh;
+                overflow: hidden;
             }
 
             .modal-header {
                 padding: 20px;
-                border-bottom: 1px solid var(--border-color);
+                border-bottom: 1px solid var(--border, #334155);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -1035,9 +1002,9 @@
                 width: 32px;
                 height: 32px;
                 border: none;
-                border-radius: 8px;
-                background: var(--bg-tertiary);
-                color: var(--text-secondary);
+                border-radius: 6px;
+                background: var(--surface-hover, #334155);
+                color: var(--text-secondary, #94a3b8);
                 cursor: pointer;
                 display: flex;
                 align-items: center;
@@ -1088,15 +1055,15 @@
                 padding: 12px;
                 border-radius: 8px;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: background 0.2s;
             }
 
             .attendant-option:hover {
-                background: var(--bg-tertiary);
+                background: var(--surface-hover, #334155);
             }
 
             .attendant-option.selected {
-                background: var(--accent-color);
+                background: var(--primary, #3b82f6);
             }
 
             .attendant-option .status-indicator {
@@ -1106,31 +1073,32 @@
 
             .modal-footer {
                 padding: 16px 20px;
-                border-top: 1px solid var(--border-color);
+                border-top: 1px solid var(--border, #334155);
                 display: flex;
                 justify-content: flex-end;
-                gap: 12px;
+                gap: 8px;
             }
 
             /* Toast Notifications */
             .toast-container {
                 position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 2000;
+                bottom: 24px;
+                right: 24px;
                 display: flex;
                 flex-direction: column;
                 gap: 8px;
+                z-index: 1001;
             }
 
             .toast {
-                padding: 14px 20px;
-                background: var(--bg-secondary);
+                padding: 12px 20px;
+                background: var(--surface, #1e293b);
+                border: 1px solid var(--border, #334155);
                 border-radius: 8px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
                 display: flex;
                 align-items: center;
                 gap: 12px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
                 animation: slideIn 0.3s ease;
             }
 
@@ -1146,24 +1114,24 @@
             }
 
             .toast.success {
-                border-left: 4px solid var(--success-color);
+                border-left: 3px solid var(--success, #10b981);
             }
             .toast.error {
-                border-left: 4px solid var(--error-color);
+                border-left: 3px solid var(--error, #ef4444);
             }
             .toast.warning {
-                border-left: 4px solid var(--warning-color);
+                border-left: 3px solid var(--warning, #f59e0b);
             }
             .toast.info {
-                border-left: 4px solid var(--info-color);
+                border-left: 3px solid var(--primary, #3b82f6);
             }
 
             /* Loading State */
             .loading-spinner {
                 width: 24px;
                 height: 24px;
-                border: 3px solid var(--bg-tertiary);
-                border-top-color: var(--accent-color);
+                border: 3px solid var(--surface-hover, #334155);
+                border-top-color: var(--primary, #3b82f6);
                 border-radius: 50%;
                 animation: spin 1s linear infinite;
             }
@@ -1209,36 +1177,22 @@
                     right: 0;
                 }
             }
-        </style>
-    </head>
-    <body>
-        <!-- CRM Disabled State -->
-        <div class="crm-disabled" id="crmDisabled">
+</style>
+
+<!-- CRM Disabled State -->
+<!-- CRM Disabled State - Hidden by default, CRM is now enabled by default -->
+<div class="crm-disabled" id="crmDisabled" style="display: none">
             <div class="crm-disabled-icon">🚫</div>
-            <h2>CRM Features Not Enabled</h2>
+            <h2 data-i18n="attendant-crm-disabled">CRM Features Not Enabled</h2>
             <p>
                 The Attendant Console requires CRM features to be enabled for
                 this bot. This allows human agents to receive and respond to
                 conversations transferred from the bot.
             </p>
-            <p>
-                To enable CRM features, add this line to your bot's
-                <strong>config.csv</strong>:
-            </p>
-            <code>crm-enabled,true</code>
-            <p style="margin-top: 24px">
-                Then create an <strong>attendant.csv</strong> file to configure
-                your team:
-            </p>
-            <code
-                >id,name,channel,preferences,department,aliases att-001,John
-                Smith,all,sales,commercial,john;johnny att-002,Jane
-                Doe,web,support,customer-service,jane</code
-            >
         </div>
 
-        <!-- Main Layout -->
-        <div class="attendant-layout" id="mainLayout" style="display: none">
+        <!-- Main Layout - Shown by default, CRM is enabled by default -->
+<div class="attendant-layout" id="mainLayout" style="display: grid">
             <!-- Left Sidebar - Queue -->
             <aside class="queue-sidebar">
                 <div class="queue-header">
@@ -1256,7 +1210,7 @@
                             <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                             <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                         </svg>
-                        Attendant Console
+                        <span data-i18n="attendant-title">Attendant Console</span>
                     </div>
                     <div
                         class="attendant-status"
@@ -1271,7 +1225,7 @@
                             <div class="status-name" id="attendantName">
                                 Loading...
                             </div>
-                            <div class="status-text" id="statusText">
+                            <div class="status-text" id="statusText" data-i18n="attendant-status-online">
                                 Online - Ready for conversations
                             </div>
                         </div>
@@ -1393,7 +1347,7 @@
                             d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                         />
                     </svg>
-                    <h3>Select a conversation</h3>
+                    <h3 data-i18n="attendant-select-conversation">Select a conversation</h3>
                     <p>
                         Choose a conversation from the queue to start responding
                     </p>
@@ -1749,7 +1703,7 @@
         <div class="modal-overlay" id="transferModal">
             <div class="modal">
                 <div class="modal-header">
-                    <h3>Transfer Conversation</h3>
+                    <h3 data-i18n="attendant-transfer">Transfer Conversation</h3>
                     <button class="modal-close" onclick="closeTransferModal()">
                         <svg
                             width="16"
@@ -1831,6 +1785,7 @@
             });
 
             async function checkCRMEnabled() {
+                // CRM is now enabled by default
                 try {
                     const response = await fetch(
                         `${API_BASE}/api/attendance/attendants`,
@@ -1840,36 +1795,40 @@
                     if (response.ok && Array.isArray(data)) {
                         attendants = data;
                         if (attendants.length > 0) {
-                            // CRM is enabled
-                            document.getElementById(
-                                "crmDisabled",
-                            ).style.display = "none";
-                            document.getElementById(
-                                "mainLayout",
-                            ).style.display = "grid";
-
                             // Set current attendant (first one for now, should come from auth)
                             currentAttendantId = attendants[0].attendant_id;
                             document.getElementById(
                                 "attendantName",
                             ).textContent = attendants[0].attendant_name;
-
-                            await loadQueue();
-                            connectWebSocket();
                         } else {
-                            showCRMDisabled();
+                            // No attendants configured, use default
+                            document.getElementById(
+                                "attendantName",
+                            ).textContent = "Agent";
                         }
                     } else {
-                        showCRMDisabled();
+                        // API error, use default
+                        document.getElementById(
+                            "attendantName",
+                        ).textContent = "Agent";
                     }
+
+                    // Always load queue and connect WebSocket - CRM enabled by default
+                    await loadQueue();
+                    connectWebSocket();
                 } catch (error) {
-                    console.error("Failed to check CRM status:", error);
-                    showCRMDisabled();
+                    console.error("Failed to load attendants:", error);
+                    // Still enable the console with default settings
+                    document.getElementById("attendantName").textContent = "Agent";
+                    await loadQueue();
+                    connectWebSocket();
                 }
             }
 
             function showCRMDisabled() {
+                // Kept for backwards compatibility but no longer used by default
                 document.getElementById("crmDisabled").classList.add("active");
+                document.getElementById("crmDisabled").style.display = "flex";
                 document.getElementById("mainLayout").style.display = "none";
             }
 
@@ -2930,5 +2889,3 @@
                 });
             }
         </script>
-    </body>
-</html>

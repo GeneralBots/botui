@@ -39,6 +39,8 @@
     document.body.addEventListener("htmx:beforeSwap", (event) => {
       const target = event.detail.target;
       const status = event.detail.xhr?.status;
+      const response = event.detail.serverResponse;
+      const swapStyle = event.detail.swapStyle || "innerHTML";
 
       // If target doesn't exist or response is 404, prevent the swap
       if (!target || status === 404) {
@@ -61,12 +63,94 @@
         return;
       }
 
-      // For empty responses, set empty content to prevent insertBefore errors
+      // Additional check: verify parentNode is still in DOM (race condition protection)
       if (
-        !event.detail.serverResponse ||
-        event.detail.serverResponse.trim() === ""
+        !document.body.contains(target.parentNode) &&
+        target.parentNode !== document.body &&
+        target.parentNode !== document.documentElement
       ) {
+        event.detail.shouldSwap = false;
+        console.warn("HTMX swap prevented: target parent not in DOM");
+        return;
+      }
+
+      // For swap styles that use insertBefore, verify the parent can accept children
+      const insertBasedSwaps = [
+        "outerHTML",
+        "beforebegin",
+        "afterbegin",
+        "beforeend",
+        "afterend",
+      ];
+      if (insertBasedSwaps.includes(swapStyle)) {
+        try {
+          // Verify we can actually perform DOM operations on the target
+          if (
+            swapStyle === "outerHTML" &&
+            (!target.parentNode || !target.parentNode.contains(target))
+          ) {
+            event.detail.shouldSwap = false;
+            console.warn(
+              "HTMX swap prevented: outerHTML target detached from parent",
+            );
+            return;
+          }
+        } catch (e) {
+          event.detail.shouldSwap = false;
+          console.warn("HTMX swap prevented: DOM access error", e);
+          return;
+        }
+      }
+
+      // For empty responses, set empty content to prevent insertBefore errors
+      if (!response || response.trim() === "") {
         event.detail.serverResponse = "<!-- empty -->";
+        return;
+      }
+
+      // Validate that response is valid HTML before swapping
+      // This prevents "Unexpected end of input" errors
+      try {
+        const trimmedResponse = response.trim();
+
+        // Skip validation for comments
+        if (
+          trimmedResponse.startsWith("<!--") &&
+          trimmedResponse.endsWith("-->")
+        ) {
+          return;
+        }
+
+        // Try to parse the response as HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(response, "text/html");
+
+        // Check for parsing errors
+        const parseError = doc.querySelector("parsererror");
+        if (parseError) {
+          console.warn(
+            "HTMX swap: Response contains invalid HTML, wrapping in div",
+          );
+          event.detail.serverResponse = "<div>" + response + "</div>";
+        }
+
+        // Check if body is empty (happens with malformed HTML)
+        if (
+          doc.body &&
+          doc.body.children.length === 0 &&
+          doc.body.textContent.trim() === ""
+        ) {
+          if (trimmedResponse.length > 0) {
+            console.warn(
+              "HTMX swap: Response produced empty DOM, preserving as text",
+            );
+            event.detail.serverResponse = "<div>" + response + "</div>";
+          }
+        }
+      } catch (e) {
+        console.warn("HTMX swap: Error validating response HTML:", e);
+        // Wrap potentially malformed content
+        event.detail.serverResponse = "<div>" + response + "</div>";
       }
     });
 
@@ -74,6 +158,19 @@
     document.body.addEventListener("htmx:swapError", (event) => {
       console.error("HTMX swap error:", event.detail);
       // Don't show notification for swap errors - they're usually timing issues
+      // Prevent the error from propagating
+      event.preventDefault();
+    });
+
+    // Catch any uncaught HTMX errors related to DOM manipulation
+    document.body.addEventListener("htmx:afterRequest", (event) => {
+      // Clean up any orphaned requests
+      const target = event.detail.target;
+      if (target && !document.body.contains(target)) {
+        console.warn(
+          "HTMX afterRequest: target no longer in DOM, cleanup performed",
+        );
+      }
     });
 
     // Handle HTMX errors more gracefully

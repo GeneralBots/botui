@@ -1,0 +1,800 @@
+<!-- =============================================================================
+     GB SHEET - Excel-like Spreadsheet
+     General Bots Suite Component
+     ============================================================================= -->
+
+<link rel="stylesheet" href="/suite/sheet/sheet.css" />
+
+<div class="sheet-container">
+    <!-- Sidebar - Sheets List -->
+    <aside class="sheet-sidebar" id="sheet-sidebar">
+        <div class="sidebar-header">
+            <h2 data-i18n="sheets">Sheets</h2>
+            <button
+                class="btn-icon"
+                onclick="gbSheet.toggleSidebar()"
+                title="Toggle sidebar"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-search">
+            <input
+                type="text"
+                placeholder="Search sheets..."
+                id="sheet-search"
+                hx-get="/api/sheet/search"
+                hx-trigger="keyup changed delay:300ms"
+                hx-target="#sheet-list"
+                hx-include="this"
+            />
+            <svg
+                class="search-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </div>
+
+        <div
+            class="sheet-list"
+            id="sheet-list"
+            hx-get="/api/sheet/list"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
+            <div class="loading-placeholder">
+                <div class="loading-spinner"></div>
+                Loading sheets...
+            </div>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="btn-new-sheet" onclick="gbSheet.createNewSheet()">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span data-i18n="new-sheet">New Sheet</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="sheet-main">
+        <!-- Toolbar -->
+        <div class="sheet-toolbar">
+            <div class="toolbar-left">
+                <button
+                    class="btn-icon"
+                    onclick="gbSheet.toggleSidebar()"
+                    title="Menu"
+                >
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <input
+                    type="text"
+                    class="sheet-name-input"
+                    id="sheet-name"
+                    value="Untitled Spreadsheet"
+                    onchange="gbSheet.renameSheet(this.value)"
+                />
+            </div>
+
+            <div class="toolbar-center">
+                <!-- Undo/Redo -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.undo()"
+                        title="Undo (Ctrl+Z)"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M3 7v6h6"></path>
+                            <path
+                                d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"
+                            ></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.redo()"
+                        title="Redo (Ctrl+Y)"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M21 7v6h-6"></path>
+                            <path
+                                d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"
+                            ></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Font Controls -->
+                <div class="toolbar-group">
+                    <select
+                        class="toolbar-select font-family"
+                        id="font-family"
+                        onchange="gbSheet.formatCells('fontFamily', this.value)"
+                    >
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    <select
+                        class="toolbar-select font-size"
+                        id="font-size"
+                        onchange="gbSheet.formatCells('fontSize', this.value)"
+                    >
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11" selected>11</option>
+                        <option value="12">12</option>
+                        <option value="14">14</option>
+                        <option value="16">16</option>
+                        <option value="18">18</option>
+                        <option value="24">24</option>
+                        <option value="36">36</option>
+                    </select>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Text Formatting -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        id="btn-bold"
+                        onclick="gbSheet.formatCells('bold')"
+                        title="Bold (Ctrl+B)"
+                    >
+                        <strong>B</strong>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        id="btn-italic"
+                        onclick="gbSheet.formatCells('italic')"
+                        title="Italic (Ctrl+I)"
+                    >
+                        <em>I</em>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        id="btn-underline"
+                        onclick="gbSheet.formatCells('underline')"
+                        title="Underline (Ctrl+U)"
+                    >
+                        <u>U</u>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        id="btn-strikethrough"
+                        onclick="gbSheet.formatCells('strikethrough')"
+                        title="Strikethrough"
+                    >
+                        <s>S</s>
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Colors -->
+                <div class="toolbar-group">
+                    <button class="btn-icon color-btn" title="Text Color">
+                        <span>A</span>
+                        <span
+                            class="color-indicator"
+                            id="text-color-indicator"
+                        ></span>
+                        <input
+                            type="color"
+                            class="color-input"
+                            id="text-color"
+                            onchange="gbSheet.formatCells('color', this.value)"
+                        />
+                    </button>
+                    <button class="btn-icon color-btn" title="Fill Color">
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2"
+                            ></rect>
+                        </svg>
+                        <span
+                            class="color-indicator"
+                            id="fill-color-indicator"
+                        ></span>
+                        <input
+                            type="color"
+                            class="color-input"
+                            id="fill-color"
+                            onchange="gbSheet.formatCells('backgroundColor', this.value)"
+                        />
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Alignment -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.formatCells('alignLeft')"
+                        title="Align Left"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="15" y2="12"></line>
+                            <line x1="3" y1="18" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.formatCells('alignCenter')"
+                        title="Align Center"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="6" y1="12" x2="18" y2="12"></line>
+                            <line x1="4" y1="18" x2="20" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.formatCells('alignRight')"
+                        title="Align Right"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="9" y1="12" x2="21" y2="12"></line>
+                            <line x1="6" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Row/Column Operations -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.insertRow()"
+                        title="Insert Row"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2"
+                            ></rect>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.insertColumn()"
+                        title="Insert Column"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2"
+                            ></rect>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.deleteRow()"
+                        title="Delete Row"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2"
+                            ></rect>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        onclick="gbSheet.deleteColumn()"
+                        title="Delete Column"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2"
+                            ></rect>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="toolbar-right">
+                <div class="collaborators" id="collaborators"></div>
+                <button
+                    class="btn-icon"
+                    onclick="gbSheet.showModal('function-modal')"
+                    title="Functions"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <text
+                            x="6"
+                            y="17"
+                            font-size="14"
+                            font-style="italic"
+                            fill="currentColor"
+                            stroke="none"
+                        >
+                            fx
+                        </text>
+                    </svg>
+                </button>
+                <button
+                    class="btn-primary"
+                    id="save-btn"
+                    onclick="gbSheet.saveSheet()"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"
+                        ></path>
+                        <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                        <polyline points="7,3 7,8 15,8"></polyline>
+                    </svg>
+                    <span>Save</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Formula Bar -->
+        <div class="formula-bar">
+            <div class="cell-address" id="cell-address">A1</div>
+            <span class="formula-icon">fx</span>
+            <input
+                type="text"
+                class="formula-input"
+                id="formula-input"
+                placeholder="Enter value or formula..."
+            />
+            <div class="formula-preview" id="formula-preview"></div>
+        </div>
+
+        <!-- Grid Container -->
+        <div class="sheet-grid-container">
+            <div class="sheet-grid">
+                <div class="grid-corner"></div>
+                <div class="column-headers" id="column-headers"></div>
+                <div class="row-headers" id="row-headers"></div>
+                <div class="cells-container" id="cells-container">
+                    <div class="cells" id="cells"></div>
+                    <div class="selection-box" id="selection-box"></div>
+                    <div class="copy-box hidden" id="copy-box"></div>
+                    <div class="autofill-handle" id="autofill-handle"></div>
+                    <div class="cursor-indicators" id="cursor-indicators"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Worksheet Tabs -->
+        <div class="sheet-tabs-container">
+            <div class="sheet-tabs" id="worksheet-tabs"></div>
+            <button
+                class="btn-add-sheet"
+                onclick="gbSheet.addWorksheet()"
+                title="Add Sheet"
+            >
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="sheet-status-bar">
+            <div class="status-left">
+                <span id="selection-info"></span>
+            </div>
+            <div class="status-center">
+                <span id="calculation-result"></span>
+            </div>
+            <div class="status-right">
+                <span class="save-status" id="save-status"></span>
+                <div class="zoom-control">
+                    <button class="btn-zoom" onclick="gbSheet.zoomOut()">
+                        −
+                    </button>
+                    <span id="zoom-level">100%</span>
+                    <button class="btn-zoom" onclick="gbSheet.zoomIn()">
+                        +
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Context Menu -->
+    <div class="context-menu hidden" id="context-menu">
+        <div class="context-item" onclick="gbSheet.cutSelection()">
+            Cut <span class="shortcut">Ctrl+X</span>
+        </div>
+        <div class="context-item" onclick="gbSheet.copySelection()">
+            Copy <span class="shortcut">Ctrl+C</span>
+        </div>
+        <div class="context-item" onclick="gbSheet.pasteSelection()">
+            Paste <span class="shortcut">Ctrl+V</span>
+        </div>
+        <div class="context-divider"></div>
+        <div class="context-item" onclick="gbSheet.insertRow()">Insert Row</div>
+        <div class="context-item" onclick="gbSheet.insertColumn()">
+            Insert Column
+        </div>
+        <div class="context-item" onclick="gbSheet.deleteRow()">Delete Row</div>
+        <div class="context-item" onclick="gbSheet.deleteColumn()">
+            Delete Column
+        </div>
+        <div class="context-divider"></div>
+        <div class="context-item" onclick="gbSheet.clearCells()">
+            Clear Contents
+        </div>
+        <div class="context-item" onclick="gbSheet.sortAscending()">
+            Sort A → Z
+        </div>
+        <div class="context-item" onclick="gbSheet.sortDescending()">
+            Sort Z → A
+        </div>
+    </div>
+
+    <!-- Tab Context Menu -->
+    <div class="tab-context-menu hidden" id="tab-context-menu">
+        <div
+            class="context-item"
+            onclick="gbSheet.renameWorksheet(parseInt(this.parentElement.dataset.index), prompt('Sheet name:'))"
+        >
+            Rename
+        </div>
+        <div
+            class="context-item"
+            onclick="gbSheet.deleteWorksheet(parseInt(this.parentElement.dataset.index))"
+        >
+            Delete
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal hidden" id="share-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Share Spreadsheet</h3>
+                <button
+                    class="btn-close"
+                    onclick="gbSheet.hideModal('share-modal')"
+                >
+                    ×
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="share-input-group">
+                    <input type="email" placeholder="Add people by email..." />
+                    <select>
+                        <option value="view">Can view</option>
+                        <option value="edit">Can edit</option>
+                    </select>
+                    <button class="btn-primary">Share</button>
+                </div>
+                <div class="share-link-section">
+                    <h4>Or share via link</h4>
+                    <div class="share-link-group">
+                        <input type="text" id="share-link" readonly />
+                        <button
+                            class="btn-primary"
+                            onclick="gbSheet.copyShareLink()"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Function Browser Modal -->
+    <div class="modal hidden" id="function-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Insert Function</h3>
+                <button
+                    class="btn-close"
+                    onclick="gbSheet.hideModal('function-modal')"
+                >
+                    ×
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="function-categories">
+                    <button class="category-btn active" data-category="all">
+                        All
+                    </button>
+                    <button class="category-btn" data-category="math">
+                        Math
+                    </button>
+                    <button class="category-btn" data-category="stats">
+                        Statistics
+                    </button>
+                    <button class="category-btn" data-category="text">
+                        Text
+                    </button>
+                    <button class="category-btn" data-category="date">
+                        Date/Time
+                    </button>
+                    <button class="category-btn" data-category="logic">
+                        Logical
+                    </button>
+                </div>
+                <div class="function-list">
+                    <div class="function-item" data-function="SUM">
+                        <div class="function-name">SUM</div>
+                        <div class="function-syntax">SUM(range)</div>
+                        <div class="function-desc">
+                            Adds all numbers in a range of cells
+                        </div>
+                    </div>
+                    <div class="function-item" data-function="AVERAGE">
+                        <div class="function-name">AVERAGE</div>
+                        <div class="function-syntax">AVERAGE(range)</div>
+                        <div class="function-desc">
+                            Returns the average of numbers in a range
+                        </div>
+                    </div>
+                    <div class="function-item" data-function="COUNT">
+                        <div class="function-name">COUNT</div>
+                        <div class="function-syntax">COUNT(range)</div>
+                        <div class="function-desc">
+                            Counts cells containing numbers in a range
+                        </div>
+                    </div>
+                    <div class="function-item" data-function="MAX">
+                        <div class="function-name">MAX</div>
+                        <div class="function-syntax">MAX(range)</div>
+                        <div class="function-desc">
+                            Returns the maximum value in a range
+                        </div>
+                    </div>
+                    <div class="function-item" data-function="MIN">
+                        <div class="function-name">MIN</div>
+                        <div class="function-syntax">MIN(range)</div>
+                        <div class="function-desc">
+                            Returns the minimum value in a range
+                        </div>
+                    </div>
+                    <div class="function-item" data-function="IF">
+                        <div class="function-name">IF</div>
+                        <div class="function-syntax">
+                            IF(condition, true_value, false_value)
+                        </div>
+                        <div class="function-desc">
+                            Returns one value if condition is true, another if
+                            false
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Modal -->
+    <div class="modal hidden" id="chart-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>Insert Chart</h3>
+                <button
+                    class="btn-close"
+                    onclick="gbSheet.hideModal('chart-modal')"
+                >
+                    ×
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-options">
+                    <button class="chart-type-btn active" data-type="bar">
+                        <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect x="3" y="12" width="4" height="9"></rect>
+                            <rect x="10" y="6" width="4" height="15"></rect>
+                            <rect x="17" y="9" width="4" height="12"></rect>
+                        </svg>
+                        <span>Bar</span>
+                    </button>
+                    <button class="chart-type-btn" data-type="line">
+                        <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <polyline points="3,17 9,11 13,15 21,7"></polyline>
+                        </svg>
+                        <span>Line</span>
+                    </button>
+                    <button class="chart-type-btn" data-type="pie">
+                        <svg
+                            width="32"
+                            height="32"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="12" r="9"></circle>
+                            <path d="M12 3v9l6.5 6.5"></path>
+                        </svg>
+                        <span>Pie</span>
+                    </button>
+                </div>
+                <button class="btn-primary" style="width: 100%">
+                    Create Chart
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/suite/sheet/sheet.js"></script>

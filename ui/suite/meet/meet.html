@@ -8,7 +8,7 @@
                 alt="Meet"
                 class="brand-icon"
             />
-            <h1>Meet</h1>
+            <h1 data-i18n="nav-meet">Meet</h1>
         </div>
         <div class="meet-actions">
             <button class="btn-primary" onclick="showModal('create-modal')">
@@ -23,7 +23,7 @@
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
-                New Meeting
+                <span data-i18n="meet-new-meeting">New Meeting</span>
             </button>
             <button class="btn-secondary" onclick="showModal('join-modal')">
                 <svg
@@ -38,7 +38,7 @@
                     <polyline points="10 17 15 12 10 7"></polyline>
                     <line x1="15" y1="12" x2="3" y2="12"></line>
                 </svg>
-                Join Meeting
+                <span data-i18n="meet-join-meeting">Join Meeting</span>
             </button>
         </div>
     </header>
@@ -48,7 +48,7 @@
         <!-- Active Rooms Section -->
         <section class="rooms-section">
             <div class="section-header">
-                <h2>Active Rooms</h2>
+                <h2 data-i18n="meet-active-rooms">Active Rooms</h2>
                 <span class="room-count" id="room-count">0</span>
             </div>
             <div
@@ -100,16 +100,12 @@
     </main>
 
     <!-- Meeting Room (shown when in a call) -->
-    <div
-        class="meeting-room hidden"
-        id="meeting-room"
-        hx-ext="ws"
-        ws-connect="/ws/meet"
-    >
+    <!-- Note: ws-connect="/ws/meet" removed until backend WebSocket endpoint is implemented -->
+    <div class="meeting-room hidden" id="meeting-room">
         <!-- Room Header -->
         <header class="room-header">
             <div class="room-info">
-                <h2 id="room-title">Meeting Room</h2>
+                <h2 id="room-title" data-i18n="meet-room-title">Meeting Room</h2>
                 <span class="room-id" id="room-id"></span>
                 <span class="room-timer" id="room-timer">00:00:00</span>
             </div>
@@ -138,7 +134,7 @@
                             fill="currentColor"
                         ></circle>
                     </svg>
-                    <span>Record</span>
+                    <span data-i18n="meet-record">Record</span>
                 </button>
                 <button
                     class="control-btn active"
@@ -270,7 +266,7 @@
             <!-- Participants Panel -->
             <div class="sidebar-panel hidden" id="participants-panel">
                 <div class="panel-header">
-                    <h3>Participants</h3>
+                    <h3 data-i18n="meet-participants">Participants</h3>
                     <button
                         class="btn-icon-sm"
                         onclick="togglePanel('participants')"
@@ -354,7 +350,7 @@
             <!-- Chat Panel -->
             <div class="sidebar-panel hidden" id="chat-panel">
                 <div class="panel-header">
-                    <h3>Chat</h3>
+                    <h3 data-i18n="nav-chat">Chat</h3>
                     <button class="btn-icon-sm" onclick="togglePanel('chat')">
                         <svg
                             width="16"
@@ -457,7 +453,7 @@
                         <line x1="12" y1="19" x2="12" y2="23"></line>
                         <line x1="8" y1="23" x2="16" y2="23"></line>
                     </svg>
-                    <span>Mic</span>
+                    <span data-i18n="meet-mute">Mute</span>
                 </button>
                 <button
                     class="control-btn-lg"
@@ -484,7 +480,7 @@
                             ry="2"
                         ></rect>
                     </svg>
-                    <span>Camera</span>
+                    <span data-i18n="meet-camera">Camera</span>
                 </button>
                 <button
                     class="control-btn-lg"
@@ -514,7 +510,7 @@
                         <line x1="8" y1="21" x2="16" y2="21"></line>
                         <line x1="12" y1="17" x2="12" y2="21"></line>
                     </svg>
-                    <span>Share</span>
+                    <span data-i18n="meet-share">Share</span>
                 </button>
             </div>
             <div class="controls-center">
@@ -537,7 +533,7 @@
                         ></path>
                         <line x1="1" y1="1" x2="23" y2="23"></line>
                     </svg>
-                    <span>End</span>
+                    <span data-i18n="meet-info">Info</span>
                 </button>
             </div>
             <div class="controls-right">
@@ -560,7 +556,7 @@
                         <line x1="9" y1="9" x2="9.01" y2="9"></line>
                         <line x1="15" y1="9" x2="15.01" y2="9"></line>
                     </svg>
-                    <span>React</span>
+                    <span data-i18n="meet-leave">Leave</span>
                 </button>
                 <button
                     class="control-btn-lg"
@@ -580,7 +576,7 @@
                         <circle cx="19" cy="12" r="1"></circle>
                         <circle cx="5" cy="12" r="1"></circle>
                     </svg>
-                    <span>More</span>
+                    <span data-i18n="meet-more">More</span>
                 </button>
             </div>
         </footer>
@@ -590,7 +586,7 @@
     <dialog class="modal" id="create-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Create Meeting</h3>
+                <h3 data-i18n="meet-share-meeting">Share Meeting</h3>
                 <button class="btn-icon-sm" onclick="hideModal('create-modal')">
                     <svg
                         width="16"
@@ -613,7 +609,7 @@
                 hx-on::after-request="hideModal('create-modal'); enterMeeting()"
             >
                 <div class="form-group">
-                    <label for="meeting-title">Meeting Title</label>
+                    <label for="meeting-title" data-i18n="meet-meeting-title">Meeting Title</label>
                     <input
                         type="text"
                         id="meeting-title"
@@ -633,7 +629,7 @@
                     ></textarea>
                 </div>
                 <div class="form-group">
-                    <label>Settings</label>
+                    <label data-i18n="nav-settings">Settings</label>
                     <div class="checkbox-group">
                         <label class="checkbox-label">
                             <input
@@ -657,7 +653,7 @@
                         </label>
                         <label class="checkbox-label">
                             <input type="checkbox" name="waiting_room" />
-                            <span>Use waiting room</span>
+                            <span data-i18n="meet-waiting-room">Enable waiting room</span>
                         </label>
                     </div>
                 </div>
@@ -681,7 +677,7 @@
     <dialog class="modal" id="join-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Join Meeting</h3>
+                <h3 data-i18n="meet-new-meeting">New Meeting</h3>
                 <button class="btn-icon-sm" onclick="hideModal('join-modal')">
                     <svg
                         width="16"
@@ -704,7 +700,7 @@
                 hx-on::after-request="hideModal('join-modal'); enterMeeting()"
             >
                 <div class="form-group">
-                    <label for="user-name">Your Name</label>
+                    <label for="display-name" data-i18n="label-your-name">Your Name</label>
                     <input
                         type="text"
                         id="user-name"
@@ -714,7 +710,7 @@
                     />
                 </div>
                 <div class="form-group">
-                    <label for="meeting-code">Meeting Code or Link</label>
+                    <label for="meeting-code" data-i18n="meet-meeting-code">Meeting Code</label>
                     <input
                         type="text"
                         id="meeting-code"
@@ -838,7 +834,7 @@
                 hx-on::after-request="showNotification('Invites sent!')"
             >
                 <div class="form-group">
-                    <label>Meeting Link</label>
+                    <label data-i18n="meet-meeting-link">Meeting Link</label>
                     <div class="copy-input">
                         <input type="text" id="meeting-link" readonly />
                         <button
@@ -883,11 +879,12 @@
                         class="btn-secondary"
                         onclick="hideModal('invite-modal')"
                     >
-                        Close
-                    </button>
-                    <button type="submit" class="btn-primary">
-                        Send Invites
-                    </button>
+                        <button type="button" onclick="hideModal('share-modal')" data-i18n="action-close">
+                            Close
+                        </button>
+                        <button type="submit" class="btn-primary" data-i18n="meet-send-invite">
+                            Send Invite
+                        </button>
                 </div>
             </form>
         </div>
@@ -1323,10 +1320,10 @@
     .modal {
         position: fixed;
         inset: 0;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
-        background: rgba(0, 0, 0, 0.5);
+        background: transparent;
         z-index: 200;
         border: none;
         padding: 0;
@@ -1334,6 +1331,10 @@
         max-height: 100%;
         width: 100%;
         height: 100%;
+    }
+
+    .modal[open] {
+        display: flex;
     }
 
     .modal::backdrop {
@@ -1560,180 +1561,191 @@
 </style>
 
 <script>
-    // Modal functions
-    function showModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.showModal();
-    }
+    // Guard against re-execution - check BEFORE any declarations
+    if (!window._meetModuleLoaded) {
+        window._meetModuleLoaded = true;
 
-    function hideModal(id) {
-        const modal = document.getElementById(id);
-        if (modal) modal.close();
-    }
+        // Use window object for all state to avoid redeclaration
+        window._meetState = window._meetState || {
+            localStream: null,
+            isMuted: false,
+            isCameraOff: false,
+            timerInterval: null,
+            timerSeconds: 0
+        };
 
-    // Panel toggle
-    function togglePanel(name) {
-        const panels = ["participants", "chat", "transcription"];
-        panels.forEach((p) => {
-            const panel = document.getElementById(p + "-panel");
-            if (panel) {
-                if (p === name) {
-                    panel.classList.toggle("hidden");
-                } else {
-                    panel.classList.add("hidden");
+        // Modal functions
+        window.showModal = function(id) {
+            var modal = document.getElementById(id);
+            if (modal) modal.showModal();
+        };
+
+        window.hideModal = function(id) {
+            var modal = document.getElementById(id);
+            if (modal) modal.close();
+        };
+
+        // Panel toggle
+        window.togglePanel = function(name) {
+            var panels = ["participants", "chat", "transcription"];
+            panels.forEach(function(p) {
+                var panel = document.getElementById(p + "-panel");
+                if (panel) {
+                    if (p === name) {
+                        panel.classList.toggle("hidden");
+                    } else {
+                        panel.classList.add("hidden");
+                    }
+                }
+            });
+        };
+
+        // Meeting functions
+        window.enterMeeting = function() {
+            var meetMain = document.querySelector(".meet-main");
+            var meetHeader = document.querySelector(".meet-header");
+            var meetingRoom = document.getElementById("meeting-room");
+            if (meetMain) meetMain.classList.add("hidden");
+            if (meetHeader) meetHeader.classList.add("hidden");
+            if (meetingRoom) meetingRoom.classList.remove("hidden");
+            window.startTimer();
+            window.initializeMedia();
+        };
+
+        window.leaveMeeting = function() {
+            var meetingRoom = document.getElementById("meeting-room");
+            var meetMain = document.querySelector(".meet-main");
+            var meetHeader = document.querySelector(".meet-header");
+            if (meetingRoom) meetingRoom.classList.add("hidden");
+            if (meetMain) meetMain.classList.remove("hidden");
+            if (meetHeader) meetHeader.classList.remove("hidden");
+            window.stopTimer();
+            window.stopMedia();
+        };
+
+        // Media controls
+        window.initializeMedia = async function() {
+            try {
+                window._meetState.localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true,
+                });
+                var localVideo = document.getElementById("local-video");
+                if (localVideo) localVideo.srcObject = window._meetState.localStream;
+            } catch (err) {
+                console.error("Error accessing media devices:", err);
+            }
+        };
+
+        window.stopMedia = function() {
+            if (window._meetState.localStream) {
+                window._meetState.localStream.getTracks().forEach(function(track) { track.stop(); });
+                window._meetState.localStream = null;
+            }
+        };
+
+        window.toggleMic = function() {
+            if (window._meetState.localStream) {
+                var audioTrack = window._meetState.localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = !audioTrack.enabled;
+                    window._meetState.isMuted = !audioTrack.enabled;
+                    var btn = document.getElementById("mic-btn");
+                    if (btn) btn.classList.toggle("muted", window._meetState.isMuted);
                 }
             }
-        });
-    }
+        };
 
-    // Meeting functions
-    function enterMeeting() {
-        document.querySelector(".meet-main")?.classList.add("hidden");
-        document.querySelector(".meet-header")?.classList.add("hidden");
-        document.getElementById("meeting-room")?.classList.remove("hidden");
-        startTimer();
-        initializeMedia();
-    }
-
-    function leaveMeeting() {
-        document.getElementById("meeting-room")?.classList.add("hidden");
-        document.querySelector(".meet-main")?.classList.remove("hidden");
-        document.querySelector(".meet-header")?.classList.remove("hidden");
-        stopTimer();
-        stopMedia();
-    }
-
-    // Media controls
-    let localStream = null;
-    let isMuted = false;
-    let isCameraOff = false;
-
-    async function initializeMedia() {
-        try {
-            localStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true,
-            });
-            const localVideo = document.getElementById("local-video");
-            if (localVideo) localVideo.srcObject = localStream;
-        } catch (err) {
-            console.error("Error accessing media devices:", err);
-        }
-    }
-
-    function stopMedia() {
-        if (localStream) {
-            localStream.getTracks().forEach((track) => track.stop());
-            localStream = null;
-        }
-    }
-
-    function toggleMic() {
-        if (localStream) {
-            const audioTrack = localStream.getAudioTracks()[0];
-            if (audioTrack) {
-                audioTrack.enabled = !audioTrack.enabled;
-                isMuted = !audioTrack.enabled;
-                const btn = document.getElementById("mic-btn");
-                btn?.classList.toggle("muted", isMuted);
+        window.toggleCamera = function() {
+            if (window._meetState.localStream) {
+                var videoTrack = window._meetState.localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    window._meetState.isCameraOff = !videoTrack.enabled;
+                    var btn = document.getElementById("camera-btn");
+                    if (btn) btn.classList.toggle("muted", window._meetState.isCameraOff);
+                }
             }
-        }
-    }
+        };
 
-    function toggleCamera() {
-        if (localStream) {
-            const videoTrack = localStream.getVideoTracks()[0];
-            if (videoTrack) {
-                videoTrack.enabled = !videoTrack.enabled;
-                isCameraOff = !videoTrack.enabled;
-                const btn = document.getElementById("camera-btn");
-                btn?.classList.toggle("muted", isCameraOff);
+        window.toggleScreenShare = async function() {
+            try {
+                var screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                });
+                // Handle screen share stream
+            } catch (err) {
+                console.error("Error sharing screen:", err);
             }
-        }
-    }
+        };
 
-    async function toggleScreenShare() {
-        try {
-            const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                video: true,
-            });
-            // Handle screen share stream
-        } catch (err) {
-            console.error("Error sharing screen:", err);
-        }
-    }
+        // Timer
+        window.startTimer = function() {
+            window._meetState.timerInterval = setInterval(function() {
+                window._meetState.timerSeconds++;
+                var hours = Math.floor(window._meetState.timerSeconds / 3600);
+                var minutes = Math.floor((window._meetState.timerSeconds % 3600) / 60);
+                var seconds = window._meetState.timerSeconds % 60;
+                var display = [hours, minutes, seconds]
+                    .map(function(v) { return v.toString().padStart(2, "0"); })
+                    .join(":");
+                var timerEl = document.getElementById("room-timer");
+                if (timerEl) timerEl.textContent = display;
+            }, 1000);
+        };
 
-    // Timer
-    let timerInterval = null;
-    let timerSeconds = 0;
+        window.stopTimer = function() {
+            if (window._meetState.timerInterval) {
+                clearInterval(window._meetState.timerInterval);
+                window._meetState.timerInterval = null;
+            }
+            window._meetState.timerSeconds = 0;
+        };
 
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            timerSeconds++;
-            const hours = Math.floor(timerSeconds / 3600);
-            const minutes = Math.floor((timerSeconds % 3600) / 60);
-            const seconds = timerSeconds % 60;
-            const display = [hours, minutes, seconds]
-                .map((v) => v.toString().padStart(2, "0"))
-                .join(":");
-            const timerEl = document.getElementById("room-timer");
-            if (timerEl) timerEl.textContent = display;
-        }, 1000);
-    }
+        // Reactions
+        window.showReactions = function() {
+            var popup = document.getElementById("reactions-popup");
+            if (popup) popup.classList.toggle("hidden");
+        };
 
-    function stopTimer() {
-        if (timerInterval) {
-            clearInterval(timerInterval);
-            timerInterval = null;
-        }
-        timerSeconds = 0;
-    }
+        window.sendReaction = function(emoji) {
+            console.log("Sending reaction:", emoji);
+            var popup = document.getElementById("reactions-popup");
+            if (popup) popup.classList.add("hidden");
+        };
 
-    // Reactions
-    function showReactions() {
-        document.getElementById("reactions-popup")?.classList.toggle("hidden");
-    }
+        // Copy meeting link
+        window.copyMeetingLink = function() {
+            var input = document.getElementById("meeting-link");
+            if (input) {
+                input.select();
+                navigator.clipboard.writeText(input.value);
+            }
+        };
 
-    function sendReaction(emoji) {
-        // Send via WebSocket
-        console.log("Sending reaction:", emoji);
-        document.getElementById("reactions-popup")?.classList.add("hidden");
-    }
+        // Preview for join modal
+        window.testVideo = async function() {
+            try {
+                var stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                });
+                var preview = document.getElementById("preview-video");
+                if (preview) preview.srcObject = stream;
+            } catch (err) {
+                console.error("Error testing video:", err);
+            }
+        };
 
-    // Copy meeting link
-    function copyMeetingLink() {
-        const input = document.getElementById("meeting-link");
-        if (input) {
-            input.select();
-            navigator.clipboard.writeText(input.value);
-        }
-    }
+        window.testAudio = function() {
+            console.log("Testing audio...");
+        };
 
-    // Preview for join modal
-    async function testVideo() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-            });
-            const preview = document.getElementById("preview-video");
-            if (preview) preview.srcObject = stream;
-        } catch (err) {
-            console.error("Error testing video:", err);
-        }
-    }
+        window.showMoreOptions = function() {
+            console.log("More options...");
+        };
 
-    function testAudio() {
-        // Test audio input/output
-        console.log("Testing audio...");
-    }
-
-    function showMoreOptions() {
-        // Show more options menu
-        console.log("More options...");
-    }
-
-    function showNotification(message) {
-        // Show notification toast
-        console.log("Notification:", message);
+        window.showNotification = function(message) {
+            console.log("Notification:", message);
+        };
     }
 </script>

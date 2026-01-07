@@ -1,13 +1,13 @@
-<div class="monitoring-home" id="monitoring-home">
+<div class="monitoring-home" id="monitoring-home" style="background: var(--bg); border-radius: 12px; overflow: hidden;">
     <!-- Live System Visualization -->
     <div class="live-visualization">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" class="live-svg">
             <defs>
                 <!-- Gradients -->
                 <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style="stop-color:var(--bg-dark, #0f172a)"/>
-                    <stop offset="50%" style="stop-color:var(--bg-surface, #1e293b)"/>
-                    <stop offset="100%" style="stop-color:var(--bg-dark, #0f172a)"/>
+                    <stop offset="0%" class="bg-stop-dark"/>
+                    <stop offset="50%" class="bg-stop-surface"/>
+                    <stop offset="100%" class="bg-stop-dark"/>
                 </linearGradient>
 
                 <linearGradient id="coreGlow" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -78,7 +78,7 @@
             <rect width="100%" height="100%" fill="url(#bgGradient)"/>
 
             <!-- Subtle grid -->
-            <g opacity="0.08" stroke="#64748b" stroke-width="0.5">
+            <g opacity="0.08" stroke="currentColor" stroke-width="0.5" class="grid-lines">
                 <line x1="0" y1="175" x2="1200" y2="175"/>
                 <line x1="0" y1="350" x2="1200" y2="350"/>
                 <line x1="0" y1="525" x2="1200" y2="525"/>
@@ -96,27 +96,27 @@
                 <circle r="70" fill="none" stroke="url(#coreGlow)" stroke-width="3" opacity="0.6" class="pulse-ring"/>
 
                 <!-- Core background -->
-                <circle r="55" fill="#1e293b" stroke="url(#coreGlow)" stroke-width="3" filter="url(#glow)"/>
+                <circle r="55" class="node-bg" stroke="url(#coreGlow)" stroke-width="3" filter="url(#glow)"/>
 
                 <!-- Bot icon -->
-                <g fill="#f8fafc">
+                <g class="icon-fill">
                     <rect x="-25" y="-20" width="50" height="35" rx="8" fill="url(#coreGlow)" opacity="0.9"/>
-                    <circle cx="-10" cy="-5" r="5" fill="#f8fafc"/>
-                    <circle cx="10" cy="-5" r="5" fill="#f8fafc"/>
-                    <path d="M-12 10 Q0 18 12 10" stroke="#f8fafc" stroke-width="2.5" fill="none"/>
+                    <circle cx="-10" cy="-5" r="5" class="icon-fill"/>
+                    <circle cx="10" cy="-5" r="5" class="icon-fill"/>
+                    <path d="M-12 10 Q0 18 12 10" class="icon-stroke" stroke-width="2.5" fill="none"/>
                     <rect x="-3" y="-35" width="6" height="12" rx="3" fill="url(#coreGlow)"/>
                     <circle cx="0" cy="-38" r="5" fill="url(#coreGlow)" class="antenna-pulse"/>
                 </g>
 
-                <text y="80" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="14" font-weight="600">BotServer</text>
-                <text y="98" text-anchor="middle" fill="#10b981" font-family="system-ui" font-size="11" class="status-text" data-service="core">● Running</text>
+                <text y="80" text-anchor="middle" class="label-text" font-family="system-ui" font-size="14" font-weight="600">BotServer</text>
+                <text y="98" text-anchor="middle" fill="var(--success, #10b981)" font-family="system-ui" font-size="11" class="status-text" data-service="core">● Running</text>
             </g>
 
             <!-- ==================== LEFT: Data Layer ==================== -->
 
             <!-- PostgreSQL -->
             <g transform="translate(150, 200)" class="service-node" data-service="postgresql">
-                <circle r="45" fill="#1e293b" stroke="url(#dbGradient)" stroke-width="2" filter="url(#glow)"/>
+                <circle r="45" class="node-bg" stroke="url(#dbGradient)" stroke-width="2" filter="url(#glow)"/>
                 <g transform="translate(-15, -18)">
                     <ellipse cx="15" cy="0" rx="18" ry="6" fill="url(#dbGradient)"/>
                     <path d="M-3 0 L-3 20 Q15 30 33 20 L33 0" fill="url(#dbGradient)" opacity="0.8"/>
@@ -124,16 +124,16 @@
                     <line x1="-3" y1="7" x2="33" y2="7" stroke="#1e40af" stroke-width="1"/>
                     <line x1="-3" y1="14" x2="33" y2="14" stroke="#1e40af" stroke-width="1"/>
                 </g>
-                <text y="65" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="500">PostgreSQL</text>
+                <text y="65" text-anchor="middle" class="label-text" font-family="system-ui" font-size="12" font-weight="500">PostgreSQL</text>
                 <circle cx="35" cy="-35" r="6" class="status-dot running" data-status="postgresql"/>
             </g>
 
             <!-- Qdrant -->
             <g transform="translate(150, 350)" class="service-node" data-service="qdrant">
-                <circle r="45" fill="#1e293b" stroke="url(#vectorGradient)" stroke-width="2" filter="url(#glow)"/>
+                <circle r="45" class="node-bg" stroke="url(#vectorGradient)" stroke-width="2" filter="url(#glow)"/>
                 <g fill="url(#vectorGradient)">
                     <polygon points="0,-22 19,11 -19,11" opacity="0.9"/>
-                    <polygon points="0,-12 12,7 -12,7" fill="#1e293b"/>
+                    <polygon points="0,-12 12,7 -12,7" class="node-bg"/>
                     <circle cx="0" cy="-22" r="4"/>
                     <circle cx="19" cy="11" r="4"/>
                     <circle cx="-19" cy="11" r="4"/>
@@ -141,22 +141,22 @@
                     <line x1="15" y1="9" x2="8" y2="5" stroke="#c4b5fd" stroke-width="1.5"/>
                     <line x1="-15" y1="9" x2="-8" y2="5" stroke="#c4b5fd" stroke-width="1.5"/>
                 </g>
-                <text y="65" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size""="12" font-weight="500">Qdrant</text>
+                <text y="65" text-anchor="middle" class="label-text" font-family="system-ui" font-size="12" font-weight="500">Qdrant</text>
                 <circle cx="35" cy="-35" r="6" class="status-dot running" data-status="qdrant"/>
             </g>
 
             <!-- MinIO -->
             <g transform="translate(150, 500)" class="service-node" data-service="drive">
-                <circle r="45" fill="#1e293b" stroke="url(#storageGradient)" stroke-width="2" filter="url(#glow)"/>
+                <circle r="45" class="node-bg" stroke="url(#storageGradient)" stroke-width="2" filter="url(#glow)"/>
                 <g fill="url(#storageGradient)">
                     <rect x="-22" y="-18" width="44" height="36" rx="4"/>
-                    <rect x="-18" y="-14" width="36" height="28" rx="2" fill="#1e293b"/>
+                    <rect x="-18" y="-14" width="36" height="28" rx="2" class="node-bg"/>
                     <rect x="-14" y="-10" width="28" height="8" rx="1" fill="#fcd34d" opacity="0.4"/>
                     <rect x="-14" y="2" width="28" height="8" rx="1" fill="#fcd34d" opacity="0.4"/>
                     <circle cx="10" cy="-6" r="2" fill="#fbbf24"/>
                     <circle cx="10" cy="6" r="2" fill="#fbbf24"/>
                 </g>
-                <text y="65" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="500">MinIO</text>
+                <text y="65" text-anchor="middle" class="label-text" font-family="system-ui" font-size="12" font-weight="500">MinIO</text>
                 <circle cx="35" cy="-35" r="6" class="status-dot running" data-status="drive"/>
             </g>
 
@@ -164,40 +164,40 @@
 
             <!-- BotModels -->
             <g transform="translate(1050, 200)" class="service-node" data-service="botmodels">
-                <circle r="45" fill="#1e293b" stroke="url(#aiGradient)" stroke-width="2" filter="url(#glow)"/>
+                <circle r="45" class="node-bg" stroke="url(#aiGradient)" stroke-width="2" filter="url(#glow)"/>
                 <g>
                     <circle cx="0" cy="-8" r="14" fill="none" stroke="url(#aiGradient)" stroke-width="2"/>
                     <circle cx="0" cy="-8" r="6" fill="url(#aiGradient)" class="ai-pulse"/>
                     <path d="M-18 12 L0 -2 L18 12" stroke="url(#aiGradient)" stroke-width="2" fill="none"/>
                     <path d="M-12 18 L0 8 L12 18" stroke="url(#aiGradient)" stroke-width="2" fill="none"/>
                 </g>
-                <text y="65" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="500">BotModels</text>
+                <text y="65" text-anchor="middle" class="label-text" font-family="system-ui" font-size="12" font-weight="500">BotModels</text>
                 <circle cx="35" cy="-35" r="6" class="status-dot running" data-status="botmodels"/>
             </g>
 
             <!-- Cache -->
             <g transform="translate(1050, 350)" class="service-node" data-service="cache">
-                <circle r="45" fill="#1e293b" stroke="url(#cacheGradient)" stroke-width="2" filter="url(#glow)"/>
+                <circle r="45" class="node-bg" stroke="url(#cacheGradient)" stroke-width="2" filter="url(#glow)"/>
                 <g fill="url(#cacheGradient)">
                     <rect x="-20" y="-18" width="40" height="36" rx="3"/>
-                    <rect x="-16" y="-14" width="32" height="28" rx="2" fill="#1e293b"/>
-                    <text x="0" y="5" text-anchor="middle" font-family="system-ui" font-size="18" fill="#22d3ee">⚡</text>
+                    <rect x="-16" y="-14" width="32" height="28" rx="2" class="node-bg"/>
+                    <text x="0" y="5" text-anchor="middle" font-family="system-ui" font-size="18" fill="var(--primary, #22d3ee)">⚡</text>
                 </g>
-                <text y="65" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="500">Cache</text>
+                <text y="65" text-anchor="middle" class="label-text" font-family="system-ui" font-size="12" font-weight="500">Cache</text>
                 <circle cx="35" cy="-35" r="6" class="status-dot running" data-status="cache"/>
             </g>
 
             <!-- Vault -->
             <g transform="translate(1050, 500)" class="service-node" data-service="vault">
-                <circle r="45" fill="#1e293b" stroke="url(#greenGlow)" stroke-width="2" filter="url(#glow)"/>
+                <circle r="45" class="node-bg" stroke="url(#greenGlow)" stroke-width="2" filter="url(#glow)"/>
                 <g fill="url(#greenGlow)">
                     <rect x="-18" y="-10" width="36" height="28" rx="4"/>
-                    <rect x="-14" y="-6" width="28" height="20" rx="2" fill="#1e293b"/>
+                    <rect x="-14" y="-6" width="28" height="20" rx="2" class="node-bg"/>
                     <circle cx="0" cy="4" r="6" fill="url(#greenGlow)"/>
                     <rect x="-2" y="4" width="4" height="8" fill="url(#greenGlow)"/>
                     <path d="M-10 -18 L0 -26 L10 -18" stroke="url(#greenGlow)" stroke-width="3" fill="none"/>
                 </g>
-                <text y="65" text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="12" font-weight="500">Vault</text>
+                <text y="65" text-anchor="middle" class="label-text" font-family="system-ui" font-size="12" font-weight="500">Vault</text>
                 <circle cx="35" cy="-35" r="6" class="status-dot running" data-status="vault"/>
             </g>
 
@@ -243,13 +243,13 @@
 
             <!-- Sessions -->
             <g transform="translate(320, 80)">
-                <rect x="0" y="0" width="160" height="85" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-                <text x="12" y="24" fill="#64748b" font-family="system-ui" font-size="10" font-weight="500">ACTIVE SESSIONS</text>
-                <text x="12" y="58" fill="#f8fafc" font-family="system-ui" font-size="32" font-weight="700"
+                <rect x="0" y="0" width="160" height="85" rx="10" class="card-bg" stroke="var(--border, #334155)" stroke-width="1"/>
+                <text x="12" y="24" class="label-secondary" font-family="system-ui" font-size="10" font-weight="500">ACTIVE SESSIONS</text>
+                <text x="12" y="58" class="label-text" font-family="system-ui" font-size="32" font-weight="700"
                       hx-get="/api/ui/monitoring/metric/sessions"
                       hx-trigger="load, every 5s"
                       hx-swap="innerHTML">--</text>
-                <text x="148" y="70" fill="#10b981" font-family="system-ui" font-size="11" text-anchor="end"
+                <text x="148" y="70" fill="var(--success, #10b981)" font-family="system-ui" font-size="11" text-anchor="end"
                       hx-get="/api/ui/monitoring/trend/sessions"
                       hx-trigger="load, every 5s"
                       hx-swap="innerHTML">↑ 0%</text>
@@ -257,13 +257,13 @@
 
             <!-- Messages -->
             <g transform="translate(500, 80)">
-                <rect x="0" y="0" width="160" height="85" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-                <text x="12" y="24" fill="#64748b" font-family="system-ui" font-size="10" font-weight="500">MESSAGES TODAY</text>
-                <text x="12" y="58" fill="#f8fafc" font-family="system-ui" font-size="32" font-weight="700"
+                <rect x="0" y="0" width="160" height="85" rx="10" class="card-bg" stroke="var(--border, #334155)" stroke-width="1"/>
+                <text x="12" y="24" class="label-secondary" font-family="system-ui" font-size="10" font-weight="500">MESSAGES TODAY</text>
+                <text x="12" y="58" class="label-text" font-family="system-ui" font-size="32" font-weight="700"
                       hx-get="/api/ui/monitoring/metric/messages"
                       hx-trigger="load, every 10s"
                       hx-swap="innerHTML">--</text>
-                <text x="148" y="70" fill="#94a3b8" font-family="system-ui" font-size="11" text-anchor="end"
+                <text x="148" y="70" class="label-secondary" font-family="system-ui" font-size="11" text-anchor="end"
                       hx-get="/api/ui/monitoring/rate/messages"
                       hx-trigger="load, every 10s"
                       hx-swap="innerHTML">0/hr</text>
@@ -271,13 +271,13 @@
 
             <!-- Response Time -->
             <g transform="translate(680, 80)">
-                <rect x="0" y="0" width="160" height="85" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-                <text x="12" y="24" fill="#64748b" font-family="system-ui" font-size="10" font-weight="500">AVG RESPONSE</text>
-                <text x="12" y="58" fill="#f8fafc" font-family="system-ui" font-size="32" font-weight="700"
+                <rect x="0" y="0" width="160" height="85" rx="10" class="card-bg" stroke="var(--border, #334155)" stroke-width="1"/>
+                <text x="12" y="24" class="label-secondary" font-family="system-ui" font-size="10" font-weight="500">AVG RESPONSE</text>
+                <text x="12" y="58" class="label-text" font-family="system-ui" font-size="32" font-weight="700"
                       hx-get="/api/ui/monitoring/metric/response_time"
                       hx-trigger="load, every 10s"
                       hx-swap="innerHTML">--</text>
-                <text x="148" y="70" fill="#94a3b8" font-family="system-ui" font-size="11" text-anchor="end">ms</text>
+                <text x="148" y="70" class="label-secondary" font-family="system-ui" font-size="11" text-anchor="end">ms</text>
             </g>
 
             <!-- ==================== RESOURCE BARS ==================== -->
@@ -287,44 +287,39 @@
                hx-trigger="load, every 15s"
                hx-swap="innerHTML">
                 <!-- CPU -->
-                <g transform="translate(0, 0)">
-                    <text x="0" y="12" fill="#94a3b8" font-family="system-ui" font-size="10" font-weight="500">CPU</text>
-                    <rect x="40" y="2" width="100" height="14" rx="4" fill="#334155"/>
-                    <rect x="40" y="2" width="65" height="14" rx="4" fill="url(#coreGlow)" class="resource-fill"/>
-                    <text x="150" y="13" fill="#f8fafc" font-family="system-ui" font-size="11" font-weight="500">65%</text>
+                <g transform="translate(245, 600)">
+                    <g transform="translate(0, 0)">
+                        <text x="0" y="12" class="label-secondary" font-family="system-ui" font-size="10" font-weight="500">CPU</text>
+                        <rect x="40" y="2" width="100" height="14" rx="4" class="progress-bg"/>
+                        <rect x="40" y="2" width="65" height="14" rx="4" fill="url(#coreGlow)" class="resource-fill"/>
+                        <text x="150" y="13" class="label-text" font-family="system-ui" font-size="11" font-weight="500">65%</text>
+                    </g>
+                    <g transform="translate(180, 0)">
+                        <text x="0" y="12" class="label-secondary" font-family="system-ui" font-size="10" font-weight="500">MEM</text>
+                        <rect x="40" y="2" width="100" height="14" rx="4" class="progress-bg"/>
+                        <rect x="40" y="2" width="72" height="14" rx="4" fill="url(#greenGlow)" class="resource-fill"/>
+                        <text x="150" y="13" class="label-text" font-family="system-ui" font-size="11" font-weight="500">72%</text>
+                    </g>
+                    <g transform="translate(360, 0)">
+                        <text x="0" y="12" class="label-secondary" font-family="system-ui" font-size="10" font-weight="500">GPU</text>
+                        <rect x="40" y="2" width="100" height="14" rx="4" class="progress-bg"/>
+                        <rect x="40" y="2" width="45" height="14" rx="4" fill="url(#vectorGradient)" class="resource-fill"/>
+                        <text x="150" y="13" class="label-text" font-family="system-ui" font-size="11" font-weight="500">45%</text>
+                    </g>
+                    <g transform="translate(540, 0)">
+                        <text x="0" y="12" class="label-secondary" font-family="system-ui" font-size="10" font-weight="500">DISK</text>
+                        <rect x="40" y="2" width="100" height="14" rx="4" class="progress-bg"/>
+                        <rect x="40" y="2" width="28" height="14" rx="4" fill="url(#storageGradient)" class="resource-fill"/>
+                        <text x="150" y="13" class="label-text" font-family="system-ui" font-size="11" font-weight="500">28%</text>
+                    </g>
                 </g>
-
-                <!-- Memory -->
-                <g transform="translate(180, 0)">
-                    <text x="0" y="12" fill="#94a3b8" font-family="system-ui" font-size="10" font-weight="500">MEM</text>
-                    <rect x="40" y="2" width="100" height="14" rx="4" fill="#334155"/>
-                    <rect x="40" y="2" width="72" height="14" rx="4" fill="url(#greenGlow)" class="resource-fill"/>
-                    <text x="150" y="13" fill="#f8fafc" font-family="system-ui" font-size="11" font-weight="500">72%</text>
-                </g>
-
-                <!-- GPU -->
-                <g transform="translate(360, 0)">
-                    <text x="0" y="12" fill="#94a3b8" font-family="system-ui" font-size="10" font-weight="500">GPU</text>
-                    <rect x="40" y="2" width="100" height="14" rx="4" fill="#334155"/>
-                    <rect x="40" y="2" width="45" height="14" rx="4" fill="url(#vectorGradient)" class="resource-fill"/>
-                    <text x="150" y="13" fill="#f8fafc" font-family="system-ui" font-size="11" font-weight="500">45%</text>
-                </g>
-
-                <!-- Disk -->
-                <g transform="translate(540, 0)">
-                    <text x="0" y="12" fill="#94a3b8" font-family="system-ui" font-size="10" font-weight="500">DISK</text>
-                    <rect x="40" y="2" width="100" height="14" rx="4" fill="#334155"/>
-                    <rect x="40" y="2" width="28" height="14" rx="4" fill="url(#storageGradient)" class="resource-fill"/>
-                    <text x="150" y="13" fill="#f8fafc" font-family="system-ui" font-size="11" font-weight="500">28%</text>
-                </g>
-            </g>
 
             <!-- ==================== ACTIVITY TICKER ==================== -->
 
             <g transform="translate(320, 630)">
-                <rect x="0" y="0" width="520" height="40" rx="8" fill="#1e293b" stroke="#334155" stroke-width="1"/>
-                <circle cx="18" cy="20" r="5" fill="#10b981" class="pulse-dot"/>
-                <text x="34" y="25" fill="#94a3b8" font-family="system-ui" font-size="12"
+                <rect x="0" y="0" width="520" height="40" rx="8" class="card-bg" stroke="var(--border, #334155)" stroke-width="1"/>
+                <circle cx="18" cy="20" r="5" fill="var(--success, #10b981)" class="pulse-dot"/>
+                <text x="34" y="25" class="label-secondary" font-family="system-ui" font-size="12"
                       hx-get="/api/ui/monitoring/activity/latest"
                       hx-trigger="load, every 5s"
                       hx-swap="innerHTML">System monitoring active...</text>
@@ -333,8 +328,8 @@
             <!-- ==================== TITLE ==================== -->
 
             <g transform="translate(600, 45)">
-                <text text-anchor="middle" fill="#f8fafc" font-family="system-ui" font-size="22" font-weight="600">Live System Monitor</text>
-                <text y="24" text-anchor="middle" fill="#64748b" font-family="system-ui" font-size="12"
+                <text text-anchor="middle" class="label-text" font-family="system-ui" font-size="22" font-weight="600">Live System Monitor</text>
+                <text y="24" text-anchor="middle" class="label-secondary" font-family="system-ui" font-size="12"
                       hx-get="/api/ui/monitoring/timestamp"
                       hx-trigger="load, every 5s"
                       hx-swap="innerHTML">Last updated: --</text>

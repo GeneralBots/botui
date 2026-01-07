@@ -38,6 +38,14 @@
                 </svg>
                 <span>Appearance</span>
             </a>
+            <a href="#language" class="nav-item" onclick="showSection('language', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span>Language</span>
+            </a>
             <a href="#notifications" class="nav-item" onclick="showSection('notifications', this)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
@@ -73,6 +81,58 @@
                 </svg>
                 <span>Billing</span>
             </a>
+
+            <!-- Admin Section Divider -->
+            <div class="nav-divider">
+                <span>Administration</span>
+            </div>
+
+            <a href="#users" class="nav-item" onclick="showSection('users', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                <span data-i18n="admin-users">Users</span>
+            </a>
+            <a href="#groups" class="nav-item" onclick="showSection('groups', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <circle cx="19" cy="11" r="2"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-2-3.46"></path>
+                </svg>
+                <span data-i18n="admin-groups">Groups</span>
+            </a>
+            <a href="#bots" class="nav-item" onclick="showSection('bots', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <path d="M12 7v4"></path>
+                    <line x1="8" y1="16" x2="8" y2="16"></line>
+                    <line x1="16" y1="16" x2="16" y2="16"></line>
+                </svg>
+                <span data-i18n="admin-bots">Bots</span>
+            </a>
+            <a href="#dns" class="nav-item" onclick="showSection('dns', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span data-i18n="admin-dns">DNS</span>
+            </a>
+            <a href="#audit" class="nav-item" onclick="showSection('audit', this)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span data-i18n="admin-audit">Audit Log</span>
+            </a>
         </nav>
 
         <div class="settings-footer">
@@ -106,11 +166,11 @@
                         <p>Your profile photo is visible to other users</p>
                     </div>
                     <div class="avatar-section">
-                        <div class="current-avatar" i</p>d="current-avatar">
+                        <div class="current-avatar" id="current-avatar">
                             <span>JD</span>
                         </div>
                         <div class="avatar-actions">
-                            <label class="btn-secondary upload-btn"></span>
+                            <label class="btn-secondary upload-btn">
                                 <input type="file" name="avatar" accept="image/*" hidden onchange="previewAvatar(this)">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -212,15 +272,15 @@
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>Current Password</label>
-                            <input type="password" name="current_password" required>
+                            <input type="password" name="current_password" required autocomplete="current-password">
                         </div>
                         <div class="form-group">
                             <label>New Password</label>
-                            <input type="password" name="new_password" required minlength="8">
+                            <input type="password" name="new_password" required minlength="8" autocomplete="new-password">
                         </div>
                         <div class="form-group">
                             <label>Confirm New Password</label>
-                            <input type="password" name="confirm_password" required>
+                            <input type="password" name="confirm_password" required autocomplete="new-password">
                         </div>
                     </div>
                     <div class="form-actions">
@@ -287,6 +347,187 @@
                      hx-swap="innerHTML">
                     <div class="loading-state">
                         <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Language Section -->
+        <section id="language-section" class="settings-section">
+            <div class="section-header">
+                <h1>Language & Region</h1>
+                <p class="subtitle">Choose your preferred language and regional settings</p>
+            </div>
+
+            <!-- Language Selection -->
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2>Display Language</h2>
+                    <p>Choose the language for the application interface</p>
+                </div>
+                <div class="language-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
+                    <button class="language-option" data-locale="en" onclick="selectLanguage('en', this)" style="display: flex; align-items: center; gap: 16px; padding: 20px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; cursor: pointer; position: relative; transition: all 0.2s; text-align: left;">
+                        <span style="font-size: 40px; line-height: 1;">🇺🇸</span>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">English</div>
+                            <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">English</div>
+                        </div>
+                        <svg class="lang-check" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="3" style="opacity: 0;">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </button>
+                    <button class="language-option" data-locale="pt-BR" onclick="selectLanguage('pt-BR', this)" style="display: flex; align-items: center; gap: 16px; padding: 20px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; cursor: pointer; position: relative; transition: all 0.2s; text-align: left;">
+                        <span style="font-size: 40px; line-height: 1;">🇧🇷</span>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">Portuguese (Brazil)</div>
+                            <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Português (Brasil)</div>
+                        </div>
+                        <svg class="lang-check" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="3" style="opacity: 0;">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </button>
+                    <button class="language-option" data-locale="es" disabled style="display: flex; align-items: center; gap: 16px; padding: 20px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; cursor: not-allowed; position: relative; opacity: 0.5; text-align: left;">
+                        <span style="font-size: 40px; line-height: 1;">🇪🇸</span>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">Spanish</div>
+                            <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Español</div>
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; background: #334155; border-radius: 4px; color: #94a3b8;">Coming Soon</span>
+                    </button>
+                    <button class="language-option" data-locale="zh-CN" disabled style="display: flex; align-items: center; gap: 16px; padding: 20px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; cursor: not-allowed; position: relative; opacity: 0.5; text-align: left;">
+                        <span style="font-size: 40px; line-height: 1;">🇨🇳</span>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">Chinese (Simplified)</div>
+                            <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">简体中文</div>
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; background: #334155; border-radius: 4px; color: #94a3b8;">Coming Soon</span>
+                    </button>
+                    <button class="language-option" data-locale="fr" disabled style="display: flex; align-items: center; gap: 16px; padding: 20px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; cursor: not-allowed; position: relative; opacity: 0.5; text-align: left;">
+                        <span style="font-size: 40px; line-height: 1;">🇫🇷</span>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">French</div>
+                            <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Français</div>
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; background: #334155; border-radius: 4px; color: #94a3b8;">Coming Soon</span>
+                    </button>
+                    <button class="language-option" data-locale="de" disabled style="display: flex; align-items: center; gap: 16px; padding: 20px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; cursor: not-allowed; position: relative; opacity: 0.5; text-align: left;">
+                        <span style="font-size: 40px; line-height: 1;">🇩🇪</span>
+                        <div style="flex: 1;">
+                            <div style="font-size: 16px; font-weight: 600; color: #f8fafc;">German</div>
+                            <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">Deutsch</div>
+                        </div>
+                        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 4px 8px; background: #334155; border-radius: 4px; color: #94a3b8;">Coming Soon</span>
+                    </button>
+                </div>
+            </div>
+
+            <script>
+            (function() {
+                function initLanguageSelector() {
+                    var savedLocale = localStorage.getItem('gb-locale') || 'en';
+                    var buttons = document.querySelectorAll('.language-option[data-locale]');
+
+                    buttons.forEach(function(btn) {
+                        var locale = btn.dataset.locale;
+                        var checkmark = btn.querySelector('.lang-check');
+
+                        if (locale === savedLocale && checkmark) {
+                            btn.style.borderColor = '#3b82f6';
+                            btn.style.background = 'rgba(59, 130, 246, 0.1)';
+                            checkmark.style.opacity = '1';
+                        }
+
+                        btn.addEventListener('mouseover', function() {
+                            if (!btn.disabled) {
+                                btn.style.borderColor = '#3b82f6';
+                            }
+                        });
+
+                        btn.addEventListener('mouseout', function() {
+                            if (!btn.disabled && locale !== localStorage.getItem('gb-locale')) {
+                                btn.style.borderColor = '#334155';
+                                btn.style.background = '#0f172a';
+                            }
+                        });
+                    });
+                }
+
+                window.selectLanguage = function(locale, element) {
+                    var buttons = document.querySelectorAll('.language-option[data-locale]');
+                    buttons.forEach(function(btn) {
+                        btn.style.borderColor = '#334155';
+                        btn.style.background = '#0f172a';
+                        var check = btn.querySelector('.lang-check');
+                        if (check) check.style.opacity = '0';
+                    });
+
+                    if (element) {
+                        element.style.borderColor = '#3b82f6';
+                        element.style.background = 'rgba(59, 130, 246, 0.1)';
+                        var check = element.querySelector('.lang-check');
+                        if (check) check.style.opacity = '1';
+                    }
+
+                    localStorage.setItem('gb-locale', locale);
+                    document.documentElement.lang = locale;
+
+                    if (window.showToast) {
+                        showToast('Language changed to ' + (locale === 'pt-BR' ? 'Português' : 'English') + '. Reloading...');
+                    }
+
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initLanguageSelector);
+                } else {
+                    initLanguageSelector();
+                }
+            })();
+            </script>
+
+            <!-- Regional Settings -->
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2>Regional Settings</h2>
+                    <p>Configure date, time, and number formats</p>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Date Format</label>
+                        <select id="date-format-select" class="form-select" onchange="changeDateFormat(this.value)">
+                            <option value="MM/DD/YYYY">MM/DD/YYYY (US)</option>
+                            <option value="DD/MM/YYYY">DD/MM/YYYY (EU/BR)</option>
+                            <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Time Format</label>
+                        <select id="time-format-select" class="form-select" onchange="changeTimeFormat(this.value)">
+                            <option value="12h">12-hour (1:30 PM)</option>
+                            <option value="24h">24-hour (13:30)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Timezone</label>
+                        <select id="timezone-select" class="form-select" onchange="changeTimezone(this.value)">
+                            <option value="America/Sao_Paulo">São Paulo (GMT-3)</option>
+                            <option value="America/New_York">New York (GMT-5)</option>
+                            <option value="America/Los_Angeles">Los Angeles (GMT-8)</option>
+                            <option value="Europe/London">London (GMT+0)</option>
+                            <option value="Europe/Paris">Paris (GMT+1)</option>
+                            <option value="Asia/Tokyo">Tokyo (GMT+9)</option>
+                            <option value="UTC">UTC</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>First Day of Week</label>
+                        <select id="first-day-select" class="form-select">
+                            <option value="sunday">Sunday</option>
+                            <option value="monday">Monday</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -403,6 +644,53 @@
                         <input type="checkbox" name="animations" checked>
                         <span class="toggle-slider"></span>
                     </label>
+                </div>
+            </div>
+
+            <!-- Language Selection -->
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2 data-i18n="settings-language">Language</h2>
+                    <p data-i18n="settings-language-desc">Choose your preferred language</p>
+                </div>
+                <div class="language-selector-container">
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title" data-i18n="settings-display-language">Display Language</span>
+                            <span class="setting-desc" data-i18n="settings-language-affects">Affects all text in the application</span>
+                        </div>
+                        <select id="language-select" class="form-select" onchange="changeLanguage(this.value)">
+                            <option value="en">🇺🇸 English</option>
+                            <option value="pt-BR">🇧🇷 Português (Brasil)</option>
+                            <option value="es" disabled>🇪🇸 Español (Coming soon)</option>
+                            <option value="zh-CN" disabled>🇨🇳 简体中文 (Coming soon)</option>
+                            <option value="fr" disabled>🇫🇷 Français (Coming soon)</option>
+                            <option value="de" disabled>🇩🇪 Deutsch (Coming soon)</option>
+                            <option value="ja" disabled>🇯🇵 日本語 (Coming soon)</option>
+                            <option value="ko" disabled>🇰🇷 한국어 (Coming soon)</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title" data-i18n="settings-date-format">Date Format</span>
+                            <span class="setting-desc" data-i18n="settings-date-format-desc">How dates are displayed</span>
+                        </div>
+                        <select id="date-format-select" class="form-select" onchange="changeDateFormat(this.value)">
+                            <option value="MM/DD/YYYY">MM/DD/YYYY (US)</option>
+                            <option value="DD/MM/YYYY">DD/MM/YYYY (EU/BR)</option>
+                            <option value="YYYY-MM-DD">YYYY-MM-DD (ISO)</option>
+                        </select>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <span class="setting-title" data-i18n="settings-time-format">Time Format</span>
+                            <span class="setting-desc" data-i18n="settings-time-format-desc">12-hour or 24-hour clock</span>
+                        </div>
+                        <select id="time-format-select" class="form-select" onchange="changeTimeFormat(this.value)">
+                            <option value="12h">12-hour (1:30 PM)</option>
+                            <option value="24h">24-hour (13:30)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </section>
@@ -935,12 +1223,316 @@
                 </div>
             </div>
         </section>
+
+        <!-- Users Section (Admin) -->
+        <section id="users-section" class="settings-section">
+            <div class="section-header">
+                <h1 data-i18n="admin-users">Users</h1>
+                <p class="subtitle" data-i18n="admin-users-subtitle">Manage user accounts and permissions</p>
+            </div>
+
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2>User Management</h2>
+                    <button class="btn-primary btn-sm" onclick="document.getElementById('create-user-modal').showModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add User
+                    </button>
+                </div>
+                <div hx-get="/api/admin/users" hx-trigger="load" hx-swap="innerHTML">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading users...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Groups Section (Admin) -->
+        <section id="groups-section" class="settings-section">
+            <div class="section-header">
+                <h1 data-i18n="admin-groups">Groups</h1>
+                <p class="subtitle" data-i18n="admin-groups-subtitle">Manage groups and team permissions</p>
+            </div>
+
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2>Group Management</h2>
+                    <button class="btn-primary btn-sm" onclick="document.getElementById('create-group-modal').showModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Group
+                    </button>
+                </div>
+                <div hx-get="/api/admin/groups" hx-trigger="load" hx-swap="innerHTML">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading groups...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bots Section (Admin) -->
+        <section id="bots-section" class="settings-section">
+            <div class="section-header">
+                <h1 data-i18n="admin-bots">Bots</h1>
+                <p class="subtitle" data-i18n="admin-bots-subtitle">Manage bot instances and deployments</p>
+            </div>
+
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2>Bot Management</h2>
+                </div>
+                <div hx-get="/api/admin/bots" hx-trigger="load" hx-swap="innerHTML">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading bots...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DNS Section (Admin) -->
+        <section id="dns-section" class="settings-section">
+            <div class="section-header">
+                <h1 data-i18n="admin-dns">DNS Management</h1>
+                <p class="subtitle" data-i18n="admin-dns-subtitle">Configure custom domains and DNS settings</p>
+            </div>
+
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2>Domain Configuration</h2>
+                    <button class="btn-primary btn-sm" onclick="document.getElementById('register-dns-modal').showModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Domain
+                    </button>
+                </div>
+                <div hx-get="/api/admin/dns" hx-trigger="load" hx-swap="innerHTML">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading DNS records...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audit Section (Admin) -->
+        <section id="audit-section" class="settings-section">
+            <div class="section-header">
+                <h1 data-i18n="admin-audit">Audit Log</h1>
+                <p class="subtitle" data-i18n="admin-audit-subtitle">Track system events and user actions</p>
+            </div>
+
+            <div class="setting-card">
+                <div class="card-header">
+                    <h2>Recent Activity</h2>
+                </div>
+                <div hx-get="/api/admin/audit" hx-trigger="load" hx-swap="innerHTML">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Loading audit log...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 </div>
+
+<!-- Create User Modal -->
+<dialog id="create-user-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 data-i18n="admin-create-user">Create User</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('create-user-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/api/users/create" hx-swap="none" hx-on::after-request="if(event.detail.successful) { document.getElementById('create-user-modal').close(); showToast('User created successfully'); }">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required placeholder="username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" required placeholder="user@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" name="display_name" placeholder="John Doe" autocomplete="name">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select name="role">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                    <option value="viewer">Viewer</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('create-user-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Create User</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Create Group Modal -->
+<dialog id="create-group-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 data-i18n="admin-create-group">Create Group</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('create-group-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/api/groups/create" hx-swap="none" hx-on::after-request="if(event.detail.successful) { document.getElementById('create-group-modal').close(); showToast('Group created successfully'); }">
+            <div class="form-group">
+                <label>Group Name</label>
+                <input type="text" name="name" required placeholder="Engineering Team">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" placeholder="Group description..." rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('create-group-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Create Group</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Register DNS Modal -->
+<dialog id="register-dns-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Register DNS Hostname</h2>
+            <button type="button" class="close-btn" onclick="document.getElementById('register-dns-modal').close()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <form hx-post="/api/dns/register" hx-swap="none" hx-on::after-request="if(event.detail.successful) { document.getElementById('register-dns-modal').close(); showToast('DNS record registered'); }">
+            <div class="form-group">
+                <label>Hostname</label>
+                <input type="text" name="hostname" required placeholder="mybot.example.com">
+            </div>
+            <div class="form-group">
+                <label>Record Type</label>
+                <select name="record_type">
+                    <option value="A">A (IPv4)</option>
+                    <option value="AAAA">AAAA (IPv6)</option>
+                    <option value="CNAME">CNAME</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Target</label>
+                <input type="text" name="target" placeholder="192.168.1.1 or target.domain.com">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="document.getElementById('register-dns-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary">Register</button>
+            </div>
+        </form>
+    </div>
+</dialog>
 
 
 
 <style>
+    /* Fix dialog elements - ensure they're hidden by default */
+    dialog.modal {
+        display: none;
+        padding: 0;
+        border: none;
+        border-radius: 16px;
+        background: var(--surface);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        max-width: 480px;
+        width: 90%;
+    }
+
+    dialog.modal[open] {
+        display: flex;
+        flex-direction: column;
+    }
+
+    dialog.modal::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    dialog.modal form {
+        padding: 24px;
+    }
+
+    dialog.modal .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    dialog.modal .modal-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    dialog.modal .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 16px 24px;
+        border-top: 1px solid var(--border);
+        background: var(--surface-hover);
+        border-radius: 0 0 16px 16px;
+    }
+
+    .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        color: var(--text-secondary);
+    }
+
+    .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
     .settings-layout {
         display: grid;
         grid-template-columns: 260px 1fr;
@@ -953,7 +1545,20 @@
         border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
-        padding: 24px 0;
+    }
+
+    .nav-divider {
+        padding: 16px 16px 8px 16px;
+        margin-top: 8px;
+        border-top: 1px solid var(--border);
+    }
+
+    .nav-divider span {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
     }
 
     .settings-header {
@@ -1750,7 +2355,12 @@
         if (window.showNotification) {
             window.showNotification(message, type);
         } else {
-            alert(message);
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification toast-' + type;
+            toast.textContent = message;
+            toast.style.cssText = 'position:fixed;top:20px;right:20px;padding:12px 24px;background:#333;color:#fff;border-radius:8px;z-index:10000;animation:fadeIn 0.3s';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
     }
 
@@ -1765,7 +2375,7 @@
         }
     });
 
-    // Theme selection
+    // Theme selection - handle both .theme-card and .theme-option elements
     document.querySelectorAll('.theme-card').forEach(card => {
         card.addEventListener('click', function() {
             const theme = this.dataset.theme;
@@ -1776,4 +2386,39 @@
             this.classList.add('active');
         });
     });
+
+    // Initialize theme options - mark current theme as active
+    (function initThemeOptions() {
+        const savedTheme = localStorage.getItem('gb-theme') || 'sentient';
+
+        // Mark the active theme option
+        document.querySelectorAll('.theme-option').forEach(opt => {
+            if (opt.dataset.theme === savedTheme) {
+                opt.classList.add('active');
+            } else {
+                opt.classList.remove('active');
+            }
+        });
+
+        // Also mark theme-card if present
+        document.querySelectorAll('.theme-card').forEach(card => {
+            if (card.dataset.theme === savedTheme) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+    })();
+
+    // Load translation script and translate page
+    (function loadTranslations() {
+        var script = document.createElement('script');
+        script.src = '/suite/js/translations.js';
+        script.onload = function() {
+            if (window.gbTranslations) {
+                window.gbTranslations.translatePage();
+            }
+        };
+        document.head.appendChild(script);
+    })();
 </script>

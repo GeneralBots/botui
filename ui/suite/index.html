@@ -15,6 +15,7 @@
         <link rel="stylesheet" href="css/apps-extended.css" />
         <link rel="stylesheet" href="css/components.css" />
         <link rel="stylesheet" href="css/base.css" />
+        <link rel="stylesheet" href="css/partials.css" />
         <link rel="stylesheet" href="css/theme-sentient.css" />
 
         <!-- App-specific CSS -->
@@ -24,6 +25,8 @@
         <link rel="stylesheet" href="mail/mail.css" />
         <link rel="stylesheet" href="meet/meet.css" />
         <link rel="stylesheet" href="paper/paper.css" />
+        <link rel="stylesheet" href="sheet/sheet.css" />
+        <link rel="stylesheet" href="slides/slides.css" />
         <link rel="stylesheet" href="research/research.css" />
         <link rel="stylesheet" href="tasks/tasks.css?v=20251230" />
         <link rel="stylesheet" href="tasks/taskmd.css?v=20251230" />
@@ -36,11 +39,46 @@
         <script src="js/vendor/htmx-json-enc.js"></script>
         <script src="js/vendor/marked.min.js"></script>
 
+        <!-- i18n -->
+        <script src="js/i18n.js"></script>
+
         <!-- Enable HTMX to process inline scripts in swapped content -->
         <script>
             htmx.config.allowEval = true;
             htmx.config.includeIndicatorStyles = false;
             htmx.config.timeout = 300000; // 5 minutes for long-running LLM operations
+
+            // Global error handler to catch HTMX DOM manipulation errors
+            window.addEventListener("error", function (event) {
+                // Catch insertBefore errors from HTMX swap operations
+                if (
+                    event.message &&
+                    event.message.includes("insertBefore") &&
+                    event.message.includes("null")
+                ) {
+                    console.warn(
+                        "HTMX DOM error caught and suppressed:",
+                        event.message,
+                    );
+                    event.preventDefault();
+                    return true;
+                }
+            });
+
+            // Handle unhandled promise rejections from HTMX
+            window.addEventListener("unhandledrejection", function (event) {
+                if (
+                    event.reason &&
+                    event.reason.message &&
+                    event.reason.message.includes("insertBefore")
+                ) {
+                    console.warn(
+                        "HTMX promise rejection caught:",
+                        event.reason.message,
+                    );
+                    event.preventDefault();
+                }
+            });
         </script>
     </head>
 
@@ -128,32 +166,7 @@
                                 d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
                             />
                         </svg>
-                        <span>Chat</span>
-                    </a>
-                    <a
-                        class="app-tab"
-                        href="#paper"
-                        data-section="paper"
-                        hx-get="/suite/paper/paper.html"
-                        hx-target="#main-content"
-                        hx-push-url="/#paper"
-                    >
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path
-                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                            />
-                            <polyline points="14 2 14 8 20 8" />
-                            <line x1="16" y1="13" x2="8" y2="13" />
-                            <line x1="16" y1="17" x2="8" y2="17" />
-                        </svg>
-                        <span>Paper</span>
+                        <span data-i18n="nav-chat">Chat</span>
                     </a>
                     <a
                         class="app-tab"
@@ -176,7 +189,7 @@
                             />
                             <polyline points="22,6 12,13 2,6" />
                         </svg>
-                        <span>Mail</span>
+                        <span data-i18n="nav-mail">E-mail</span>
                     </a>
                     <a
                         class="app-tab"
@@ -206,7 +219,7 @@
                             <line x1="8" y1="2" x2="8" y2="6" />
                             <line x1="3" y1="10" x2="21" y2="10" />
                         </svg>
-                        <span>Calendar</span>
+                        <span data-i18n="nav-calendar">Calendário</span>
                     </a>
                     <a
                         class="app-tab"
@@ -228,7 +241,7 @@
                                 d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
                             />
                         </svg>
-                        <span>Drive</span>
+                        <span data-i18n="nav-drive">Arquivos</span>
                     </a>
                     <a
                         class="app-tab"
@@ -251,7 +264,92 @@
                                 d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
                             />
                         </svg>
-                        <span>Tasks</span>
+                        <span data-i18n="nav-tasks">Tarefas</span>
+                    </a>
+                    <a
+                        class="app-tab"
+                        href="#docs"
+                        data-section="docs"
+                        hx-get="/suite/docs/docs.html"
+                        hx-target="#main-content"
+                        hx-push-url="/#docs"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                            />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                        <span data-i18n="nav-docs">Documentos</span>
+                    </a>
+                    <a
+                        class="app-tab"
+                        href="#sheet"
+                        data-section="sheet"
+                        hx-get="/suite/sheet/sheet.html"
+                        hx-target="#main-content"
+                        hx-push-url="/#sheet"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2"
+                                ry="2"
+                            />
+                            <line x1="3" y1="9" x2="21" y2="9" />
+                            <line x1="3" y1="15" x2="21" y2="15" />
+                            <line x1="9" y1="3" x2="9" y2="21" />
+                            <line x1="15" y1="3" x2="15" y2="21" />
+                        </svg>
+                        <span data-i18n="nav-sheet">Planilhas</span>
+                    </a>
+                    <a
+                        class="app-tab"
+                        href="#slides"
+                        data-section="slides"
+                        hx-get="/suite/slides/slides.html"
+                        hx-target="#main-content"
+                        hx-push-url="/#slides"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="2"
+                                y="3"
+                                width="20"
+                                height="14"
+                                rx="2"
+                                ry="2"
+                            />
+                            <line x1="8" y1="21" x2="16" y2="21" />
+                            <line x1="12" y1="17" x2="12" y2="21" />
+                        </svg>
+                        <span data-i18n="nav-slides">Apresentações</span>
                     </a>
                 </nav>
 
@@ -291,7 +389,12 @@
                         role="menu"
                         aria-label="Applications"
                     >
-                        <div class="apps-dropdown-title">All Applications</div>
+                        <div
+                            class="apps-dropdown-title"
+                            data-i18n="nav-all-apps"
+                        >
+                            All Applications
+                        </div>
                         <div class="app-grid" role="group">
                             <!-- Chat -->
                             <a
@@ -318,19 +421,19 @@
                                         />
                                     </svg>
                                 </div>
-                                <span>Chat</span>
+                                <span data-i18n="nav-chat">Chat</span>
                             </a>
 
-                            <!-- Paper -->
+                            <!-- Docs -->
                             <a
                                 class="app-item"
-                                href="#paper"
-                                data-section="paper"
+                                href="#docs"
+                                data-section="docs"
                                 role="menuitem"
-                                aria-label="Paper - Notes & Writing"
-                                hx-get="/suite/paper/paper.html"
+                                aria-label="Docs - Documents"
+                                hx-get="/suite/docs/docs.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#paper"
+                                hx-push-url="/#docs"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -349,7 +452,109 @@
                                         <line x1="16" y1="17" x2="8" y2="17" />
                                     </svg>
                                 </div>
-                                <span>Paper</span>
+                                <span data-i18n="nav-docs">Documentos</span>
+                            </a>
+
+                            <!-- Sheet -->
+                            <a
+                                class="app-item"
+                                href="#sheet"
+                                data-section="sheet"
+                                role="menuitem"
+                                aria-label="Sheet - Spreadsheets"
+                                hx-get="/suite/sheet/sheet.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#sheet"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="3"
+                                            width="18"
+                                            height="18"
+                                            rx="2"
+                                            ry="2"
+                                        />
+                                        <line x1="3" y1="9" x2="21" y2="9" />
+                                        <line x1="3" y1="15" x2="21" y2="15" />
+                                        <line x1="9" y1="3" x2="9" y2="21" />
+                                        <line x1="15" y1="3" x2="15" y2="21" />
+                                    </svg>
+                                </div>
+                                <span data-i18n="nav-sheet">Planilhas</span>
+                            </a>
+
+                            <!-- Slides -->
+                            <a
+                                class="app-item"
+                                href="#slides"
+                                data-section="slides"
+                                role="menuitem"
+                                aria-label="Slides - Presentations"
+                                hx-get="/suite/slides/slides.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#slides"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <rect
+                                            x="2"
+                                            y="3"
+                                            width="20"
+                                            height="14"
+                                            rx="2"
+                                            ry="2"
+                                        />
+                                        <line x1="8" y1="21" x2="16" y2="21" />
+                                        <line x1="12" y1="17" x2="12" y2="21" />
+                                    </svg>
+                                </div>
+                                <span data-i18n="nav-slides"
+                                    >Apresentações</span
+                                >
+                            </a>
+
+                            <!-- Editor -->
+                            <a
+                                class="app-item"
+                                href="#editor"
+                                data-section="editor"
+                                role="menuitem"
+                                aria-label="Editor - Code & Text"
+                                hx-get="/editor.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#editor"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="16 18 22 12 16 6" />
+                                        <polyline points="8 6 2 12 8 18" />
+                                        <line x1="12" y1="2" x2="12" y2="22" />
+                                    </svg>
+                                </div>
+                                <span data-i18n="nav-editor">Editor</span>
                             </a>
 
                             <!-- Mail -->
@@ -378,7 +583,7 @@
                                         <polyline points="22,6 12,13 2,6" />
                                     </svg>
                                 </div>
-                                <span>Mail</span>
+                                <span data-i18n="nav-mail">E-mail</span>
                             </a>
 
                             <!-- Drive -->
@@ -406,7 +611,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <span>Drive</span>
+                                <span data-i18n="nav-drive">Arquivos</span>
                             </a>
 
                             <!-- Calendar -->
@@ -442,7 +647,7 @@
                                         <line x1="3" y1="10" x2="21" y2="10" />
                                     </svg>
                                 </div>
-                                <span>Calendar</span>
+                                <span data-i18n="nav-calendar">Calendário</span>
                             </a>
 
                             <!-- Tasks -->
@@ -471,7 +676,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <span>Tasks</span>
+                                <span data-i18n="nav-tasks">Tarefas</span>
                             </a>
 
                             <!-- Research -->
@@ -499,7 +704,7 @@
                                         <path d="M11 8v6M8 11h6" />
                                     </svg>
                                 </div>
-                                <span>Research</span>
+                                <span data-i18n="nav-research">Pesquisa</span>
                             </a>
 
                             <!-- Meet -->
@@ -535,7 +740,7 @@
                                         />
                                     </svg>
                                 </div>
-                                <span>Meet</span>
+                                <span data-i18n="nav-meet">Reuniões</span>
                             </a>
 
                             <!-- Analytics -->
@@ -563,7 +768,7 @@
                                         <line x1="6" y1="20" x2="6" y2="14" />
                                     </svg>
                                 </div>
-                                <span>Analytics</span>
+                                <span data-i18n="nav-analytics">Analytics</span>
                             </a>
 
                             <!-- Monitoring -->
@@ -591,35 +796,352 @@
                                         <circle cx="12" cy="12" r="2" />
                                     </svg>
                                 </div>
-                                <span>Monitoring</span>
+                                <span data-i18n="nav-monitoring"
+                                    >Monitoring</span
+                                >
+                            </a>
+
+                            <!-- Sources -->
+                            <a
+                                class="app-item"
+                                href="#sources"
+                                data-section="sources"
+                                role="menuitem"
+                                aria-label="Data Sources"
+                                hx-get="/suite/sources/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#sources"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <ellipse cx="12" cy="5" rx="9" ry="3" />
+                                        <path
+                                            d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"
+                                        />
+                                        <path
+                                            d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"
+                                        />
+                                    </svg>
+                                </div>
+                                <span data-i18n="nav-sources">Sources</span>
+                            </a>
+
+                            <!-- Tools -->
+                            <a
+                                class="app-item"
+                                href="#tools"
+                                data-section="tools"
+                                role="menuitem"
+                                aria-label="Tools"
+                                hx-get="/suite/tools/compliance.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#tools"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"
+                                        />
+                                    </svg>
+                                </div>
+                                <span data-i18n="nav-tools">Tools</span>
+                            </a>
+
+                            <!-- Designer (.bas Editor) -->
+                            <a
+                                class="app-item"
+                                href="#designer"
+                                data-section="designer"
+                                role="menuitem"
+                                aria-label="Dialog Designer"
+                                hx-get="/designer.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#designer"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                        <path d="M2 17l10 5 10-5" />
+                                        <path d="M2 12l10 5 10-5" />
+                                    </svg>
+                                </div>
+                                <span data-i18n="nav-designer">Designer</span>
+                            </a>
+
+                            <!-- Attendant -->
+                            <a
+                                class="app-item"
+                                href="#attendant"
+                                data-section="attendant"
+                                role="menuitem"
+                                aria-label="Attendant"
+                                hx-get="/suite/attendant/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#attendant"
+                            >
+                                <div class="app-icon" aria-hidden="true">
+                                    <svg
+                                        width="20"
+                                        height="20"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path
+                                            d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+                                        />
+                                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                                        <path d="M12 2v2" />
+                                    </svg>
+                                </div>
+                                <span data-i18n="nav-attendant">Attendant</span>
                             </a>
                         </div>
                     </nav>
                 </div>
             </div>
 
-            <!-- Center: Search -->
+            <!-- Center: Omnibox (Search + Chat) -->
             <div class="header-center">
-                <div class="header-search">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <circle cx="11" cy="11" r="8" />
-                        <path d="m21 21-4.35-4.35" />
-                    </svg>
-                    <input
-                        type="text"
-                        class="search-input"
-                        placeholder="Search..."
-                        id="globalSearch"
-                    />
-                    <kbd class="search-shortcut">⌘K</kbd>
+                <div class="omnibox" id="omnibox">
+                    <div class="omnibox-input-area">
+                        <svg
+                            class="omnibox-icon search-icon"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                        <svg
+                            class="omnibox-icon bot-icon"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            style="display: none"
+                        >
+                            <rect x="3" y="11" width="18" height="10" rx="2" />
+                            <circle cx="9" cy="16" r="1" />
+                            <circle cx="15" cy="16" r="1" />
+                            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                        </svg>
+                        <input
+                            type="text"
+                            class="omnibox-input"
+                            placeholder="Search or ask anything..."
+                            id="omniboxInput"
+                            autocomplete="off"
+                        />
+                        <div class="omnibox-hints">
+                            <kbd class="omnibox-shortcut">⌘K</kbd>
+                            <button
+                                class="omnibox-mode-toggle"
+                                id="omniboxModeToggle"
+                                title="Toggle chat mode"
+                            >
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Expandable Results/Chat Panel -->
+                    <div class="omnibox-panel" id="omniboxPanel">
+                        <!-- Search Results Section -->
+                        <div class="omnibox-results" id="omniboxResults">
+                            <div class="omnibox-section">
+                                <div class="omnibox-section-title">
+                                    Quick Actions
+                                </div>
+                                <div
+                                    class="omnibox-actions"
+                                    id="omniboxActions"
+                                >
+                                    <button
+                                        class="omnibox-action"
+                                        data-action="chat"
+                                    >
+                                        <span class="action-icon">💬</span>
+                                        <span class="action-text"
+                                            >Chat with Bot</span
+                                        >
+                                        <kbd>↵</kbd>
+                                    </button>
+                                    <button
+                                        class="omnibox-action"
+                                        data-action="navigate"
+                                        data-target="chat"
+                                    >
+                                        <span class="action-icon">📱</span>
+                                        <span class="action-text"
+                                            >Open Chat App</span
+                                        >
+                                    </button>
+                                    <button
+                                        class="omnibox-action"
+                                        data-action="navigate"
+                                        data-target="tasks"
+                                    >
+                                        <span class="action-icon">✓</span>
+                                        <span class="action-text"
+                                            >Go to Tasks</span
+                                        >
+                                    </button>
+                                    <button
+                                        class="omnibox-action"
+                                        data-action="navigate"
+                                        data-target="mail"
+                                    >
+                                        <span class="action-icon">✉️</span>
+                                        <span class="action-text"
+                                            >Go to Mail</span
+                                        >
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                class="omnibox-section"
+                                id="searchResultsSection"
+                                style="display: none"
+                            >
+                                <div class="omnibox-section-title">
+                                    Search Results
+                                </div>
+                                <div
+                                    class="omnibox-search-results"
+                                    id="searchResultsList"
+                                ></div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Section -->
+                        <div
+                            class="omnibox-chat"
+                            id="omniboxChat"
+                            style="display: none"
+                        >
+                            <div
+                                class="omnibox-chat-messages"
+                                id="omniboxChatMessages"
+                            >
+                                <div class="omnibox-chat-welcome">
+                                    <div class="welcome-icon">🤖</div>
+                                    <div class="welcome-text">
+                                        <strong>Hi! I'm your assistant.</strong>
+                                        <p>
+                                            Ask me anything or tell me what
+                                            you'd like to do.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="omnibox-chat-input-area">
+                                <input
+                                    type="text"
+                                    class="omnibox-chat-input"
+                                    placeholder="Type your message..."
+                                    id="omniboxChatInput"
+                                />
+                                <button
+                                    class="omnibox-send-btn"
+                                    id="omniboxSendBtn"
+                                >
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <line x1="22" y1="2" x2="11" y2="13" />
+                                        <polygon
+                                            points="22 2 15 22 11 13 2 9 22 2"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="omnibox-chat-footer">
+                                <button
+                                    class="omnibox-back-btn"
+                                    id="omniboxBackBtn"
+                                >
+                                    <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                                    </svg>
+                                    Back to search
+                                </button>
+                                <button
+                                    class="omnibox-expand-btn"
+                                    id="omniboxExpandBtn"
+                                    title="Open full chat"
+                                >
+                                    <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <polyline points="15 3 21 3 21 9" />
+                                        <polyline points="9 21 3 21 3 15" />
+                                        <line x1="21" y1="3" x2="14" y2="10" />
+                                        <line x1="3" y1="21" x2="10" y2="14" />
+                                    </svg>
+                                    Open full chat
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div class="omnibox-backdrop" id="omniboxBackdrop"></div>
             </div>
 
             <!-- Right: Notifications + User -->
@@ -1098,15 +1620,137 @@
                     </a>
                 </div>
 
-                <!-- User avatar -->
-                <button
-                    class="user-avatar"
-                    id="userAvatar"
-                    title="User Account"
-                    aria-label="User account menu"
-                >
-                    <span aria-hidden="true">U</span>
-                </button>
+                <!-- User avatar with dropdown -->
+                <div class="user-avatar-container" style="position: relative">
+                    <button
+                        class="user-avatar"
+                        id="userAvatar"
+                        title="User Account"
+                        aria-label="User account menu"
+                        aria-expanded="false"
+                        aria-haspopup="true"
+                    >
+                        <span aria-hidden="true">U</span>
+                    </button>
+
+                    <!-- User Menu Dropdown -->
+                    <div class="user-menu" id="userMenu" style="display: none">
+                        <div class="user-menu-header">
+                            <div class="user-avatar-large" id="userAvatarLarge">
+                                U
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name" id="userName">User</div>
+                                <div class="user-email" id="userEmail">
+                                    user@example.com
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="user-menu-divider"></div>
+
+                        <nav class="user-menu-nav">
+                            <a
+                                href="#settings"
+                                class="user-menu-item"
+                                hx-get="/suite/settings/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#settings"
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                                    ></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                <span>Profile</span>
+                            </a>
+
+                            <a
+                                href="#settings"
+                                class="user-menu-item"
+                                hx-get="/suite/settings/index.html"
+                                hx-target="#main-content"
+                                hx-push-url="/#settings"
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                                    ></path>
+                                </svg>
+                                <span>Settings</span>
+                            </a>
+
+                            <a
+                                href="https://docs.pragmatismo.com.br"
+                                target="_blank"
+                                class="user-menu-item"
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path
+                                        d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
+                                    ></path>
+                                    <line
+                                        x1="12"
+                                        y1="17"
+                                        x2="12.01"
+                                        y2="17"
+                                    ></line>
+                                </svg>
+                                <span>Help & Support</span>
+                            </a>
+                        </nav>
+
+                        <div class="user-menu-divider"></div>
+
+                        <a
+                            href="/auth/login.html"
+                            class="user-menu-item login-item"
+                            id="authAction"
+                            style="margin: 8px; color: var(--primary)"
+                        >
+                            <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                id="authIcon"
+                            >
+                                <path
+                                    d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"
+                                ></path>
+                                <polyline points="10 17 15 12 10 7"></polyline>
+                                <line x1="15" y1="12" x2="3" y2="12"></line>
+                            </svg>
+                            <span id="authText">Sign in</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -1118,13 +1762,666 @@
         <!-- Core scripts -->
         <script src="js/theme-manager.js"></script>
         <script src="js/htmx-app.js"></script>
+        <script src="js/base.js"></script>
         <script src="tasks/tasks.js?v=20260102"></script>
 
         <!-- Application initialization -->
         <script>
             // Simple initialization for HTMX app
             // Note: Chat module is self-contained in chat.html
+            // ==========================================
+            // OMNIBOX (Search + Chat) Functionality
+            // ==========================================
+            const Omnibox = {
+                isActive: false,
+                isChatMode: false,
+                chatHistory: [],
+                selectedIndex: 0,
+
+                init() {
+                    this.omnibox = document.getElementById("omnibox");
+                    this.input = document.getElementById("omniboxInput");
+                    this.panel = document.getElementById("omniboxPanel");
+                    this.backdrop = document.getElementById("omniboxBackdrop");
+                    this.results = document.getElementById("omniboxResults");
+                    this.chat = document.getElementById("omniboxChat");
+                    this.chatMessages = document.getElementById(
+                        "omniboxChatMessages",
+                    );
+                    this.chatInput =
+                        document.getElementById("omniboxChatInput");
+                    this.modeToggle =
+                        document.getElementById("omniboxModeToggle");
+
+                    this.bindEvents();
+                },
+
+                bindEvents() {
+                    // Input focus/blur
+                    this.input.addEventListener("focus", () => this.open());
+                    this.backdrop.addEventListener("click", () => this.close());
+
+                    // Input typing
+                    this.input.addEventListener("input", (e) =>
+                        this.handleInput(e.target.value),
+                    );
+
+                    // Keyboard navigation
+                    this.input.addEventListener("keydown", (e) =>
+                        this.handleKeydown(e),
+                    );
+                    this.chatInput?.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            this.sendMessage();
+                        }
+                    });
+
+                    // Mode toggle
+                    this.modeToggle.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        this.toggleChatMode();
+                    });
+
+                    // Action buttons
+                    document
+                        .querySelectorAll(".omnibox-action")
+                        .forEach((btn) => {
+                            btn.addEventListener("click", () =>
+                                this.handleAction(btn),
+                            );
+                        });
+
+                    // Send button
+                    document
+                        .getElementById("omniboxSendBtn")
+                        ?.addEventListener("click", () => this.sendMessage());
+
+                    // Back button
+                    document
+                        .getElementById("omniboxBackBtn")
+                        ?.addEventListener("click", () => this.showResults());
+
+                    // Expand button
+                    document
+                        .getElementById("omniboxExpandBtn")
+                        ?.addEventListener("click", () =>
+                            this.expandToFullChat(),
+                        );
+
+                    // Global shortcut (Cmd+K / Ctrl+K)
+                    document.addEventListener("keydown", (e) => {
+                        if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                            e.preventDefault();
+                            this.input.focus();
+                            this.open();
+                        }
+                        if (e.key === "Escape" && this.isActive) {
+                            this.close();
+                        }
+                    });
+                },
+
+                open() {
+                    this.isActive = true;
+                    this.omnibox.classList.add("active");
+                    this.updateActions();
+                },
+
+                close() {
+                    this.isActive = false;
+                    this.omnibox.classList.remove("active");
+                    this.input.blur();
+                },
+
+                handleInput(value) {
+                    if (value.trim()) {
+                        this.searchContent(value);
+                    } else {
+                        this.showDefaultActions();
+                    }
+                },
+
+                handleKeydown(e) {
+                    const actions = document.querySelectorAll(
+                        '.omnibox-action:not([style*="display: none"])',
+                    );
+
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        this.selectedIndex = Math.min(
+                            this.selectedIndex + 1,
+                            actions.length - 1,
+                        );
+                        this.updateSelection(actions);
+                    } else if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        this.selectedIndex = Math.max(
+                            this.selectedIndex - 1,
+                            0,
+                        );
+                        this.updateSelection(actions);
+                    } else if (e.key === "Enter") {
+                        e.preventDefault();
+                        const selected = actions[this.selectedIndex];
+                        if (selected) {
+                            this.handleAction(selected);
+                        } else if (this.input.value.trim()) {
+                            // Start chat with the query
+                            this.startChatWithQuery(this.input.value);
+                        }
+                    }
+                },
+
+                updateSelection(actions) {
+                    actions.forEach((a, i) => {
+                        a.classList.toggle(
+                            "selected",
+                            i === this.selectedIndex,
+                        );
+                    });
+                },
+
+                updateActions() {
+                    const currentApp = this.getCurrentApp();
+                    const actionsContainer =
+                        document.getElementById("omniboxActions");
+
+                    const contextActions = {
+                        chat: [
+                            {
+                                icon: "💬",
+                                text: "New conversation",
+                                action: "chat",
+                            },
+                            {
+                                icon: "📋",
+                                text: "View history",
+                                action: "navigate",
+                                target: "chat",
+                            },
+                        ],
+                        mail: [
+                            {
+                                icon: "✉️",
+                                text: "Compose email",
+                                action: "chat",
+                                query: "Help me compose an email",
+                            },
+                            {
+                                icon: "📥",
+                                text: "Check inbox",
+                                action: "navigate",
+                                target: "mail",
+                            },
+                        ],
+                        tasks: [
+                            {
+                                icon: "✅",
+                                text: "Create task",
+                                action: "chat",
+                                query: "Create a new task",
+                            },
+                            {
+                                icon: "📋",
+                                text: "Show my tasks",
+                                action: "navigate",
+                                target: "tasks",
+                            },
+                        ],
+                        calendar: [
+                            {
+                                icon: "📅",
+                                text: "Schedule event",
+                                action: "chat",
+                                query: "Schedule a meeting",
+                            },
+                            {
+                                icon: "📆",
+                                text: "View calendar",
+                                action: "navigate",
+                                target: "calendar",
+                            },
+                        ],
+                        default: [
+                            {
+                                icon: "💬",
+                                text: "Chat with Bot",
+                                action: "chat",
+                            },
+                            {
+                                icon: "🔍",
+                                text: "Search everywhere",
+                                action: "search",
+                            },
+                        ],
+                    };
+
+                    const actions =
+                        contextActions[currentApp] || contextActions.default;
+
+                    // Add navigation shortcuts
+                    const navActions = [
+                        {
+                            icon: "📱",
+                            text: "Open Chat",
+                            action: "navigate",
+                            target: "chat",
+                        },
+                        {
+                            icon: "✉️",
+                            text: "Open Mail",
+                            action: "navigate",
+                            target: "mail",
+                        },
+                        {
+                            icon: "✓",
+                            text: "Open Tasks",
+                            action: "navigate",
+                            target: "tasks",
+                        },
+                        {
+                            icon: "📅",
+                            text: "Open Calendar",
+                            action: "navigate",
+                            target: "calendar",
+                        },
+                    ];
+
+                    actionsContainer.innerHTML = actions
+                        .concat(navActions)
+                        .map(
+                            (a, i) => `
+                        <button class="omnibox-action ${i === 0 ? "selected" : ""}"
+                                data-action="${a.action}"
+                                data-target="${a.target || ""}"
+                                data-query="${a.query || ""}">
+                            <span class="action-icon">${a.icon}</span>
+                            <span class="action-text">${a.text}</span>
+                            ${i === 0 ? "<kbd>↵</kbd>" : ""}
+                        </button>
+                    `,
+                        )
+                        .join("");
+
+                    // Rebind events
+                    actionsContainer
+                        .querySelectorAll(".omnibox-action")
+                        .forEach((btn) => {
+                            btn.addEventListener("click", () =>
+                                this.handleAction(btn),
+                            );
+                        });
+
+                    this.selectedIndex = 0;
+                },
+
+                getCurrentApp() {
+                    const hash = window.location.hash.replace("#", "");
+                    return hash || "default";
+                },
+
+                handleAction(btn) {
+                    const action = btn.dataset.action;
+                    const target = btn.dataset.target;
+                    const query = btn.dataset.query;
+
+                    if (action === "chat") {
+                        if (query) {
+                            this.startChatWithQuery(query);
+                        } else {
+                            this.showChat();
+                        }
+                    } else if (action === "navigate" && target) {
+                        this.navigateTo(target);
+                    } else if (action === "search") {
+                        this.input.focus();
+                    }
+                },
+
+                navigateTo(target) {
+                    this.close();
+                    const link = document.querySelector(
+                        `a[data-section="${target}"]`,
+                    );
+                    if (link) {
+                        link.click();
+                    }
+                },
+
+                toggleChatMode() {
+                    this.isChatMode = !this.isChatMode;
+                    this.omnibox.classList.toggle("chat-mode", this.isChatMode);
+
+                    if (this.isChatMode) {
+                        this.input.placeholder = "Ask me anything...";
+                        this.showChat();
+                    } else {
+                        this.input.placeholder = "Search or ask anything...";
+                        this.showResults();
+                    }
+                },
+
+                showChat() {
+                    this.results.style.display = "none";
+                    this.chat.style.display = "flex";
+                    this.isChatMode = true;
+                    this.omnibox.classList.add("chat-mode");
+                    this.chatInput?.focus();
+                },
+
+                showResults() {
+                    this.chat.style.display = "none";
+                    this.results.style.display = "block";
+                    this.isChatMode = false;
+                    this.omnibox.classList.remove("chat-mode");
+                    this.input.focus();
+                },
+
+                showDefaultActions() {
+                    document.getElementById(
+                        "searchResultsSection",
+                    ).style.display = "none";
+                    this.updateActions();
+                },
+
+                searchContent(query) {
+                    // Show search results section
+                    const resultsSection = document.getElementById(
+                        "searchResultsSection",
+                    );
+                    const resultsList =
+                        document.getElementById("searchResultsList");
+
+                    resultsSection.style.display = "block";
+
+                    // Update first action to be "Ask about: query"
+                    const actionsContainer =
+                        document.getElementById("omniboxActions");
+                    const firstAction =
+                        actionsContainer.querySelector(".omnibox-action");
+                    if (firstAction) {
+                        firstAction.dataset.action = "chat";
+                        firstAction.dataset.query = query;
+                        firstAction.querySelector(".action-icon").textContent =
+                            "💬";
+                        firstAction.querySelector(".action-text").textContent =
+                            `Ask: "${query.substring(0, 30)}${query.length > 30 ? "..." : ""}"`;
+                    }
+
+                    // Simple client-side search of navigation items
+                    const searchResults = this.performSearch(query);
+                    resultsList.innerHTML =
+                        searchResults
+                            .map(
+                                (r) => `
+                        <button class="omnibox-result" data-action="navigate" data-target="${r.target}">
+                            <span class="result-icon">${r.icon}</span>
+                            <div class="result-content">
+                                <span class="result-title">${r.title}</span>
+                                <span class="result-desc">${r.description}</span>
+                            </div>
+                        </button>
+                    `,
+                            )
+                            .join("") ||
+                        '<div class="no-results">No results found. Try asking the bot!</div>';
+
+                    // Bind click events
+                    resultsList
+                        .querySelectorAll(".omnibox-result")
+                        .forEach((btn) => {
+                            btn.addEventListener("click", () =>
+                                this.navigateTo(btn.dataset.target),
+                            );
+                        });
+                },
+
+                performSearch(query) {
+                    const q = query.toLowerCase();
+                    const items = [
+                        {
+                            target: "chat",
+                            icon: "💬",
+                            title: "Chat",
+                            description: "Chat with the bot",
+                        },
+                        {
+                            target: "mail",
+                            icon: "✉️",
+                            title: "Mail",
+                            description: "Email inbox",
+                        },
+                        {
+                            target: "tasks",
+                            icon: "✓",
+                            title: "Tasks",
+                            description: "Task management",
+                        },
+                        {
+                            target: "calendar",
+                            icon: "📅",
+                            title: "Calendar",
+                            description: "Schedule and events",
+                        },
+                        {
+                            target: "drive",
+                            icon: "📁",
+                            title: "Drive",
+                            description: "File storage",
+                        },
+                        {
+                            target: "paper",
+                            icon: "📄",
+                            title: "Documents",
+                            description: "Document editor",
+                        },
+                        {
+                            target: "sheet",
+                            icon: "📊",
+                            title: "Sheet",
+                            description: "Spreadsheets",
+                        },
+                        {
+                            target: "slides",
+                            icon: "📽️",
+                            title: "Slides",
+                            description: "Presentations",
+                        },
+                        {
+                            target: "editor",
+                            icon: "📝",
+                            title: "Editor",
+                            description: "Code & text editor",
+                        },
+                        {
+                            target: "designer",
+                            icon: "🔷",
+                            title: "Designer",
+                            description: "Visual .bas editor",
+                        },
+                        {
+                            target: "meet",
+                            icon: "📹",
+                            title: "Meet",
+                            description: "Video meetings",
+                        },
+                        {
+                            target: "research",
+                            icon: "🔍",
+                            title: "Research",
+                            description: "Research assistant",
+                        },
+                        {
+                            target: "analytics",
+                            icon: "📊",
+                            title: "Analytics",
+                            description: "Data analytics",
+                        },
+                        {
+                            target: "settings",
+                            icon: "⚙️",
+                            title: "Settings",
+                            description: "App settings",
+                        },
+                    ];
+
+                    return items.filter(
+                        (item) =>
+                            item.title.toLowerCase().includes(q) ||
+                            item.description.toLowerCase().includes(q),
+                    );
+                },
+
+                startChatWithQuery(query) {
+                    this.showChat();
+                    this.input.value = "";
+                    setTimeout(() => {
+                        this.addMessage(query, "user");
+                        this.sendToBot(query);
+                    }, 100);
+                },
+
+                async sendMessage() {
+                    const message = this.chatInput?.value.trim();
+                    if (!message) return;
+
+                    this.chatInput.value = "";
+                    this.addMessage(message, "user");
+                    await this.sendToBot(message);
+                },
+
+                async sendToBot(message) {
+                    // Show typing indicator
+                    const typingId = this.addTypingIndicator();
+
+                    try {
+                        // Call the bot API
+                        const response = await fetch("/api/chat", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                message,
+                                context: this.getCurrentApp(),
+                            }),
+                        });
+
+                        this.removeTypingIndicator(typingId);
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.addMessage(
+                                data.reply ||
+                                    data.message ||
+                                    "I received your message.",
+                                "bot",
+                            );
+
+                            // Handle any actions the bot suggests
+                            if (data.action) {
+                                this.handleBotAction(data.action);
+                            }
+                        } else {
+                            this.addMessage(
+                                "Sorry, I encountered an error. Please try again.",
+                                "bot",
+                            );
+                        }
+                    } catch (error) {
+                        this.removeTypingIndicator(typingId);
+                        // Fallback response when API is not available
+                        this.addMessage(
+                            this.getFallbackResponse(message),
+                            "bot",
+                        );
+                    }
+                },
+
+                getFallbackResponse(message) {
+                    const msg = message.toLowerCase();
+                    if (msg.includes("help")) {
+                        return "I can help you navigate the app, search for content, manage tasks, compose emails, and more. What would you like to do?";
+                    } else if (msg.includes("task") || msg.includes("todo")) {
+                        return "Would you like me to open Tasks for you? You can create, view, and manage your tasks there.";
+                    } else if (msg.includes("email") || msg.includes("mail")) {
+                        return "I can help with email! Would you like to compose a new message or check your inbox?";
+                    } else if (
+                        msg.includes("calendar") ||
+                        msg.includes("meeting") ||
+                        msg.includes("schedule")
+                    ) {
+                        return "I can help with scheduling. Would you like to create an event or view your calendar?";
+                    }
+                    return (
+                        "I understand you're asking about: \"" +
+                        message +
+                        '". How can I assist you further?'
+                    );
+                },
+
+                addMessage(text, sender) {
+                    const msgDiv = document.createElement("div");
+                    msgDiv.className = `omnibox-message ${sender}`;
+                    msgDiv.innerHTML = `
+                        <div class="message-avatar">${sender === "user" ? "👤" : "🤖"}</div>
+                        <div class="message-content">${this.escapeHtml(text)}</div>
+                    `;
+                    this.chatMessages.appendChild(msgDiv);
+                    this.chatMessages.scrollTop =
+                        this.chatMessages.scrollHeight;
+
+                    this.chatHistory.push({ role: sender, content: text });
+                },
+
+                addTypingIndicator() {
+                    const id = "typing-" + Date.now();
+                    const typingDiv = document.createElement("div");
+                    typingDiv.id = id;
+                    typingDiv.className = "omnibox-message bot typing";
+                    typingDiv.innerHTML = `
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                    `;
+                    this.chatMessages.appendChild(typingDiv);
+                    this.chatMessages.scrollTop =
+                        this.chatMessages.scrollHeight;
+                    return id;
+                },
+
+                removeTypingIndicator(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.remove();
+                },
+
+                handleBotAction(action) {
+                    if (action.navigate) {
+                        setTimeout(
+                            () => this.navigateTo(action.navigate),
+                            1000,
+                        );
+                    }
+                },
+
+                expandToFullChat() {
+                    this.close();
+                    const chatLink = document.querySelector(
+                        'a[data-section="chat"]',
+                    );
+                    if (chatLink) chatLink.click();
+                },
+
+                escapeHtml(text) {
+                    const div = document.createElement("div");
+                    div.textContent = text;
+                    return div.innerHTML;
+                },
+            };
+
+            // Initialize Omnibox when DOM is ready
             document.addEventListener("DOMContentLoaded", () => {
+                Omnibox.init();
                 console.log("🚀 Initializing General Bots with HTMX...");
 
                 // Hide loading overlay
@@ -1230,6 +2527,8 @@
                 const headerTabSections = [
                     "chat",
                     "paper",
+                    "sheet",
+                    "slides",
                     "mail",
                     "calendar",
                     "drive",
@@ -1290,24 +2589,126 @@
                     });
                 });
 
+                // Track currently loaded section to prevent duplicate loads
+                let currentLoadedSection = null;
+                let isLoadingSection = false;
+                let pendingLoadTimeout = null;
+
                 // Handle hash navigation
-                function handleHashChange() {
+                function handleHashChange(fromHtmxSwap = false) {
                     const hash = window.location.hash.slice(1) || "chat";
+
+                    // Skip if already loaded this section or currently loading
+                    if (currentLoadedSection === hash || isLoadingSection) {
+                        return;
+                    }
+
+                    // If this was triggered by HTMX swap, just update tracking
+                    if (fromHtmxSwap) {
+                        currentLoadedSection = hash;
+                        return;
+                    }
+
                     updateNavigationActive(hash);
 
-                    // Trigger HTMX load if not already loaded
-                    const appItem = document.querySelector(
-                        `.app-item[data-section="${hash}"]`,
-                    );
-                    if (appItem) {
-                        const hxGet = appItem.getAttribute("hx-get");
-                        if (hxGet) {
-                            htmx.ajax("GET", hxGet, {
-                                target: "#main-content",
-                            });
+                    // Abort any pending load timeout
+                    if (pendingLoadTimeout) {
+                        clearTimeout(pendingLoadTimeout);
+                        pendingLoadTimeout = null;
+                    }
+
+                    // Abort any in-flight HTMX requests for main-content
+                    const mainContent = document.getElementById("main-content");
+                    if (mainContent) {
+                        try {
+                            htmx.trigger(mainContent, "htmx:abort");
+                        } catch (e) {
+                            // Ignore abort errors
                         }
                     }
+
+                    // Validate target exists before triggering HTMX load
+                    if (!mainContent) {
+                        console.warn(
+                            "handleHashChange: #main-content not found, skipping load",
+                        );
+                        return;
+                    }
+
+                    // Check if main-content is in the DOM
+                    if (!document.body.contains(mainContent)) {
+                        console.warn(
+                            "handleHashChange: #main-content not in DOM, skipping load",
+                        );
+                        return;
+                    }
+
+                    // Verify main-content has a valid parent (prevents insertBefore errors)
+                    if (!mainContent.parentNode) {
+                        console.warn(
+                            "handleHashChange: #main-content has no parent, skipping load",
+                        );
+                        return;
+                    }
+
+                    // Debounce the load to prevent rapid double-requests
+                    pendingLoadTimeout = setTimeout(() => {
+                        // Re-check if section changed during debounce
+                        const currentHash =
+                            window.location.hash.slice(1) || "chat";
+                        if (currentLoadedSection === currentHash) {
+                            return;
+                        }
+
+                        // Trigger HTMX load
+                        const appItem = document.querySelector(
+                            `.app-item[data-section="${currentHash}"]`,
+                        );
+                        if (appItem) {
+                            const hxGet = appItem.getAttribute("hx-get");
+                            if (hxGet) {
+                                try {
+                                    isLoadingSection = true;
+                                    currentLoadedSection = currentHash;
+                                    htmx.ajax("GET", hxGet, {
+                                        target: "#main-content",
+                                        swap: "innerHTML",
+                                    });
+                                } catch (e) {
+                                    console.warn(
+                                        "handleHashChange: HTMX ajax error:",
+                                        e,
+                                    );
+                                    currentLoadedSection = null;
+                                } finally {
+                                    isLoadingSection = false;
+                                }
+                            }
+                        }
+                    }, 50);
                 }
+
+                // Listen for HTMX swaps to track loaded sections and prevent duplicates
+                document.body.addEventListener("htmx:afterSwap", (event) => {
+                    if (
+                        event.detail.target &&
+                        event.detail.target.id === "main-content"
+                    ) {
+                        const hash = window.location.hash.slice(1) || "chat";
+                        currentLoadedSection = hash;
+                        isLoadingSection = false;
+                    }
+                });
+
+                // Reset tracking on swap errors
+                document.body.addEventListener("htmx:swapError", (event) => {
+                    if (
+                        event.detail.target &&
+                        event.detail.target.id === "main-content"
+                    ) {
+                        isLoadingSection = false;
+                    }
+                });
 
                 // Load initial content based on hash or default to chat
                 window.addEventListener("hashchange", handleHashChange);
@@ -1516,6 +2917,85 @@
                     }
                 });
             });
+
+            // User Profile Loading
+            (function () {
+                const token =
+                    localStorage.getItem("access_token") ||
+                    sessionStorage.getItem("access_token");
+
+                function updateUserUI(user) {
+                    const userName = document.getElementById("userName");
+                    const userEmail = document.getElementById("userEmail");
+                    const userAvatar = document.getElementById("userAvatar");
+                    const userAvatarLarge =
+                        document.getElementById("userAvatarLarge");
+                    const authAction = document.getElementById("authAction");
+                    const authText = document.getElementById("authText");
+                    const authIcon = document.getElementById("authIcon");
+
+                    if (user) {
+                        const displayName =
+                            user.display_name ||
+                            user.first_name ||
+                            user.username ||
+                            "User";
+                        const email = user.email || "";
+                        const initial = (
+                            displayName.charAt(0) || "U"
+                        ).toUpperCase();
+
+                        if (userName) userName.textContent = displayName;
+                        if (userEmail) userEmail.textContent = email;
+                        if (userAvatar)
+                            userAvatar.querySelector("span").textContent =
+                                initial;
+                        if (userAvatarLarge)
+                            userAvatarLarge.textContent = initial;
+
+                        if (authAction) {
+                            authAction.href = "#";
+                            authAction.onclick = function (e) {
+                                e.preventDefault();
+                                logout();
+                            };
+                            authAction.style.color = "var(--error)";
+                        }
+                        if (authText) authText.textContent = "Sign out";
+                        if (authIcon) {
+                            authIcon.innerHTML =
+                                '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>';
+                        }
+                    }
+                }
+
+                function logout() {
+                    fetch("/api/auth/logout", { method: "POST" }).finally(
+                        () => {
+                            localStorage.removeItem("access_token");
+                            sessionStorage.removeItem("access_token");
+                            window.location.href = "/auth/login.html";
+                        },
+                    );
+                }
+
+                if (token) {
+                    fetch("/api/auth/me", {
+                        headers: { Authorization: "Bearer " + token },
+                    })
+                        .then((res) =>
+                            res.ok
+                                ? res.json()
+                                : Promise.reject("Not authenticated"),
+                        )
+                        .then((user) => updateUserUI(user))
+                        .catch((err) => {
+                            console.log("Not authenticated:", err);
+                            localStorage.removeItem("access_token");
+                            sessionStorage.removeItem("access_token");
+                        });
+                }
+            })();
         </script>
     </body>
 </html>

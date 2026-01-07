@@ -2,6 +2,115 @@ const appsBtn = document.getElementById("apps-btn");
 const appsDropdown = document.getElementById("apps-dropdown");
 const settingsBtn = document.getElementById("settings-btn");
 const settingsPanel = document.getElementById("settings-panel");
+const userAvatarBtn = document.getElementById("userAvatar");
+const userMenu = document.getElementById("userMenu");
+
+// Global product configuration
+window.productConfig = null;
+
+// Load product configuration and apply white-label settings
+async function loadProductConfig() {
+  try {
+    const response = await fetch("/api/product");
+    if (response.ok) {
+      window.productConfig = await response.json();
+      applyProductConfig(window.productConfig);
+    }
+  } catch (e) {
+    console.warn("Failed to load product config:", e);
+  }
+}
+
+// Apply product configuration to the UI
+function applyProductConfig(config) {
+  if (!config) return;
+
+  // Update page title with product name
+  if (config.name && config.name !== "General Bots") {
+    document.title = document.title.replace("General Bots", config.name);
+    // Update any visible branding text
+    document.querySelectorAll("[data-brand]").forEach((el) => {
+      el.textContent = el.textContent.replace("General Bots", config.name);
+    });
+  }
+
+  // Apply default theme if specified and user hasn't set one
+  if (config.theme && !localStorage.getItem("gb-theme")) {
+    document.body.setAttribute("data-theme", config.theme);
+    localStorage.setItem("gb-theme", config.theme);
+  }
+
+  // Filter apps based on enabled list
+  if (config.apps && Array.isArray(config.apps)) {
+    filterAppsByConfig(config.apps);
+  }
+
+  // Apply custom logo
+  if (config.logo) {
+    const logoEl = document.querySelector(".header-logo img, .logo img");
+    if (logoEl) logoEl.src = config.logo;
+  }
+
+  // Apply custom primary color
+  if (config.primary_color) {
+    document.documentElement.style.setProperty(
+      "--primary",
+      config.primary_color,
+    );
+  }
+
+  // Update docs URL
+  if (config.docs_url) {
+    document.querySelectorAll('a[href*="docs.pragmatismo"]').forEach((el) => {
+      el.href = config.docs_url;
+    });
+  }
+
+  // Update copyright
+  if (config.copyright) {
+    document.querySelectorAll(".copyright, .footer-copyright").forEach((el) => {
+      el.textContent = config.copyright;
+    });
+  }
+}
+
+// Filter visible apps based on enabled list
+function filterAppsByConfig(enabledApps) {
+  const enabledSet = new Set(enabledApps.map((a) => a.toLowerCase()));
+
+  // Hide nav items for disabled apps
+  document.querySelectorAll("[data-app]").forEach((el) => {
+    const appName = el.getAttribute("data-app").toLowerCase();
+    if (!enabledSet.has(appName)) {
+      el.style.display = "none";
+    }
+  });
+
+  // Hide app items in dropdown
+  document.querySelectorAll(".app-item").forEach((el) => {
+    const href = el.getAttribute("href") || el.getAttribute("hx-get") || "";
+    const appMatch = href.match(
+      /\/(chat|mail|calendar|drive|tasks|docs|paper|sheet|slides|meet|research|sources|analytics|admin|monitoring|settings)/i,
+    );
+    if (appMatch) {
+      const appName = appMatch[1].toLowerCase();
+      if (!enabledSet.has(appName)) {
+        el.style.display = "none";
+      }
+    }
+  });
+}
+
+// Check if an app is enabled
+function isAppEnabled(appName) {
+  if (!window.productConfig || !window.productConfig.apps) return true;
+  return window.productConfig.apps
+    .map((a) => a.toLowerCase())
+    .includes(appName.toLowerCase());
+}
+
+// Load product config on page load
+loadProductConfig();
 
 if (appsBtn) {
   appsBtn.addEventListener("click", (e) => {
@@ -18,6 +127,24 @@ if (settingsBtn) {
     const isOpen = settingsPanel.classList.toggle("show");
     settingsBtn.setAttribute("aria-expanded", isOpen);
     appsDropdown.classList.remove("show");
+    if (userMenu) {
+      userMenu.style.display = "none";
+      userAvatarBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
+if (userAvatarBtn) {
+  userAvatarBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen =
+      userMenu.style.display === "none" || userMenu.style.display === "";
+    userMenu.style.display = isOpen ? "block" : "none";
+    userAvatarBtn.setAttribute("aria-expanded", isOpen);
+    if (appsDropdown) appsDropdown.classList.remove("show");
+    if (settingsPanel) settingsPanel.classList.remove("show");
+    if (appsBtn) appsBtn.setAttribute("aria-expanded", "false");
+    if (settingsBtn) settingsBtn.setAttribute("aria-expanded", "false");
   });
 }
 
@@ -38,14 +165,24 @@ document.addEventListener("click", (e) => {
     settingsPanel.classList.remove("show");
     settingsBtn.setAttribute("aria-expanded", "false");
   }
+  if (
+    userMenu &&
+    !userMenu.contains(e.target) &&
+    !userAvatarBtn.contains(e.target)
+  ) {
+    userMenu.style.display = "none";
+    userAvatarBtn.setAttribute("aria-expanded", "false");
+  }
 });
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     if (appsDropdown) appsDropdown.classList.remove("show");
     if (settingsPanel) settingsPanel.classList.remove("show");
+    if (userMenu) userMenu.style.display = "none";
     if (appsBtn) appsBtn.setAttribute("aria-expanded", "false");
     if (settingsBtn) settingsBtn.setAttribute("aria-expanded", "false");
+    if (userAvatarBtn) userAvatarBtn.setAttribute("aria-expanded", "false");
   }
 });
 
@@ -143,13 +280,31 @@ themeOptions.forEach((option) => {
   });
 });
 
-window.setTheme = function (theme) {
+window.setTheme = function (theme, element) {
   document.body.setAttribute("data-theme", theme);
   localStorage.setItem("gb-theme", theme);
+
+  // Update theme options in header settings panel
   themeOptions.forEach((o) => {
     o.classList.toggle("active", o.getAttribute("data-theme") === theme);
   });
+
+  // Update theme options in settings page (if present)
+  document.querySelectorAll(".theme-option").forEach((opt) => {
+    opt.classList.toggle("active", opt.getAttribute("data-theme") === theme);
+  });
+
+  // If element was passed, ensure it's marked active
+  if (element) {
+    element.classList.add("active");
+  }
+
   updateThemeColor(theme);
+
+  // Show toast notification if available
+  if (window.showNotification) {
+    window.showNotification("Theme updated", "success");
+  }
 };
 
 function toggleQuickSetting(el) {

@@ -383,6 +383,51 @@ body {
     flex-direction: column;
 }
 
+/* Compact Mode - reduces spacing throughout the app */
+body.compact-mode {
+    --spacing-xs: 2px;
+    --spacing-sm: 4px;
+    --spacing-md: 8px;
+    --spacing-lg: 12px;
+    --spacing-xl: 16px;
+}
+
+body.compact-mode .app-header {
+    height: 48px;
+    padding: 0 0.5rem;
+}
+
+body.compact-mode .settings-panel,
+body.compact-mode .apps-dropdown {
+    padding: 0.5rem;
+}
+
+body.compact-mode .app-item {
+    padding: 0.5rem;
+    gap: 0.25rem;
+}
+
+body.compact-mode .setting-card,
+body.compact-mode .settings-section {
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+/* No Animations - disables all transitions and animations */
+body.no-animations,
+body.no-animations * {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.no-animations .htmx-indicator {
+    animation: none !important;
+}
+
+body.no-animations .spinner {
+    animation: none !important;
+}
+
 /* ============================================ */
 /* APP HEADER                                   */
 /* ============================================ */
@@ -489,7 +534,20 @@ body {
     position: relative;
 }
 
-.apps-dropdown,
+.apps-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: none;
+    z-index: 1001;
+}
+
 .settings-panel {
     position: absolute;
     top: 100%;
@@ -510,7 +568,10 @@ body {
     display: block;
 }
 
-.apps-dropdown-title,
+.apps-dropdown-title {
+    display: none;
+}
+
 .settings-panel-title {
     font-size: 0.75rem;
     font-weight: 600;
@@ -524,21 +585,34 @@ body {
 /* APPS GRID                                    */
 /* ============================================ */
 
-.apps-grid {
+.apps-grid,
+.app-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    gap: 2px;
 }
 
 .app-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.75rem;
-    border-radius: 8px;
+    gap: 4px;
+    padding: 8px 6px;
+    border-radius: 6px;
     text-decoration: none;
     color: var(--text);
-    transition: background 0.2s;
+    transition: background 0.1s;
+    min-width: 56px;
+}
+
+/* Hide items visible in header tabs */
+.app-item[data-section="chat"],
+.app-item[data-section="paper"],
+.app-item[data-section="mail"],
+.app-item[data-section="drive"],
+.app-item[data-section="calendar"],
+.app-item[data-section="tasks"] {
+    display: none;
 }
 
 .app-item:hover {
@@ -550,20 +624,69 @@ body {
     color: var(--primary);
 }
 
-.app-item-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+.app-icon {
+    font-size: 18px;
+}
+
+.app-icon svg {
+    width: 18px;
+    height: 18px;
 }
 
 .app-item span {
-    font-size: 0.75rem;
+    font-size: 10px;
     font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Show items in dropdown as header tabs hide */
+@media (max-width: 1200px) {
+    .app-tab[data-section="tasks"] {
+        display: none;
+    }
+    .app-item[data-section="tasks"] {
+        display: flex;
+    }
+}
+@media (max-width: 1100px) {
+    .app-tab[data-section="calendar"] {
+        display: none;
+    }
+    .app-item[data-section="calendar"] {
+        display: flex;
+    }
+}
+@media (max-width: 1000px) {
+    .app-tab[data-section="drive"] {
+        display: none;
+    }
+    .app-item[data-section="drive"] {
+        display: flex;
+    }
+}
+@media (max-width: 900px) {
+    .app-tab[data-section="mail"] {
+        display: none;
+    }
+    .app-item[data-section="mail"] {
+        display: flex;
+    }
+}
+@media (max-width: 800px) {
+    .app-tab[data-section="paper"] {
+        display: none;
+    }
+    .app-item[data-section="paper"] {
+        display: flex;
+    }
+}
+@media (max-width: 700px) {
+    .app-tab[data-section="chat"] {
+        display: none;
+    }
+    .app-item[data-section="chat"] {
+        display: flex;
+    }
 }
 
 /* ============================================ */

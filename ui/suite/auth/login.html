@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Login - General Bots</title>
         <script src="/js/vendor/htmx.min.js"></script>
+        <script src="/js/vendor/htmx-json-enc.js"></script>
         <style>
             :root {
                 --primary: #3b82f6;
@@ -613,6 +614,7 @@
                     <form
                         id="login-form"
                         hx-post="/api/auth/login"
+                        hx-ext="json-enc"
                         hx-target="#login-response"
                         hx-swap="innerHTML"
                         hx-indicator="#login-btn"
@@ -879,6 +881,7 @@
                     <form
                         id="twofa-form"
                         hx-post="/api/auth/2fa/verify"
+                        hx-ext="json-enc"
                         hx-target="#twofa-response"
                         hx-swap="innerHTML"
                         hx-indicator="#verify-btn"

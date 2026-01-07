@@ -3,7 +3,7 @@
     <!-- Sidebar - Notes List -->
     <aside class="paper-sidebar" id="paper-sidebar">
         <div class="sidebar-header">
-            <h2>Paper</h2>
+            <h2 data-i18n="paper-title">Paper</h2>
             <button
                 class="btn-icon"
                 title="New Note"
@@ -29,6 +29,7 @@
         <div class="sidebar-search">
             <input
                 type="text"
+                data-i18n-placeholder="paper-search-notes"
                 placeholder="Search notes..."
                 name="q"
                 hx-get="/api/ui/paper/search"
@@ -62,7 +63,7 @@
 
         <!-- AI Templates -->
         <div class="sidebar-section">
-            <h3>Quick Start</h3>
+            <h3 data-i18n="paper-quick-start">Quick Start</h3>
             <div class="template-grid">
                 <button
                     class="template-btn"
@@ -70,7 +71,7 @@
                     hx-target="#editor-content"
                 >
                     <span class="template-icon">📄</span>
-                    <span>Blank</span>
+                    <span data-i18n="paper-template-blank">Blank</span>
                 </button>
                 <button
                     class="template-btn"
@@ -78,7 +79,7 @@
                     hx-target="#editor-content"
                 >
                     <span class="template-icon">📋</span>
-                    <span>Meeting</span>
+                    <span data-i18n="paper-template-meeting">Meeting</span>
                 </button>
                 <button
                     class="template-btn"
@@ -86,7 +87,7 @@
                     hx-target="#editor-content"
                 >
                     <span class="template-icon">✓</span>
-                    <span>To-Do</span>
+                    <span data-i18n="paper-template-todo">To-Do</span>
                 </button>
                 <button
                     class="template-btn"
@@ -94,7 +95,7 @@
                     hx-target="#editor-content"
                 >
                     <span class="template-icon">🔬</span>
-                    <span>Research</span>
+                    <span data-i18n="paper-template-research">Research</span>
                 </button>
             </div>
         </div>
@@ -574,6 +575,7 @@
                     class="paper-title"
                     contenteditable="true"
                     data-placeholder="Untitled"
+                    data-i18n-placeholder="paper-untitled"
                     id="paper-title"
                 ></div>
 
@@ -583,6 +585,7 @@
                     id="editor-content"
                     contenteditable="true"
                     data-placeholder="Start writing, or type / for commands..."
+                    data-i18n-placeholder="paper-placeholder"
                     hx-post="/api/ui/paper/autosave"
                     hx-trigger="keyup changed delay:2000ms"
                     hx-swap="none"
@@ -592,48 +595,80 @@
 
         <!-- Slash Command Menu -->
         <div class="slash-menu hidden" id="slash-menu">
-            <div class="slash-menu-header">Commands</div>
+            <div class="slash-menu-header" data-i18n="paper-commands">
+                Commands
+            </div>
             <div class="slash-menu-items">
                 <button class="slash-item" data-cmd="h1">
                     <span class="slash-icon">H1</span>
                     <div class="slash-text">
-                        <span class="slash-label">Heading 1</span>
-                        <span class="slash-desc">Large section heading</span>
+                        <span class="slash-label" data-i18n="paper-heading1"
+                            >Heading 1</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-heading1-desc"
+                            >Large section heading</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="h2">
                     <span class="slash-icon">H2</span>
                     <div class="slash-text">
-                        <span class="slash-label">Heading 2</span>
-                        <span class="slash-desc">Medium section heading</span>
+                        <span class="slash-label" data-i18n="paper-heading2"
+                            >Heading 2</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-heading2-desc"
+                            >Medium section heading</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="h3">
                     <span class="slash-icon">H3</span>
                     <div class="slash-text">
-                        <span class="slash-label">Heading 3</span>
-                        <span class="slash-desc">Small section heading</span>
+                        <span class="slash-label" data-i18n="paper-heading3"
+                            >Heading 3</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-heading3-desc"
+                            >Small section heading</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="bullet">
                     <span class="slash-icon">•</span>
                     <div class="slash-text">
-                        <span class="slash-label">Bullet List</span>
-                        <span class="slash-desc">Create a bullet list</span>
+                        <span class="slash-label" data-i18n="paper-bullet-list"
+                            >Bullet List</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-bullet-list-desc"
+                            >Create a bullet list</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="number">
                     <span class="slash-icon">1.</span>
                     <div class="slash-text">
-                        <span class="slash-label">Numbered List</span>
-                        <span class="slash-desc">Create a numbered list</span>
+                        <span
+                            class="slash-label"
+                            data-i18n="paper-numbered-list"
+                            >Numbered List</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-numbered-list-desc"
+                            >Create a numbered list</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="todo">
                     <span class="slash-icon">☑</span>
                     <div class="slash-text">
-                        <span class="slash-label">To-Do</span>
-                        <span class="slash-desc"
+                        <span class="slash-label" data-i18n="paper-todo-list"
+                            >To-Do</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-todo-list-desc"
                             >Track tasks with checkboxes</span
                         >
                     </div>
@@ -641,52 +676,85 @@
                 <button class="slash-item" data-cmd="quote">
                     <span class="slash-icon">"</span>
                     <div class="slash-text">
-                        <span class="slash-label">Quote</span>
-                        <span class="slash-desc">Capture a quote</span>
+                        <span class="slash-label" data-i18n="paper-quote"
+                            >Quote</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-quote-desc"
+                            >Capture a quote</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="code">
                     <span class="slash-icon">&lt;/&gt;</span>
                     <div class="slash-text">
-                        <span class="slash-label">Code Block</span>
-                        <span class="slash-desc">Display code with syntax</span>
+                        <span class="slash-label" data-i18n="paper-code-block"
+                            >Code Block</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-code-block-desc"
+                            >Display code with syntax</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="divider">
                     <span class="slash-icon">—</span>
                     <div class="slash-text">
-                        <span class="slash-label">Divider</span>
-                        <span class="slash-desc">Visual section break</span>
+                        <span class="slash-label" data-i18n="paper-divider"
+                            >Divider</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-divider-desc"
+                            >Visual section break</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="callout">
                     <span class="slash-icon">💡</span>
                     <div class="slash-text">
-                        <span class="slash-label">Callout</span>
-                        <span class="slash-desc">Highlight important info</span>
+                        <span class="slash-label" data-i18n="paper-callout"
+                            >Callout</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-callout-desc"
+                            >Highlight important info</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="table">
                     <span class="slash-icon">▦</span>
                     <div class="slash-text">
-                        <span class="slash-label">Table</span>
-                        <span class="slash-desc">Add a table</span>
+                        <span class="slash-label" data-i18n="paper-table"
+                            >Table</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-table-desc"
+                            >Add a table</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item" data-cmd="image">
                     <span class="slash-icon">🖼</span>
                     <div class="slash-text">
-                        <span class="slash-label">Image</span>
-                        <span class="slash-desc">Upload or embed image</span>
+                        <span class="slash-label" data-i18n="paper-image"
+                            >Image</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-image-desc"
+                            >Upload or embed image</span
+                        >
                     </div>
                 </button>
                 <div class="slash-menu-divider"></div>
-                <div class="slash-menu-header">AI Actions</div>
+                <div
+                    class="slash-menu-header"
+                    data-i18n="paper-ai-quick-actions"
+                >
+                    AI Actions
+                </div>
                 <button class="slash-item ai-item" data-cmd="ai-write">
                     <span class="slash-icon">✨</span>
                     <div class="slash-text">
-                        <span class="slash-label">AI Write</span>
-                        <span class="slash-desc"
+                        <span class="slash-label" data-i18n="paper-ai-write"
+                            >AI Write</span
+                        >
+                        <span class="slash-desc" data-i18n="paper-ai-write-desc"
                             >Generate content from prompt</span
                         >
                     </div>
@@ -694,29 +762,51 @@
                 <button class="slash-item ai-item" data-cmd="ai-summarize">
                     <span class="slash-icon">📝</span>
                     <div class="slash-text">
-                        <span class="slash-label">Summarize</span>
-                        <span class="slash-desc">Condense selected text</span>
+                        <span class="slash-label" data-i18n="paper-ai-summarize"
+                            >Summarize</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-ai-summarize-desc"
+                            >Condense selected text</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item ai-item" data-cmd="ai-expand">
                     <span class="slash-icon">📖</span>
                     <div class="slash-text">
-                        <span class="slash-label">Expand</span>
-                        <span class="slash-desc">Add more detail</span>
+                        <span class="slash-label" data-i18n="paper-ai-expand"
+                            >Expand</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-ai-expand-desc"
+                            >Add more detail</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item ai-item" data-cmd="ai-improve">
                     <span class="slash-icon">✏️</span>
                     <div class="slash-text">
-                        <span class="slash-label">Improve Writing</span>
-                        <span class="slash-desc">Fix grammar & clarity</span>
+                        <span class="slash-label" data-i18n="paper-ai-improve"
+                            >Improve Writing</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-ai-improve-desc"
+                            >Fix grammar & clarity</span
+                        >
                     </div>
                 </button>
                 <button class="slash-item ai-item" data-cmd="ai-translate">
                     <span class="slash-icon">🌐</span>
                     <div class="slash-text">
-                        <span class="slash-label">Translate</span>
-                        <span class="slash-desc"
+                        <span class="slash-label" data-i18n="paper-ai-translate"
+                            >Translate</span
+                        >
+                        <span
+                            class="slash-desc"
+                            data-i18n="paper-ai-translate-desc"
                             >Convert to another language</span
                         >
                     </div>
@@ -734,7 +824,7 @@
         <!-- AI Assistant Panel -->
         <div class="ai-panel hidden" id="ai-panel">
             <div class="ai-panel-header">
-                <h3>AI Assistant</h3>
+                <h3 data-i18n="paper-ai-assistant">AI Assistant</h3>
                 <button class="btn-icon" id="close-ai-panel">
                     <svg
                         width="16"
@@ -760,7 +850,8 @@
                         hx-target="#ai-response-content"
                         hx-swap="innerHTML"
                     >
-                        <span>📝</span> Summarize
+                        <span>📝</span>
+                        <span data-i18n="paper-ai-summarize">Summarize</span>
                     </button>
                     <button
                         class="ai-action-btn"
@@ -769,7 +860,8 @@
                         hx-target="#ai-response-content"
                         hx-swap="innerHTML"
                     >
-                        <span>📖</span> Expand
+                        <span>📖</span>
+                        <span data-i18n="paper-ai-expand">Expand</span>
                     </button>
                     <button
                         class="ai-action-btn"
@@ -778,7 +870,8 @@
                         hx-target="#ai-response-content"
                         hx-swap="innerHTML"
                     >
-                        <span>✏️</span> Improve
+                        <span>✏️</span>
+                        <span data-i18n="paper-ai-improve">Improve</span>
                     </button>
                     <button
                         class="ai-action-btn"
@@ -787,24 +880,41 @@
                         hx-target="#ai-response-content"
                         hx-swap="innerHTML"
                     >
-                        <span>🎯</span> Simplify
+                        <span>🎯</span>
+                        <span data-i18n="paper-ai-make-shorter">Simplify</span>
                     </button>
                 </div>
 
                 <!-- Tone Selector -->
                 <div class="ai-tone-section">
-                    <label>Change Tone</label>
+                    <label data-i18n="paper-ai-tone">Change Tone</label>
                     <div class="tone-buttons">
-                        <button class="tone-btn" data-tone="professional">
+                        <button
+                            class="tone-btn"
+                            data-tone="professional"
+                            data-i18n="paper-ai-tone-professional"
+                        >
                             Professional
                         </button>
-                        <button class="tone-btn" data-tone="casual">
+                        <button
+                            class="tone-btn"
+                            data-tone="casual"
+                            data-i18n="paper-ai-tone-casual"
+                        >
                             Casual
                         </button>
-                        <button class="tone-btn" data-tone="friendly">
+                        <button
+                            class="tone-btn"
+                            data-tone="friendly"
+                            data-i18n="paper-ai-tone-friendly"
+                        >
                             Friendly
                         </button>
-                        <button class="tone-btn" data-tone="formal">
+                        <button
+                            class="tone-btn"
+                            data-tone="formal"
+                            data-i18n="paper-ai-tone-formal"
+                        >
                             Formal
                         </button>
                     </div>
@@ -812,14 +922,16 @@
 
                 <!-- Translation -->
                 <div class="ai-translate-section">
-                    <label>Translate to</label>
+                    <label data-i18n="paper-ai-translate-to"
+                        >Translate to</label
+                    >
                     <select id="translate-lang" class="ai-select">
                         <option value="en">English</option>
-                        <option value="pt">Portuguese</option>
-                        <option value="es">Spanish</option>
-                        <option value="fr">French</option>
-                        <option value="de">German</option>
-                        <option value="ja">Japanese</option>
+                        <option value="pt">Português</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="ja">日本語</option>
                     </select>
                     <button
                         class="ai-action-btn"
@@ -828,15 +940,18 @@
                         hx-target="#ai-response-content"
                         hx-swap="innerHTML"
                     >
-                        Translate
+                        <span data-i18n="paper-ai-translate">Translate</span>
                     </button>
                 </div>
 
                 <!-- Custom Prompt -->
                 <div class="ai-custom-section">
-                    <label>Custom AI Command</label>
+                    <label data-i18n="paper-ai-custom-prompt"
+                        >Custom AI Command</label
+                    >
                     <textarea
                         id="ai-custom-prompt"
+                        data-i18n-placeholder="paper-ai-custom-placeholder"
                         placeholder="Tell AI what to do with selected text..."
                     ></textarea>
                     <button
@@ -846,7 +961,7 @@
                         hx-target="#ai-response-content"
                         hx-swap="innerHTML"
                     >
-                        Run Command
+                        <span data-i18n="paper-ai-generate">Run Command</span>
                     </button>
                 </div>
 
@@ -861,7 +976,7 @@
             <!-- AI Response -->
             <div class="ai-response hidden" id="ai-response">
                 <div class="ai-response-header">
-                    <span>AI Response</span>
+                    <span data-i18n="paper-ai-response">AI Response</span>
                     <div class="ai-response-actions">
                         <button
                             class="btn-icon"
@@ -885,7 +1000,7 @@
                                     ry="2"
                                 ></rect>
                                 <path
-                                    d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2</span> 2 0 012 2v1"
+                                    d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
                                 ></path>
                             </svg>
                         </button>
@@ -936,16 +1051,34 @@
         <!-- Status Bar -->
         <div class="paper-status-bar">
             <div class="status-left">
-                <span class="status-item" id="word-count">0 words</span>
-                <span class="status-item" id="char-count">0 characters</span>
+                <span
+                    class="status-item"
+                    id="word-count"
+                    data-i18n="paper-word-count"
+                    data-i18n-args='{"count": 0}'
+                    >0 words</span
+                >
+                <span
+                    class="status-item"
+                    id="char-count"
+                    data-i18n="paper-char-count"
+                    data-i18n-args='{"count": 0}'
+                    >0 characters</span
+                >
             </div>
             <div class="status-center">
-                <span class="status-item save-status" id="save-status"
+                <span
+                    class="status-item save-status"
+                    id="save-status"
+                    data-i18n="paper-saved"
                     >Saved</span
                 >
             </div>
             <div class="status-right">
-                <span class="status-item" id="last-edited"
+                <span
+                    class="status-item"
+                    id="last-edited"
+                    data-i18n="paper-last-edited-now"
                     >Last edited: Just now</span
                 >
             </div>
@@ -956,7 +1089,7 @@
     <div class="modal hidden" id="export-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Export Document</h3>
+                <h3 data-i18n="paper-export">Export Document</h3>
                 <button class="btn-icon close-modal">
                     <svg
                         width="16"
@@ -979,7 +1112,9 @@
                         hx-swap="none"
                     >
                         <span class="export-icon">📄</span>
-                        <span class="export-label">PDF</span>
+                        <span class="export-label" data-i18n="paper-export-pdf"
+                            >PDF</span
+                        >
                     </button>
                     <button
                         class="export-option"
@@ -987,7 +1122,9 @@
                         hx-swap="none"
                     >
                         <span class="export-icon">📝</span>
-                        <span class="export-label">Word (.docx)</span>
+                        <span class="export-label" data-i18n="paper-export-docx"
+                            >Word (.docx)</span
+                        >
                     </button>
                     <button
                         class="export-option"
@@ -995,7 +1132,11 @@
                         hx-swap="none"
                     >
                         <span class="export-icon">📑</span>
-                        <span class="export-label">Markdown</span>
+                        <span
+                            class="export-label"
+                            data-i18n="paper-export-markdown"
+                            >Markdown</span
+                        >
                     </button>
                     <button
                         class="export-option"
@@ -2026,15 +2167,34 @@
                 .filter((w) => w.length > 0).length;
             const chars = text.length;
 
-            document.getElementById("word-count").textContent =
-                words + " words";
-            document.getElementById("char-count").textContent =
-                chars + " characters";
+            const wordEl = document.getElementById("word-count");
+            const charEl = document.getElementById("char-count");
+
+            if (window.i18n && window.i18n.loaded) {
+                wordEl.textContent = window.i18n.t("paper-word-count", {
+                    count: words,
+                });
+                charEl.textContent = window.i18n.t("paper-char-count", {
+                    count: chars,
+                });
+            } else {
+                wordEl.textContent = words + " words";
+                charEl.textContent = chars + " characters";
+            }
         }
 
         function saveDocument() {
             const status = document.getElementById("save-status");
-            status.textContent = "Saving...";
+            const savingText =
+                window.i18n && window.i18n.loaded
+                    ? window.i18n.t("paper-saving")
+                    : "Saving...";
+            const savedText =
+                window.i18n && window.i18n.loaded
+                    ? window.i18n.t("paper-saved")
+                    : "Saved";
+
+            status.textContent = savingText;
             status.className = "status-item save-status saving";
 
             htmx.ajax("POST", "/api/ui/paper/save", {
@@ -2044,7 +2204,7 @@
                     content: editor.innerHTML,
                 },
             }).then(() => {
-                status.textContent = "Saved";
+                status.textContent = savedText;
                 status.className = "status-item save-status saved";
             });
         }

@@ -1,0 +1,949 @@
+<!-- =============================================================================
+     GB DOCS - Word-like Document Editor
+     General Bots Suite Component
+     ============================================================================= -->
+
+<link rel="stylesheet" href="/suite/docs/docs.css" />
+
+<div class="docs-container" id="docs-app">
+    <!-- Sidebar - Documents List -->
+    <aside class="docs-sidebar" id="docs-sidebar">
+        <div class="sidebar-header">
+            <h2 data-i18n="docs-title">Documents</h2>
+            <button
+                class="btn-icon"
+                onclick="gbDocs.toggleSidebar()"
+                title="Toggle sidebar"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-search">
+            <input
+                type="text"
+                placeholder="Search documents..."
+                id="doc-search"
+                hx-get="/api/ui/docs/search"
+                hx-trigger="keyup changed delay:300ms"
+                hx-target="#docs-list"
+                hx-include="this"
+            />
+            <svg
+                class="search-icon"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </div>
+
+        <div
+            class="docs-list"
+            id="docs-list"
+            hx-get="/api/ui/docs/list"
+            hx-trigger="load"
+            hx-swap="innerHTML"
+        >
+            <div class="loading-placeholder">
+                <div class="loading-spinner"></div>
+                Loading documents...
+            </div>
+        </div>
+
+        <!-- Quick Start Templates -->
+        <div class="sidebar-section">
+            <h3 data-i18n="docs-quick-start">Quick Start</h3>
+            <div class="template-grid">
+                <button
+                    class="template-btn"
+                    hx-post="/api/ui/docs/template/blank"
+                    hx-target="#editor-content"
+                >
+                    <span class="template-icon">📄</span>
+                    <span>Blank</span>
+                </button>
+                <button
+                    class="template-btn"
+                    hx-post="/api/ui/docs/template/meeting"
+                    hx-target="#editor-content"
+                >
+                    <span class="template-icon">📋</span>
+                    <span>Meeting</span>
+                </button>
+                <button
+                    class="template-btn"
+                    hx-post="/api/ui/docs/template/report"
+                    hx-target="#editor-content"
+                >
+                    <span class="template-icon">📊</span>
+                    <span>Report</span>
+                </button>
+                <button
+                    class="template-btn"
+                    hx-post="/api/ui/docs/template/letter"
+                    hx-target="#editor-content"
+                >
+                    <span class="template-icon">✉️</span>
+                    <span>Letter</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="btn-new-doc" onclick="gbDocs.createNewDocument()">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span data-i18n="new-document">New Document</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Editor Area -->
+    <main class="docs-main">
+        <!-- Editor Toolbar -->
+        <div class="editor-toolbar" id="editor-toolbar">
+            <!-- Left: Document Actions -->
+            <div class="toolbar-left">
+                <button
+                    class="btn-icon"
+                    onclick="gbDocs.toggleSidebar()"
+                    title="Toggle Sidebar"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
+                <input
+                    type="text"
+                    class="doc-title-input"
+                    id="doc-title"
+                    value="Untitled Document"
+                    onchange="gbDocs.renameDocument(this.value)"
+                />
+                <span class="toolbar-divider"></span>
+                <button class="btn-icon" data-cmd="undo" title="Undo (Ctrl+Z)">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M3 7v6h6"></path>
+                        <path
+                            d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"
+                        ></path>
+                    </svg>
+                </button>
+                <button class="btn-icon" data-cmd="redo" title="Redo (Ctrl+Y)">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M21 7v6h-6"></path>
+                        <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Center: Formatting -->
+            <div class="toolbar-center">
+                <!-- Heading Select -->
+                <div class="toolbar-group">
+                    <select
+                        class="toolbar-select"
+                        id="heading-select"
+                        title="Heading Style"
+                    >
+                        <option value="p">Paragraph</option>
+                        <option value="h1">Heading 1</option>
+                        <option value="h2">Heading 2</option>
+                        <option value="h3">Heading 3</option>
+                    </select>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Text Formatting -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        data-cmd="bold"
+                        title="Bold (Ctrl+B)"
+                    >
+                        <strong>B</strong>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="italic"
+                        title="Italic (Ctrl+I)"
+                    >
+                        <em>I</em>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="underline"
+                        title="Underline (Ctrl+U)"
+                    >
+                        <u>U</u>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="strikethrough"
+                        title="Strikethrough"
+                    >
+                        <s>S</s>
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Text Color -->
+                <div class="toolbar-group">
+                    <button class="btn-icon color-picker" title="Text Color">
+                        <span>A</span>
+                        <span
+                            class="color-indicator"
+                            id="text-color-indicator"
+                            style="background: #000000"
+                        ></span>
+                        <input
+                            type="color"
+                            class="color-input"
+                            id="text-color"
+                            value="#000000"
+                        />
+                    </button>
+                    <button
+                        class="btn-icon color-picker"
+                        title="Highlight Color"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M12 20h9"></path>
+                            <path
+                                d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"
+                            ></path>
+                        </svg>
+                        <span
+                            class="color-indicator"
+                            id="highlight-color-indicator"
+                            style="background: #ffff00"
+                        ></span>
+                        <input
+                            type="color"
+                            class="color-input"
+                            id="highlight-color"
+                            value="#ffff00"
+                        />
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Alignment -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        data-cmd="alignLeft"
+                        title="Align Left"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="17" y1="10" x2="3" y2="10"></line>
+                            <line x1="21" y1="6" x2="3" y2="6"></line>
+                            <line x1="21" y1="14" x2="3" y2="14"></line>
+                            <line x1="17" y1="18" x2="3" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="alignCenter"
+                        title="Align Center"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="18" y1="10" x2="6" y2="10"></line>
+                            <line x1="21" y1="6" x2="3" y2="6"></line>
+                            <line x1="21" y1="14" x2="3" y2="14"></line>
+                            <line x1="18" y1="18" x2="6" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="alignRight"
+                        title="Align Right"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="21" y1="10" x2="7" y2="10"></line>
+                            <line x1="21" y1="6" x2="3" y2="6"></line>
+                            <line x1="21" y1="14" x2="3" y2="14"></line>
+                            <line x1="21" y1="18" x2="7" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Lists -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        data-cmd="bullet"
+                        title="Bullet List"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <circle
+                                cx="4"
+                                cy="6"
+                                r="1"
+                                fill="currentColor"
+                            ></circle>
+                            <circle
+                                cx="4"
+                                cy="12"
+                                r="1"
+                                fill="currentColor"
+                            ></circle>
+                            <circle
+                                cx="4"
+                                cy="18"
+                                r="1"
+                                fill="currentColor"
+                            ></circle>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="number"
+                        title="Numbered List"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="10" y1="6" x2="21" y2="6"></line>
+                            <line x1="10" y1="12" x2="21" y2="12"></line>
+                            <line x1="10" y1="18" x2="21" y2="18"></line>
+                            <text
+                                x="3"
+                                y="8"
+                                font-size="8"
+                                fill="currentColor"
+                                stroke="none"
+                            >
+                                1
+                            </text>
+                            <text
+                                x="3"
+                                y="14"
+                                font-size="8"
+                                fill="currentColor"
+                                stroke="none"
+                            >
+                                2
+                            </text>
+                            <text
+                                x="3"
+                                y="20"
+                                font-size="8"
+                                fill="currentColor"
+                                stroke="none"
+                            >
+                                3
+                            </text>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="indent"
+                        title="Increase Indent"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="21" y1="6" x2="11" y2="6"></line>
+                            <line x1="21" y1="12" x2="11" y2="12"></line>
+                            <line x1="21" y1="18" x2="11" y2="18"></line>
+                            <polyline points="3 8 7 12 3 16"></polyline>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="outdent"
+                        title="Decrease Indent"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <line x1="21" y1="6" x2="11" y2="6"></line>
+                            <line x1="21" y1="12" x2="11" y2="12"></line>
+                            <line x1="21" y1="18" x2="11" y2="18"></line>
+                            <polyline points="7 8 3 12 7 16"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <span class="toolbar-divider"></span>
+
+                <!-- Insert -->
+                <div class="toolbar-group">
+                    <button
+                        class="btn-icon"
+                        data-cmd="link"
+                        title="Insert Link"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
+                            ></path>
+                            <path
+                                d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
+                            ></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="btn-icon"
+                        data-cmd="image"
+                        title="Insert Image"
+                    >
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <rect
+                                x="3"
+                                y="3"
+                                width="18"
+                                height="18"
+                                rx="2"
+                            ></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Actions -->
+            <div class="toolbar-right">
+                <button class="btn-ai" id="ai-assist-btn" title="AI Assistant">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                        ></path>
+                    </svg>
+                    <span>AI</span>
+                </button>
+                <button
+                    class="btn-icon"
+                    onclick="gbDocs.showModal('export-modal')"
+                    title="Export"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"
+                        ></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    onclick="gbDocs.toggleFocusMode()"
+                    title="Focus Mode"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"
+                        ></path>
+                    </svg>
+                </button>
+                <button
+                    class="btn-primary"
+                    id="save-btn"
+                    onclick="gbDocs.saveDocument()"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"
+                        ></path>
+                        <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                        <polyline points="7,3 7,8 15,8"></polyline>
+                    </svg>
+                    <span>Save</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Editor Canvas -->
+        <div class="editor-canvas">
+            <div class="editor-page">
+                <div
+                    class="editor-title"
+                    id="editor-title"
+                    contenteditable="true"
+                    data-placeholder="Untitled Document"
+                >
+                    Untitled Document
+                </div>
+                <div
+                    class="editor-content"
+                    id="editor-content"
+                    contenteditable="true"
+                    data-placeholder="Start typing or use / for commands..."
+                ></div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="docs-status-bar">
+            <div class="status-left">
+                <span class="status-item" id="word-count">0 words</span>
+                <span class="status-item" id="char-count">0 characters</span>
+            </div>
+            <div class="status-center">
+                <span class="save-status" id="save-status"></span>
+            </div>
+            <div class="status-right">
+                <span class="status-item" id="last-edited"></span>
+            </div>
+        </div>
+    </main>
+
+    <!-- Slash Command Menu -->
+    <div class="slash-menu hidden" id="slash-menu">
+        <div class="slash-menu-header">Basic Blocks</div>
+        <div class="slash-menu-items">
+            <div class="slash-item" data-cmd="h1">
+                <div class="slash-icon">H1</div>
+                <div class="slash-text">
+                    <div class="slash-label">Heading 1</div>
+                    <div class="slash-desc">Large section heading</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="h2">
+                <div class="slash-icon">H2</div>
+                <div class="slash-text">
+                    <div class="slash-label">Heading 2</div>
+                    <div class="slash-desc">Medium section heading</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="h3">
+                <div class="slash-icon">H3</div>
+                <div class="slash-text">
+                    <div class="slash-label">Heading 3</div>
+                    <div class="slash-desc">Small section heading</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="paragraph">
+                <div class="slash-icon">¶</div>
+                <div class="slash-text">
+                    <div class="slash-label">Paragraph</div>
+                    <div class="slash-desc">Plain text paragraph</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="bullet">
+                <div class="slash-icon">•</div>
+                <div class="slash-text">
+                    <div class="slash-label">Bullet List</div>
+                    <div class="slash-desc">Unordered list</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="number">
+                <div class="slash-icon">1.</div>
+                <div class="slash-text">
+                    <div class="slash-label">Numbered List</div>
+                    <div class="slash-desc">Ordered list</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="todo">
+                <div class="slash-icon">☐</div>
+                <div class="slash-text">
+                    <div class="slash-label">To-Do</div>
+                    <div class="slash-desc">Checkbox task item</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="quote">
+                <div class="slash-icon">"</div>
+                <div class="slash-text">
+                    <div class="slash-label">Quote</div>
+                    <div class="slash-desc">Blockquote text</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="code">
+                <div class="slash-icon">&lt;/&gt;</div>
+                <div class="slash-text">
+                    <div class="slash-label">Code Block</div>
+                    <div class="slash-desc">Preformatted code</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="divider">
+                <div class="slash-icon">—</div>
+                <div class="slash-text">
+                    <div class="slash-label">Divider</div>
+                    <div class="slash-desc">Horizontal line</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="callout">
+                <div class="slash-icon">💡</div>
+                <div class="slash-text">
+                    <div class="slash-label">Callout</div>
+                    <div class="slash-desc">Highlighted notice</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="table">
+                <div class="slash-icon">⊞</div>
+                <div class="slash-text">
+                    <div class="slash-label">Table</div>
+                    <div class="slash-desc">Insert a table</div>
+                </div>
+            </div>
+            <div class="slash-item" data-cmd="image">
+                <div class="slash-icon">🖼</div>
+                <div class="slash-text">
+                    <div class="slash-label">Image</div>
+                    <div class="slash-desc">Insert an image</div>
+                </div>
+            </div>
+
+            <div class="slash-menu-divider"></div>
+            <div class="slash-menu-header">AI Assist</div>
+
+            <div class="slash-item ai-item" data-cmd="ai-write">
+                <div class="slash-icon">✨</div>
+                <div class="slash-text">
+                    <div class="slash-label">AI Write</div>
+                    <div class="slash-desc">Generate content with AI</div>
+                </div>
+            </div>
+            <div class="slash-item ai-item" data-cmd="ai-improve">
+                <div class="slash-icon">🔄</div>
+                <div class="slash-text">
+                    <div class="slash-label">AI Improve</div>
+                    <div class="slash-desc">Enhance selected text</div>
+                </div>
+            </div>
+            <div class="slash-item ai-item" data-cmd="ai-summarize">
+                <div class="slash-icon">📝</div>
+                <div class="slash-text">
+                    <div class="slash-label">AI Summarize</div>
+                    <div class="slash-desc">Summarize selected text</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Panel -->
+    <div class="ai-panel hidden" id="ai-panel">
+        <div class="ai-panel-header">
+            <h3>AI Assistant</h3>
+            <button class="btn-close" id="close-ai-panel">×</button>
+        </div>
+        <div class="ai-panel-content">
+            <!-- Quick Actions -->
+            <div class="ai-quick-actions">
+                <button class="ai-action-btn" data-action="improve">
+                    ✨ Improve
+                </button>
+                <button class="ai-action-btn" data-action="shorten">
+                    📏 Shorten
+                </button>
+                <button class="ai-action-btn" data-action="expand">
+                    📖 Expand
+                </button>
+                <button class="ai-action-btn" data-action="fix">
+                    🔧 Fix Grammar
+                </button>
+            </div>
+
+            <!-- Tone Selection -->
+            <div class="ai-section">
+                <span class="ai-section-label">Change Tone</span>
+                <div class="tone-buttons">
+                    <button class="tone-btn" data-tone="professional">
+                        Professional
+                    </button>
+                    <button class="tone-btn" data-tone="casual">Casual</button>
+                    <button class="tone-btn" data-tone="friendly">
+                        Friendly
+                    </button>
+                    <button class="tone-btn" data-tone="formal">Formal</button>
+                </div>
+            </div>
+
+            <!-- Translate -->
+            <div class="ai-section">
+                <span class="ai-section-label">Translate To</span>
+                <select class="ai-select" id="translate-language">
+                    <option value="">Select language...</option>
+                    <option value="en">English</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="zh">Chinese</option>
+                    <option value="ja">Japanese</option>
+                </select>
+                <button
+                    class="btn-primary"
+                    style="width: 100%; margin-top: 8px"
+                    data-action="translate"
+                >
+                    Translate
+                </button>
+            </div>
+
+            <!-- Custom Prompt -->
+            <div class="ai-section">
+                <span class="ai-section-label">Custom Request</span>
+                <textarea
+                    class="ai-textarea"
+                    id="selected-text-input"
+                    placeholder="Describe what you want AI to do..."
+                ></textarea>
+                <button
+                    class="btn-primary"
+                    style="width: 100%; margin-top: 8px"
+                    data-action="custom"
+                >
+                    Generate
+                </button>
+            </div>
+
+            <!-- AI Response -->
+            <div class="ai-response hidden" id="ai-response">
+                <div class="ai-response-header">
+                    <span>AI Response</span>
+                    <div class="ai-response-actions">
+                        <button
+                            class="btn-icon"
+                            id="copy-ai-response"
+                            title="Copy"
+                        >
+                            <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <rect
+                                    x="9"
+                                    y="9"
+                                    width="13"
+                                    height="13"
+                                    rx="2"
+                                ></rect>
+                                <path
+                                    d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
+                                ></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="ai-response-content" id="ai-response-content"></div>
+                <div style="padding: 12px; display: flex; gap: 8px">
+                    <button
+                        class="btn-primary"
+                        id="insert-ai-response"
+                        style="flex: 1"
+                    >
+                        Insert
+                    </button>
+                    <button
+                        class="btn-primary"
+                        id="replace-ai-response"
+                        style="flex: 1; background: #64748b"
+                    >
+                        Replace
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal hidden" id="export-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Export Document</h3>
+                <button
+                    class="btn-close"
+                    onclick="gbDocs.hideModal('export-modal')"
+                >
+                    ×
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="export-options">
+                    <button
+                        class="export-option"
+                        onclick="gbDocs.exportDocument('pdf')"
+                    >
+                        <span class="export-icon">📄</span>
+                        <span class="export-label">PDF</span>
+                    </button>
+                    <button
+                        class="export-option"
+                        onclick="gbDocs.exportDocument('docx')"
+                    >
+                        <span class="export-icon">📝</span>
+                        <span class="export-label">Word</span>
+                    </button>
+                    <button
+                        class="export-option"
+                        onclick="gbDocs.exportDocument('html')"
+                    >
+                        <span class="export-icon">🌐</span>
+                        <span class="export-label">HTML</span>
+                    </button>
+                    <button
+                        class="export-option"
+                        onclick="gbDocs.exportDocument('txt')"
+                    >
+                        <span class="export-icon">📃</span>
+                        <span class="export-label">Text</span>
+                    </button>
+                    <button
+                        class="export-option"
+                        onclick="gbDocs.exportDocument('md')"
+                    >
+                        <span class="export-icon">📋</span>
+                        <span class="export-label">Markdown</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/suite/docs/docs.js"></script>

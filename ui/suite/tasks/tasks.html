@@ -22,7 +22,7 @@
             hx-swap="innerHTML"
         >
             <span class="pill-icon">✓</span>
-            <span class="pill-label">Complete</span>
+            <span class="pill-label" data-i18n="tasks-completed">Complete</span>
             <span class="pill-count" id="count-complete">-</span>
         </button>
         <button
@@ -33,7 +33,7 @@
             hx-swap="innerHTML"
         >
             <span class="pill-icon">📋</span>
-            <span class="pill-label">All Tasks</span>
+            <span class="pill-label" data-i18n="tasks-all">All Tasks</span>
             <span class="pill-count" id="count-all">-</span>
         </button>
         <button
@@ -44,7 +44,9 @@
             hx-swap="innerHTML"
         >
             <span class="pill-icon">⚡</span>
-            <span class="pill-label">Active Intents</span>
+            <span class="pill-label" data-i18n="tasks-active"
+                >Active Intents</span
+            >
             <span class="pill-count" id="count-active">-</span>
         </button>
         <button
@@ -55,7 +57,9 @@
             hx-swap="innerHTML"
         >
             <span class="pill-icon">⏳</span>
-            <span class="pill-label">Awaiting Decision</span>
+            <span class="pill-label" data-i18n="tasks-awaiting"
+                >Awaiting Decision</span
+            >
             <span class="pill-count" id="count-awaiting">-</span>
         </button>
         <button
@@ -66,7 +70,7 @@
             hx-swap="innerHTML"
         >
             <span class="pill-icon">⏸</span>
-            <span class="pill-label">Paused</span>
+            <span class="pill-label" data-i18n="tasks-paused">Paused</span>
             <span class="pill-count" id="count-paused">-</span>
         </button>
         <button
@@ -77,11 +81,15 @@
             hx-swap="innerHTML"
         >
             <span class="pill-icon">⚠</span>
-            <span class="pill-label">Blocked/Issues</span>
+            <span class="pill-label" data-i18n="tasks-blocked"
+                >Blocked/Issues</span
+            >
             <span class="pill-count" id="count-blocked">-</span>
         </button>
         <div class="time-saved-badge">
-            <span class="time-label">Active Time Saved:</span>
+            <span class="time-label" data-i18n="tasks-time-saved"
+                >Active Time Saved:</span
+            >
             <span class="time-value" id="time-saved-value">-</span>
         </div>
     </div>
@@ -95,6 +103,7 @@
                 name="intent"
                 class="quick-intent-input"
                 placeholder="What would you like to do? e.g., 'create a CRM app' or 'remind me to call John tomorrow'"
+                data-i18n-placeholder="tasks-input-placeholder"
                 autocomplete="off"
             />
             <button

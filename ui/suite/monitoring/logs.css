@@ -58,17 +58,27 @@
     border-radius: 50%;
 }
 
-.stat-dot.debug { background: #6b7280; }
-.stat-dot.info { background: var(--primary); }
-.stat-dot.warn { background: var(--warning); }
-.stat-dot.error { background: var(--error); }
-.stat-dot.fatal { background: #dc2626; }
+.stat-dot.debug {
+    background: var(--text-secondary);
+}
+.stat-dot.info {
+    background: var(--primary);
+}
+.stat-dot.warn {
+    background: var(--warning);
+}
+.stat-dot.error {
+    background: var(--error);
+}
+.stat-dot.fatal {
+    background: var(--error);
+}
 
 .stat-count {
     font-size: 0.8125rem;
     font-weight: 600;
     color: var(--text);
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", monospace;
 }
 
 .stat-label {
@@ -117,8 +127,13 @@
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* Log Stream */
@@ -136,7 +151,7 @@
     flex: 1;
     overflow-y: auto;
     padding: 0.5rem;
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
     font-size: 0.8125rem;
     line-height: 1.6;
 }
@@ -199,7 +214,7 @@
 
 .log-entry[data-level="debug"] .log-level {
     background: rgba(107, 114, 128, 0.15);
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 .log-entry[data-level="info"] .log-level {
@@ -219,11 +234,11 @@
 
 .log-entry[data-level="fatal"] .log-level {
     background: rgba(220, 38, 38, 0.2);
-    color: #dc2626;
+    color: var(--error);
 }
 
 .log-service {
-    color: #8b5cf6;
+    color: var(--primary);
     font-size: 0.75rem;
     white-space: nowrap;
     flex-shrink: 0;
@@ -352,7 +367,7 @@
 }
 
 .detail-value {
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", monospace;
     font-size: 0.8125rem;
     color: var(--text);
     background: var(--bg);
@@ -364,7 +379,7 @@
 
 /* Logs View (legacy) */
 .logs-content {
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
     font-size: 0.8125rem;
     line-height: 1.6;
     padding: 1rem;

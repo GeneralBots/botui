@@ -46,12 +46,30 @@
     flex-shrink: 0;
 }
 
-.metric-icon.requests { background: var(--primary-light); color: var(--primary); }
-.metric-icon.latency { background: rgba(34, 197, 94, 0.1); color: var(--success); }
-.metric-icon.errors { background: rgba(239, 68, 68, 0.1); color: var(--error); }
-.metric-icon.users { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
-.metric-icon.conversations { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
-.metric-icon.uptime { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+.metric-icon.requests {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+.metric-icon.latency {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+}
+.metric-icon.errors {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+.metric-icon.users {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+.metric-icon.conversations {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+.metric-icon.uptime {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
 
 .metric-info {
     flex: 1;
@@ -74,7 +92,7 @@
     font-size: 2rem;
     font-weight: 700;
     color: var(--text);
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
 }
 
 .metric-change {
@@ -175,13 +193,27 @@
     border-radius: 2px;
 }
 
-.legend-dot.p50 { background: var(--success); }
-.legend-dot.p95 { background: var(--warning); }
-.legend-dot.p99 { background: var(--error); }
-.legend-dot.error-4xx { background: var(--warning); }
-.legend-dot.error-5xx { background: var(--error); }
-.legend-dot.incoming { background: #8b5cf6; }
-.legend-dot.outgoing { background: #06b6d4; }
+.legend-dot.p50 {
+    background: var(--success);
+}
+.legend-dot.p95 {
+    background: var(--warning);
+}
+.legend-dot.p99 {
+    background: var(--error);
+}
+.legend-dot.error-4xx {
+    background: var(--warning);
+}
+.legend-dot.error-5xx {
+    background: var(--error);
+}
+.legend-dot.incoming {
+    background: var(--primary);
+}
+.legend-dot.outgoing {
+    background: var(--success);
+}
 
 .chart-body {
     padding: 1rem;
@@ -240,7 +272,7 @@
 }
 
 .metrics-table .metric-name {
-    font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+    font-family: "SF Mono", "Monaco", "Inconsolata", monospace;
     font-weight: 500;
 }
 
