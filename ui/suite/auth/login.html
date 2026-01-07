@@ -1234,6 +1234,38 @@
                                 return;
                             }
 
+                            // Save token before redirect
+                            if (response.access_token) {
+                                const rememberCheckbox =
+                                    document.getElementById("remember");
+                                const storage =
+                                    rememberCheckbox && rememberCheckbox.checked
+                                        ? localStorage
+                                        : sessionStorage;
+                                storage.setItem(
+                                    "gb-access-token",
+                                    response.access_token,
+                                );
+                                if (response.refresh_token) {
+                                    storage.setItem(
+                                        "gb-refresh-token",
+                                        response.refresh_token,
+                                    );
+                                }
+                                if (response.expires_in) {
+                                    const expiresAt =
+                                        Date.now() + response.expires_in * 1000;
+                                    storage.setItem(
+                                        "gb-token-expires",
+                                        expiresAt.toString(),
+                                    );
+                                }
+                                console.log(
+                                    "Token saved:",
+                                    response.access_token,
+                                );
+                            }
+
                             // Successful login - redirect
                             if (response.redirect || response.success) {
                                 window.location.href = response.redirect || "/";
