@@ -6,9 +6,7 @@ mod shared;
 mod ui_server;
 
 fn init_logging() {
-    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info"))
-        .format_timestamp_millis()
-        .init();
+    botlib::logging::init_compact_logger("info");
 }
 
 fn get_port() -> u16 {

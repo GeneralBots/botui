@@ -46,6 +46,16 @@ const SUITE_DIRS: &[&str] = &[
     "tools",
     "assets",
     "partials",
+    "video",
+    "learn",
+    "social",
+    "dashboards",
+    "designer",
+    "workspace",
+    "project",
+    "goals",
+    "player",
+    "canvas",
 ];
 
 pub async fn index() -> impl IntoResponse {

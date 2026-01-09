@@ -1,660 +1,1148 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>General Bots Suite</title>
-        <script src="js/vendor/htmx.min.js"></script>
-        <link rel="stylesheet" href="/css/app.css" />
-        <style>
-            :root {
-                --primary: #3b82f6;
-                --primary-hover: #2563eb;
-                --bg: #0f172a;
-                --surface: #1e293b;
-                --border: #334155;
-                --text: #f8fafc;
-                --text-secondary: #94a3b8;
-            }
+<link rel="stylesheet" href="css/home.css" />
 
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family:
-                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                    sans-serif;
-                background: var(--bg);
-                color: var(--text);
-                min-height: 100vh;
-            }
-
-            .home-container {
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: 2rem;
-            }
-
-            .home-header {
-                text-align: center;
-                margin-bottom: 3rem;
-            }
-
-            .home-logo {
-                width: 80px;
-                height: 80px;
-                margin: 0 auto 1.5rem;
-                background: linear-gradient(135deg, var(--primary), #8b5cf6);
-                border-radius: 20px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 2.5rem;
-            }
-
-            .home-title {
-                font-size: 2.5rem;
-                font-weight: 700;
-                margin-bottom: 0.75rem;
-                background: linear-gradient(
-                    135deg,
-                    var(--text),
-                    var(--primary)
-                );
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-
-            .home-subtitle {
-                color: var(--text-secondary);
-                font-size: 1.125rem;
-                max-width: 500px;
-                margin: 0 auto;
-            }
-
-            .apps-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 1.5rem;
-                margin-bottom: 3rem;
-            }
-
-            .app-card {
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: 16px;
-                padding: 1.5rem;
-                text-decoration: none;
-                color: inherit;
-                transition:
-                    transform 0.2s,
-                    border-color 0.2s,
-                    box-shadow 0.2s;
-                display: block;
-            }
-
-            .app-card:hover {
-                transform: translateY(-4px);
-                border-color: var(--primary);
-                box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
-            }
-
-            .app-icon {
-                width: 56px;
-                height: 56px;
-                border-radius: 14px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.75rem;
-                margin-bottom: 1rem;
-            }
-
-            .app-icon.chat {
-                background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            }
-            .app-icon.drive {
-                background: linear-gradient(135deg, #f59e0b, #d97706);
-            }
-            .app-icon.tasks {
-                background: linear-gradient(135deg, #10b981, #059669);
-            }
-            .app-icon.mail {
-                background: linear-gradient(135deg, #ef4444, #dc2626);
-            }
-            .app-icon.calendar {
-                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            }
-            .app-icon.meet {
-                background: linear-gradient(135deg, #06b6d4, #0891b2);
-            }
-            .app-icon.paper {
-                background: linear-gradient(135deg, #ec4899, #db2777);
-            }
-            .app-icon.sheet {
-                background: linear-gradient(135deg, #22c55e, #16a34a);
-            }
-            .app-icon.slides {
-                background: linear-gradient(135deg, #f59e0b, #d97706);
-            }
-            .app-icon.research {
-                background: linear-gradient(135deg, #14b8a6, #0d9488);
-            }
-            .app-icon.analytics {
-                background: linear-gradient(135deg, #6366f1, #4f46e5);
-            }
-            .app-icon.sources {
-                background: linear-gradient(135deg, #a855f7, #9333ea);
-            }
-            .app-icon.attendant {
-                background: linear-gradient(135deg, #22c55e, #16a34a);
-            }
-            .app-icon.monitoring {
-                background: linear-gradient(135deg, #f97316, #ea580c);
-            }
-            .app-icon.tools {
-                background: linear-gradient(135deg, #64748b, #475569);
-            }
-            .app-icon.admin {
-                background: linear-gradient(135deg, #78716c, #57534e);
-            }
-            .app-icon.settings {
-                background: linear-gradient(135deg, #71717a, #52525b);
-            }
-
-            .app-name {
-                font-size: 1.25rem;
-                font-weight: 600;
-                margin-bottom: 0.5rem;
-            }
-
-            .app-description {
-                color: var(--text-secondary);
-                font-size: 0.875rem;
-                line-height: 1.5;
-            }
-
-            .section-title {
-                font-size: 1rem;
-                font-weight: 600;
-                color: var(--text-secondary);
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                margin-bottom: 1rem;
-            }
-
-            .quick-actions {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.75rem;
-                margin-bottom: 3rem;
-            }
-
-            .quick-action-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.75rem 1.25rem;
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: 10px;
-                color: var(--text);
-                font-size: 0.875rem;
-                cursor: pointer;
-                transition:
-                    border-color 0.2s,
-                    background 0.2s;
-                text-decoration: none;
-            }
-
-            .quick-action-btn:hover {
-                border-color: var(--primary);
-                background: rgba(59, 130, 246, 0.1);
-            }
-
-            .recent-section {
-                background: var(--surface);
-                border: 1px solid var(--border);
-                border-radius: 16px;
-                padding: 1.5rem;
-            }
-
-            .recent-list {
-                display: flex;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .recent-item {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                padding: 0.75rem;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background 0.2s;
-            }
-
-            .recent-item:hover {
-                background: var(--bg);
-            }
-
-            .recent-icon {
-                width: 40px;
-                height: 40px;
-                border-radius: 8px;
-                background: var(--bg);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1.25rem;
-            }
-
-            .recent-info {
-                flex: 1;
-            }
-
-            .recent-name {
-                font-weight: 500;
-                margin-bottom: 0.25rem;
-            }
-
-            .recent-meta {
-                font-size: 0.75rem;
-                color: var(--text-secondary);
-            }
-
-            .recent-time {
-                font-size: 0.75rem;
-                color: var(--text-secondary);
-            }
-
-            @media (max-width: 768px) {
-                .home-container {
-                    padding: 1rem;
-                }
-
-                .home-title {
-                    font-size: 1.75rem;
-                }
-
-                .apps-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="home-container">
-            <header class="home-header">
-                <div class="home-logo">🤖</div>
-                <h1 class="home-title">General Bots Suite</h1>
-                <p class="home-subtitle">
-                    Your AI-powered productivity workspace. Chat, collaborate,
-                    and create.
-                </p>
-            </header>
-
-            <section>
-                <h2 class="section-title">Quick Actions</h2>
-                <div class="quick-actions">
-                    <a
-                        href="#chat"
-                        class="quick-action-btn"
-                        hx-get="/chat/chat.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        💬 Start Chat
-                    </a>
-                    <a
-                        href="#drive"
-                        class="quick-action-btn"
-                        hx-get="/drive/index.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        📁 Upload Files
-                    </a>
-                    <a
-                        href="#tasks"
-                        class="quick-action-btn"
-                        hx-get="/tasks/tasks.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        ✓ New Task
-                    </a>
-                    <a
-                        href="#mail"
-                        class="quick-action-btn"
-                        hx-get="/mail/mail.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        ✉️ Compose Email
-                    </a>
-                    <a
-                        href="#meet"
-                        class="quick-action-btn"
-                        hx-get="/meet/meet.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        🎥 Start Meeting
-                    </a>
-                </div>
-            </section>
-
-            <section>
-                <h2 class="section-title">Applications</h2>
-                <div class="apps-grid">
-                    <a
-                        href="#chat"
-                        class="app-card"
-                        hx-get="/chat/chat.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon chat">💬</div>
-                        <div class="app-name">Chat</div>
-                        <div class="app-description">
-                            AI-powered conversations. Ask questions, get help,
-                            and automate tasks.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#drive"
-                        class="app-card"
-                        hx-get="/drive/index.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon drive">📁</div>
-                        <div class="app-name">Drive</div>
-                        <div class="app-description">
-                            Cloud storage for all your files. Upload, organize,
-                            and share.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#tasks"
-                        class="app-card"
-                        hx-get="/tasks/tasks.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon tasks">✓</div>
-                        <div class="app-name">Tasks</div>
-                        <div class="app-description">
-                            Stay organized with to-do lists, priorities, and due
-                            dates.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#mail"
-                        class="app-card"
-                        hx-get="/mail/mail.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon mail">✉️</div>
-                        <div class="app-name">Mail</div>
-                        <div class="app-description">
-                            Email client with AI-assisted writing and smart
-                            organization.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#calendar"
-                        class="app-card"
-                        hx-get="/calendar/calendar.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon calendar">📅</div>
-                        <div class="app-name">Calendar</div>
-                        <div class="app-description">
-                            Schedule meetings, events, and manage your time
-                            effectively.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#meet"
-                        class="app-card"
-                        hx-get="/meet/meet.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon meet">🎥</div>
-                        <div class="app-name">Meet</div>
-                        <div class="app-description">
-                            Video conferencing with screen sharing and live
-                            transcription.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#paper"
-                        class="app-card"
-                        hx-get="/paper/paper.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon paper">📝</div>
-                        <div class="app-name">Paper</div>
-                        <div class="app-description">
-                            Write documents with AI assistance. Notes, reports,
-                            and more.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#sheet"
-                        class="app-card"
-                        hx-get="/suite/sheet/sheet.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon sheet">📊</div>
-                        <div class="app-name">Sheet</div>
-                        <div class="app-description">
-                            Spreadsheets with formulas, charts, and real-time
-                            collaboration.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#slides"
-                        class="app-card"
-                        hx-get="/suite/slides/slides.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon slides">📽️</div>
-                        <div class="app-name">Slides</div>
-                        <div class="app-description">
-                            Create presentations with themes, animations, and
-                            collaboration.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#research"
-                        class="app-card"
-                        hx-get="/research/research.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon research">🔍</div>
-                        <div class="app-name">Research</div>
-                        <div class="app-description">
-                            AI-powered search and discovery across all your
-                            sources.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#analytics"
-                        class="app-card"
-                        hx-get="/analytics/analytics.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon analytics">📊</div>
-                        <div class="app-name">Analytics</div>
-                        <div class="app-description">
-                            Dashboards and reports to track usage and insights.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#sources"
-                        class="app-card"
-                        hx-get="/sources/index.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon sources">📦</div>
-                        <div class="app-name">Sources</div>
-                        <div class="app-description">
-                            Repositories, Apps, Prompts, Templates and MCP
-                            Servers.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#attendant"
-                        class="app-card"
-                        hx-get="/attendant/index.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon attendant">👤</div>
-                        <div class="app-name">Attendant</div>
-                        <div class="app-description">
-                            Human agent console for CRM and conversation
-                            management.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#monitoring"
-                        class="app-card"
-                        hx-get="/monitoring/monitoring.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon monitoring">📡</div>
-                        <div class="app-name">Monitoring</div>
-                        <div class="app-description">
-                            System health, logs, metrics and real-time
-                            monitoring.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#tools"
-                        class="app-card"
-                        hx-get="/tools/compliance.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon tools">🛠️</div>
-                        <div class="app-name">Tools</div>
-                        <div class="app-description">
-                            Compliance scanning, security checks and bot
-                            utilities.
-                        </div>
-                    </a>
-
-                    <a
-                        href="#settings"
-                        class="app-card"
-                        hx-get="/suite/settings/index.html"
-                        hx-target="#main-content"
-                        hx-push-url="true"
-                    >
-                        <div class="app-icon settings">⚙️</div>
-                        <div class="app-name">Settings</div>
-                        <div class="app-description">
-                            Personal preferences, administration and account
-                            settings.
-                        </div>
-                    </a>
-                </div>
-            </section>
-
-            <section class="recent-section">
-                <h2 class="section-title">Recent Activity</h2>
-                <div
-                    class="recent-list"
-                    hx-get="/api/activity/recent"
-                    hx-trigger="load"
-                    hx-swap="innerHTML"
-                >
-                    {% for item in recent_items %}
-                    <div
-                        class="recent-item"
-                        hx-get="{{ item.url }}"
-                        hx-target="#main-content"
-                    >
-                        <div class="recent-icon">{{ item.icon }}</div>
-                        <div class="recent-info">
-                            <div class="recent-name">{{ item.name }}</div>
-                            <div class="recent-meta">
-                                {{ item.app }} • {{ item.description }}
-                            </div>
-                        </div>
-                        <div class="recent-time">{{ item.time }}</div>
-                    </div>
-                    {% endfor %} {% if recent_items.is_empty() %}
-                    <div
-                        style="
-                            text-align: center;
-                            padding: 2rem;
-                            color: var(--text-secondary);
-                        "
-                    >
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem">
-                            🚀
-                        </div>
-                        <p>No recent activity yet. Start exploring!</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </section>
+<div class="home-container">
+    <!-- Welcome Section -->
+    <section class="welcome-section">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Welcome back</h1>
+            <p class="welcome-subtitle">
+                Your AI-powered workspace. What would you like to do today?
+            </p>
         </div>
+        <div class="quick-search">
+            <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input
+                type="text"
+                placeholder="Search or ask anything..."
+                id="home-search"
+            />
+            <kbd>⌘K</kbd>
+        </div>
+    </section>
 
-        <script>
-            // Keyboard shortcuts
-            document.addEventListener("keydown", (e) => {
-                if (e.altKey && !e.ctrlKey && !e.shiftKey) {
-                    const shortcuts = {
-                        1: "#chat",
-                        2: "#drive",
-                        3: "#tasks",
-                        4: "#mail",
-                        5: "#calendar",
-                        6: "#meet",
-                    };
-                    if (shortcuts[e.key]) {
-                        e.preventDefault();
-                        const link = document.querySelector(
-                            `a[href="${shortcuts[e.key]}"]`,
-                        );
-                        if (link) link.click();
-                    }
-                }
+    <!-- Recent Documents Section -->
+    <section class="recent-section">
+        <div class="section-header">
+            <h2>Recent</h2>
+            <a
+                href="#drive"
+                class="view-all"
+                hx-get="/suite/drive/drive.html"
+                hx-target="#main-content"
+                hx-push-url="/#drive"
+                >View all</a
+            >
+        </div>
+        <div class="recent-grid" id="recent-documents">
+            <!-- Recent items will be loaded here -->
+            <div class="recent-card placeholder">
+                <div class="recent-icon doc">
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                </div>
+                <div class="recent-info">
+                    <span class="recent-name">Project Proposal</span>
+                    <span class="recent-meta">Edited 2 hours ago</span>
+                </div>
+            </div>
+            <div class="recent-card placeholder">
+                <div class="recent-icon sheet">
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        />
+                        <line x1="3" y1="9" x2="21" y2="9" />
+                        <line x1="3" y1="15" x2="21" y2="15" />
+                        <line x1="9" y1="3" x2="9" y2="21" />
+                    </svg>
+                </div>
+                <div class="recent-info">
+                    <span class="recent-name">Q4 Budget</span>
+                    <span class="recent-meta">Edited yesterday</span>
+                </div>
+            </div>
+            <div class="recent-card placeholder">
+                <div class="recent-icon slides">
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="2"
+                            y="3"
+                            width="20"
+                            height="14"
+                            rx="2"
+                            ry="2"
+                        />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                    </svg>
+                </div>
+                <div class="recent-info">
+                    <span class="recent-name">Team Presentation</span>
+                    <span class="recent-meta">Edited 3 days ago</span>
+                </div>
+            </div>
+            <div class="recent-card placeholder">
+                <div class="recent-icon paper">
+                    <svg
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                </div>
+                <div class="recent-info">
+                    <span class="recent-name">Meeting Notes</span>
+                    <span class="recent-meta">Edited this week</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Applications Section -->
+    <section class="apps-section">
+        <div class="section-header">
+            <h2>Applications</h2>
+        </div>
+        <div class="apps-grid">
+            <!-- Communication -->
+            <a
+                href="#chat"
+                class="app-card"
+                hx-get="/suite/chat/chat.html"
+                hx-target="#main-content"
+                hx-push-url="/#chat"
+            >
+                <div class="app-icon chat">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Chat</h3>
+                    <p>
+                        AI-powered conversations. Ask questions, get help, and
+                        automate tasks with your intelligent assistant.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#people"
+                class="app-card"
+                hx-get="/suite/people/people.html"
+                hx-target="#main-content"
+                hx-push-url="/#people"
+            >
+                <div class="app-icon people">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>People</h3>
+                    <p>
+                        Manage your contacts, groups, and organization
+                        directory. Connect with colleagues and collaborators.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#mail"
+                class="app-card"
+                hx-get="/suite/mail/mail.html"
+                hx-target="#main-content"
+                hx-push-url="/#mail"
+            >
+                <div class="app-icon mail">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                        />
+                        <polyline points="22,6 12,13 2,6" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Mail</h3>
+                    <p>
+                        Smart email with AI assistance. Write better emails,
+                        organize your inbox, and never miss important messages.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#meet"
+                class="app-card"
+                hx-get="/suite/meet/meet.html"
+                hx-target="#main-content"
+                hx-push-url="/#meet"
+            >
+                <div class="app-icon meet">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polygon points="23 7 16 12 23 17 23 7" />
+                        <rect
+                            x="1"
+                            y="5"
+                            width="15"
+                            height="14"
+                            rx="2"
+                            ry="2"
+                        />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Meet</h3>
+                    <p>
+                        Video conferencing with screen sharing, live
+                        transcription, and AI-powered meeting summaries.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Productivity -->
+            <a
+                href="#calendar"
+                class="app-card"
+                hx-get="/suite/calendar/calendar.html"
+                hx-target="#main-content"
+                hx-push-url="/#calendar"
+            >
+                <div class="app-icon calendar">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="4"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Calendar</h3>
+                    <p>
+                        Schedule meetings, events, and manage your time
+                        effectively. Smart scheduling with conflict detection.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#tasks"
+                class="app-card"
+                hx-get="/suite/tasks/tasks.html"
+                hx-target="#main-content"
+                hx-push-url="/#tasks"
+            >
+                <div class="app-icon tasks">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M9 11l3 3L22 4" />
+                        <path
+                            d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                        />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Tasks</h3>
+                    <p>
+                        Stay organized with to-do lists, priorities, and due
+                        dates. Track progress and get things done.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#project"
+                class="app-card"
+                hx-get="/suite/project/project.html"
+                hx-target="#main-content"
+                hx-push-url="/#project"
+            >
+                <div class="app-icon project">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        />
+                        <path d="M3 9h18" />
+                        <path d="M9 21V9" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Project</h3>
+                    <p>
+                        Project management with Gantt charts, timelines, and
+                        team collaboration. Plan and execute projects.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#goals"
+                class="app-card"
+                hx-get="/suite/goals/goals.html"
+                hx-target="#main-content"
+                hx-push-url="/#goals"
+            >
+                <div class="app-icon goals">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="12" r="6" />
+                        <circle cx="12" cy="12" r="2" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Goals</h3>
+                    <p>
+                        Set objectives and key results (OKRs). Track progress,
+                        align teams, and achieve your targets.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Documents -->
+            <a
+                href="#paper"
+                class="app-card"
+                hx-get="/suite/paper/paper.html"
+                hx-target="#main-content"
+                hx-push-url="/#paper"
+            >
+                <div class="app-icon paper">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Paper</h3>
+                    <p>
+                        Write documents with AI assistance. Notes, reports, and
+                        more with smart formatting and collaboration.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#docs"
+                class="app-card"
+                hx-get="/suite/docs/docs.html"
+                hx-target="#main-content"
+                hx-push-url="/#docs"
+            >
+                <div class="app-icon docs">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                        />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Docs</h3>
+                    <p>
+                        Rich document editing with templates, real-time
+                        collaboration, and advanced formatting options.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#sheet"
+                class="app-card"
+                hx-get="/suite/sheet/sheet.html"
+                hx-target="#main-content"
+                hx-push-url="/#sheet"
+            >
+                <div class="app-icon sheet">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        />
+                        <line x1="3" y1="9" x2="21" y2="9" />
+                        <line x1="3" y1="15" x2="21" y2="15" />
+                        <line x1="9" y1="3" x2="9" y2="21" />
+                        <line x1="15" y1="3" x2="15" y2="21" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Sheet</h3>
+                    <p>
+                        Spreadsheets with formulas, charts, and real-time
+                        collaboration. Analyze data and create reports.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#slides"
+                class="app-card"
+                hx-get="/suite/slides/slides.html"
+                hx-target="#main-content"
+                hx-push-url="/#slides"
+            >
+                <div class="app-icon slides">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="2"
+                            y="3"
+                            width="20"
+                            height="14"
+                            rx="2"
+                            ry="2"
+                        />
+                        <line x1="8" y1="21" x2="16" y2="21" />
+                        <line x1="12" y1="17" x2="12" y2="21" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Slides</h3>
+                    <p>
+                        Create presentations with themes, animations, and
+                        collaboration. Present with confidence.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Storage & Media -->
+            <a
+                href="#drive"
+                class="app-card"
+                hx-get="/suite/drive/drive.html"
+                hx-target="#main-content"
+                hx-push-url="/#drive"
+            >
+                <div class="app-icon drive">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                        />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Drive</h3>
+                    <p>
+                        Cloud storage for all your files. Upload, organize, and
+                        share with powerful search and versioning.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#video"
+                class="app-card"
+                hx-get="/suite/video/video.html"
+                hx-target="#main-content"
+                hx-push-url="/#video"
+            >
+                <div class="app-icon video">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="2"
+                            y="2"
+                            width="20"
+                            height="20"
+                            rx="2.18"
+                            ry="2.18"
+                        />
+                        <line x1="7" y1="2" x2="7" y2="22" />
+                        <line x1="17" y1="2" x2="17" y2="22" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Video</h3>
+                    <p>
+                        Video library and player. Watch, organize, and share
+                        videos with your team.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#player"
+                class="app-card"
+                hx-get="/suite/player/player.html"
+                hx-target="#main-content"
+                hx-push-url="/#player"
+            >
+                <div class="app-icon player">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Player</h3>
+                    <p>
+                        Media player for audio and video files. Stream content
+                        with playlists and playback controls.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Social & Learning -->
+            <a
+                href="#social"
+                class="app-card"
+                hx-get="/suite/social/social.html"
+                hx-target="#main-content"
+                hx-push-url="/#social"
+            >
+                <div class="app-icon social">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="18" cy="5" r="3" />
+                        <circle cx="6" cy="12" r="3" />
+                        <circle cx="18" cy="19" r="3" />
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Social</h3>
+                    <p>
+                        Internal social network. Share updates, celebrate wins,
+                        and stay connected with your team.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#learn"
+                class="app-card"
+                hx-get="/suite/learn/learn.html"
+                hx-target="#main-content"
+                hx-push-url="/#learn"
+            >
+                <div class="app-icon learn">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Learn</h3>
+                    <p>
+                        Learning management system. Courses, training materials,
+                        and skill development for your team.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#research"
+                class="app-card"
+                hx-get="/suite/research/research.html"
+                hx-target="#main-content"
+                hx-push-url="/#research"
+            >
+                <div class="app-icon research">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.35-4.35" />
+                        <path d="M11 8v6M8 11h6" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Research</h3>
+                    <p>
+                        AI-powered search and discovery. Find information across
+                        all your sources with smart summaries.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Analytics & Business -->
+            <a
+                href="#analytics"
+                class="app-card"
+                hx-get="/suite/analytics/analytics.html"
+                hx-target="#main-content"
+                hx-push-url="/#analytics"
+            >
+                <div class="app-icon analytics">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Analytics</h3>
+                    <p>
+                        Dashboards and reports to track usage and insights.
+                        Understand your data and make better decisions.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#dashboards"
+                class="app-card"
+                hx-get="/suite/dashboards/dashboards.html"
+                hx-target="#main-content"
+                hx-push-url="/#dashboards"
+            >
+                <div class="app-icon dashboards">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Dashboards</h3>
+                    <p>
+                        Custom dashboards with widgets and visualizations.
+                        Monitor KPIs and business metrics in real-time.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#sources"
+                class="app-card"
+                hx-get="/suite/sources/index.html"
+                hx-target="#main-content"
+                hx-push-url="/#sources"
+            >
+                <div class="app-icon sources">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <ellipse cx="12" cy="5" rx="9" ry="3" />
+                        <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                        <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Sources</h3>
+                    <p>
+                        Repositories, Apps, Prompts, Templates and MCP Servers.
+                        Manage all your integrations in one place.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Advanced Tools -->
+            <a
+                href="#canvas"
+                class="app-card"
+                hx-get="/suite/canvas/canvas.html"
+                hx-target="#main-content"
+                hx-push-url="/#canvas"
+            >
+                <div class="app-icon canvas">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M8 12h8" />
+                        <path d="M12 8v8" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Canvas</h3>
+                    <p>
+                        Infinite whiteboard for brainstorming. Draw, add sticky
+                        notes, and collaborate visually with your team.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#workspace"
+                class="app-card"
+                hx-get="/suite/workspace/workspace.html"
+                hx-target="#main-content"
+                hx-push-url="/#workspace"
+            >
+                <div class="app-icon workspace">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="2"
+                            y="7"
+                            width="20"
+                            height="14"
+                            rx="2"
+                            ry="2"
+                        />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Workspace</h3>
+                    <p>
+                        Organize your work environment. Create custom workspaces
+                        for different projects and teams.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#designer"
+                class="app-card"
+                hx-get="/designer.html"
+                hx-target="#main-content"
+                hx-push-url="/#designer"
+            >
+                <div class="app-icon designer">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Designer</h3>
+                    <p>
+                        Visual dialog designer for bot conversations. Create
+                        flows, manage intents, and build chatbots.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#editor"
+                class="app-card"
+                hx-get="/editor.html"
+                hx-target="#main-content"
+                hx-push-url="/#editor"
+            >
+                <div class="app-icon editor">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polyline points="16 18 22 12 16 6" />
+                        <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Editor</h3>
+                    <p>
+                        Code and text editor with syntax highlighting, AI
+                        completion, and multi-file support.
+                    </p>
+                </div>
+            </a>
+
+            <!-- Admin & Operations -->
+            <a
+                href="#attendant"
+                class="app-card"
+                hx-get="/suite/attendant/index.html"
+                hx-target="#main-content"
+                hx-push-url="/#attendant"
+            >
+                <div class="app-icon attendant">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        <path d="M12 2v2" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Attendant</h3>
+                    <p>
+                        Human handoff and queue management. Route conversations
+                        to the right team members.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#compliance"
+                class="app-card"
+                hx-get="/suite/tools/compliance.html"
+                hx-target="#main-content"
+                hx-push-url="/#compliance"
+            >
+                <div class="app-icon compliance">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M9 12l2 2 4-4" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Compliance</h3>
+                    <p>
+                        Security, auditing, and compliance tools. Monitor
+                        access, track changes, and ensure data protection.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#monitoring"
+                class="app-card"
+                hx-get="/suite/monitoring/monitoring.html"
+                hx-target="#main-content"
+                hx-push-url="/#monitoring"
+            >
+                <div class="app-icon monitoring">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Monitoring</h3>
+                    <p>
+                        System health, logs, and metrics. Real-time monitoring
+                        of your infrastructure and applications.
+                    </p>
+                </div>
+            </a>
+
+            <a
+                href="#settings"
+                class="app-card"
+                hx-get="/suite/settings/index.html"
+                hx-target="#main-content"
+                hx-push-url="/#settings"
+            >
+                <div class="app-icon settings">
+                    <svg
+                        width="28"
+                        height="28"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                        />
+                    </svg>
+                </div>
+                <div class="app-content">
+                    <h3>Settings</h3>
+                    <p>
+                        Personal preferences, account settings, and
+                        administration. Customize your workspace experience.
+                    </p>
+                </div>
+            </a>
+        </div>
+    </section>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadRecentDocuments();
+
+        document
+            .getElementById("home-search")
+            ?.addEventListener("focus", () => {
+                document.getElementById("omniboxInput")?.focus();
             });
-        </script>
-    </body>
-</html>
+    });
+
+    async function loadRecentDocuments() {
+        try {
+            const response = await fetch("/api/activity/recent");
+            if (response.ok) {
+                const items = await response.json();
+                renderRecentDocuments(items);
+            }
+        } catch (error) {
+            console.log("Using placeholder recent documents");
+        }
+    }
+
+    function renderRecentDocuments(items) {
+        if (!items || items.length === 0) return;
+
+        const container = document.getElementById("recent-documents");
+        container.innerHTML = items
+            .slice(0, 4)
+            .map(
+                (item) => `
+        <div class="recent-card" onclick="window.location.href='${item.url}'">
+            <div class="recent-icon ${item.type}">
+                ${getIconForType(item.type)}
+            </div>
+            <div class="recent-info">
+                <span class="recent-name">${item.name}</span>
+                <span class="recent-meta">${item.meta}</span>
+            </div>
+        </div>
+    `,
+            )
+            .join("");
+    }
+
+    function getIconForType(type) {
+        const icons = {
+            doc: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+            sheet: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg>',
+            slides: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+            paper: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>',
+        };
+        return icons[type] || icons.doc;
+    }
+</script>
