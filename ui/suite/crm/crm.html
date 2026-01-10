@@ -1,0 +1,311 @@
+<!-- CRM - Customer Relationship Management -->
+<!-- Dynamics nomenclature: Lead → Opportunity → Account/Contact -->
+
+<link rel="stylesheet" href="/suite/crm/crm.css">
+
+<div class="crm-container">
+    <!-- Header -->
+    <header class="crm-header">
+        <div class="crm-header-left">
+            <h1 data-i18n="crm-title">CRM</h1>
+            <nav class="crm-tabs">
+                <button class="crm-tab active" data-view="pipeline" data-i18n="crm-pipeline">Pipeline</button>
+                <button class="crm-tab" data-view="leads" data-i18n="crm-leads">Leads</button>
+                <button class="crm-tab" data-view="opportunities" data-i18n="crm-opportunities">Opportunities</button>
+                <button class="crm-tab" data-view="accounts" data-i18n="crm-accounts">Accounts</button>
+                <button class="crm-tab" data-view="contacts" data-i18n="crm-contacts">Contacts</button>
+            </nav>
+        </div>
+        <div class="crm-header-right">
+            <div class="crm-search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input type="text"
+                       placeholder="Search leads, opportunities, accounts..."
+                       data-i18n-placeholder="crm-search-placeholder"
+                       hx-get="/api/crm/search"
+                       hx-trigger="keyup changed delay:300ms"
+                       hx-target="#crm-search-results">
+            </div>
+            <button class="btn-primary" id="crm-new-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <span data-i18n="crm-new">New</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Search Results Dropdown -->
+    <div id="crm-search-results" class="crm-search-results"></div>
+
+    <!-- Pipeline View (Default) -->
+    <div id="crm-pipeline-view" class="crm-view active">
+        <div class="pipeline-container">
+            <!-- Lead Stage -->
+            <div class="pipeline-column" data-stage="lead">
+                <div class="pipeline-header">
+                    <span class="pipeline-title" data-i18n="crm-stage-lead">Lead</span>
+                    <span class="pipeline-count" hx-get="/api/crm/count?stage=lead" hx-trigger="load">0</span>
+                </div>
+                <div class="pipeline-cards"
+                     hx-get="/api/crm/pipeline?stage=lead"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                    <!-- Lead cards loaded via HTMX -->
+                </div>
+                <button class="pipeline-add" hx-get="/suite/crm/partials/lead-form.html" hx-target="#crm-modal-content" hx-on::after-request="openCrmModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                    <span data-i18n="crm-add-lead">Add Lead</span>
+                </button>
+            </div>
+
+            <!-- Qualified Stage -->
+            <div class="pipeline-column" data-stage="qualified">
+                <div class="pipeline-header">
+                    <span class="pipeline-title" data-i18n="crm-stage-qualified">Qualified</span>
+                    <span class="pipeline-count" hx-get="/api/crm/count?stage=qualified" hx-trigger="load">0</span>
+                </div>
+                <div class="pipeline-cards"
+                     hx-get="/api/crm/pipeline?stage=qualified"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+            </div>
+
+            <!-- Proposal Stage -->
+            <div class="pipeline-column" data-stage="proposal">
+                <div class="pipeline-header">
+                    <span class="pipeline-title" data-i18n="crm-stage-proposal">Proposal</span>
+                    <span class="pipeline-count" hx-get="/api/crm/count?stage=proposal" hx-trigger="load">0</span>
+                </div>
+                <div class="pipeline-cards"
+                     hx-get="/api/crm/pipeline?stage=proposal"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+            </div>
+
+            <!-- Negotiation Stage -->
+            <div class="pipeline-column" data-stage="negotiation">
+                <div class="pipeline-header">
+                    <span class="pipeline-title" data-i18n="crm-stage-negotiation">Negotiation</span>
+                    <span class="pipeline-count" hx-get="/api/crm/count?stage=negotiation" hx-trigger="load">0</span>
+                </div>
+                <div class="pipeline-cards"
+                     hx-get="/api/crm/pipeline?stage=negotiation"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+            </div>
+
+            <!-- Won Stage -->
+            <div class="pipeline-column won" data-stage="won">
+                <div class="pipeline-header">
+                    <span class="pipeline-title" data-i18n="crm-stage-won">Won</span>
+                    <span class="pipeline-count" hx-get="/api/crm/count?stage=won" hx-trigger="load">0</span>
+                </div>
+                <div class="pipeline-cards"
+                     hx-get="/api/crm/pipeline?stage=won"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+            </div>
+
+            <!-- Lost Stage -->
+            <div class="pipeline-column lost" data-stage="lost">
+                <div class="pipeline-header">
+                    <span class="pipeline-title" data-i18n="crm-stage-lost">Lost</span>
+                    <span class="pipeline-count" hx-get="/api/crm/count?stage=lost" hx-trigger="load">0</span>
+                </div>
+                <div class="pipeline-cards"
+                     hx-get="/api/crm/pipeline?stage=lost"
+                     hx-trigger="load"
+                     hx-swap="innerHTML">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline Summary -->
+        <div class="pipeline-summary">
+            <div class="summary-card">
+                <span class="summary-label" data-i18n="crm-total-value">Total Pipeline Value</span>
+                <span class="summary-value" hx-get="/api/crm/stats/pipeline-value" hx-trigger="load">$0</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label" data-i18n="crm-conversion-rate">Conversion Rate</span>
+                <span class="summary-value" hx-get="/api/crm/stats/conversion-rate" hx-trigger="load">0%</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label" data-i18n="crm-avg-deal">Avg Deal Size</span>
+                <span class="summary-value" hx-get="/api/crm/stats/avg-deal" hx-trigger="load">$0</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label" data-i18n="crm-this-month">Won This Month</span>
+                <span class="summary-value success" hx-get="/api/crm/stats/won-month" hx-trigger="load">$0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leads List View -->
+    <div id="crm-leads-view" class="crm-view">
+        <div class="crm-list-header">
+            <div class="list-filters">
+                <select hx-get="/api/crm/leads" hx-trigger="change" hx-target="#leads-table-body" hx-include="this">
+                    <option value="all" data-i18n="crm-filter-all">All Leads</option>
+                    <option value="new" data-i18n="crm-filter-new">New</option>
+                    <option value="contacted" data-i18n="crm-filter-contacted">Contacted</option>
+                    <option value="qualified" data-i18n="crm-filter-qualified">Qualified</option>
+                </select>
+            </div>
+        </div>
+        <table class="crm-table">
+            <thead>
+                <tr>
+                    <th data-i18n="crm-col-name">Name</th>
+                    <th data-i18n="crm-col-company">Company</th>
+                    <th data-i18n="crm-col-email">Email</th>
+                    <th data-i18n="crm-col-phone">Phone</th>
+                    <th data-i18n="crm-col-source">Source</th>
+                    <th data-i18n="crm-col-status">Status</th>
+                    <th data-i18n="crm-col-created">Created</th>
+                    <th data-i18n="crm-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="leads-table-body" hx-get="/api/crm/leads" hx-trigger="load">
+                <!-- Leads loaded via HTMX -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Opportunities List View -->
+    <div id="crm-opportunities-view" class="crm-view">
+        <table class="crm-table">
+            <thead>
+                <tr>
+                    <th data-i18n="crm-col-opportunity">Opportunity</th>
+                    <th data-i18n="crm-col-account">Account</th>
+                    <th data-i18n="crm-col-value">Value</th>
+                    <th data-i18n="crm-col-stage">Stage</th>
+                    <th data-i18n="crm-col-probability">Probability</th>
+                    <th data-i18n="crm-col-close-date">Expected Close</th>
+                    <th data-i18n="crm-col-owner">Owner</th>
+                    <th data-i18n="crm-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="opportunities-table-body" hx-get="/api/crm/opportunities" hx-trigger="load">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Accounts List View -->
+    <div id="crm-accounts-view" class="crm-view">
+        <table class="crm-table">
+            <thead>
+                <tr>
+                    <th data-i18n="crm-col-account">Account</th>
+                    <th data-i18n="crm-col-industry">Industry</th>
+                    <th data-i18n="crm-col-phone">Phone</th>
+                    <th data-i18n="crm-col-city">City</th>
+                    <th data-i18n="crm-col-revenue">Annual Revenue</th>
+                    <th data-i18n="crm-col-contacts">Contacts</th>
+                    <th data-i18n="crm-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="accounts-table-body" hx-get="/api/crm/accounts" hx-trigger="load">
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Contacts List View -->
+    <div id="crm-contacts-view" class="crm-view">
+        <table class="crm-table">
+            <thead>
+                <tr>
+                    <th data-i18n="crm-col-name">Name</th>
+                    <th data-i18n="crm-col-account">Account</th>
+                    <th data-i18n="crm-col-title">Title</th>
+                    <th data-i18n="crm-col-email">Email</th>
+                    <th data-i18n="crm-col-phone">Phone</th>
+                    <th data-i18n="crm-col-actions">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="contacts-table-body" hx-get="/api/crm/contacts" hx-trigger="load">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for forms -->
+<div id="crm-modal" class="crm-modal">
+    <div class="crm-modal-backdrop" onclick="closeCrmModal()"></div>
+    <div class="crm-modal-content" id="crm-modal-content">
+        <!-- Form content loaded via HTMX -->
+    </div>
+</div>
+
+<script>
+(function() {
+    // Tab switching
+    document.querySelectorAll('.crm-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.crm-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.crm-view').forEach(v => v.classList.remove('active'));
+            this.classList.add('active');
+            const view = this.dataset.view;
+            document.getElementById(`crm-${view}-view`).classList.add('active');
+        });
+    });
+
+    // New button dropdown
+    const newBtn = document.getElementById('crm-new-btn');
+    newBtn.addEventListener('click', function() {
+        // Default: open lead form
+        htmx.ajax('GET', '/suite/crm/partials/lead-form.html', '#crm-modal-content').then(() => {
+            openCrmModal();
+        });
+    });
+
+    // Modal functions
+    window.openCrmModal = function() {
+        document.getElementById('crm-modal').classList.add('open');
+    };
+
+    window.closeCrmModal = function() {
+        document.getElementById('crm-modal').classList.remove('open');
+    };
+
+    // Drag and drop for pipeline
+    const pipelineCards = document.querySelectorAll('.pipeline-cards');
+    pipelineCards.forEach(column => {
+        column.addEventListener('dragover', e => {
+            e.preventDefault();
+            column.classList.add('drag-over');
+        });
+
+        column.addEventListener('dragleave', () => {
+            column.classList.remove('drag-over');
+        });
+
+        column.addEventListener('drop', e => {
+            e.preventDefault();
+            column.classList.remove('drag-over');
+            const cardId = e.dataTransfer.getData('text/plain');
+            const newStage = column.closest('.pipeline-column').dataset.stage;
+
+            // Update via HTMX
+            htmx.ajax('POST', `/api/crm/opportunity/${cardId}/stage`, {
+                values: { stage: newStage }
+            });
+        });
+    });
+
+    // Initialize i18n if available
+    if (window.i18n && window.i18n.translatePage) {
+        window.i18n.translatePage();
+    }
+})();
+</script>

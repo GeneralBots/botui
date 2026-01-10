@@ -403,13 +403,29 @@ body {
 }
 
 /* Hide header tabs progressively as screen shrinks */
+/* Header tabs: chat, mail, calendar, drive, tasks, docs, sheet, slides, social */
+
+@media (max-width: 1400px) {
+    .app-tab[data-section="social"] {
+        display: none;
+    }
+}
+
+@media (max-width: 1300px) {
+    .app-tab[data-section="slides"] {
+        display: none;
+    }
+}
+
 @media (max-width: 1200px) {
+    .app-tab[data-section="sheet"],
     .app-tab[data-section="tasks"] {
         display: none;
     }
 }
 
 @media (max-width: 1100px) {
+    .app-tab[data-section="docs"],
     .app-tab[data-section="calendar"] {
         display: none;
     }
@@ -423,12 +439,6 @@ body {
 
 @media (max-width: 900px) {
     .app-tab[data-section="mail"] {
-        display: none;
-    }
-}
-
-@media (max-width: 800px) {
-    .app-tab[data-section="paper"] {
         display: none;
     }
 }
@@ -1122,12 +1132,17 @@ body {
 }
 
 /* Hide items that are visible in header tabs */
+/* Header tabs show: chat, mail, calendar, drive, tasks, docs, sheet, slides, social */
+/* These must be hidden from dropdown when visible in header */
 .app-item[data-section="chat"],
-.app-item[data-section="paper"],
 .app-item[data-section="mail"],
-.app-item[data-section="drive"],
 .app-item[data-section="calendar"],
-.app-item[data-section="tasks"] {
+.app-item[data-section="drive"],
+.app-item[data-section="tasks"],
+.app-item[data-section="docs"],
+.app-item[data-section="sheet"],
+.app-item[data-section="slides"],
+.app-item[data-section="social"] {
     display: none;
 }
 
@@ -1170,37 +1185,54 @@ body {
     white-space: nowrap;
 }
 
-/* Show more items as screen gets smaller */
+/* Show dropdown items as their header tab counterparts get hidden */
+/* Must match the breakpoints in header-app-tabs section */
+
+/* At 1400px: social tab hides */
+@media (max-width: 1400px) {
+    .app-item[data-section="social"] {
+        display: flex;
+    }
+}
+
+/* At 1300px: slides tab hides */
+@media (max-width: 1300px) {
+    .app-item[data-section="slides"] {
+        display: flex;
+    }
+}
+
+/* At 1200px: sheet, tasks tabs hide */
 @media (max-width: 1200px) {
+    .app-item[data-section="sheet"],
     .app-item[data-section="tasks"] {
         display: flex;
     }
 }
 
+/* At 1100px: docs, calendar tabs hide */
 @media (max-width: 1100px) {
+    .app-item[data-section="docs"],
     .app-item[data-section="calendar"] {
         display: flex;
     }
 }
 
+/* At 1000px: drive tab hides */
 @media (max-width: 1000px) {
     .app-item[data-section="drive"] {
         display: flex;
     }
 }
 
+/* At 900px: mail tab hides */
 @media (max-width: 900px) {
     .app-item[data-section="mail"] {
         display: flex;
     }
 }
 
-@media (max-width: 800px) {
-    .app-item[data-section="paper"] {
-        display: flex;
-    }
-}
-
+/* At 700px: chat tab hides */
 @media (max-width: 700px) {
     .app-item[data-section="chat"] {
         display: flex;
