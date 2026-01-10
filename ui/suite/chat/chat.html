@@ -5,14 +5,23 @@
 
     <footer>
         <div class="suggestions-container" id="suggestions"></div>
+        <div class="mention-dropdown" id="mentionDropdown">
+            <div class="mention-header">
+                <span class="mention-title" data-i18n="chat-mention-title"
+                    >Reference Entity</span
+                >
+            </div>
+            <div class="mention-results" id="mentionResults"></div>
+        </div>
         <form class="input-container" id="chatForm">
             <input
                 name="content"
                 id="messageInput"
                 type="text"
-                placeholder="Message..."
+                placeholder="Message... (type @ to mention)"
                 data-i18n-placeholder="chat-placeholder"
                 autofocus
+                autocomplete="off"
             />
             <button
                 type="button"
@@ -35,13 +44,28 @@
     <button class="scroll-to-bottom" id="scrollToBottom">↓</button>
 </div>
 
+<div class="entity-card-tooltip" id="entityCardTooltip">
+    <div class="entity-card-header">
+        <span class="entity-card-type"></span>
+        <span class="entity-card-status"></span>
+    </div>
+    <div class="entity-card-title"></div>
+    <div class="entity-card-details"></div>
+    <div class="entity-card-actions">
+        <button
+            class="entity-card-btn"
+            data-action="view"
+            data-i18n="action-view"
+        >
+            View
+        </button>
+    </div>
+</div>
+
 <script>
     (function () {
         "use strict";
 
-        // ==========================================================================
-        // NOTIFICATION HELPER - Uses GBAlerts bell system
-        // ==========================================================================
         function notify(message, type) {
             type = type || "info";
             if (window.GBAlerts) {
@@ -55,9 +79,6 @@
             }
         }
 
-        // ==========================================================================
-        // CONFIGURATION
-        // ==========================================================================
         var WS_BASE_URL =
             window.location.protocol === "https:" ? "wss://" : "ws://";
         var WS_URL = WS_BASE_URL + window.location.host;
@@ -71,9 +92,58 @@
             CONTEXT_CHANGE: 5,
         };
 
-        // ==========================================================================
-        // STATE
-        // ==========================================================================
+        var EntityTypes = {
+            lead: { icon: "👤", color: "#4CAF50", label: "Lead", route: "crm" },
+            opportunity: {
+                icon: "💰",
+                color: "#FF9800",
+                label: "Opportunity",
+                route: "crm",
+            },
+            account: {
+                icon: "🏢",
+                color: "#2196F3",
+                label: "Account",
+                route: "crm",
+            },
+            contact: {
+                icon: "📇",
+                color: "#9C27B0",
+                label: "Contact",
+                route: "crm",
+            },
+            invoice: {
+                icon: "📄",
+                color: "#F44336",
+                label: "Invoice",
+                route: "billing",
+            },
+            quote: {
+                icon: "📋",
+                color: "#607D8B",
+                label: "Quote",
+                route: "billing",
+            },
+            case: {
+                icon: "🎫",
+                color: "#E91E63",
+                label: "Case",
+                route: "tickets",
+            },
+            product: {
+                icon: "📦",
+                color: "#795548",
+                label: "Product",
+                route: "products",
+            },
+            service: {
+                icon: "⚙️",
+                color: "#00BCD4",
+                label: "Service",
+                route: "products",
+            },
+        };
+
         var ws = null;
         var currentSessionId = null;
         var currentUserId = null;
@@ -84,13 +154,46 @@
         var reconnectAttempts = 0;
         var maxReconnectAttempts = 5;
 
-        // ==========================================================================
-        // MESSAGE FUNCTIONS
-        // ==========================================================================
+        var mentionState = {
+            active: false,
+            query: "",
+            startPos: -1,
+            selectedIndex: 0,
+            results: [],
+        };
+
         function escapeHtml(text) {
             var div = document.createElement("div");
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function renderMentionInMessage(content) {
+            return content.replace(
+                /@(\w+):([^\s]+)/g,
+                function (match, type, name) {
+                    var entityType = EntityTypes[type.toLowerCase()];
+                    if (entityType) {
+                        return (
+                            '<span class="mention-tag" data-type="' +
+                            type +
+                            '" data-name="' +
+                            escapeHtml(name) +
+                            '">' +
+                            '<span class="mention-icon">' +
+                            entityType.icon +
+                            "</span>" +
+                            '<span class="mention-text">@' +
+                            type +
+                            ":" +
+                            escapeHtml(name) +
+                            "</span>" +
+                            "</span>"
+                        );
+                    }
+                    return match;
+                },
+            );
         }
 
         function addMessage(sender, content, msgId) {
@@ -102,15 +205,19 @@
             if (msgId) div.id = msgId;
 
             if (sender === "user") {
+                var processedContent = renderMentionInMessage(
+                    escapeHtml(content),
+                );
                 div.innerHTML =
                     '<div class="message-content user-message">' +
-                    escapeHtml(content) +
+                    processedContent +
                     "</div>";
             } else {
                 var parsed =
                     typeof marked !== "undefined" && marked.parse
                         ? marked.parse(content)
                         : escapeHtml(content);
+                parsed = renderMentionInMessage(parsed);
                 div.innerHTML =
                     '<div class="message-content bot-message">' +
                     parsed +
@@ -119,6 +226,415 @@
 
             messages.appendChild(div);
             messages.scrollTop = messages.scrollHeight;
+
+            setupMentionClickHandlers(div);
+        }
+
+        function setupMentionClickHandlers(container) {
+            var mentions = container.querySelectorAll(".mention-tag");
+            mentions.forEach(function (mention) {
+                mention.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    var type = this.getAttribute("data-type");
+                    var name = this.getAttribute("data-name");
+                    navigateToEntity(type, name);
+                });
+
+                mention.addEventListener("mouseenter", function (e) {
+                    var type = this.getAttribute("data-type");
+                    var name = this.getAttribute("data-name");
+                    showEntityCard(type, name, e.target);
+                });
+
+                mention.addEventListener("mouseleave", function () {
+                    hideEntityCard();
+                });
+            });
+        }
+
+        function navigateToEntity(type, name) {
+            var entityType = EntityTypes[type.toLowerCase()];
+            if (entityType) {
+                var route = entityType.route;
+                window.location.hash = "#" + route;
+
+                var htmxLink = document.querySelector(
+                    'a[data-section="' + route + '"]',
+                );
+                if (htmxLink) {
+                    htmx.trigger(htmxLink, "click");
+                }
+            }
+        }
+
+        function showEntityCard(type, name, targetEl) {
+            var card = document.getElementById("entityCardTooltip");
+            var entityType = EntityTypes[type.toLowerCase()];
+            if (!card || !entityType) return;
+
+            card.querySelector(".entity-card-type").textContent =
+                entityType.label;
+            card.querySelector(".entity-card-type").style.background =
+                entityType.color;
+            card.querySelector(".entity-card-title").textContent =
+                entityType.icon + " " + name;
+            card.querySelector(".entity-card-status").textContent = "";
+            card.querySelector(".entity-card-details").textContent =
+                "Loading...";
+
+            var rect = targetEl.getBoundingClientRect();
+            card.style.left = rect.left + "px";
+            card.style.top = rect.top - card.offsetHeight - 8 + "px";
+            card.classList.add("visible");
+
+            fetchEntityDetails(type, name).then(function (details) {
+                if (card.classList.contains("visible")) {
+                    card.querySelector(".entity-card-details").innerHTML =
+                        details;
+                }
+            });
+        }
+
+        function hideEntityCard() {
+            var card = document.getElementById("entityCardTooltip");
+            if (card) {
+                card.classList.remove("visible");
+            }
+        }
+
+        function fetchEntityDetails(type, name) {
+            return fetch(
+                "/api/search/entity?type=" +
+                    encodeURIComponent(type) +
+                    "&name=" +
+                    encodeURIComponent(name),
+            )
+                .then(function (r) {
+                    return r.json();
+                })
+                .then(function (data) {
+                    if (data && data.details) {
+                        return data.details;
+                    }
+                    return "No additional details available";
+                })
+                .catch(function () {
+                    return "Unable to load details";
+                });
+        }
+
+        function showMentionDropdown() {
+            var dropdown = document.getElementById("mentionDropdown");
+            if (dropdown) {
+                dropdown.classList.add("visible");
+            }
+        }
+
+        function hideMentionDropdown() {
+            var dropdown = document.getElementById("mentionDropdown");
+            if (dropdown) {
+                dropdown.classList.remove("visible");
+            }
+            mentionState.active = false;
+            mentionState.query = "";
+            mentionState.startPos = -1;
+            mentionState.selectedIndex = 0;
+            mentionState.results = [];
+        }
+
+        function searchEntities(query) {
+            if (!query || query.length < 1) {
+                var defaultResults = Object.keys(EntityTypes).map(
+                    function (type) {
+                        return {
+                            type: type,
+                            name: EntityTypes[type].label,
+                            icon: EntityTypes[type].icon,
+                            isTypeHint: true,
+                        };
+                    },
+                );
+                renderMentionResults(defaultResults);
+                return;
+            }
+
+            var colonIndex = query.indexOf(":");
+            if (colonIndex > 0) {
+                var entityType = query.substring(0, colonIndex).toLowerCase();
+                var searchTerm = query.substring(colonIndex + 1);
+
+                if (EntityTypes[entityType]) {
+                    fetchEntitiesOfType(entityType, searchTerm);
+                    return;
+                }
+            }
+
+            var filteredTypes = Object.keys(EntityTypes)
+                .filter(function (type) {
+                    return (
+                        type.toLowerCase().indexOf(query.toLowerCase()) === 0 ||
+                        EntityTypes[type].label
+                            .toLowerCase()
+                            .indexOf(query.toLowerCase()) === 0
+                    );
+                })
+                .map(function (type) {
+                    return {
+                        type: type,
+                        name: EntityTypes[type].label,
+                        icon: EntityTypes[type].icon,
+                        isTypeHint: true,
+                    };
+                });
+
+            renderMentionResults(filteredTypes);
+        }
+
+        function fetchEntitiesOfType(type, searchTerm) {
+            fetch(
+                "/api/search/entities?type=" +
+                    encodeURIComponent(type) +
+                    "&q=" +
+                    encodeURIComponent(searchTerm || ""),
+            )
+                .then(function (r) {
+                    return r.json();
+                })
+                .then(function (data) {
+                    var results = (data.results || []).map(function (item) {
+                        return {
+                            type: type,
+                            name: item.name || item.title || item.number,
+                            id: item.id,
+                            icon: EntityTypes[type].icon,
+                            subtitle: item.subtitle || item.status || "",
+                            isTypeHint: false,
+                        };
+                    });
+
+                    if (results.length === 0) {
+                        results = [
+                            {
+                                type: type,
+                                name: "No results for '" + searchTerm + "'",
+                                icon: "❌",
+                                isTypeHint: false,
+                                disabled: true,
+                            },
+                        ];
+                    }
+
+                    renderMentionResults(results);
+                })
+                .catch(function () {
+                    renderMentionResults([
+                        {
+                            type: type,
+                            name: "Search unavailable",
+                            icon: "⚠️",
+                            isTypeHint: false,
+                            disabled: true,
+                        },
+                    ]);
+                });
+        }
+
+        function renderMentionResults(results) {
+            var container = document.getElementById("mentionResults");
+            if (!container) return;
+
+            mentionState.results = results;
+            mentionState.selectedIndex = 0;
+
+            container.innerHTML = results
+                .map(function (item, index) {
+                    var classes = "mention-item";
+                    if (index === mentionState.selectedIndex)
+                        classes += " selected";
+                    if (item.disabled) classes += " disabled";
+
+                    var subtitle = item.subtitle
+                        ? '<span class="mention-item-subtitle">' +
+                          escapeHtml(item.subtitle) +
+                          "</span>"
+                        : "";
+                    var hint = item.isTypeHint
+                        ? '<span class="mention-item-hint">Type : to search</span>'
+                        : "";
+
+                    return (
+                        '<div class="' +
+                        classes +
+                        '" data-index="' +
+                        index +
+                        '" data-type="' +
+                        item.type +
+                        '" data-name="' +
+                        escapeHtml(item.name) +
+                        '" data-is-type="' +
+                        item.isTypeHint +
+                        '">' +
+                        '<span class="mention-item-icon">' +
+                        item.icon +
+                        "</span>" +
+                        '<span class="mention-item-content">' +
+                        '<span class="mention-item-name">' +
+                        escapeHtml(item.name) +
+                        "</span>" +
+                        subtitle +
+                        hint +
+                        "</span>" +
+                        "</div>"
+                    );
+                })
+                .join("");
+
+            container
+                .querySelectorAll(".mention-item:not(.disabled)")
+                .forEach(function (item) {
+                    item.addEventListener("click", function () {
+                        selectMentionItem(
+                            parseInt(this.getAttribute("data-index")),
+                        );
+                    });
+                });
+        }
+
+        function selectMentionItem(index) {
+            var item = mentionState.results[index];
+            if (!item || item.disabled) return;
+
+            var input = document.getElementById("messageInput");
+            if (!input) return;
+
+            var value = input.value;
+            var beforeMention = value.substring(0, mentionState.startPos);
+            var afterMention = value.substring(input.selectionStart);
+
+            var insertText;
+            if (item.isTypeHint) {
+                insertText = "@" + item.type + ":";
+                mentionState.query = item.type + ":";
+                mentionState.startPos = beforeMention.length;
+                input.value = beforeMention + insertText + afterMention;
+                input.setSelectionRange(
+                    beforeMention.length + insertText.length,
+                    beforeMention.length + insertText.length,
+                );
+                searchEntities(mentionState.query);
+                return;
+            } else {
+                insertText = "@" + item.type + ":" + item.name + " ";
+                input.value = beforeMention + insertText + afterMention;
+                input.setSelectionRange(
+                    beforeMention.length + insertText.length,
+                    beforeMention.length + insertText.length,
+                );
+                hideMentionDropdown();
+            }
+
+            input.focus();
+        }
+
+        function updateMentionSelection(direction) {
+            var enabledResults = mentionState.results.filter(function (r) {
+                return !r.disabled;
+            });
+            if (enabledResults.length === 0) return;
+
+            var currentEnabled = 0;
+            for (var i = 0; i < mentionState.selectedIndex; i++) {
+                if (!mentionState.results[i].disabled) currentEnabled++;
+            }
+
+            currentEnabled += direction;
+            if (currentEnabled < 0) currentEnabled = enabledResults.length - 1;
+            if (currentEnabled >= enabledResults.length) currentEnabled = 0;
+
+            var newIndex = 0;
+            var count = 0;
+            for (var j = 0; j < mentionState.results.length; j++) {
+                if (!mentionState.results[j].disabled) {
+                    if (count === currentEnabled) {
+                        newIndex = j;
+                        break;
+                    }
+                    count++;
+                }
+            }
+
+            mentionState.selectedIndex = newIndex;
+
+            var items = document.querySelectorAll(
+                "#mentionResults .mention-item",
+            );
+            items.forEach(function (item, idx) {
+                item.classList.toggle("selected", idx === newIndex);
+            });
+
+            var selectedItem = document.querySelector(
+                "#mentionResults .mention-item.selected",
+            );
+            if (selectedItem) {
+                selectedItem.scrollIntoView({ block: "nearest" });
+            }
+        }
+
+        function handleMentionInput(e) {
+            var input = e.target;
+            var value = input.value;
+            var cursorPos = input.selectionStart;
+
+            var textBeforeCursor = value.substring(0, cursorPos);
+            var atIndex = textBeforeCursor.lastIndexOf("@");
+
+            if (atIndex >= 0) {
+                var charBeforeAt =
+                    atIndex > 0 ? textBeforeCursor[atIndex - 1] : " ";
+                if (charBeforeAt === " " || atIndex === 0) {
+                    var query = textBeforeCursor.substring(atIndex + 1);
+
+                    if (!query.includes(" ")) {
+                        mentionState.active = true;
+                        mentionState.startPos = atIndex;
+                        mentionState.query = query;
+                        showMentionDropdown();
+                        searchEntities(query);
+                        return;
+                    }
+                }
+            }
+
+            if (mentionState.active) {
+                hideMentionDropdown();
+            }
+        }
+
+        function handleMentionKeydown(e) {
+            if (!mentionState.active) return false;
+
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                updateMentionSelection(1);
+                return true;
+            }
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                updateMentionSelection(-1);
+                return true;
+            }
+            if (e.key === "Enter" || e.key === "Tab") {
+                e.preventDefault();
+                selectMentionItem(mentionState.selectedIndex);
+                return true;
+            }
+            if (e.key === "Escape") {
+                e.preventDefault();
+                hideMentionDropdown();
+                return true;
+            }
+
+            return false;
         }
 
         function updateStreaming(content) {
@@ -128,6 +644,7 @@
                     typeof marked !== "undefined" && marked.parse
                         ? marked.parse(content)
                         : escapeHtml(content);
+                parsed = renderMentionInMessage(parsed);
                 el.querySelector(".message-content").innerHTML = parsed;
             }
         }
@@ -139,8 +656,10 @@
                     typeof marked !== "undefined" && marked.parse
                         ? marked.parse(currentStreamingContent)
                         : escapeHtml(currentStreamingContent);
+                parsed = renderMentionInMessage(parsed);
                 el.querySelector(".message-content").innerHTML = parsed;
                 el.removeAttribute("id");
+                setupMentionClickHandlers(el);
             }
             streamingMessageId = null;
             currentStreamingContent = "";
@@ -171,9 +690,6 @@
             }
         }
 
-        // ==========================================================================
-        // SEND MESSAGE - GLOBAL FUNCTION
-        // ==========================================================================
         function sendMessage() {
             var input = document.getElementById("messageInput");
             if (!input) {
@@ -186,12 +702,11 @@
                 return;
             }
 
-            // Always show user message locally
+            hideMentionDropdown();
             addMessage("user", content);
             input.value = "";
             input.focus();
 
-            // Try to send via WebSocket if connected
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(
                     JSON.stringify({
@@ -209,12 +724,8 @@
             }
         }
 
-        // Make sendMessage globally available immediately
         window.sendMessage = sendMessage;
 
-        // ==========================================================================
-        // WEBSOCKET CONNECTION
-        // ==========================================================================
         function connectWebSocket() {
             if (ws) {
                 ws.close();
@@ -258,9 +769,6 @@
             };
         }
 
-        // ==========================================================================
-        // INITIALIZATION
-        // ==========================================================================
         function initChat() {
             var botName = "default";
             fetch("/api/auth?bot_name=" + encodeURIComponent(botName))
@@ -299,7 +807,12 @@
             }
 
             if (input) {
+                input.addEventListener("input", handleMentionInput);
+
                 input.onkeydown = function (e) {
+                    if (handleMentionKeydown(e)) {
+                        return;
+                    }
                     if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
                         sendMessage();
@@ -313,15 +826,20 @@
                     sendMessage();
                 };
             }
+
+            document.addEventListener("click", function (e) {
+                if (
+                    !e.target.closest("#mentionDropdown") &&
+                    !e.target.closest("#messageInput")
+                ) {
+                    hideMentionDropdown();
+                }
+            });
         }
 
-        // Run setup immediately
         setupEventHandlers();
         initChat();
 
-        console.log(
-            "Chat module initialized, sendMessage is:",
-            typeof window.sendMessage,
-        );
+        console.log("Chat module initialized with @ mentions support");
     })();
 </script>

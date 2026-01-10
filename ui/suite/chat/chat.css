@@ -278,6 +278,211 @@ footer {
     padding: 16px 0;
     border-top: 1px solid var(--border, var(--border-color, #2a2a2a));
     background: transparent;
+    position: relative;
+}
+
+/* Mention Dropdown */
+.mention-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    background: var(--surface, var(--card, #1a1a24));
+    border: 1px solid var(--border, var(--border-color, #2a2a2a));
+    border-radius: 12px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    margin-bottom: 8px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.mention-dropdown.visible {
+    display: flex;
+}
+
+.mention-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border, var(--border-color, #2a2a2a));
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary, #888);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mention-results {
+    overflow-y: auto;
+    max-height: 250px;
+}
+
+.mention-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mention-item:hover,
+.mention-item.selected {
+    background: var(--hover, rgba(255, 255, 255, 0.05));
+}
+
+.mention-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mention-item-icon {
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hover, rgba(255, 255, 255, 0.05));
+    border-radius: 8px;
+}
+
+.mention-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mention-item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text, var(--text-primary, #fff));
+}
+
+.mention-item-subtitle {
+    font-size: 12px;
+    color: var(--text-secondary, #888);
+}
+
+.mention-item-hint {
+    font-size: 11px;
+    color: var(--text-tertiary, #666);
+    font-style: italic;
+}
+
+/* Mention Tags in Messages */
+.mention-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: var(--accent-glow, rgba(59, 130, 246, 0.15));
+    border: 1px solid var(--accent, var(--accent-color, #3b82f6));
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.mention-tag:hover {
+    background: var(--accent, var(--accent-color, #3b82f6));
+    color: #fff;
+}
+
+.mention-icon {
+    font-size: 12px;
+}
+
+.mention-text {
+    font-weight: 500;
+}
+
+/* Entity Card Tooltip */
+.entity-card-tooltip {
+    position: fixed;
+    min-width: 250px;
+    max-width: 320px;
+    background: var(--surface, var(--card, #1a1a24));
+    border: 1px solid var(--border, var(--border-color, #2a2a2a));
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    padding: 12px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.entity-card-tooltip.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.entity-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.entity-card-type {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    color: #fff;
+    background: var(--accent, #3b82f6);
+}
+
+.entity-card-status {
+    font-size: 11px;
+    color: var(--text-secondary, #888);
+}
+
+.entity-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text, var(--text-primary, #fff));
+    margin-bottom: 8px;
+}
+
+.entity-card-details {
+    font-size: 13px;
+    color: var(--text-secondary, #aaa);
+    line-height: 1.5;
+}
+
+.entity-card-actions {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border, var(--border-color, #2a2a2a));
+    display: flex;
+    gap: 8px;
+}
+
+.entity-card-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--accent, var(--accent-color, #3b82f6));
+    color: #fff;
+    transition: all 0.2s;
+}
+
+.entity-card-btn:hover {
+    filter: brightness(1.1);
 }
 
 /* Suggestions */
