@@ -44,6 +44,10 @@
         <script src="js/vendor/htmx-json-enc.js"></script>
         <script src="js/vendor/marked.min.js"></script>
 
+        <!-- SECURITY BOOTSTRAP - MUST load immediately after HTMX -->
+        <!-- This provides centralized auth for ALL apps: HTMX, fetch, XHR -->
+        <script src="js/security-bootstrap.js?v=20260110"></script>
+
         <!-- i18n -->
         <script src="js/i18n.js"></script>
 
@@ -2358,7 +2362,7 @@
             <!-- Sections will be loaded dynamically -->
         </main>
 
-        <!-- Core scripts -->
+        <!-- Core scripts (auth handled by security-bootstrap.js in head) -->
         <script src="js/api-client.js"></script>
         <script src="js/theme-manager.js"></script>
         <script src="js/htmx-app.js"></script>

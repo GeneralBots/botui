@@ -404,6 +404,78 @@ pub mod http_client;
 
 ---
 
+## Security Architecture - MANDATORY
+
+### Centralized Auth Engine
+
+All authentication is handled by `security-bootstrap.js` which MUST be loaded immediately after HTMX in the `<head>` section. This provides:
+
+1. **Automatic HTMX auth headers** - All `hx-get`, `hx-post`, etc. requests get Authorization header
+2. **Fetch API interception** - All `fetch()` calls automatically get auth headers
+3. **XMLHttpRequest interception** - Legacy XHR calls also get auth headers
+4. **Session management** - Handles token storage, refresh, and expiration
+
+### Script Loading Order (CRITICAL)
+
+```html
+<head>
+    <!-- 1. HTMX must load first -->
+    <script src="js/vendor/htmx.min.js"></script>
+    <script src="js/vendor/htmx-ws.js"></script>
+    
+    <!-- 2. Security bootstrap IMMEDIATELY after HTMX -->
+    <script src="js/security-bootstrap.js"></script>
+    
+    <!-- 3. Other scripts can follow -->
+    <script src="js/api-client.js"></script>
+</head>
+```
+
+### DO NOT Duplicate Auth Logic
+
+```javascript
+// ❌ WRONG - Don't add auth headers manually
+fetch("/api/data", {
+    headers: { "Authorization": "Bearer " + token }
+});
+
+// ✅ CORRECT - Let security-bootstrap.js handle it
+fetch("/api/data");
+```
+
+### DO NOT Register Multiple HTMX Auth Listeners
+
+```javascript
+// ❌ WRONG - Don't register duplicate listeners
+document.addEventListener("htmx:configRequest", (e) => {
+    e.detail.headers["Authorization"] = "Bearer " + token;
+});
+
+// ✅ CORRECT - This is handled by security-bootstrap.js automatically
+```
+
+### Auth Events
+
+The security engine dispatches these events:
+
+- `gb:security:ready` - Security bootstrap initialized
+- `gb:auth:unauthorized` - 401 response received
+- `gb:auth:expired` - Session expired, user should re-login
+- `gb:auth:login` - Dispatch to store tokens after login
+- `gb:auth:logout` - Dispatch to clear tokens
+
+### Token Storage Keys
+
+All auth data uses these keys (defined in security-bootstrap.js):
+
+- `gb-access-token` - JWT access token
+- `gb-refresh-token` - Refresh token
+- `gb-session-id` - Session identifier
+- `gb-token-expires` - Token expiration timestamp
+- `gb-user-data` - Cached user profile
+
+---
+
 ## HTMX Patterns
 
 ### Server-Side Rendering

@@ -1235,19 +1235,14 @@
                             }
 
                             // Save token before redirect
+                            // ALWAYS use localStorage - sessionStorage doesn't persist across redirects properly
                             if (response.access_token) {
-                                const rememberCheckbox =
-                                    document.getElementById("remember");
-                                const storage =
-                                    rememberCheckbox && rememberCheckbox.checked
-                                        ? localStorage
-                                        : sessionStorage;
-                                storage.setItem(
+                                localStorage.setItem(
                                     "gb-access-token",
                                     response.access_token,
                                 );
                                 if (response.refresh_token) {
-                                    storage.setItem(
+                                    localStorage.setItem(
                                         "gb-refresh-token",
                                         response.refresh_token,
                                     );
@@ -1255,14 +1250,15 @@
                                 if (response.expires_in) {
                                     const expiresAt =
                                         Date.now() + response.expires_in * 1000;
-                                    storage.setItem(
+                                    localStorage.setItem(
                                         "gb-token-expires",
                                         expiresAt.toString(),
                                     );
                                 }
                                 console.log(
-                                    "Token saved:",
-                                    response.access_token,
+                                    "[LOGIN] Token saved to localStorage:",
+                                    response.access_token.substring(0, 20) +
+                                        "...",
                                 );
                             }
 

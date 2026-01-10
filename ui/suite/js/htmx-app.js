@@ -1,51 +1,7 @@
 // HTMX-based application initialization
+// NOTE: Auth headers are now handled centrally by security-bootstrap.js
 (function () {
   "use strict";
-
-  // =========================================================================
-  // CRITICAL: Register auth header listener IMMEDIATELY on document
-  // This MUST run before any HTMX requests are made
-  // =========================================================================
-  console.log(
-    "[HTMX-AUTH] Registering htmx:configRequest listener on document",
-  );
-
-  document.addEventListener("htmx:configRequest", (event) => {
-    // Add Authorization header with access token
-    const accessToken =
-      localStorage.getItem("gb-access-token") ||
-      sessionStorage.getItem("gb-access-token");
-
-    console.log(
-      "[HTMX-AUTH] configRequest for:",
-      event.detail.path,
-      "token:",
-      accessToken ? accessToken.substring(0, 20) + "..." : "NONE",
-    );
-
-    if (accessToken) {
-      event.detail.headers["Authorization"] = `Bearer ${accessToken}`;
-      console.log("[HTMX-AUTH] Authorization header SET");
-    } else {
-      console.warn(
-        "[HTMX-AUTH] NO TOKEN FOUND - request will be unauthenticated",
-      );
-    }
-
-    // Add CSRF token if available
-    const csrfToken = localStorage.getItem("csrf_token");
-    if (csrfToken) {
-      event.detail.headers["X-CSRF-Token"] = csrfToken;
-    }
-
-    // Add session ID if available
-    const sessionId =
-      localStorage.getItem("gb-session-id") ||
-      sessionStorage.getItem("gb-session-id");
-    if (sessionId) {
-      event.detail.headers["X-Session-ID"] = sessionId;
-    }
-  });
 
   // Configuration
   const config = {

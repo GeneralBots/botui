@@ -376,6 +376,7 @@
     });
 
     // Load task statistics
+    // Auth headers automatically added by security-bootstrap.js
     function loadTaskStats() {
         fetch("/api/tasks/stats/json")
             .then((r) => r.json())
