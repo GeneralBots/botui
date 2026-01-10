@@ -8,27 +8,9 @@ Following Microsoft Dynamics nomenclature (simplified for SMB).
 
 ## ✅ COMPLETED
 
-- [x] Create folder structure (crm, billing, products, tickets, forms)
-- [x] Create TODO.md
-- [x] Create `/suite/crm/crm.html` - Pipeline view (Kanban style)
-- [x] Create `/suite/crm/crm.css` - Styling
-- [x] Create `/suite/billing/billing.html` - Invoice list + dashboard
-- [x] Create `/suite/billing/billing.css` - Styling
-- [x] Create `/suite/products/products.html` - Product/Service catalog
-- [x] Create `/suite/products/products.css` - Styling
-- [x] Create `/suite/tickets/tickets.html` - AI-assisted support tickets
-- [x] Create `/suite/tickets/tickets.css` - Styling
-- [x] Create `/suite/forms/forms.html` - Redirect to Tasks with AI prompt
-- [x] Add CRM, Billing, Products, Tickets, Forms to dropdown menu
-- [x] Add i18n entries (en, pt-BR) for nav-crm, nav-billing, nav-products, nav-tickets, nav-forms
+### Phase 1: Create HTML/CSS for New Apps ✅
 
----
-
-## 🔄 IN PROGRESS
-
-### Phase 1: Create HTML/CSS for New Apps
-
-#### 1.1 CRM (`/suite/crm/`)
+#### 1.1 CRM (`/suite/crm/`) ✅
 - [x] `crm.html` - Pipeline view (Kanban style)
 - [x] `crm.css` - Styling
 - [x] Entities (Dynamics nomenclature):
@@ -38,7 +20,7 @@ Following Microsoft Dynamics nomenclature (simplified for SMB).
   - **Contact** - Person at Account
   - **Activity** - Linked tasks/calls/emails
 
-#### 1.2 Billing (`/suite/billing/`)
+#### 1.2 Billing (`/suite/billing/`) ✅
 - [x] `billing.html` - Invoice list + dashboard
 - [x] `billing.css` - Styling
 - [x] Entities:
@@ -46,7 +28,7 @@ Following Microsoft Dynamics nomenclature (simplified for SMB).
   - **Payment** - Payment received
   - **Quote** - Price quotation → converts to Invoice
 
-#### 1.3 Products (`/suite/products/`)
+#### 1.3 Products (`/suite/products/`) ✅
 - [x] `products.html` - Product/Service catalog
 - [x] `products.css` - Styling
 - [x] Entities:
@@ -54,47 +36,52 @@ Following Microsoft Dynamics nomenclature (simplified for SMB).
   - **Service** - Service offering
   - **PriceList** - Pricing tiers
 
-#### 1.4 Tickets (`/suite/tickets/`)
+#### 1.4 Tickets (`/suite/tickets/`) ✅
 - [x] `tickets.html` - AI-assisted support tickets
 - [x] `tickets.css` - Styling
 - [x] Entities:
   - **Case** - Support ticket (Dynamics term)
   - **Resolution** - AI-suggested solutions
 
-#### 1.5 Forms (`/suite/forms/`)
+#### 1.5 Forms (`/suite/forms/`) ✅
 - [x] `forms.html` - Redirect to Tasks with AI prompt
 - [x] Behavior: "Create a form for me about [topic]"
 
----
-
-## 📋 TODO
-
-### Phase 2: Menu Integration (`/suite/index.html`)
+### Phase 2: Menu Integration (`/suite/index.html`) ✅
 
 - [x] Add CRM to dropdown menu
 - [x] Add Billing to dropdown menu  
 - [x] Add Products to dropdown menu
 - [x] Add Tickets to dropdown menu
 - [x] Add Forms to dropdown menu
-- [ ] Update header tabs (add CRM)
-- [ ] Update CSS breakpoints (`/suite/css/app.css`)
+- [x] Update header tabs (add CRM)
+- [x] Update CSS breakpoints (`/suite/css/app.css`)
 
-### Phase 3: i18n Updates
+### Phase 3: i18n Updates ✅
 
-#### English (`/suite/js/i18n.js`)
+**NOTE:** Translations are stored in `.ftl` files in `botlib/locales/` - NOT in JS files.
+
+#### English (`botlib/locales/en/ui.ftl`) ✅
 - [x] nav-crm, nav-billing, nav-products, nav-tickets, nav-forms
-- [ ] CRM: lead, opportunity, account, contact, pipeline, qualify, convert, won, lost
-- [ ] Billing: invoice, payment, quote, due-date, overdue, paid, pending
-- [ ] Products: product, service, price, sku, category, unit
-- [ ] Tickets: case, priority, status, assigned, resolved, escalate
+- [x] CRM: lead, opportunity, account, contact, pipeline, qualify, convert, won, lost
+- [x] Billing: invoice, payment, quote, due-date, overdue, paid, pending
+- [x] Products: product, service, price, sku, category, unit
+- [x] Tickets: case, priority, status, assigned, resolved, escalate
 
-#### Portuguese (`/suite/js/i18n.js`)
+#### Portuguese (`botlib/locales/pt-BR/ui.ftl`) ✅
 - [x] nav-crm: "CRM"
 - [x] nav-billing: "Faturamento"
 - [x] nav-products: "Produtos"
 - [x] nav-tickets: "Chamados"
 - [x] nav-forms: "Formulários"
-- [ ] All entity labels in Portuguese
+- [x] All entity labels in Portuguese
+
+#### Spanish (`botlib/locales/es/ui.ftl`) ✅
+- [x] All navigation and entity labels in Spanish
+
+---
+
+## 📋 TODO
 
 ### Phase 4: Chat @ Mentions
 
@@ -142,38 +129,49 @@ Following Microsoft Dynamics nomenclature (simplified for SMB).
 
 ---
 
-## File Checklist
+## File Structure
 
-### New Files to Create:
+### i18n Files (Fluent format .ftl):
 ```
-/suite/crm/crm.html
-/suite/crm/crm.css
-/suite/billing/billing.html
-/suite/billing/billing.css
-/suite/products/products.html
-/suite/products/products.css
-/suite/tickets/tickets.html
-/suite/tickets/tickets.css
-/suite/forms/forms.html
+botlib/locales/
+├── en/
+│   └── ui.ftl          # English translations
+├── pt-BR/
+│   └── ui.ftl          # Portuguese translations
+└── es/
+    └── ui.ftl          # Spanish translations
 ```
 
-### Files to Update:
+### Suite Files:
 ```
-/suite/index.html        - Menu items + HTMX routes
-/suite/css/app.css       - Breakpoints for new tabs
-/suite/js/i18n/en.json   - English labels
-/suite/js/i18n/pt.json   - Portuguese labels
-/suite/chat/chat.html    - @ mention UI
-/suite/chat/chat.js      - @ autocomplete logic
+botui/ui/suite/
+├── crm/
+│   ├── crm.html
+│   └── crm.css
+├── billing/
+│   ├── billing.html
+│   └── billing.css
+├── products/
+│   ├── products.html
+│   └── products.css
+├── tickets/
+│   ├── tickets.html
+│   └── tickets.css
+├── forms/
+│   └── forms.html
+├── index.html          # Menu items + HTMX routes
+└── css/
+    └── app.css         # Breakpoints for tabs
 ```
 
-### BotBook Files:
+### BotBook Files (TODO):
 ```
-/botbook/src/SUMMARY.md           - Add new chapters
-/botbook/src/XX-crm/              - CRM documentation
-/botbook/src/XX-billing/          - Billing documentation
-/botbook/src/XX-products/         - Products documentation
-/botbook/src/XX-tickets/          - Tickets documentation
+botbook/src/
+├── SUMMARY.md           # Add new chapters
+├── XX-crm/              # CRM documentation
+├── XX-billing/          # Billing documentation
+├── XX-products/         # Products documentation
+└── XX-tickets/          # Tickets documentation
 ```
 
 ---
@@ -225,6 +223,7 @@ Account ◄──► Opportunity (1:N)
 
 ## Notes
 
+- **i18n Location**: All translations in `botlib/locales/{locale}/ui.ftl` files (Fluent format)
 - **Dynamics Nomenclature**: Lead, Opportunity, Account, Contact, Case, Quote, Invoice
 - **SMB Focus**: Simple, not enterprise complexity
 - **AI-First**: Tickets use AI suggestions, Forms use AI generation

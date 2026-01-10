@@ -403,10 +403,16 @@ body {
 }
 
 /* Hide header tabs progressively as screen shrinks */
-/* Header tabs: chat, mail, calendar, drive, tasks, docs, sheet, slides, social */
+/* Header tabs: chat, mail, calendar, drive, tasks, crm, docs, sheet, slides, social */
 
 @media (max-width: 1400px) {
     .app-tab[data-section="social"] {
+        display: none;
+    }
+}
+
+@media (max-width: 1350px) {
+    .app-tab[data-section="crm"] {
         display: none;
     }
 }
@@ -1191,6 +1197,13 @@ body {
 /* At 1400px: social tab hides */
 @media (max-width: 1400px) {
     .app-item[data-section="social"] {
+        display: flex;
+    }
+}
+
+/* At 1350px: crm tab hides */
+@media (max-width: 1350px) {
+    .app-item[data-section="crm"] {
         display: flex;
     }
 }
