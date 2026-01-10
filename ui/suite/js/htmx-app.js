@@ -21,11 +21,27 @@
     htmx.config.defaultSettleDelay = 100;
     htmx.config.timeout = 10000;
 
-    // Add CSRF token to all requests if available
+    // Add CSRF token and Authorization header to all requests
     document.body.addEventListener("htmx:configRequest", (event) => {
-      const token = localStorage.getItem("csrf_token");
-      if (token) {
-        event.detail.headers["X-CSRF-Token"] = token;
+      const csrfToken = localStorage.getItem("csrf_token");
+      if (csrfToken) {
+        event.detail.headers["X-CSRF-Token"] = csrfToken;
+      }
+
+      // Add Authorization header with access token
+      const accessToken =
+        localStorage.getItem("gb-access-token") ||
+        sessionStorage.getItem("gb-access-token");
+      if (accessToken) {
+        event.detail.headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
+      // Add session ID if available
+      const sessionId =
+        localStorage.getItem("gb-session-id") ||
+        sessionStorage.getItem("gb-session-id");
+      if (sessionId) {
+        event.detail.headers["X-Session-ID"] = sessionId;
       }
     });
 
