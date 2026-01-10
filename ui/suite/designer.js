@@ -807,7 +807,7 @@ function saveDesign() {
 
     // Trigger HTMX save if available
     if (typeof htmx !== 'undefined') {
-        htmx.ajax('POST', '/api/v1/designer/save', {
+        htmx.ajax('POST', '/api/designer/save', {
             source: document.getElementById('designer-data'),
             target: '#status-message'
         });

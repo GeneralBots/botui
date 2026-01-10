@@ -904,7 +904,7 @@
                 </button>
 
                 <button class="toolbar-btn" id="btn-open"
-                        hx-get="/api/v1/designer/files"
+                        hx-get="/api/designer/files"
                         hx-target="#file-list-content"
                         hx-trigger="click"
                         onclick="showModal('open-modal')"
@@ -916,7 +916,7 @@
                 </button>
 
                 <button class="toolbar-btn primary" id="btn-save"
-                        hx-post="/api/v1/designer/save"
+                        hx-post="/api/designer/save"
                         hx-include="#designer-data"
                         hx-indicator="#save-spinner"
                         title="Save (Ctrl+S)">
@@ -948,7 +948,7 @@
                 <div class="toolbar-separator"></div>
 
                 <button class="toolbar-btn" id="btn-run"
-                        hx-post="/api/v1/designer/validate"
+                        hx-post="/api/designer/validate"
                         hx-include="#designer-data"
                         title="Validate Dialog">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -958,7 +958,7 @@
                 </button>
 
                 <button class="toolbar-btn" id="btn-export"
-                        hx-get="/api/v1/designer/export"
+                        hx-get="/api/designer/export"
                         hx-include="#designer-data"
                         title="Export as .bas">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1374,7 +1374,7 @@
             <div class="modal-footer">
                 <button class="toolbar-btn" onclick="hideModal('open-modal')">Cancel</button>
                 <button class="toolbar-btn primary" id="btn-open-selected"
-                        hx-get="/api/v1/designer/load"
+                        hx-get="/api/designer/load"
                         hx-include="#selected-file"
                         hx-target="#canvas-inner"
                         hx-swap="innerHTML"
@@ -2372,7 +2372,7 @@
             if (state.driveSource) {
                 saveToDrive();
             } else {
-                htmx.ajax('POST', '/api/v1/designer/save', {
+                htmx.ajax('POST', '/api/designer/save', {
                     source: document.getElementById('designer-data'),
                     target: '#status-message'
                 });
@@ -2594,7 +2594,7 @@
             };
 
             try {
-                const response = await fetch('/api/v1/designer/magic', {
+                const response = await fetch('/api/designer/magic', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(dialogData)

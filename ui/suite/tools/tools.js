@@ -208,7 +208,7 @@
      */
     function exportReport() {
         if (typeof htmx !== 'undefined') {
-            htmx.ajax('GET', '/api/v1/compliance/export', {
+            htmx.ajax('GET', '/api/compliance/export', {
                 swap: 'none'
             });
         }
@@ -219,7 +219,7 @@
      */
     function fixIssue(issueId) {
         if (typeof htmx !== 'undefined') {
-            htmx.ajax('POST', `/api/v1/compliance/fix/${issueId}`, {
+            htmx.ajax('POST', `/api/compliance/fix/${issueId}`, {
                 swap: 'none'
             }).then(() => {
                 // Refresh results

@@ -23,6 +23,6 @@ document.getElementById('text-editor')?.addEventListener('input', function() {
 document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
-        htmx.trigger(document.querySelector('[hx-post="/api/v1/editor/save"]'), 'click');
+        htmx.trigger(document.querySelector('[hx-post="/api/editor/save"]'), 'click');
     }
 });

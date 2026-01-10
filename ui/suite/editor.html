@@ -359,7 +359,7 @@
                         <span
                             class="editor-title-text"
                             id="editor-filename"
-                            hx-get="/api/v1/editor/filename"
+                            hx-get="/api/editor/filename"
                             hx-trigger="load"
                             hx-swap="innerHTML"></div>
                             Untitled
@@ -367,7 +367,7 @@
                         <div
                             class="editor-path"
                             id="editor-filepath"
-                            hx-get="/api/v1/editor/filepath"
+                            hx-get="/api/editor/filepath"
                             hx-trigger="load"
                             hx-swap="innerHTML">
                         </div>
@@ -395,7 +395,7 @@
                 <div class="toolbar-group">
                     <button
                         class="btn btn-primary btn-small"
-                        hx-post="/api/v1/editor/save"
+                        hx-post="/api/editor/save"
                         hx-include="#text-editor"
                         hx-indicator="#save-spinner"
                         hx-swap="none"
@@ -405,7 +405,7 @@
                     </button>
                     <button
                         class="btn btn-small"
-                        hx-get="/api/v1/editor/save-as"
+                        hx-get="/api/editor/save-as"
                         hx-target="#save-dialog"
                         hx-swap="innerHTML">
                         Save As
@@ -415,14 +415,14 @@
                 <div class="toolbar-group">
                     <button
                         class="btn btn-small"
-                        hx-post="/api/v1/editor/undo"
+                        hx-post="/api/editor/undo"
                         hx-target="#editor-content"
                         hx-swap="innerHTML">
                         ↩️ Undo
                     </button>
                     <button
                         class="btn btn-small"
-                        hx-post="/api/v1/editor/redo"
+                        hx-post="/api/editor/redo"
                         hx-target="#editor-content"
                         hx-swap="innerHTML">
                         ↪️ Redo
@@ -432,7 +432,7 @@
                 <div class="toolbar-group" id="text-tools">
                     <button
                         class="btn btn-small"
-                        hx-post="/api/v1/editor/format"
+                        hx-post="/api/editor/format"
                         hx-include="#text-editor"
                         hx-target="#text-editor"
                         hx-swap="innerHTML">
@@ -449,14 +449,14 @@
                 <div class="toolbar-group" id="csv-tools" style="display: none;">
                     <button
                         class="btn btn-small"
-                        hx-post="/api/v1/editor/csv/add-row"
+                        hx-post="/api/editor/csv/add-row"
                         hx-target="#csv-table-body"
                         hx-swap="beforeend">
                         ➕ Row
                     </button>
                     <button
                         class="btn btn-small"
-                        hx-post="/api/v1/editor/csv/add-column"
+                        hx-post="/api/editor/csv/add-column"
                         hx-target="#csv-editor"
                         hx-swap="innerHTML">
                         ➕ Column
@@ -482,7 +482,7 @@
                     <div
                         class="line-numbers"
                         id="line-numbers"
-                        hx-get="/api/v1/editor/line-numbers"
+                        hx-get="/api/editor/line-numbers"
                         hx-trigger="keyup from:#text-editor delay:100ms"
                         hx-swap="innerHTML">
                         1
@@ -492,7 +492,7 @@
                         id="text-editor"
                         name="content"
                         spellcheck="false"
-                        hx-post="/api/v1/editor/autosave"
+                        hx-post="/api/editor/autosave"
                         hx-trigger="keyup changed delay:5s"
                         hx-swap="none"
                         hx-indicator="#autosave-indicator"
@@ -511,7 +511,7 @@
                                         class="csv-input"
                                         name="header_0"
                                         value="Column 1"
-                                        hx-post="/api/v1/editor/csv/update-header"
+                                        hx-post="/api/editor/csv/update-header"
                                         hx-trigger="change"
                                         hx-swap="none">
                                 </th>
@@ -519,7 +519,7 @@
                         </thead>
                         <tbody
                             id="csv-table-body"
-                            hx-get="/api/v1/editor/csv/rows"
+                            hx-get="/api/editor/csv/rows"
                             hx-trigger="load"
                             hx-swap="innerHTML">
                         </tbody>
@@ -532,7 +532,7 @@
                 <div class="status-left">
                     <span
                         id="file-type"
-                        hx-get="/api/v1/editor/filetype"
+                        hx-get="/api/editor/filetype"
                         hx-trigger="load"
                         hx-swap="innerHTML">
                         📄 Plain Text
@@ -548,7 +548,7 @@
                 <div class="status-right">
                     <span
                         id="cursor-position"
-                        hx-get="/api/v1/editor/position"
+                        hx-get="/api/editor/position"
                         hx-trigger="click from:#text-editor, keyup from:#text-editor"
                         hx-swap="innerHTML">
                         Ln 1, Col 1
@@ -587,7 +587,7 @@
             document.addEventListener('keydown', function(e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                     e.preventDefault();
-                    htmx.trigger(document.querySelector('[hx-post="/api/v1/editor/save"]'), 'click');
+                    htmx.trigger(document.querySelector('[hx-post="/api/editor/save"]'), 'click');
                 }
             });
         function showMagicPanel() {
@@ -611,7 +611,7 @@
             content.innerHTML = '<div class="magic-loading">✨ Analyzing your code...</div>';
 
             try {
-                const response = await fetch('/api/v1/editor/magic', {
+                const response = await fetch('/api/editor/magic', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code: code })
