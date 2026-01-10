@@ -2,6 +2,34 @@
 (function () {
   "use strict";
 
+  // =========================================================================
+  // CRITICAL: Register auth header listener IMMEDIATELY on document
+  // This MUST run before any HTMX requests are made
+  // =========================================================================
+  document.addEventListener("htmx:configRequest", (event) => {
+    // Add Authorization header with access token
+    const accessToken =
+      localStorage.getItem("gb-access-token") ||
+      sessionStorage.getItem("gb-access-token");
+    if (accessToken) {
+      event.detail.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    // Add CSRF token if available
+    const csrfToken = localStorage.getItem("csrf_token");
+    if (csrfToken) {
+      event.detail.headers["X-CSRF-Token"] = csrfToken;
+    }
+
+    // Add session ID if available
+    const sessionId =
+      localStorage.getItem("gb-session-id") ||
+      sessionStorage.getItem("gb-session-id");
+    if (sessionId) {
+      event.detail.headers["X-Session-ID"] = sessionId;
+    }
+  });
+
   // Configuration
   const config = {
     wsUrl: "/ws",
@@ -20,30 +48,6 @@
     htmx.config.defaultSwapStyle = "innerHTML";
     htmx.config.defaultSettleDelay = 100;
     htmx.config.timeout = 10000;
-
-    // Add CSRF token and Authorization header to all requests
-    document.body.addEventListener("htmx:configRequest", (event) => {
-      const csrfToken = localStorage.getItem("csrf_token");
-      if (csrfToken) {
-        event.detail.headers["X-CSRF-Token"] = csrfToken;
-      }
-
-      // Add Authorization header with access token
-      const accessToken =
-        localStorage.getItem("gb-access-token") ||
-        sessionStorage.getItem("gb-access-token");
-      if (accessToken) {
-        event.detail.headers["Authorization"] = `Bearer ${accessToken}`;
-      }
-
-      // Add session ID if available
-      const sessionId =
-        localStorage.getItem("gb-session-id") ||
-        sessionStorage.getItem("gb-session-id");
-      if (sessionId) {
-        event.detail.headers["X-Session-ID"] = sessionId;
-      }
-    });
 
     // Handle errors globally
     document.body.addEventListener("htmx:responseError", (event) => {
