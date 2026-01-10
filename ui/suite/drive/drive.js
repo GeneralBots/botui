@@ -394,7 +394,7 @@
         if (type === "folder") {
           loadFiles(path, currentBucket);
         } else {
-          openInlineEditor(path);
+          openFile(path);
         }
       });
     });
@@ -691,7 +691,6 @@
 
     const isFolder = type === "folder";
     const ep = escapeJs(path);
-    const canEdit = !isFolder && isEditableFile(path);
 
     const icons = {
       open: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`,
@@ -709,9 +708,9 @@
       ${
         isFolder
           ? `<div class="context-menu-item" onclick="${hideMenu}DriveModule.loadFiles('${ep}', '${currentBucket}')">${icons.open}<span>Open</span></div>`
-          : `<div class="context-menu-item" onclick="${hideMenu}DriveModule.downloadFile('${ep}')">${icons.download}<span>Download</span></div>`
+          : `<div class="context-menu-item" onclick="${hideMenu}DriveModule.openFile('${ep}')">${icons.open}<span>Open</span></div>
+             <div class="context-menu-item" onclick="${hideMenu}DriveModule.downloadFile('${ep}')">${icons.download}<span>Download</span></div>`
       }
-      ${canEdit ? `<div class="context-menu-item" onclick="${hideMenu}DriveModule.openInlineEditor('${ep}')">${icons.edit}<span>Edit</span></div>` : ""}
       <div class="context-menu-divider"></div>
       <div class="context-menu-item" onclick="${hideMenu}DriveModule.copyToClipboard('${ep}')">${icons.copy}<span>Copy</span></div>
       <div class="context-menu-item" onclick="${hideMenu}DriveModule.cutToClipboard('${ep}')">${icons.cut}<span>Cut</span></div>
@@ -891,110 +890,28 @@
     }
   }
 
-  function isBasicFile(path) {
-    const ext = "." + (path.split(".").pop() || "").toLowerCase();
-    return ext === ".bas";
-  }
-
-  function openInDesigner(path) {
-    const params = new URLSearchParams({
-      bucket: currentBucket,
-      path: path,
-    });
-
-    if (window.htmx) {
-      htmx.ajax("GET", `/designer.html?${params.toString()}`, {
-        target: "#main-content",
-        swap: "innerHTML",
-      });
-      window.history.pushState({}, "", `/#designer?${params.toString()}`);
-    } else {
-      window.location.href = `/designer.html?${params.toString()}`;
-    }
-  }
-
-  function isEditableFile(path) {
-    const editableExtensions = [
-      ".txt",
-      ".md",
-      ".json",
-      ".js",
-      ".ts",
-      ".css",
-      ".html",
-      ".htm",
-      ".xml",
-      ".yaml",
-      ".yml",
-      ".csv",
-      ".vbs",
-      ".sql",
-      ".sh",
-      ".bat",
-      ".ps1",
-      ".py",
-      ".rb",
-      ".php",
-      ".java",
-      ".c",
-      ".cpp",
-      ".h",
-      ".rs",
-      ".go",
-      ".swift",
-      ".kt",
-      ".scala",
-      ".r",
-      ".lua",
-      ".pl",
-      ".ini",
-      ".conf",
-      ".config",
-      ".env",
-      ".gitignore",
-      ".dockerfile",
-      ".toml",
-      ".lock",
-      ".log",
-      ".markdown",
-      ".rst",
-      ".tex",
-      ".csv",
-    ];
-    const ext = "." + (path.split(".").pop() || "").toLowerCase();
-    return editableExtensions.includes(ext);
-  }
-
-  async function openInlineEditor(path) {
-    const fileName = path.split("/").pop() || "file";
-    console.log("openInlineEditor called with path:", path);
-
-    const isBas = isBasicFile(path);
-    console.log("isBasicFile check:", path, "->", isBas);
-
-    if (isBas) {
-      console.log("Opening .bas file in designer:", path);
-      openInDesigner(path);
-      return;
-    }
-
-    if (!isEditableFile(path)) {
-      console.log("File not editable, downloading instead");
-      downloadFile(path);
-      return;
-    }
-
+  async function openFile(path) {
     try {
-      console.log("Fetching file content for:", path);
-      const response = await apiRequest("/read", {
+      const response = await apiRequest("/open", {
         method: "POST",
         body: JSON.stringify({ bucket: currentBucket, path: path }),
       });
 
-      console.log("API response:", response);
-      const content = response.content || "";
-      console.log("Content length:", content.length);
-      showEditorModal(path, fileName, content);
+      const { app, url } = response;
+
+      if (window.htmx) {
+        htmx.ajax("GET", url, {
+          target: "#main-content",
+          swap: "innerHTML",
+        });
+        window.history.pushState(
+          {},
+          "",
+          `/#${app}?bucket=${encodeURIComponent(currentBucket)}&path=${encodeURIComponent(path)}`,
+        );
+      } else {
+        window.location.href = url;
+      }
     } catch (err) {
       console.error("Failed to open file:", err);
       showNotification(`Failed to open file: ${err.message}`, "error");
@@ -1307,9 +1224,7 @@
     selectAll,
     clearSelection,
     downloadFile,
-    openInlineEditor,
-    saveEditorContent,
-    closeEditor,
+    openFile,
     deleteItem,
     deleteSelected,
     renameItem,

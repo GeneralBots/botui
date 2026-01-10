@@ -33,6 +33,7 @@
     slashPosition: null,
     isAIPanelOpen: false,
     focusMode: false,
+    driveSource: null,
   };
 
   // =============================================================================
@@ -798,13 +799,24 @@
     const urlParams = new URLSearchParams(window.location.search);
     const hash = window.location.hash;
     let docId = urlParams.get("id");
+    let bucket = urlParams.get("bucket");
+    let path = urlParams.get("path");
 
-    if (!docId && hash) {
-      const hashParams = new URLSearchParams(hash.substring(1));
-      docId = hashParams.get("id");
+    if (hash) {
+      const hashQueryIndex = hash.indexOf("?");
+      if (hashQueryIndex !== -1) {
+        const hashParams = new URLSearchParams(
+          hash.substring(hashQueryIndex + 1),
+        );
+        docId = docId || hashParams.get("id");
+        bucket = bucket || hashParams.get("bucket");
+        path = path || hashParams.get("path");
+      }
     }
 
-    if (docId) {
+    if (bucket && path) {
+      await loadFromDrive(bucket, path);
+    } else if (docId) {
       try {
         const response = await fetch(`/api/ui/docs/${docId}`);
         if (response.ok) {
@@ -828,6 +840,80 @@
         console.error("Load failed:", e);
       }
     }
+  }
+
+  async function loadFromDrive(bucket, path) {
+    const fileName = path.split("/").pop() || "document";
+    const ext = fileName.split(".").pop().toLowerCase();
+
+    state.driveSource = { bucket, path };
+    state.docTitle = fileName;
+
+    if (elements.editorTitle) {
+      elements.editorTitle.textContent = fileName;
+    }
+    if (elements.docTitleInput) {
+      elements.docTitleInput.value = fileName;
+    }
+
+    try {
+      const response = await fetch("/api/files/read", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucket, path }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load file: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.content || "";
+
+      if (ext === "md" || ext === "markdown") {
+        if (elements.editorContent) {
+          elements.editorContent.innerHTML = markdownToHtml(content);
+        }
+      } else if (ext === "txt") {
+        if (elements.editorContent) {
+          elements.editorContent.innerHTML = `<p>${escapeHtml(content).replace(/\n/g, "</p><p>")}</p>`;
+        }
+      } else if (ext === "html" || ext === "htm") {
+        if (elements.editorContent) {
+          elements.editorContent.innerHTML = content;
+        }
+      } else {
+        if (elements.editorContent) {
+          elements.editorContent.innerHTML = `<p>${escapeHtml(content)}</p>`;
+        }
+      }
+
+      updateWordCount();
+      state.isDirty = false;
+    } catch (err) {
+      console.error("Failed to load file from drive:", err);
+      alert(`Failed to load file: ${err.message}`);
+    }
+  }
+
+  function markdownToHtml(md) {
+    return md
+      .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+      .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+      .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/`(.+?)`/g, "<code>$1</code>")
+      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
+      .replace(/\n\n/g, "</p><p>")
+      .replace(/\n/g, "<br>")
+      .replace(/^(.+)$/gm, "<p>$1</p>");
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   // =============================================================================

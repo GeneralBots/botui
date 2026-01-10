@@ -13,6 +13,7 @@ class VideoEditor {
     this.pixelsPerMs = 0.1;
     this.undoStack = [];
     this.redoStack = [];
+    this.driveSource = null;
 
     this.init();
   }
@@ -20,7 +21,94 @@ class VideoEditor {
   async init() {
     this.bindEvents();
     this.updateTimeRuler();
+    await this.loadFromUrlParams();
     await this.loadProjects();
+  }
+
+  async loadFromUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    let bucket = urlParams.get("bucket");
+    let path = urlParams.get("path");
+
+    if (hash) {
+      const hashQueryIndex = hash.indexOf("?");
+      if (hashQueryIndex !== -1) {
+        const hashParams = new URLSearchParams(
+          hash.substring(hashQueryIndex + 1),
+        );
+        bucket = bucket || hashParams.get("bucket");
+        path = path || hashParams.get("path");
+      }
+    }
+
+    if (bucket && path) {
+      await this.loadFromDrive(bucket, path);
+    }
+  }
+
+  async loadFromDrive(bucket, path) {
+    const fileName = path.split("/").pop() || "media";
+    const ext = fileName.split(".").pop().toLowerCase();
+
+    this.driveSource = { bucket, path };
+
+    try {
+      const response = await fetch("/api/files/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucket, path }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load file: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      const isImage = [
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+        "webp",
+        "svg",
+        "bmp",
+        "ico",
+        "tiff",
+        "tif",
+        "heic",
+        "heif",
+      ].includes(ext);
+      const isVideo = [
+        "mp4",
+        "webm",
+        "mov",
+        "avi",
+        "mkv",
+        "wmv",
+        "flv",
+        "m4v",
+      ].includes(ext);
+
+      const previewEl = document.getElementById("preview-video");
+      if (previewEl) {
+        if (isImage) {
+          previewEl.outerHTML = `<img id="preview-video" src="${url}" style="max-width:100%;max-height:100%;object-fit:contain;" alt="${fileName}">`;
+        } else if (isVideo) {
+          previewEl.src = url;
+          previewEl.load();
+        }
+      }
+
+      const projectName = document.getElementById("current-project-name");
+      if (projectName) {
+        projectName.textContent = fileName;
+      }
+    } catch (err) {
+      console.error("Failed to load file from drive:", err);
+    }
   }
 
   bindEvents() {

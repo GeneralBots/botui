@@ -1,5 +1,15 @@
 /* Admin Module Styles */
 
+/* Dialog Modal Styles */
+dialog.modal {
+    display: none;
+}
+
+dialog.modal[open] {
+    display: flex;
+    flex-direction: column;
+}
+
 /* Admin Layout */
 .admin-layout {
     display: grid;

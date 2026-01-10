@@ -36,6 +36,7 @@
     autoSaveTimer: null,
     isPresenting: false,
     theme: null,
+    driveSource: null,
   };
 
   const elements = {
@@ -58,7 +59,97 @@
     bindEvents();
     loadFromUrlParams();
     connectWebSocket();
-    createNewPresentation();
+  }
+
+  async function loadFromUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    let presentationId = urlParams.get("id");
+    let bucket = urlParams.get("bucket");
+    let path = urlParams.get("path");
+
+    if (hash) {
+      const hashQueryIndex = hash.indexOf("?");
+      if (hashQueryIndex !== -1) {
+        const hashParams = new URLSearchParams(
+          hash.substring(hashQueryIndex + 1),
+        );
+        presentationId = presentationId || hashParams.get("id");
+        bucket = bucket || hashParams.get("bucket");
+        path = path || hashParams.get("path");
+      }
+    }
+
+    if (bucket && path) {
+      await loadFromDrive(bucket, path);
+    } else if (presentationId) {
+      try {
+        const response = await fetch(`/api/slides/${presentationId}`);
+        if (response.ok) {
+          const data = await response.json();
+          state.presentationId = presentationId;
+          state.presentationName = data.name || "Untitled Presentation";
+          state.slides = data.slides || [];
+
+          if (elements.presentationName) {
+            elements.presentationName.value = state.presentationName;
+          }
+
+          renderThumbnails();
+          renderCurrentSlide();
+          updateSlideCounter();
+        }
+      } catch (e) {
+        console.error("Load failed:", e);
+        createNewPresentation();
+      }
+    } else {
+      createNewPresentation();
+    }
+  }
+
+  async function loadFromDrive(bucket, path) {
+    const fileName = path.split("/").pop() || "presentation";
+
+    state.driveSource = { bucket, path };
+    state.presentationName = fileName;
+
+    if (elements.presentationName) {
+      elements.presentationName.value = fileName;
+    }
+
+    try {
+      const response = await fetch("/api/files/read", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bucket, path }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load file: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.content || "";
+
+      createNewPresentation();
+      if (state.slides.length > 0 && state.slides[0].elements) {
+        const titleElement = state.slides[0].elements.find(
+          (el) => el.element_type === "text" && el.style?.fontSize >= 32,
+        );
+        if (titleElement) {
+          titleElement.content = fileName.replace(/\.[^/.]+$/, "");
+        }
+      }
+
+      renderThumbnails();
+      renderCurrentSlide();
+      updateSlideCounter();
+      state.isDirty = false;
+    } catch (err) {
+      console.error("Failed to load file from drive:", err);
+      createNewPresentation();
+    }
   }
 
   function cacheElements() {
