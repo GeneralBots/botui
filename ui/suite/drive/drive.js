@@ -223,7 +223,27 @@
 
   async function apiRequest(endpoint, options = {}) {
     const url = `${API_BASE}${endpoint}`;
+
+    // Use global ApiClient if available for automatic auth token injection
+    if (window.ApiClient) {
+      try {
+        return await window.ApiClient.request(url, options);
+      } catch (err) {
+        console.error(`API Error [${endpoint}]:`, err);
+        throw err;
+      }
+    }
+
+    // Fallback if ApiClient not loaded
     const defaultHeaders = { "Content-Type": "application/json" };
+
+    // Try to get auth token from storage
+    const token =
+      localStorage.getItem("gb-access-token") ||
+      sessionStorage.getItem("gb-access-token");
+    if (token) {
+      defaultHeaders["Authorization"] = `Bearer ${token}`;
+    }
 
     try {
       const response = await fetch(url, {
