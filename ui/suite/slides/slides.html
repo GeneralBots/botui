@@ -1,46 +1,20 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>GB Slides</title>
-        <link rel="stylesheet" href="slides.css" />
-    </head>
-    <body>
-        <div class="slides-container">
-            <!-- Sidebar: Slide Thumbnails -->
-            <aside class="slides-sidebar" id="slides-sidebar">
-                <div class="sidebar-header">
-                    <h2>Slides</h2>
-                    <button
-                        class="btn-icon"
-                        onclick="toggleSidebar()"
-                        title="Toggle Sidebar"
-                    >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
+<link rel="stylesheet" href="slides/slides.css" />
 
-                <div class="sidebar-search">
-                    <input
-                        type="text"
-                        placeholder="Search presentations..."
-                        id="search-input"
-                        oninput="searchPresentations(this.value)"
-                    />
+<div class="slides-app" id="slides-app">
+    <div class="slides-toolbar">
+        <div class="toolbar-left">
+            <input
+                type="text"
+                class="presentation-name-input"
+                id="presentationName"
+                value="Untitled Presentation"
+                spellcheck="false"
+            />
+        </div>
+        <div class="toolbar-center">
+            <div class="toolbar-group">
+                <button class="btn-icon" id="undoBtn" title="Undo (Ctrl+Z)">
                     <svg
-                        class="search-icon"
                         width="16"
                         height="16"
                         viewBox="0 0 24 24"
@@ -48,543 +22,307 @@
                         stroke="currentColor"
                         stroke-width="2"
                     >
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        <path d="M3 7v6h6"></path>
+                        <path
+                            d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"
+                        ></path>
                     </svg>
-                </div>
-
-                <div class="slide-thumbnails" id="slide-thumbnails">
-                    <!-- Thumbnails rendered dynamically -->
-                </div>
-
-                <div class="sidebar-actions">
-                    <button class="btn-add-slide" onclick="addSlide()">
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        <span>Add Slide</span>
-                    </button>
-                </div>
-            </aside>
-
-            <!-- Main Content Area -->
-            <main class="slides-main">
-                <!-- Toolbar -->
-                <div class="slides-toolbar">
-                    <div class="toolbar-left">
-                        <button
-                            class="btn-icon"
-                            onclick="toggleSidebar()"
-                            title="Toggle Sidebar"
-                        >
-                            <svg
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <rect
-                                    x="3"
-                                    y="3"
-                                    width="18"
-                                    height="18"
-                                    rx="2"
-                                    ry="2"
-                                ></rect>
-                                <line x1="9" y1="3" x2="9" y2="21"></line>
-                            </svg>
-                        </button>
-                        <input
-                            type="text"
-                            class="presentation-name-input"
-                            id="presentation-name"
-                            value="Untitled Presentation"
-                            onchange="renamePresentation(this.value)"
-                        />
-                    </div>
-
-                    <div class="toolbar-center">
-                        <!-- Insert Tools -->
-                        <div class="toolbar-group">
-                            <button
-                                class="btn-icon"
-                                onclick="addTextBox()"
-                                title="Add Text"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <polyline
-                                        points="4 7 4 4 20 4 20 7"
-                                    ></polyline>
-                                    <line x1="9" y1="20" x2="15" y2="20"></line>
-                                    <line x1="12" y1="4" x2="12" y2="20"></line>
-                                </svg>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                onclick="showImageModal()"
-                                title="Add Image"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="18"
-                                        height="18"
-                                        rx="2"
-                                        ry="2"
-                                    ></rect>
-                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                    <polyline
-                                        points="21 15 16 10 5 21"
-                                    ></polyline>
-                                </svg>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                onclick="showShapeModal()"
-                                title="Add Shape"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="18"
-                                        height="18"
-                                        rx="2"
-                                    ></rect>
-                                </svg>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                onclick="showChartModal()"
-                                title="Add Chart"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <line
-                                        x1="18"
-                                        y1="20"
-                                        x2="18"
-                                        y2="10"
-                                    ></line>
-                                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                                </svg>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                onclick="addTable()"
-                                title="Add Table"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="18"
-                                        height="18"
-                                        rx="2"
-                                    ></rect>
-                                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                                    <line x1="3" y1="15" x2="21" y2="15"></line>
-                                    <line x1="9" y1="3" x2="9" y2="21"></line>
-                                    <line x1="15" y1="3" x2="15" y2="21"></line>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <span class="toolbar-divider"></span>
-
-                        <!-- Text Formatting -->
-                        <div class="toolbar-group">
-                            <select
-                                class="toolbar-select font-family"
-                                id="font-family"
-                                onchange="setFontFamily(this.value)"
-                            >
-                                <option value="Inter">Inter</option>
-                                <option value="Arial">Arial</option>
-                                <option value="Helvetica">Helvetica</option>
-                                <option value="Georgia">Georgia</option>
-                                <option value="Times New Roman">
-                                    Times New Roman
-                                </option>
-                                <option value="Courier New">Courier New</option>
-                            </select>
-                            <select
-                                class="toolbar-select font-size"
-                                id="font-size"
-                                onchange="setFontSize(this.value)"
-                            >
-                                <option value="12">12</option>
-                                <option value="14">14</option>
-                                <option value="16">16</option>
-                                <option value="18">18</option>
-                                <option value="20">20</option>
-                                <option value="24" selected>24</option>
-                                <option value="28">28</option>
-                                <option value="32">32</option>
-                                <option value="36">36</option>
-                                <option value="48">48</option>
-                                <option value="64">64</option>
-                                <option value="72">72</option>
-                            </select>
-                        </div>
-
-                        <span class="toolbar-divider"></span>
-
-                        <!-- Text Style -->
-                        <div class="toolbar-group">
-                            <button
-                                class="btn-icon"
-                                id="btn-bold"
-                                onclick="toggleBold()"
-                                title="Bold (Ctrl+B)"
-                            >
-                                <strong>B</strong>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                id="btn-italic"
-                                onclick="toggleItalic()"
-                                title="Italic (Ctrl+I)"
-                            >
-                                <em>I</em>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                id="btn-underline"
-                                onclick="toggleUnderline()"
-                                title="Underline (Ctrl+U)"
-                            >
-                                <u>U</u>
-                            </button>
-                        </div>
-
-                        <span class="toolbar-divider"></span>
-
-                        <!-- Colors -->
-                        <div class="toolbar-group">
-                            <div class="color-btn" title="Text Color">
-                                <span style="font-weight: bold">A</span>
-                                <span
-                                    class="color-indicator"
-                                    id="text-color-indicator"
-                                    style="background: #000000"
-                                ></span>
-                                <input
-                                    type="color"
-                                    class="color-input"
-                                    id="text-color"
-                                    value="#000000"
-                                    onchange="setTextColor(this.value)"
-                                />
-                            </div>
-                            <div class="color-btn" title="Fill Color">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="18"
-                                        height="18"
-                                        rx="2"
-                                    ></rect>
-                                </svg>
-                                <span
-                                    class="color-indicator"
-                                    id="fill-color-indicator"
-                                    style="background: #3b82f6"
-                                ></span>
-                                <input
-                                    type="color"
-                                    class="color-input"
-                                    id="fill-color"
-                                    value="#3b82f6"
-                                    onchange="setFillColor(this.value)"
-                                />
-                            </div>
-                            <div class="color-btn" title="Stroke Color">
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="3"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="18"
-                                        height="18"
-                                        rx="2"
-                                    ></rect>
-                                </svg>
-                                <span
-                                    class="color-indicator"
-                                    id="stroke-color-indicator"
-                                    style="background: #1e293b"
-                                ></span>
-                                <input
-                                    type="color"
-                                    class="color-input"
-                                    id="stroke-color"
-                                    value="#1e293b"
-                                    onchange="setStrokeColor(this.value)"
-                                />
-                            </div>
-                        </div>
-
-                        <span class="toolbar-divider"></span>
-
-                        <!-- Alignment -->
-                        <div class="toolbar-group">
-                            <button
-                                class="btn-icon"
-                                onclick="setTextAlign('left')"
-                                title="Align Left"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <line x1="17" y1="10" x2="3" y2="10"></line>
-                                    <line x1="21" y1="6" x2="3" y2="6"></line>
-                                    <line x1="21" y1="14" x2="3" y2="14"></line>
-                                    <line x1="17" y1="18" x2="3" y2="18"></line>
-                                </svg>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                onclick="setTextAlign('center')"
-                                title="Align Center"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <line x1="18" y1="10" x2="6" y2="10"></line>
-                                    <line x1="21" y1="6" x2="3" y2="6"></line>
-                                    <line x1="21" y1="14" x2="3" y2="14"></line>
-                                    <line x1="18" y1="18" x2="6" y2="18"></line>
-                                </svg>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                onclick="setTextAlign('right')"
-                                title="Align Right"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <line x1="21" y1="10" x2="7" y2="10"></line>
-                                    <line x1="21" y1="6" x2="3" y2="6"></line>
-                                    <line x1="21" y1="14" x2="3" y2="14"></line>
-                                    <line x1="21" y1="18" x2="7" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <span class="toolbar-divider"></span>
-
-                        <!-- Layer Order -->
-                        <div class="toolbar-group">
-                            <button
-                                class="btn-icon"
-                                onclick="bringForward()"
-                                title="Bring Forward"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <rect
-                                        x="8"
-                                        y="8"
-                                        width="13"
-                                        height="13"
-                                        rx="2"
-                                    ></rect>
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="13"
-                                        height="13"
-                                        rx="2"
-                                        fill="currentColor"
-                                        opacity="0.3"
-                                    ></rect>
-                                </svg>
-                            </button>
-                            <button
-                                class="btn-icon"
-                                onclick="sendBackward()"
-                                title="Send Backward"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="13"
-                                        height="13"
-                                        rx="2"
-                                    ></rect>
-                                    <rect
-                                        x="8"
-                                        y="8"
-                                        width="13"
-                                        height="13"
-                                        rx="2"
-                                        fill="currentColor"
-                                        opacity="0.3"
-                                    ></rect>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="toolbar-right">
-                        <div class="collaborators" id="collaborators"></div>
-                        <button
-                            class="btn-icon"
-                            onclick="showThemeModal()"
-                            title="Themes"
-                        >
-                            <svg
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M12 2a10 10 0 0 1 0 20"></path>
-                                <line x1="2" y1="12" x2="22" y2="12"></line>
-                            </svg>
-                        </button>
-                        <button
-                            class="btn-icon"
-                            onclick="startPresentation()"
-                            title="Present (F5)"
-                        >
-                            <svg
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                            >
-                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                            </svg>
-                        </button>
-                        <button
-                            class="btn-primary"
-                            onclick="savePresentation()"
-                        >
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"
-                                ></path>
-                                <polyline
-                                    points="17 21 17 13 7 13 7 21"
-                                ></polyline>
-                                <polyline points="7 3 7 8 15 8"></polyline>
-                            </svg>
-                            <span>Save</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Slide Canvas Area -->
-                <div class="slide-canvas-container" id="canvas-container">
-                    <div class="slide-canvas" id="slide-canvas">
-                        <!-- Elements rendered here -->
-                    </div>
-
-                    <!-- Selection handles (shown when element selected) -->
-                    <div
-                        class="selection-handles hidden"
-                        id="selection-handles"
+                </button>
+                <button class="btn-icon" id="redoBtn" title="Redo (Ctrl+Y)">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
+                        <path d="M21 7v6h-6"></path>
+                        <path
+                            d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"
+                        ></path>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button class="btn-icon" id="addTextBtn" title="Add Text Box">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                        <line x1="9" y1="20" x2="15" y2="20"></line>
+                        <line x1="12" y1="4" x2="12" y2="20"></line>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="addImageBtn" title="Add Image">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        ></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="addShapeBtn" title="Add Shape">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="addTableBtn" title="Add Table">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="3" y1="15" x2="21" y2="15"></line>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <select
+                    class="toolbar-select font-family"
+                    id="fontFamily"
+                    title="Font"
+                >
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times New Roman">Times</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+                <select
+                    class="toolbar-select font-size"
+                    id="fontSize"
+                    title="Size"
+                >
+                    <option value="12">12</option>
+                    <option value="14">14</option>
+                    <option value="18">18</option>
+                    <option value="24" selected>24</option>
+                    <option value="36">36</option>
+                    <option value="48">48</option>
+                    <option value="72">72</option>
+                </select>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group format-group">
+                <button class="btn-icon" id="boldBtn" title="Bold (Ctrl+B)">
+                    <strong>B</strong>
+                </button>
+                <button class="btn-icon" id="italicBtn" title="Italic (Ctrl+I)">
+                    <em>I</em>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="underlineBtn"
+                    title="Underline (Ctrl+U)"
+                >
+                    <u>U</u>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button
+                    class="btn-icon color-btn"
+                    id="textColorBtn"
+                    title="Text Color"
+                >
+                    <span class="color-letter">A</span>
+                    <span
+                        class="color-indicator"
+                        style="background: #000000"
+                    ></span>
+                    <input
+                        type="color"
+                        id="textColorPicker"
+                        class="color-input"
+                        value="#000000"
+                    />
+                </button>
+                <button
+                    class="btn-icon color-btn"
+                    id="fillColorBtn"
+                    title="Fill Color"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        stroke="none"
+                    >
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    </svg>
+                    <span
+                        class="color-indicator fill-indicator"
+                        style="background: #ffffff"
+                    ></span>
+                    <input
+                        type="color"
+                        id="fillColorPicker"
+                        class="color-input"
+                        value="#ffffff"
+                    />
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button class="btn-icon" id="alignLeftBtn" title="Align Left">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="15" y2="12"></line>
+                        <line x1="3" y1="18" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="alignCenterBtn"
+                    title="Align Center"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="6" y1="12" x2="18" y2="12"></line>
+                        <line x1="4" y1="18" x2="20" y2="18"></line>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="alignRightBtn" title="Align Right">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="9" y1="12" x2="21" y2="12"></line>
+                        <line x1="6" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <div class="collaborators" id="collaborators"></div>
+            <button class="btn-icon" id="presentBtn" title="Present (F5)">
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    stroke="none"
+                >
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </button>
+            <button class="btn-primary" id="shareBtn">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                <span>Share</span>
+            </button>
+            <button
+                class="btn-icon chat-toggle"
+                id="chatToggle"
+                title="Toggle AI Chat"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                    ></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="slides-main">
+        <aside class="slide-thumbnails-panel" id="thumbnailsPanel">
+            <div class="thumbnails-container" id="thumbnails"></div>
+            <button class="btn-add-slide" id="addSlideBtn" title="Add Slide">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                <span>Add Slide</span>
+            </button>
+        </aside>
+
+        <div class="slide-canvas-area">
+            <div class="slide-canvas-container" id="canvasContainer">
+                <div class="slide-canvas" id="slideCanvas">
+                    <div class="canvas-content" id="canvasContent"></div>
+                    <div class="selection-handles hidden" id="selectionHandles">
                         <div class="handle nw" data-handle="nw"></div>
                         <div class="handle n" data-handle="n"></div>
                         <div class="handle ne" data-handle="ne"></div>
@@ -595,46 +333,154 @@
                         <div class="handle se" data-handle="se"></div>
                         <div class="rotate-handle" data-handle="rotate"></div>
                     </div>
-
-                    <!-- Cursor indicators for collaborators -->
-                    <div class="cursor-indicators" id="cursor-indicators"></div>
+                    <div class="cursor-indicators" id="cursorIndicators"></div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Status Bar -->
-                <div class="slides-status-bar">
-                    <div class="status-left">
-                        <span
-                            >Slide <span id="current-slide-num">1</span> of
-                            <span id="total-slides">1</span></span
+        <aside class="chat-panel" id="chatPanel">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <div class="chat-avatar">
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
                         >
+                            <path
+                                d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"
+                            />
+                            <circle cx="12" cy="10" r="3" />
+                            <path
+                                d="M12 15c-3 0-5 1.5-5 3v1h10v-1c0-1.5-2-3-5-3z"
+                            />
+                        </svg>
                     </div>
-                    <div class="status-center">
-                        <span id="save-status"></span>
-                    </div>
-                    <div class="status-right">
-                        <span>Zoom:</span>
-                        <div class="zoom-control">
-                            <button class="btn-zoom" onclick="zoomOut()">
-                                −
-                            </button>
-                            <span id="zoom-level">100</span>%
-                            <button class="btn-zoom" onclick="zoomIn()">
-                                +
-                            </button>
-                        </div>
+                    <div>
+                        <h3>AI Assistant</h3>
+                        <span class="chat-status">Ready to help</span>
                     </div>
                 </div>
-            </main>
-
-            <!-- Properties Panel -->
-            <aside class="slides-properties" id="properties-panel">
-                <div class="properties-header">
-                    <h3>Properties</h3>
-                    <button
-                        class="btn-icon"
-                        onclick="toggleProperties()"
-                        title="Close"
+                <button class="chat-close" id="chatClose" title="Close">
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message assistant">
+                    <div class="message-bubble">
+                        <p>
+                            Hi! I can help you create and edit your
+                            presentation. Try asking me to:
+                        </p>
+                        <ul>
+                            <li>Add a title slide</li>
+                            <li>Insert an image or shape</li>
+                            <li>Change the slide background</li>
+                            <li>Add speaker notes</li>
+                            <li>Duplicate or delete slides</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-suggestions" id="chatSuggestions">
+                <button class="suggestion-btn" data-action="title">
+                    Add title slide
+                </button>
+                <button class="suggestion-btn" data-action="image">
+                    Insert image
+                </button>
+                <button class="suggestion-btn" data-action="duplicate">
+                    Duplicate slide
+                </button>
+                <button class="suggestion-btn" data-action="notes">
+                    Add notes
+                </button>
+            </div>
+            <form class="chat-input-container" id="chatForm">
+                <input
+                    type="text"
+                    class="chat-input"
+                    id="chatInput"
+                    placeholder="Ask me to edit your slides..."
+                    autocomplete="off"
+                />
+                <button
+                    type="submit"
+                    class="chat-send"
+                    id="chatSend"
+                    title="Send"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </aside>
+    </div>
+
+    <div class="slides-status-bar">
+        <div class="status-left">
+            <span id="slideInfo">Slide 1 of 1</span>
+        </div>
+        <div class="status-center">
+            <span id="saveStatus">Saved</span>
+        </div>
+        <div class="status-right">
+            <div class="zoom-control">
+                <button class="btn-zoom" id="zoomOutBtn">−</button>
+                <span id="zoomLevel">100%</span>
+                <button class="btn-zoom" id="zoomInBtn">+</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="shareModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Share Presentation</h3>
+            <button class="btn-close" id="closeShareModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="share-input-group">
+                <input
+                    type="email"
+                    placeholder="Enter email address"
+                    id="shareEmail"
+                />
+                <select id="sharePermission">
+                    <option value="view">Can view</option>
+                    <option value="comment">Can comment</option>
+                    <option value="edit">Can edit</option>
+                </select>
+                <button class="btn-primary" id="sendShareBtn">Share</button>
+            </div>
+            <div class="share-link-section">
+                <h4>Or share with link</h4>
+                <div class="share-link-group">
+                    <input type="text" readonly id="shareLink" />
+                    <button class="btn-icon" id="copyLinkBtn" title="Copy link">
                         <svg
                             width="16"
                             height="16"
@@ -643,500 +489,320 @@
                             stroke="currentColor"
                             stroke-width="2"
                         >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                            <rect
+                                x="9"
+                                y="9"
+                                width="13"
+                                height="13"
+                                rx="2"
+                            ></rect>
+                            <path
+                                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                            ></path>
                         </svg>
                     </button>
                 </div>
-                <div class="properties-content" id="properties-content">
-                    <div class="property-group">
-                        <label>Position</label>
-                        <div class="property-row">
-                            <div class="property-input">
-                                <span>X</span>
-                                <input
-                                    type="number"
-                                    id="prop-x"
-                                    onchange="updateElementPosition('x', this.value)"
-                                />
-                            </div>
-                            <div class="property-input">
-                                <span>Y</span>
-                                <input
-                                    type="number"
-                                    id="prop-y"
-                                    onchange="updateElementPosition('y', this.value)"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="property-group">
-                        <label>Size</label>
-                        <div class="property-row">
-                            <div class="property-input">
-                                <span>W</span>
-                                <input
-                                    type="number"
-                                    id="prop-width"
-                                    onchange="updateElementSize('width', this.value)"
-                                />
-                            </div>
-                            <div class="property-input">
-                                <span>H</span>
-                                <input
-                                    type="number"
-                                    id="prop-height"
-                                    onchange="updateElementSize('height', this.value)"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="property-group">
-                        <label>Rotation</label>
-                        <div class="property-row">
-                            <input
-                                type="range"
-                                id="prop-rotation"
-                                min="0"
-                                max="360"
-                                value="0"
-                                oninput="updateElementRotation(this.value)"
-                            />
-                            <span id="rotation-value">0°</span>
-                        </div>
-                    </div>
-                    <div class="property-group">
-                        <label>Opacity</label>
-                        <div class="property-row">
-                            <input
-                                type="range"
-                                id="prop-opacity"
-                                min="0"
-                                max="100"
-                                value="100"
-                                oninput="updateElementOpacity(this.value)"
-                            />
-                            <span id="opacity-value">100%</span>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-        </div>
-
-        <!-- Context Menu -->
-        <div class="context-menu hidden" id="context-menu">
-            <div class="context-item" onclick="cutElement()">
-                Cut <span class="shortcut">Ctrl+X</span>
-            </div>
-            <div class="context-item" onclick="copyElement()">
-                Copy <span class="shortcut">Ctrl+C</span>
-            </div>
-            <div class="context-item" onclick="pasteElement()">
-                Paste <span class="shortcut">Ctrl+V</span>
-            </div>
-            <div class="context-divider"></div>
-            <div class="context-item" onclick="duplicateElement()">
-                Duplicate <span class="shortcut">Ctrl+D</span>
-            </div>
-            <div class="context-item" onclick="deleteElement()">
-                Delete <span class="shortcut">Del</span>
-            </div>
-            <div class="context-divider"></div>
-            <div class="context-item" onclick="bringToFront()">
-                Bring to Front
-            </div>
-            <div class="context-item" onclick="sendToBack()">Send to Back</div>
-            <div class="context-divider"></div>
-            <div class="context-item" onclick="lockElement()">Lock/Unlock</div>
-        </div>
-
-        <!-- Slide Context Menu -->
-        <div class="context-menu hidden" id="slide-context-menu">
-            <div class="context-item" onclick="addSlideAfter()">
-                Add Slide After
-            </div>
-            <div class="context-item" onclick="duplicateSlide()">
-                Duplicate Slide
-            </div>
-            <div class="context-divider"></div>
-            <div class="context-item" onclick="deleteSlide()">Delete Slide</div>
-            <div class="context-divider"></div>
-            <div class="context-item" onclick="showSlideBackground()">
-                Change Background
-            </div>
-            <div class="context-item" onclick="showSlideTransition()">
-                Transition...
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Theme Modal -->
-        <div class="modal hidden" id="theme-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Themes</h3>
-                    <button
-                        class="btn-close"
-                        onclick="hideModal('theme-modal')"
+<div class="modal hidden" id="imageModal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>Insert Image</h3>
+            <button class="btn-close" id="closeImageModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Image URL</label>
+                <input
+                    type="url"
+                    id="imageUrl"
+                    placeholder="https://example.com/image.jpg"
+                />
+            </div>
+            <div class="form-group">
+                <label>Alt Text</label>
+                <input
+                    type="text"
+                    id="imageAlt"
+                    placeholder="Describe the image"
+                />
+            </div>
+            <div class="modal-actions">
+                <button
+                    class="btn-secondary"
+                    onclick="gbSlides.hideModal('imageModal')"
+                >
+                    Cancel
+                </button>
+                <button class="btn-primary" id="insertImageBtn">Insert</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="shapeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Insert Shape</h3>
+            <button class="btn-close" id="closeShapeModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="shape-grid">
+                <button
+                    class="shape-btn"
+                    data-shape="rectangle"
+                    title="Rectangle"
+                >
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="theme-grid">
-                        <div class="theme-item" onclick="applyTheme('default')">
-                            <div
-                                class="theme-preview"
-                                style="
-                                    background: linear-gradient(
-                                        135deg,
-                                        #3b82f6,
-                                        #1e40af
-                                    );
-                                "
-                            ></div>
-                            <span>Default</span>
-                        </div>
-                        <div class="theme-item" onclick="applyTheme('dark')">
-                            <div
-                                class="theme-preview"
-                                style="
-                                    background: linear-gradient(
-                                        135deg,
-                                        #1e293b,
-                                        #0f172a
-                                    );
-                                "
-                            ></div>
-                            <span>Dark</span>
-                        </div>
-                        <div class="theme-item" onclick="applyTheme('minimal')">
-                            <div
-                                class="theme-preview"
-                                style="
-                                    background: #ffffff;
-                                    border: 1px solid #e2e8f0;
-                                "
-                            ></div>
-                            <span>Minimal</span>
-                        </div>
-                        <div class="theme-item" onclick="applyTheme('nature')">
-                            <div
-                                class="theme-preview"
-                                style="
-                                    background: linear-gradient(
-                                        135deg,
-                                        #22c55e,
-                                        #15803d
-                                    );
-                                "
-                            ></div>
-                            <span>Nature</span>
-                        </div>
-                        <div class="theme-item" onclick="applyTheme('sunset')">
-                            <div
-                                class="theme-preview"
-                                style="
-                                    background: linear-gradient(
-                                        135deg,
-                                        #f97316,
-                                        #dc2626
-                                    );
-                                "
-                            ></div>
-                            <span>Sunset</span>
-                        </div>
-                        <div class="theme-item" onclick="applyTheme('ocean')">
-                            <div
-                                class="theme-preview"
-                                style="
-                                    background: linear-gradient(
-                                        135deg,
-                                        #06b6d4,
-                                        #0284c7
-                                    );
-                                "
-                            ></div>
-                            <span>Ocean</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Shape Modal -->
-        <div class="modal hidden" id="shape-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Insert Shape</h3>
-                    <button
-                        class="btn-close"
-                        onclick="hideModal('shape-modal')"
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    </svg>
+                </button>
+                <button
+                    class="shape-btn"
+                    data-shape="rounded"
+                    title="Rounded Rectangle"
+                >
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="shape-grid">
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('rectangle')"
-                            title="Rectangle"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <rect
-                                    x="3"
-                                    y="3"
-                                    width="18"
-                                    height="18"
-                                    rx="2"
-                                ></rect>
-                            </svg>
-                        </button>
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('rounded-rectangle')"
-                            title="Rounded Rectangle"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <rect
-                                    x="3"
-                                    y="3"
-                                    width="18"
-                                    height="18"
-                                    rx="6"
-                                ></rect>
-                            </svg>
-                        </button>
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('ellipse')"
-                            title="Ellipse"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <ellipse
-                                    cx="12"
-                                    cy="12"
-                                    rx="9"
-                                    ry="9"
-                                ></ellipse>
-                            </svg>
-                        </button>
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('triangle')"
-                            title="Triangle"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <polygon points="12,3 21,21 3,21"></polygon>
-                            </svg>
-                        </button>
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('diamond')"
-                            title="Diamond"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <polygon
-                                    points="12,2 22,12 12,22 2,12"
-                                ></polygon>
-                            </svg>
-                        </button>
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('star')"
-                            title="Star"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <polygon
-                                    points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9"
-                                ></polygon>
-                            </svg>
-                        </button>
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('arrow-right')"
-                            title="Arrow Right"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <polygon
-                                    points="2,8 14,8 14,4 22,12 14,20 14,16 2,16"
-                                ></polygon>
-                            </svg>
-                        </button>
-                        <button
-                            class="shape-btn"
-                            onclick="addShape('callout')"
-                            title="Callout"
-                        >
-                            <svg
-                                width="40"
-                                height="40"
-                                viewBox="0 0 24 24"
-                                fill="#3b82f6"
-                            >
-                                <path
-                                    d="M3,3 L21,3 L21,15 L12,15 L6,21 L6,15 L3,15 Z"
-                                ></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chart Modal -->
-        <div class="modal hidden" id="chart-modal">
-            <div class="modal-content modal-large">
-                <div class="modal-header">
-                    <h3>Insert Chart</h3>
-                    <button
-                        class="btn-close"
-                        onclick="hideModal('chart-modal')"
+                        <rect x="3" y="3" width="18" height="18" rx="6"></rect>
+                    </svg>
+                </button>
+                <button class="shape-btn" data-shape="ellipse" title="Ellipse">
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="chart-type-selector">
-                        <button class="chart-type-btn active" data-type="bar">
-                            <svg
-                                width="32"
-                                height="32"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <rect x="3" y="12" width="4" height="9"></rect>
-                                <rect x="10" y="8" width="4" height="13"></rect>
-                                <rect x="17" y="4" width="4" height="17"></rect>
-                            </svg>
-                            <span>Bar</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="line">
-                            <svg
-                                width="32"
-                                height="32"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <polyline
-                                    points="3,17 8,12 13,16 21,6"
-                                ></polyline>
-                            </svg>
-                            <span>Line</span>
-                        </button>
-                        <button class="chart-type-btn" data-type="pie">
-                            <svg
-                                width="32"
-                                height="32"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path
-                                    d="M12,12 L12,2 A10,10 0 0,1 21,16 Z"
-                                ></path>
-                            </svg>
-                            <span>Pie</span>
-                        </button>
-                    </div>
-                    <div class="chart-data-input">
-                        <label>Chart Data (CSV format)</label>
-                        <textarea
-                            id="chart-data-input"
-                            rows="5"
-                            placeholder="Label,Value
-Q1,100
-Q2,150
-Q3,120
-Q4,200"
-                        ></textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button
-                            class="btn-secondary"
-                            onclick="hideModal('chart-modal')"
-                        >
-                            Cancel
-                        </button>
-                        <button class="btn-primary" onclick="insertChart()">
-                            Insert Chart
-                        </button>
-                    </div>
-                </div>
+                        <ellipse cx="12" cy="12" rx="10" ry="8"></ellipse>
+                    </svg>
+                </button>
+                <button class="shape-btn" data-shape="circle" title="Circle">
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                </button>
+                <button
+                    class="shape-btn"
+                    data-shape="triangle"
+                    title="Triangle"
+                >
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polygon points="12 2 22 22 2 22"></polygon>
+                    </svg>
+                </button>
+                <button class="shape-btn" data-shape="arrow" title="Arrow">
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+                <button class="shape-btn" data-shape="star" title="Star">
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                        ></polygon>
+                    </svg>
+                </button>
+                <button class="shape-btn" data-shape="line" title="Line">
+                    <svg
+                        width="32"
+                        height="32"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="4" y1="20" x2="20" y2="4"></line>
+                    </svg>
+                </button>
             </div>
         </div>
+    </div>
+</div>
 
-        <script src="/suite/slides/slides.js"></script>
-    </body>
-</html>
+<div class="modal hidden" id="notesModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Speaker Notes</h3>
+            <button class="btn-close" id="closeNotesModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <textarea
+                    id="speakerNotes"
+                    rows="8"
+                    placeholder="Add your speaker notes here..."
+                ></textarea>
+            </div>
+            <div class="modal-actions">
+                <button
+                    class="btn-secondary"
+                    onclick="gbSlides.hideModal('notesModal')"
+                >
+                    Cancel
+                </button>
+                <button class="btn-primary" id="saveNotesBtn">
+                    Save Notes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="backgroundModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Slide Background</h3>
+            <button class="btn-close" id="closeBackgroundModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Background Color</label>
+                <input type="color" id="bgColor" value="#ffffff" />
+            </div>
+            <div class="form-group">
+                <label>Or use an image URL</label>
+                <input
+                    type="url"
+                    id="bgImageUrl"
+                    placeholder="https://example.com/background.jpg"
+                />
+            </div>
+            <div class="modal-actions">
+                <button
+                    class="btn-secondary"
+                    onclick="gbSlides.hideModal('backgroundModal')"
+                >
+                    Cancel
+                </button>
+                <button class="btn-primary" id="applyBgBtn">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="context-menu hidden" id="contextMenu">
+    <div class="context-item" data-action="cut">
+        Cut <span class="shortcut">Ctrl+X</span>
+    </div>
+    <div class="context-item" data-action="copy">
+        Copy <span class="shortcut">Ctrl+C</span>
+    </div>
+    <div class="context-item" data-action="paste">
+        Paste <span class="shortcut">Ctrl+V</span>
+    </div>
+    <div class="context-divider"></div>
+    <div class="context-item" data-action="duplicate">
+        Duplicate <span class="shortcut">Ctrl+D</span>
+    </div>
+    <div class="context-item" data-action="delete">
+        Delete <span class="shortcut">Del</span>
+    </div>
+    <div class="context-divider"></div>
+    <div class="context-item" data-action="bringFront">Bring to Front</div>
+    <div class="context-item" data-action="sendBack">Send to Back</div>
+</div>
+
+<div class="context-menu hidden" id="slideContextMenu">
+    <div class="context-item" data-action="newSlide">New Slide</div>
+    <div class="context-item" data-action="duplicateSlide">Duplicate Slide</div>
+    <div class="context-item" data-action="deleteSlide">Delete Slide</div>
+    <div class="context-divider"></div>
+    <div class="context-item" data-action="slideBackground">
+        Change Background
+    </div>
+    <div class="context-item" data-action="slideNotes">Speaker Notes</div>
+</div>
+
+<div class="presenter-modal hidden" id="presenterModal">
+    <div class="presenter-view">
+        <div class="presenter-slide" id="presenterSlide"></div>
+        <div class="presenter-controls">
+            <button class="btn-icon" id="prevSlideBtn" title="Previous Slide">
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <polygon points="15 18 9 12 15 6 15 18"></polygon>
+                </svg>
+            </button>
+            <span class="presenter-slide-number" id="presenterSlideNumber"
+                >1 / 1</span
+            >
+            <button class="btn-icon" id="nextSlideBtn" title="Next Slide">
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+                    <polygon points="9 18 15 12 9 6 9 18"></polygon>
+                </svg>
+            </button>
+            <button class="btn-icon" id="exitPresenterBtn" title="Exit (Esc)">
+                <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script src="slides/slides.js"></script>

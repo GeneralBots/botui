@@ -1,161 +1,19 @@
-<!-- =============================================================================
-     GB DOCS - Word-like Document Editor
-     General Bots Suite Component
-     ============================================================================= -->
+<link rel="stylesheet" href="docs/docs.css" />
 
-<link rel="stylesheet" href="/suite/docs/docs.css" />
-
-<div class="docs-container" id="docs-app">
-    <!-- Sidebar - Documents List -->
-    <aside class="docs-sidebar" id="docs-sidebar">
-        <div class="sidebar-header">
-            <h2 data-i18n="docs-title">Documents</h2>
-            <button
-                class="btn-icon"
-                onclick="gbDocs.toggleSidebar()"
-                title="Toggle sidebar"
-            >
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-        </div>
-
-        <div class="sidebar-search">
+<div class="docs-app" id="docs-app">
+    <div class="docs-toolbar">
+        <div class="toolbar-left">
             <input
                 type="text"
-                placeholder="Search documents..."
-                id="doc-search"
-                hx-get="/api/ui/docs/search"
-                hx-trigger="keyup changed delay:300ms"
-                hx-target="#docs-list"
-                hx-include="this"
+                class="doc-name-input"
+                id="docName"
+                value="Untitled Document"
+                spellcheck="false"
             />
-            <svg
-                class="search-icon"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-            >
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
         </div>
-
-        <div
-            class="docs-list"
-            id="docs-list"
-            hx-get="/api/ui/docs/list"
-            hx-trigger="load"
-            hx-swap="innerHTML"
-        >
-            <div class="loading-placeholder">
-                <div class="loading-spinner"></div>
-                Loading documents...
-            </div>
-        </div>
-
-        <!-- Quick Start Templates -->
-        <div class="sidebar-section">
-            <h3 data-i18n="docs-quick-start">Quick Start</h3>
-            <div class="template-grid">
-                <button
-                    class="template-btn"
-                    hx-post="/api/ui/docs/template/blank"
-                    hx-target="#editor-content"
-                >
-                    <span class="template-icon">📄</span>
-                    <span>Blank</span>
-                </button>
-                <button
-                    class="template-btn"
-                    hx-post="/api/ui/docs/template/meeting"
-                    hx-target="#editor-content"
-                >
-                    <span class="template-icon">📋</span>
-                    <span>Meeting</span>
-                </button>
-                <button
-                    class="template-btn"
-                    hx-post="/api/ui/docs/template/report"
-                    hx-target="#editor-content"
-                >
-                    <span class="template-icon">📊</span>
-                    <span>Report</span>
-                </button>
-                <button
-                    class="template-btn"
-                    hx-post="/api/ui/docs/template/letter"
-                    hx-target="#editor-content"
-                >
-                    <span class="template-icon">✉️</span>
-                    <span>Letter</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="sidebar-actions">
-            <button class="btn-new-doc" onclick="gbDocs.createNewDocument()">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <span data-i18n="new-document">New Document</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- Main Editor Area -->
-    <main class="docs-main">
-        <!-- Editor Toolbar -->
-        <div class="editor-toolbar" id="editor-toolbar">
-            <!-- Left: Document Actions -->
-            <div class="toolbar-left">
-                <button
-                    class="btn-icon"
-                    onclick="gbDocs.toggleSidebar()"
-                    title="Toggle Sidebar"
-                >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                        <line x1="9" y1="3" x2="9" y2="21"></line>
-                    </svg>
-                </button>
-                <input
-                    type="text"
-                    class="doc-title-input"
-                    id="doc-title"
-                    value="Untitled Document"
-                    onchange="gbDocs.renameDocument(this.value)"
-                />
-                <span class="toolbar-divider"></span>
-                <button class="btn-icon" data-cmd="undo" title="Undo (Ctrl+Z)">
+        <div class="toolbar-center">
+            <div class="toolbar-group">
+                <button class="btn-icon" id="undoBtn" title="Undo (Ctrl+Z)">
                     <svg
                         width="16"
                         height="16"
@@ -166,11 +24,11 @@
                     >
                         <path d="M3 7v6h6"></path>
                         <path
-                            d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"
+                            d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"
                         ></path>
                     </svg>
                 </button>
-                <button class="btn-icon" data-cmd="redo" title="Redo (Ctrl+Y)">
+                <button class="btn-icon" id="redoBtn" title="Redo (Ctrl+Y)">
                     <svg
                         width="16"
                         height="16"
@@ -180,328 +38,539 @@
                         stroke-width="2"
                     >
                         <path d="M21 7v6h-6"></path>
-                        <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"></path>
+                        <path
+                            d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"
+                        ></path>
                     </svg>
                 </button>
             </div>
-
-            <!-- Center: Formatting -->
-            <div class="toolbar-center">
-                <!-- Heading Select -->
-                <div class="toolbar-group">
-                    <select
-                        class="toolbar-select"
-                        id="heading-select"
-                        title="Heading Style"
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <select
+                    class="toolbar-select heading-select"
+                    id="headingSelect"
+                >
+                    <option value="p">Normal</option>
+                    <option value="h1">Heading 1</option>
+                    <option value="h2">Heading 2</option>
+                    <option value="h3">Heading 3</option>
+                </select>
+                <select class="toolbar-select font-family" id="fontFamily">
+                    <option value="Arial">Arial</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times</option>
+                    <option value="Courier New">Courier</option>
+                    <option value="Verdana">Verdana</option>
+                </select>
+                <select class="toolbar-select font-size" id="fontSize">
+                    <option value="1">8</option>
+                    <option value="2">10</option>
+                    <option value="3" selected>12</option>
+                    <option value="4">14</option>
+                    <option value="5">18</option>
+                    <option value="6">24</option>
+                    <option value="7">36</option>
+                </select>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group format-group">
+                <button class="btn-icon" id="boldBtn" title="Bold (Ctrl+B)">
+                    <strong>B</strong>
+                </button>
+                <button class="btn-icon" id="italicBtn" title="Italic (Ctrl+I)">
+                    <em>I</em>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="underlineBtn"
+                    title="Underline (Ctrl+U)"
+                >
+                    <u>U</u>
+                </button>
+                <button class="btn-icon" id="strikeBtn" title="Strikethrough">
+                    <s>S</s>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button
+                    class="btn-icon color-btn"
+                    id="textColorBtn"
+                    title="Text Color"
+                >
+                    <span class="color-letter">A</span>
+                    <span
+                        class="color-indicator"
+                        id="textColorIndicator"
+                    ></span>
+                    <input
+                        type="color"
+                        class="color-input"
+                        id="textColorInput"
+                        value="#000000"
+                    />
+                </button>
+                <button
+                    class="btn-icon color-btn"
+                    id="highlightBtn"
+                    title="Highlight"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
                     >
-                        <option value="p">Paragraph</option>
-                        <option value="h1">Heading 1</option>
-                        <option value="h2">Heading 2</option>
-                        <option value="h3">Heading 3</option>
-                    </select>
-                </div>
-
-                <span class="toolbar-divider"></span>
-
-                <!-- Text Formatting -->
-                <div class="toolbar-group">
-                    <button
-                        class="btn-icon"
-                        data-cmd="bold"
-                        title="Bold (Ctrl+B)"
-                    >
-                        <strong>B</strong>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="italic"
-                        title="Italic (Ctrl+I)"
-                    >
-                        <em>I</em>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="underline"
-                        title="Underline (Ctrl+U)"
-                    >
-                        <u>U</u>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="strikethrough"
-                        title="Strikethrough"
-                    >
-                        <s>S</s>
-                    </button>
-                </div>
-
-                <span class="toolbar-divider"></span>
-
-                <!-- Text Color -->
-                <div class="toolbar-group">
-                    <button class="btn-icon color-picker" title="Text Color">
-                        <span>A</span>
-                        <span
-                            class="color-indicator"
-                            id="text-color-indicator"
-                            style="background: #000000"
-                        ></span>
-                        <input
-                            type="color"
-                            class="color-input"
-                            id="text-color"
-                            value="#000000"
+                        <path
+                            d="M15.243 4.515l-6.738 6.737-.707 2.121-1.04 1.041 2.828 2.828 1.04-1.04 2.122-.707 6.737-6.738-4.242-4.242zm6.364 3.536a1 1 0 0 1 0 1.414l-7.778 7.778-2.122.707-1.414 1.414a1 1 0 0 1-1.414 0l-4.243-4.243a1 1 0 0 1 0-1.414l1.414-1.414.707-2.121 7.778-7.778a1 1 0 0 1 1.414 0l5.657 5.657z"
                         />
-                    </button>
-                    <button
-                        class="btn-icon color-picker"
-                        title="Highlight Color"
+                    </svg>
+                    <span
+                        class="color-indicator bg-indicator"
+                        id="highlightIndicator"
+                    ></span>
+                    <input
+                        type="color"
+                        class="color-input"
+                        id="highlightInput"
+                        value="#ffff00"
+                    />
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button class="btn-icon" id="alignLeftBtn" title="Align Left">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="15" y2="12"></line>
+                        <line x1="3" y1="18" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="alignCenterBtn"
+                    title="Align Center"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="6" y1="12" x2="18" y2="12"></line>
+                        <line x1="4" y1="18" x2="20" y2="18"></line>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="alignRightBtn" title="Align Right">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="9" y1="12" x2="21" y2="12"></line>
+                        <line x1="6" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="justifyBtn" title="Justify">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button class="btn-icon" id="bulletListBtn" title="Bullet List">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="9" y1="6" x2="21" y2="6"></line>
+                        <line x1="9" y1="12" x2="21" y2="12"></line>
+                        <line x1="9" y1="18" x2="21" y2="18"></line>
+                        <circle
+                            cx="4"
+                            cy="6"
+                            r="2"
+                            fill="currentColor"
+                        ></circle>
+                        <circle
+                            cx="4"
+                            cy="12"
+                            r="2"
+                            fill="currentColor"
+                        ></circle>
+                        <circle
+                            cx="4"
+                            cy="18"
+                            r="2"
+                            fill="currentColor"
+                        ></circle>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="numberListBtn"
+                    title="Numbered List"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="10" y1="6" x2="21" y2="6"></line>
+                        <line x1="10" y1="12" x2="21" y2="12"></line>
+                        <line x1="10" y1="18" x2="21" y2="18"></line>
+                        <text
+                            x="2"
+                            y="8"
+                            font-size="8"
+                            fill="currentColor"
+                            stroke="none"
+                        >
+                            1
+                        </text>
+                        <text
+                            x="2"
+                            y="14"
+                            font-size="8"
+                            fill="currentColor"
+                            stroke="none"
+                        >
+                            2
+                        </text>
+                        <text
+                            x="2"
+                            y="20"
+                            font-size="8"
+                            fill="currentColor"
+                            stroke="none"
+                        >
+                            3
+                        </text>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="indentBtn" title="Increase Indent">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="9" y1="12" x2="21" y2="12"></line>
+                        <line x1="9" y1="18" x2="21" y2="18"></line>
+                        <polyline points="3 10 6 12 3 14"></polyline>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="outdentBtn"
+                    title="Decrease Indent"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="9" y1="12" x2="21" y2="12"></line>
+                        <line x1="9" y1="18" x2="21" y2="18"></line>
+                        <polyline points="6 10 3 12 6 14"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button class="btn-icon" id="linkBtn" title="Insert Link">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
+                        ></path>
+                        <path
+                            d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
+                        ></path>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="imageBtn" title="Insert Image">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        ></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="tableBtn" title="Insert Table">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="3" y1="15" x2="21" y2="15"></line>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                        <line x1="15" y1="3" x2="15" y2="21"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <div class="collaborators" id="collaborators"></div>
+            <button class="btn-primary" id="shareBtn">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                <span>Share</span>
+            </button>
+            <button
+                class="btn-icon chat-toggle"
+                id="chatToggle"
+                title="Toggle AI Chat"
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                    ></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="docs-main">
+        <div class="docs-canvas">
+            <div class="editor-page" id="editorPage">
+                <div
+                    class="editor-content"
+                    id="editorContent"
+                    contenteditable="true"
+                    spellcheck="true"
+                    data-placeholder="Start typing..."
+                ></div>
+            </div>
+        </div>
+
+        <aside class="chat-panel" id="chatPanel">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <div class="chat-avatar">
                         <svg
-                            width="16"
-                            height="16"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             stroke-width="2"
                         >
-                            <path d="M12 20h9"></path>
                             <path
-                                d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"
-                            ></path>
-                        </svg>
-                        <span
-                            class="color-indicator"
-                            id="highlight-color-indicator"
-                            style="background: #ffff00"
-                        ></span>
-                        <input
-                            type="color"
-                            class="color-input"
-                            id="highlight-color"
-                            value="#ffff00"
-                        />
-                    </button>
-                </div>
-
-                <span class="toolbar-divider"></span>
-
-                <!-- Alignment -->
-                <div class="toolbar-group">
-                    <button
-                        class="btn-icon"
-                        data-cmd="alignLeft"
-                        title="Align Left"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="17" y1="10" x2="3" y2="10"></line>
-                            <line x1="21" y1="6" x2="3" y2="6"></line>
-                            <line x1="21" y1="14" x2="3" y2="14"></line>
-                            <line x1="17" y1="18" x2="3" y2="18"></line>
-                        </svg>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="alignCenter"
-                        title="Align Center"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="18" y1="10" x2="6" y2="10"></line>
-                            <line x1="21" y1="6" x2="3" y2="6"></line>
-                            <line x1="21" y1="14" x2="3" y2="14"></line>
-                            <line x1="18" y1="18" x2="6" y2="18"></line>
-                        </svg>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="alignRight"
-                        title="Align Right"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="21" y1="10" x2="7" y2="10"></line>
-                            <line x1="21" y1="6" x2="3" y2="6"></line>
-                            <line x1="21" y1="14" x2="3" y2="14"></line>
-                            <line x1="21" y1="18" x2="7" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-
-                <span class="toolbar-divider"></span>
-
-                <!-- Lists -->
-                <div class="toolbar-group">
-                    <button
-                        class="btn-icon"
-                        data-cmd="bullet"
-                        title="Bullet List"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="8" y1="6" x2="21" y2="6"></line>
-                            <line x1="8" y1="12" x2="21" y2="12"></line>
-                            <line x1="8" y1="18" x2="21" y2="18"></line>
-                            <circle
-                                cx="4"
-                                cy="6"
-                                r="1"
-                                fill="currentColor"
-                            ></circle>
-                            <circle
-                                cx="4"
-                                cy="12"
-                                r="1"
-                                fill="currentColor"
-                            ></circle>
-                            <circle
-                                cx="4"
-                                cy="18"
-                                r="1"
-                                fill="currentColor"
-                            ></circle>
-                        </svg>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="number"
-                        title="Numbered List"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="10" y1="6" x2="21" y2="6"></line>
-                            <line x1="10" y1="12" x2="21" y2="12"></line>
-                            <line x1="10" y1="18" x2="21" y2="18"></line>
-                            <text
-                                x="3"
-                                y="8"
-                                font-size="8"
-                                fill="currentColor"
-                                stroke="none"
-                            >
-                                1
-                            </text>
-                            <text
-                                x="3"
-                                y="14"
-                                font-size="8"
-                                fill="currentColor"
-                                stroke="none"
-                            >
-                                2
-                            </text>
-                            <text
-                                x="3"
-                                y="20"
-                                font-size="8"
-                                fill="currentColor"
-                                stroke="none"
-                            >
-                                3
-                            </text>
-                        </svg>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="indent"
-                        title="Increase Indent"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="21" y1="6" x2="11" y2="6"></line>
-                            <line x1="21" y1="12" x2="11" y2="12"></line>
-                            <line x1="21" y1="18" x2="11" y2="18"></line>
-                            <polyline points="3 8 7 12 3 16"></polyline>
-                        </svg>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="outdent"
-                        title="Decrease Indent"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <line x1="21" y1="6" x2="11" y2="6"></line>
-                            <line x1="21" y1="12" x2="11" y2="12"></line>
-                            <line x1="21" y1="18" x2="11" y2="18"></line>
-                            <polyline points="7 8 3 12 7 16"></polyline>
-                        </svg>
-                    </button>
-                </div>
-
-                <span class="toolbar-divider"></span>
-
-                <!-- Insert -->
-                <div class="toolbar-group">
-                    <button
-                        class="btn-icon"
-                        data-cmd="link"
-                        title="Insert Link"
-                    >
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
+                                d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"
+                            />
+                            <circle cx="12" cy="10" r="3" />
                             <path
-                                d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
-                            ></path>
-                            <path
-                                d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
-                            ></path>
+                                d="M12 15c-3 0-5 1.5-5 3v1h10v-1c0-1.5-2-3-5-3z"
+                            />
                         </svg>
-                    </button>
-                    <button
-                        class="btn-icon"
-                        data-cmd="image"
-                        title="Insert Image"
+                    </div>
+                    <div>
+                        <h3>AI Assistant</h3>
+                        <span class="chat-status">Ready to help</span>
+                    </div>
+                </div>
+                <button class="chat-close" id="chatClose" title="Close">
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
                     >
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-message assistant">
+                    <div class="message-bubble">
+                        <p>
+                            Hi! I can help you edit your document. Try asking me
+                            to:
+                        </p>
+                        <ul>
+                            <li>Make text shorter or longer</li>
+                            <li>Fix grammar and spelling</li>
+                            <li>Translate to another language</li>
+                            <li>Change the tone (formal/casual)</li>
+                            <li>Add a summary</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-suggestions" id="chatSuggestions">
+                <button class="suggestion-btn" data-action="shorter">
+                    Make shorter
+                </button>
+                <button class="suggestion-btn" data-action="grammar">
+                    Fix grammar
+                </button>
+                <button class="suggestion-btn" data-action="formal">
+                    Make formal
+                </button>
+                <button class="suggestion-btn" data-action="summarize">
+                    Summarize
+                </button>
+            </div>
+            <form class="chat-input-container" id="chatForm">
+                <input
+                    type="text"
+                    class="chat-input"
+                    id="chatInput"
+                    placeholder="Ask me to edit your document..."
+                    autocomplete="off"
+                />
+                <button
+                    type="submit"
+                    class="chat-send"
+                    id="chatSend"
+                    title="Send"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+        </aside>
+    </div>
+
+    <div class="docs-status-bar">
+        <div class="status-left">
+            <span id="pageInfo">Page 1 of 1</span>
+        </div>
+        <div class="status-center">
+            <span id="wordCount">0 words</span>
+            <span class="status-divider">|</span>
+            <span id="charCount">0 characters</span>
+        </div>
+        <div class="status-right">
+            <span id="saveStatus">Saved</span>
+            <div class="zoom-control">
+                <button class="btn-zoom" id="zoomOutBtn">−</button>
+                <span id="zoomLevel">100%</span>
+                <button class="btn-zoom" id="zoomInBtn">+</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="shareModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Share Document</h3>
+            <button class="btn-close" id="closeShareModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="share-input-group">
+                <input
+                    type="email"
+                    placeholder="Enter email address"
+                    id="shareEmail"
+                />
+                <select id="sharePermission">
+                    <option value="view">Can view</option>
+                    <option value="comment">Can comment</option>
+                    <option value="edit">Can edit</option>
+                </select>
+                <button class="btn-primary" id="sendShareBtn">Share</button>
+            </div>
+            <div class="share-link-section">
+                <h4>Or share with link</h4>
+                <div class="share-link-group">
+                    <input type="text" readonly id="shareLink" />
+                    <button class="btn-icon" id="copyLinkBtn" title="Copy link">
                         <svg
                             width="16"
                             height="16"
@@ -511,434 +580,16 @@
                             stroke-width="2"
                         >
                             <rect
-                                x="3"
-                                y="3"
-                                width="18"
-                                height="18"
+                                x="9"
+                                y="9"
+                                width="13"
+                                height="13"
                                 rx="2"
                             ></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
+                            <path
+                                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                            ></path>
                         </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Right: Actions -->
-            <div class="toolbar-right">
-                <button class="btn-ai" id="ai-assist-btn" title="AI Assistant">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path
-                            d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                        ></path>
-                    </svg>
-                    <span>AI</span>
-                </button>
-                <button
-                    class="btn-icon"
-                    onclick="gbDocs.showModal('export-modal')"
-                    title="Export"
-                >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path
-                            d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"
-                        ></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                </button>
-                <button
-                    class="btn-icon"
-                    onclick="gbDocs.toggleFocusMode()"
-                    title="Focus Mode"
-                >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path
-                            d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"
-                        ></path>
-                    </svg>
-                </button>
-                <button
-                    class="btn-primary"
-                    id="save-btn"
-                    onclick="gbDocs.saveDocument()"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path
-                            d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"
-                        ></path>
-                        <polyline points="17,21 17,13 7,13 7,21"></polyline>
-                        <polyline points="7,3 7,8 15,8"></polyline>
-                    </svg>
-                    <span>Save</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Editor Canvas -->
-        <div class="editor-canvas">
-            <div class="editor-page">
-                <div
-                    class="editor-title"
-                    id="editor-title"
-                    contenteditable="true"
-                    data-placeholder="Untitled Document"
-                >
-                    Untitled Document
-                </div>
-                <div
-                    class="editor-content"
-                    id="editor-content"
-                    contenteditable="true"
-                    data-placeholder="Start typing or use / for commands..."
-                ></div>
-            </div>
-        </div>
-
-        <!-- Status Bar -->
-        <div class="docs-status-bar">
-            <div class="status-left">
-                <span class="status-item" id="word-count">0 words</span>
-                <span class="status-item" id="char-count">0 characters</span>
-            </div>
-            <div class="status-center">
-                <span class="save-status" id="save-status"></span>
-            </div>
-            <div class="status-right">
-                <span class="status-item" id="last-edited"></span>
-            </div>
-        </div>
-    </main>
-
-    <!-- Slash Command Menu -->
-    <div class="slash-menu hidden" id="slash-menu">
-        <div class="slash-menu-header">Basic Blocks</div>
-        <div class="slash-menu-items">
-            <div class="slash-item" data-cmd="h1">
-                <div class="slash-icon">H1</div>
-                <div class="slash-text">
-                    <div class="slash-label">Heading 1</div>
-                    <div class="slash-desc">Large section heading</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="h2">
-                <div class="slash-icon">H2</div>
-                <div class="slash-text">
-                    <div class="slash-label">Heading 2</div>
-                    <div class="slash-desc">Medium section heading</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="h3">
-                <div class="slash-icon">H3</div>
-                <div class="slash-text">
-                    <div class="slash-label">Heading 3</div>
-                    <div class="slash-desc">Small section heading</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="paragraph">
-                <div class="slash-icon">¶</div>
-                <div class="slash-text">
-                    <div class="slash-label">Paragraph</div>
-                    <div class="slash-desc">Plain text paragraph</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="bullet">
-                <div class="slash-icon">•</div>
-                <div class="slash-text">
-                    <div class="slash-label">Bullet List</div>
-                    <div class="slash-desc">Unordered list</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="number">
-                <div class="slash-icon">1.</div>
-                <div class="slash-text">
-                    <div class="slash-label">Numbered List</div>
-                    <div class="slash-desc">Ordered list</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="todo">
-                <div class="slash-icon">☐</div>
-                <div class="slash-text">
-                    <div class="slash-label">To-Do</div>
-                    <div class="slash-desc">Checkbox task item</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="quote">
-                <div class="slash-icon">"</div>
-                <div class="slash-text">
-                    <div class="slash-label">Quote</div>
-                    <div class="slash-desc">Blockquote text</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="code">
-                <div class="slash-icon">&lt;/&gt;</div>
-                <div class="slash-text">
-                    <div class="slash-label">Code Block</div>
-                    <div class="slash-desc">Preformatted code</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="divider">
-                <div class="slash-icon">—</div>
-                <div class="slash-text">
-                    <div class="slash-label">Divider</div>
-                    <div class="slash-desc">Horizontal line</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="callout">
-                <div class="slash-icon">💡</div>
-                <div class="slash-text">
-                    <div class="slash-label">Callout</div>
-                    <div class="slash-desc">Highlighted notice</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="table">
-                <div class="slash-icon">⊞</div>
-                <div class="slash-text">
-                    <div class="slash-label">Table</div>
-                    <div class="slash-desc">Insert a table</div>
-                </div>
-            </div>
-            <div class="slash-item" data-cmd="image">
-                <div class="slash-icon">🖼</div>
-                <div class="slash-text">
-                    <div class="slash-label">Image</div>
-                    <div class="slash-desc">Insert an image</div>
-                </div>
-            </div>
-
-            <div class="slash-menu-divider"></div>
-            <div class="slash-menu-header">AI Assist</div>
-
-            <div class="slash-item ai-item" data-cmd="ai-write">
-                <div class="slash-icon">✨</div>
-                <div class="slash-text">
-                    <div class="slash-label">AI Write</div>
-                    <div class="slash-desc">Generate content with AI</div>
-                </div>
-            </div>
-            <div class="slash-item ai-item" data-cmd="ai-improve">
-                <div class="slash-icon">🔄</div>
-                <div class="slash-text">
-                    <div class="slash-label">AI Improve</div>
-                    <div class="slash-desc">Enhance selected text</div>
-                </div>
-            </div>
-            <div class="slash-item ai-item" data-cmd="ai-summarize">
-                <div class="slash-icon">📝</div>
-                <div class="slash-text">
-                    <div class="slash-label">AI Summarize</div>
-                    <div class="slash-desc">Summarize selected text</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- AI Panel -->
-    <div class="ai-panel hidden" id="ai-panel">
-        <div class="ai-panel-header">
-            <h3>AI Assistant</h3>
-            <button class="btn-close" id="close-ai-panel">×</button>
-        </div>
-        <div class="ai-panel-content">
-            <!-- Quick Actions -->
-            <div class="ai-quick-actions">
-                <button class="ai-action-btn" data-action="improve">
-                    ✨ Improve
-                </button>
-                <button class="ai-action-btn" data-action="shorten">
-                    📏 Shorten
-                </button>
-                <button class="ai-action-btn" data-action="expand">
-                    📖 Expand
-                </button>
-                <button class="ai-action-btn" data-action="fix">
-                    🔧 Fix Grammar
-                </button>
-            </div>
-
-            <!-- Tone Selection -->
-            <div class="ai-section">
-                <span class="ai-section-label">Change Tone</span>
-                <div class="tone-buttons">
-                    <button class="tone-btn" data-tone="professional">
-                        Professional
-                    </button>
-                    <button class="tone-btn" data-tone="casual">Casual</button>
-                    <button class="tone-btn" data-tone="friendly">
-                        Friendly
-                    </button>
-                    <button class="tone-btn" data-tone="formal">Formal</button>
-                </div>
-            </div>
-
-            <!-- Translate -->
-            <div class="ai-section">
-                <span class="ai-section-label">Translate To</span>
-                <select class="ai-select" id="translate-language">
-                    <option value="">Select language...</option>
-                    <option value="en">English</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                    <option value="de">German</option>
-                    <option value="pt">Portuguese</option>
-                    <option value="zh">Chinese</option>
-                    <option value="ja">Japanese</option>
-                </select>
-                <button
-                    class="btn-primary"
-                    style="width: 100%; margin-top: 8px"
-                    data-action="translate"
-                >
-                    Translate
-                </button>
-            </div>
-
-            <!-- Custom Prompt -->
-            <div class="ai-section">
-                <span class="ai-section-label">Custom Request</span>
-                <textarea
-                    class="ai-textarea"
-                    id="selected-text-input"
-                    placeholder="Describe what you want AI to do..."
-                ></textarea>
-                <button
-                    class="btn-primary"
-                    style="width: 100%; margin-top: 8px"
-                    data-action="custom"
-                >
-                    Generate
-                </button>
-            </div>
-
-            <!-- AI Response -->
-            <div class="ai-response hidden" id="ai-response">
-                <div class="ai-response-header">
-                    <span>AI Response</span>
-                    <div class="ai-response-actions">
-                        <button
-                            class="btn-icon"
-                            id="copy-ai-response"
-                            title="Copy"
-                        >
-                            <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <rect
-                                    x="9"
-                                    y="9"
-                                    width="13"
-                                    height="13"
-                                    rx="2"
-                                ></rect>
-                                <path
-                                    d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"
-                                ></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="ai-response-content" id="ai-response-content"></div>
-                <div style="padding: 12px; display: flex; gap: 8px">
-                    <button
-                        class="btn-primary"
-                        id="insert-ai-response"
-                        style="flex: 1"
-                    >
-                        Insert
-                    </button>
-                    <button
-                        class="btn-primary"
-                        id="replace-ai-response"
-                        style="flex: 1; background: #64748b"
-                    >
-                        Replace
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Export Modal -->
-    <div class="modal hidden" id="export-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Export Document</h3>
-                <button
-                    class="btn-close"
-                    onclick="gbDocs.hideModal('export-modal')"
-                >
-                    ×
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="export-options">
-                    <button
-                        class="export-option"
-                        onclick="gbDocs.exportDocument('pdf')"
-                    >
-                        <span class="export-icon">📄</span>
-                        <span class="export-label">PDF</span>
-                    </button>
-                    <button
-                        class="export-option"
-                        onclick="gbDocs.exportDocument('docx')"
-                    >
-                        <span class="export-icon">📝</span>
-                        <span class="export-label">Word</span>
-                    </button>
-                    <button
-                        class="export-option"
-                        onclick="gbDocs.exportDocument('html')"
-                    >
-                        <span class="export-icon">🌐</span>
-                        <span class="export-label">HTML</span>
-                    </button>
-                    <button
-                        class="export-option"
-                        onclick="gbDocs.exportDocument('txt')"
-                    >
-                        <span class="export-icon">📃</span>
-                        <span class="export-label">Text</span>
-                    </button>
-                    <button
-                        class="export-option"
-                        onclick="gbDocs.exportDocument('md')"
-                    >
-                        <span class="export-icon">📋</span>
-                        <span class="export-label">Markdown</span>
                     </button>
                 </div>
             </div>
@@ -946,4 +597,138 @@
     </div>
 </div>
 
-<script src="/suite/docs/docs.js"></script>
+<div class="modal hidden" id="linkModal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>Insert Link</h3>
+            <button class="btn-close" id="closeLinkModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>URL</label>
+                <input
+                    type="url"
+                    id="linkUrl"
+                    placeholder="https://example.com"
+                />
+            </div>
+            <div class="form-group">
+                <label>Text (optional)</label>
+                <input type="text" id="linkText" placeholder="Link text" />
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelLinkBtn">Cancel</button>
+                <button class="btn-primary" id="insertLinkBtn">Insert</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="imageModal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>Insert Image</h3>
+            <button class="btn-close" id="closeImageModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Image URL</label>
+                <input
+                    type="url"
+                    id="imageUrl"
+                    placeholder="https://example.com/image.jpg"
+                />
+            </div>
+            <div class="form-group">
+                <label>Alt text</label>
+                <input
+                    type="text"
+                    id="imageAlt"
+                    placeholder="Image description"
+                />
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelImageBtn">
+                    Cancel
+                </button>
+                <button class="btn-primary" id="insertImageBtn">Insert</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="tableModal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>Insert Table</h3>
+            <button class="btn-close" id="closeTableModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="table-size-selector">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Rows</label>
+                        <input
+                            type="number"
+                            id="tableRows"
+                            value="3"
+                            min="1"
+                            max="20"
+                        />
+                    </div>
+                    <div class="form-group">
+                        <label>Columns</label>
+                        <input
+                            type="number"
+                            id="tableCols"
+                            value="3"
+                            min="1"
+                            max="10"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelTableBtn">
+                    Cancel
+                </button>
+                <button class="btn-primary" id="insertTableBtn">Insert</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="exportModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Export Document</h3>
+            <button class="btn-close" id="closeExportModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="export-options">
+                <button class="export-option" data-format="pdf">
+                    <div class="export-icon">📄</div>
+                    <div class="export-label">PDF</div>
+                </button>
+                <button class="export-option" data-format="docx">
+                    <div class="export-icon">📝</div>
+                    <div class="export-label">Word</div>
+                </button>
+                <button class="export-option" data-format="html">
+                    <div class="export-icon">🌐</div>
+                    <div class="export-label">HTML</div>
+                </button>
+                <button class="export-option" data-format="txt">
+                    <div class="export-icon">📃</div>
+                    <div class="export-label">Text</div>
+                </button>
+                <button class="export-option" data-format="md">
+                    <div class="export-icon">✏️</div>
+                    <div class="export-label">Markdown</div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="docs/docs.js"></script>

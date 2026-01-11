@@ -1,24 +1,11 @@
-/* =============================================================================
-   GB DOCS - Word-like Document Editor JavaScript
-   General Bots Suite Component
-   ============================================================================= */
-
 (function () {
   "use strict";
-
-  // =============================================================================
-  // CONFIGURATION
-  // =============================================================================
 
   const CONFIG = {
     AUTOSAVE_DELAY: 3000,
     MAX_HISTORY: 50,
     WS_RECONNECT_DELAY: 5000,
   };
-
-  // =============================================================================
-  // STATE
-  // =============================================================================
 
   const state = {
     docId: null,
@@ -30,64 +17,44 @@
     autoSaveTimer: null,
     ws: null,
     collaborators: [],
-    slashPosition: null,
-    isAIPanelOpen: false,
-    focusMode: false,
+    chatPanelOpen: true,
     driveSource: null,
+    zoom: 100,
   };
 
-  // =============================================================================
-  // DOM ELEMENTS
-  // =============================================================================
-
-  const elements = {
-    container: null,
-    sidebar: null,
-    docsList: null,
-    docTitleInput: null,
-    editorTitle: null,
-    editorContent: null,
-    slashMenu: null,
-    aiPanel: null,
-    wordCount: null,
-    charCount: null,
-    saveStatus: null,
-    exportModal: null,
-  };
-
-  // =============================================================================
-  // INITIALIZATION
-  // =============================================================================
+  const elements = {};
 
   function init() {
     cacheElements();
     bindEvents();
     loadFromUrlParams();
-    setupSlashMenu();
-    setupAIPanel();
     setupToolbar();
     setupKeyboardShortcuts();
     updateWordCount();
+    connectWebSocket();
   }
 
   function cacheElements() {
-    elements.container = document.querySelector(".docs-container");
-    elements.sidebar = document.getElementById("docs-sidebar");
-    elements.docsList = document.getElementById("docs-list");
-    elements.docTitleInput = document.getElementById("doc-title");
-    elements.editorTitle = document.getElementById("editor-title");
-    elements.editorContent = document.getElementById("editor-content");
-    elements.slashMenu = document.getElementById("slash-menu");
-    elements.aiPanel = document.getElementById("ai-panel");
-    elements.wordCount = document.getElementById("word-count");
-    elements.charCount = document.getElementById("char-count");
-    elements.saveStatus = document.getElementById("save-status");
-    elements.exportModal = document.getElementById("export-modal");
+    elements.app = document.getElementById("docs-app");
+    elements.docName = document.getElementById("docName");
+    elements.editorContent = document.getElementById("editorContent");
+    elements.editorPage = document.getElementById("editorPage");
+    elements.collaborators = document.getElementById("collaborators");
+    elements.pageInfo = document.getElementById("pageInfo");
+    elements.wordCount = document.getElementById("wordCount");
+    elements.charCount = document.getElementById("charCount");
+    elements.saveStatus = document.getElementById("saveStatus");
+    elements.zoomLevel = document.getElementById("zoomLevel");
+    elements.chatPanel = document.getElementById("chatPanel");
+    elements.chatMessages = document.getElementById("chatMessages");
+    elements.chatInput = document.getElementById("chatInput");
+    elements.chatForm = document.getElementById("chatForm");
+    elements.shareModal = document.getElementById("shareModal");
+    elements.linkModal = document.getElementById("linkModal");
+    elements.imageModal = document.getElementById("imageModal");
+    elements.tableModal = document.getElementById("tableModal");
+    elements.exportModal = document.getElementById("exportModal");
   }
-
-  // =============================================================================
-  // EVENT BINDING
-  // =============================================================================
 
   function bindEvents() {
     if (elements.editorContent) {
@@ -96,611 +63,320 @@
       elements.editorContent.addEventListener("paste", handlePaste);
     }
 
-    if (elements.editorTitle) {
-      elements.editorTitle.addEventListener("input", handleTitleInput);
-      elements.editorTitle.addEventListener("keydown", handleTitleKeydown);
+    if (elements.docName) {
+      elements.docName.addEventListener("change", handleDocNameChange);
+      elements.docName.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          elements.editorContent?.focus();
+        }
+      });
     }
 
-    document.addEventListener("click", handleDocumentClick);
+    document.getElementById("undoBtn")?.addEventListener("click", undo);
+    document.getElementById("redoBtn")?.addEventListener("click", redo);
+    document
+      .getElementById("boldBtn")
+      ?.addEventListener("click", () => execCommand("bold"));
+    document
+      .getElementById("italicBtn")
+      ?.addEventListener("click", () => execCommand("italic"));
+    document
+      .getElementById("underlineBtn")
+      ?.addEventListener("click", () => execCommand("underline"));
+    document
+      .getElementById("strikeBtn")
+      ?.addEventListener("click", () => execCommand("strikeThrough"));
+
+    document
+      .getElementById("alignLeftBtn")
+      ?.addEventListener("click", () => execCommand("justifyLeft"));
+    document
+      .getElementById("alignCenterBtn")
+      ?.addEventListener("click", () => execCommand("justifyCenter"));
+    document
+      .getElementById("alignRightBtn")
+      ?.addEventListener("click", () => execCommand("justifyRight"));
+    document
+      .getElementById("alignJustifyBtn")
+      ?.addEventListener("click", () => execCommand("justifyFull"));
+
+    document
+      .getElementById("bulletListBtn")
+      ?.addEventListener("click", () => execCommand("insertUnorderedList"));
+    document
+      .getElementById("numberListBtn")
+      ?.addEventListener("click", () => execCommand("insertOrderedList"));
+    document
+      .getElementById("indentBtn")
+      ?.addEventListener("click", () => execCommand("indent"));
+    document
+      .getElementById("outdentBtn")
+      ?.addEventListener("click", () => execCommand("outdent"));
+
+    document
+      .getElementById("linkBtn")
+      ?.addEventListener("click", () => showModal("linkModal"));
+    document
+      .getElementById("imageBtn")
+      ?.addEventListener("click", () => showModal("imageModal"));
+    document
+      .getElementById("tableBtn")
+      ?.addEventListener("click", () => showModal("tableModal"));
+
+    document
+      .getElementById("shareBtn")
+      ?.addEventListener("click", () => showModal("shareModal"));
+
+    document
+      .getElementById("headingSelect")
+      ?.addEventListener("change", handleHeadingChange);
+    document
+      .getElementById("fontFamily")
+      ?.addEventListener("change", handleFontFamilyChange);
+    document
+      .getElementById("fontSize")
+      ?.addEventListener("change", handleFontSizeChange);
+
+    document.getElementById("textColorBtn")?.addEventListener("click", () => {
+      document.getElementById("textColorPicker")?.click();
+    });
+    document
+      .getElementById("textColorPicker")
+      ?.addEventListener("input", handleTextColorChange);
+    document.getElementById("highlightBtn")?.addEventListener("click", () => {
+      document.getElementById("highlightPicker")?.click();
+    });
+    document
+      .getElementById("highlightPicker")
+      ?.addEventListener("input", handleHighlightChange);
+
+    document.getElementById("zoomInBtn")?.addEventListener("click", zoomIn);
+    document.getElementById("zoomOutBtn")?.addEventListener("click", zoomOut);
+
+    document
+      .getElementById("chatToggle")
+      ?.addEventListener("click", toggleChatPanel);
+    document
+      .getElementById("chatClose")
+      ?.addEventListener("click", toggleChatPanel);
+    elements.chatForm?.addEventListener("submit", handleChatSubmit);
+
+    document.querySelectorAll(".suggestion-btn").forEach((btn) => {
+      btn.addEventListener("click", () =>
+        handleSuggestionClick(btn.dataset.action),
+      );
+    });
+
+    document.querySelectorAll(".btn-close, .modal").forEach((el) => {
+      el.addEventListener("click", (e) => {
+        if (e.target === el) closeModals();
+      });
+    });
+
+    document
+      .getElementById("closeShareModal")
+      ?.addEventListener("click", () => hideModal("shareModal"));
+    document
+      .getElementById("closeLinkModal")
+      ?.addEventListener("click", () => hideModal("linkModal"));
+    document
+      .getElementById("closeImageModal")
+      ?.addEventListener("click", () => hideModal("imageModal"));
+    document
+      .getElementById("closeTableModal")
+      ?.addEventListener("click", () => hideModal("tableModal"));
+    document
+      .getElementById("closeExportModal")
+      ?.addEventListener("click", () => hideModal("exportModal"));
+
+    document
+      .getElementById("insertLinkBtn")
+      ?.addEventListener("click", insertLink);
+    document
+      .getElementById("insertImageBtn")
+      ?.addEventListener("click", insertImage);
+    document
+      .getElementById("insertTableBtn")
+      ?.addEventListener("click", insertTable);
+    document
+      .getElementById("copyLinkBtn")
+      ?.addEventListener("click", copyShareLink);
+
+    document.querySelectorAll(".export-option").forEach((btn) => {
+      btn.addEventListener("click", () => exportDocument(btn.dataset.format));
+    });
+
     window.addEventListener("beforeunload", handleBeforeUnload);
   }
 
-  // =============================================================================
-  // EDITOR INPUT HANDLING
-  // =============================================================================
-
-  function handleEditorInput(e) {
+  function handleEditorInput() {
+    saveToHistory();
     state.isDirty = true;
     updateWordCount();
     scheduleAutoSave();
-    checkSlashCommand();
+    broadcastChange();
   }
 
-  function handleTitleInput(e) {
-    state.docTitle = elements.editorTitle.textContent || "Untitled Document";
-    if (elements.docTitleInput) {
-      elements.docTitleInput.value = state.docTitle;
-    }
+  function handleDocNameChange() {
+    state.docTitle = elements.docName.value || "Untitled Document";
     state.isDirty = true;
     scheduleAutoSave();
   }
 
-  function handleTitleKeydown(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      elements.editorContent?.focus();
-    }
-  }
-
   function handleEditorKeydown(e) {
-    if (!elements.slashMenu?.classList.contains("hidden")) {
-      if (e.key === "Escape") {
-        hideSlashMenu();
-        e.preventDefault();
-      } else if (e.key === "Enter") {
-        const selected =
-          elements.slashMenu.querySelector(".slash-item.selected") ||
-          elements.slashMenu.querySelector(".slash-item");
-        if (selected) {
-          executeSlashCommand(selected.dataset.cmd);
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case "b":
           e.preventDefault();
-        }
-      } else if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-        navigateSlashMenu(e.key === "ArrowDown" ? 1 : -1);
-        e.preventDefault();
+          execCommand("bold");
+          break;
+        case "i":
+          e.preventDefault();
+          execCommand("italic");
+          break;
+        case "u":
+          e.preventDefault();
+          execCommand("underline");
+          break;
+        case "z":
+          e.preventDefault();
+          if (e.shiftKey) {
+            redo();
+          } else {
+            undo();
+          }
+          break;
+        case "y":
+          e.preventDefault();
+          redo();
+          break;
+        case "s":
+          e.preventDefault();
+          saveDocument();
+          break;
       }
     }
   }
 
   function handlePaste(e) {
     e.preventDefault();
-    const text = e.clipboardData?.getData("text/plain") || "";
+    const text = e.clipboardData.getData("text/plain");
     document.execCommand("insertText", false, text);
-  }
-
-  function handleDocumentClick(e) {
-    if (
-      elements.slashMenu &&
-      !elements.slashMenu.contains(e.target) &&
-      !elements.editorContent?.contains(e.target)
-    ) {
-      hideSlashMenu();
-    }
   }
 
   function handleBeforeUnload(e) {
     if (state.isDirty) {
       e.preventDefault();
       e.returnValue = "";
-      return "";
     }
   }
-
-  // =============================================================================
-  // SLASH COMMAND MENU
-  // =============================================================================
-
-  function checkSlashCommand() {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    const text = range.startContainer.textContent || "";
-    const cursorPos = range.startOffset;
-
-    if (text[cursorPos - 1] === "/") {
-      showSlashMenu(range);
-    } else if (
-      elements.slashMenu &&
-      !elements.slashMenu.classList.contains("hidden")
-    ) {
-      const slashIndex = text.lastIndexOf("/");
-      if (slashIndex >= 0 && cursorPos > slashIndex) {
-        const filter = text.substring(slashIndex + 1, cursorPos).toLowerCase();
-        filterSlashMenu(filter);
-      }
-    }
-  }
-
-  function showSlashMenu(range) {
-    if (!elements.slashMenu || !elements.editorContent) return;
-
-    const rect = range.getBoundingClientRect();
-    const editorRect = elements.editorContent.getBoundingClientRect();
-
-    elements.slashMenu.style.top =
-      rect.bottom -
-      editorRect.top +
-      elements.editorContent.scrollTop +
-      8 +
-      "px";
-    elements.slashMenu.style.left = rect.left - editorRect.left + "px";
-    elements.slashMenu.classList.remove("hidden");
-    state.slashPosition = range.startOffset;
-
-    filterSlashMenu("");
-  }
-
-  function hideSlashMenu() {
-    if (elements.slashMenu) {
-      elements.slashMenu.classList.add("hidden");
-    }
-    state.slashPosition = null;
-  }
-
-  function filterSlashMenu(filter) {
-    if (!elements.slashMenu) return;
-
-    const items = elements.slashMenu.querySelectorAll(".slash-item");
-    let firstVisible = null;
-
-    items.forEach((item) => {
-      const label =
-        item.querySelector(".slash-label")?.textContent.toLowerCase() || "";
-      const matches = label.includes(filter);
-      item.style.display = matches ? "flex" : "none";
-      if (matches && !firstVisible) firstVisible = item;
-    });
-
-    items.forEach((item) => item.classList.remove("selected"));
-    if (firstVisible) firstVisible.classList.add("selected");
-  }
-
-  function navigateSlashMenu(direction) {
-    if (!elements.slashMenu) return;
-
-    const items = Array.from(
-      elements.slashMenu.querySelectorAll(".slash-item"),
-    ).filter((i) => i.style.display !== "none");
-    const current = items.findIndex((i) => i.classList.contains("selected"));
-
-    items.forEach((i) => i.classList.remove("selected"));
-
-    let next = current + direction;
-    if (next < 0) next = items.length - 1;
-    if (next >= items.length) next = 0;
-
-    if (items[next]) {
-      items[next].classList.add("selected");
-      items[next].scrollIntoView({ block: "nearest" });
-    }
-  }
-
-  function executeSlashCommand(cmd) {
-    hideSlashMenu();
-
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return;
-
-    const range = selection.getRangeAt(0);
-    const text = range.startContainer.textContent || "";
-    const slashIndex = text.lastIndexOf("/");
-
-    if (slashIndex >= 0) {
-      range.startContainer.textContent =
-        text.substring(0, slashIndex) + text.substring(range.startOffset);
-      range.setStart(range.startContainer, slashIndex);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-
-    switch (cmd) {
-      case "h1":
-        document.execCommand("formatBlock", false, "h1");
-        break;
-      case "h2":
-        document.execCommand("formatBlock", false, "h2");
-        break;
-      case "h3":
-        document.execCommand("formatBlock", false, "h3");
-        break;
-      case "paragraph":
-        document.execCommand("formatBlock", false, "p");
-        break;
-      case "bullet":
-        document.execCommand("insertUnorderedList");
-        break;
-      case "number":
-        document.execCommand("insertOrderedList");
-        break;
-      case "todo":
-        insertTodo();
-        break;
-      case "quote":
-        document.execCommand("formatBlock", false, "blockquote");
-        break;
-      case "code":
-        document.execCommand("formatBlock", false, "pre");
-        break;
-      case "divider":
-        document.execCommand("insertHTML", false, "<hr>");
-        break;
-      case "callout":
-        document.execCommand(
-          "insertHTML",
-          false,
-          '<div class="callout">💡 Callout text here...</div>',
-        );
-        break;
-      case "table":
-        insertTable();
-        break;
-      case "image":
-        insertImage();
-        break;
-      case "link":
-        insertLink();
-        break;
-      case "ai-write":
-      case "ai-improve":
-      case "ai-summarize":
-        openAIPanel(cmd);
-        break;
-    }
-
-    state.isDirty = true;
-    updateWordCount();
-    scheduleAutoSave();
-  }
-
-  function setupSlashMenu() {
-    if (!elements.slashMenu) return;
-
-    elements.slashMenu.querySelectorAll(".slash-item").forEach((item) => {
-      item.addEventListener("click", () => {
-        executeSlashCommand(item.dataset.cmd);
-      });
-    });
-  }
-
-  // =============================================================================
-  // CONTENT INSERTION
-  // =============================================================================
-
-  function insertTodo() {
-    const html =
-      '<div class="todo-item"><input type="checkbox" class="todo-checkbox"><span>Todo item</span></div>';
-    document.execCommand("insertHTML", false, html);
-  }
-
-  function insertTable() {
-    const html = `
-      <table>
-        <thead>
-          <tr>
-            <th>Header 1</th>
-            <th>Header 2</th>
-            <th>Header 3</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Cell 1</td>
-            <td>Cell 2</td>
-            <td>Cell 3</td>
-          </tr>
-          <tr>
-            <td>Cell 4</td>
-            <td>Cell 5</td>
-            <td>Cell 6</td>
-          </tr>
-        </tbody>
-      </table>
-    `;
-    document.execCommand("insertHTML", false, html);
-  }
-
-  function insertImage() {
-    const url = prompt("Enter image URL:");
-    if (url) {
-      document.execCommand(
-        "insertHTML",
-        false,
-        `<img src="${escapeHtml(url)}" alt="Image">`,
-      );
-    }
-  }
-
-  function insertLink() {
-    const url = prompt("Enter URL:");
-    if (url) {
-      document.execCommand("createLink", false, url);
-    }
-  }
-
-  // =============================================================================
-  // TOOLBAR
-  // =============================================================================
 
   function setupToolbar() {
-    document.querySelectorAll("[data-cmd]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        executeToolbarCommand(btn.dataset.cmd);
-      });
-    });
-
-    const headingSelect = document.getElementById("heading-select");
-    if (headingSelect) {
-      headingSelect.addEventListener("change", (e) => {
-        const value = e.target.value;
-        document.execCommand("formatBlock", false, value);
-        elements.editorContent?.focus();
-      });
-    }
-
-    const colorPicker = document.getElementById("text-color");
-    if (colorPicker) {
-      colorPicker.addEventListener("change", (e) => {
-        document.execCommand("foreColor", false, e.target.value);
-      });
-    }
-
-    const highlightPicker = document.getElementById("highlight-color");
-    if (highlightPicker) {
-      highlightPicker.addEventListener("change", (e) => {
-        document.execCommand("hiliteColor", false, e.target.value);
-      });
+    updateToolbarState();
+    if (elements.editorContent) {
+      elements.editorContent.addEventListener("mouseup", updateToolbarState);
+      elements.editorContent.addEventListener("keyup", updateToolbarState);
     }
   }
 
-  function executeToolbarCommand(cmd) {
-    elements.editorContent?.focus();
-
-    switch (cmd) {
-      case "bold":
-        document.execCommand("bold");
-        break;
-      case "italic":
-        document.execCommand("italic");
-        break;
-      case "underline":
-        document.execCommand("underline");
-        break;
-      case "strikethrough":
-        document.execCommand("strikeThrough");
-        break;
-      case "alignLeft":
-        document.execCommand("justifyLeft");
-        break;
-      case "alignCenter":
-        document.execCommand("justifyCenter");
-        break;
-      case "alignRight":
-        document.execCommand("justifyRight");
-        break;
-      case "alignJustify":
-        document.execCommand("justifyFull");
-        break;
-      case "bullet":
-        document.execCommand("insertUnorderedList");
-        break;
-      case "number":
-        document.execCommand("insertOrderedList");
-        break;
-      case "indent":
-        document.execCommand("indent");
-        break;
-      case "outdent":
-        document.execCommand("outdent");
-        break;
-      case "undo":
-        document.execCommand("undo");
-        break;
-      case "redo":
-        document.execCommand("redo");
-        break;
-      case "link":
-        insertLink();
-        break;
-      case "image":
-        insertImage();
-        break;
-      case "clearFormat":
-        document.execCommand("removeFormat");
-        break;
-    }
-
-    state.isDirty = true;
-    scheduleAutoSave();
+  function updateToolbarState() {
+    document
+      .getElementById("boldBtn")
+      ?.classList.toggle("active", document.queryCommandState("bold"));
+    document
+      .getElementById("italicBtn")
+      ?.classList.toggle("active", document.queryCommandState("italic"));
+    document
+      .getElementById("underlineBtn")
+      ?.classList.toggle("active", document.queryCommandState("underline"));
+    document
+      .getElementById("strikeBtn")
+      ?.classList.toggle("active", document.queryCommandState("strikeThrough"));
   }
-
-  // =============================================================================
-  // KEYBOARD SHORTCUTS
-  // =============================================================================
 
   function setupKeyboardShortcuts() {
     document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey || e.metaKey) {
-        switch (e.key.toLowerCase()) {
-          case "s":
-            e.preventDefault();
-            saveDocument();
-            break;
-          case "b":
-            e.preventDefault();
-            document.execCommand("bold");
-            break;
-          case "i":
-            e.preventDefault();
-            document.execCommand("italic");
-            break;
-          case "u":
-            e.preventDefault();
-            document.execCommand("underline");
-            break;
-          case "z":
-            if (e.shiftKey) {
-              e.preventDefault();
-              document.execCommand("redo");
-            }
-            break;
-          case "k":
-            e.preventDefault();
-            insertLink();
-            break;
-        }
-      }
+      if (e.target.closest(".chat-input, .modal input")) return;
 
       if (e.key === "Escape") {
-        hideSlashMenu();
-        closeAIPanel();
+        closeModals();
       }
     });
   }
 
-  // =============================================================================
-  // AI PANEL
-  // =============================================================================
+  function execCommand(command, value = null) {
+    elements.editorContent?.focus();
+    document.execCommand(command, false, value);
+    saveToHistory();
+    state.isDirty = true;
+    scheduleAutoSave();
+    updateToolbarState();
+  }
 
-  function setupAIPanel() {
-    const aiBtn = document.getElementById("ai-assist-btn");
-    if (aiBtn) {
-      aiBtn.addEventListener("click", () => {
-        const selectedText = window.getSelection()?.toString() || "";
-        openAIPanel("ai-improve", selectedText);
-      });
-    }
+  function handleHeadingChange(e) {
+    const value = e.target.value;
+    execCommand("formatBlock", value);
+  }
 
-    const closeBtn = document.getElementById("close-ai-panel");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", closeAIPanel);
-    }
+  function handleFontFamilyChange(e) {
+    execCommand("fontName", e.target.value);
+  }
 
-    document.querySelectorAll(".tone-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        document
-          .querySelectorAll(".tone-btn")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-      });
-    });
+  function handleFontSizeChange(e) {
+    execCommand("fontSize", e.target.value);
+  }
 
-    document.querySelectorAll(".ai-action-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const action = btn.dataset.action;
-        const selectedText = window.getSelection()?.toString() || "";
-        processAIAction(action, selectedText);
-      });
-    });
+  function handleTextColorChange(e) {
+    execCommand("foreColor", e.target.value);
+    const indicator = document.querySelector("#textColorBtn .color-indicator");
+    if (indicator) indicator.style.background = e.target.value;
+  }
 
-    const copyBtn = document.getElementById("copy-ai-response");
-    if (copyBtn) {
-      copyBtn.addEventListener("click", () => {
-        const content =
-          document.getElementById("ai-response-content")?.innerText || "";
-        navigator.clipboard.writeText(content);
-      });
-    }
+  function handleHighlightChange(e) {
+    execCommand("hiliteColor", e.target.value);
+    const indicator = document.querySelector("#highlightBtn .color-indicator");
+    if (indicator) indicator.style.background = e.target.value;
+  }
 
-    const insertBtn = document.getElementById("insert-ai-response");
-    if (insertBtn) {
-      insertBtn.addEventListener("click", () => {
-        const content =
-          document.getElementById("ai-response-content")?.innerHTML || "";
-        elements.editorContent?.focus();
-        document.execCommand("insertHTML", false, content);
-        closeAIPanel();
-      });
-    }
+  function saveToHistory() {
+    if (!elements.editorContent) return;
+    const content = elements.editorContent.innerHTML;
+    if (state.history[state.historyIndex] === content) return;
 
-    const replaceBtn = document.getElementById("replace-ai-response");
-    if (replaceBtn) {
-      replaceBtn.addEventListener("click", () => {
-        const content =
-          document.getElementById("ai-response-content")?.innerHTML || "";
-        document.execCommand("insertHTML", false, content);
-        closeAIPanel();
-      });
+    state.history = state.history.slice(0, state.historyIndex + 1);
+    state.history.push(content);
+    if (state.history.length > CONFIG.MAX_HISTORY) {
+      state.history.shift();
+    } else {
+      state.historyIndex++;
     }
   }
 
-  function openAIPanel(action, selectedText) {
-    if (!elements.aiPanel) return;
-
-    elements.aiPanel.classList.remove("hidden");
-    state.isAIPanelOpen = true;
-
-    const input = document.getElementById("selected-text-input");
-    if (input && selectedText) {
-      input.value = selectedText;
-    }
-  }
-
-  function closeAIPanel() {
-    if (elements.aiPanel) {
-      elements.aiPanel.classList.add("hidden");
-      state.isAIPanelOpen = false;
-    }
-  }
-
-  async function processAIAction(action, text) {
-    const responseContainer = document.getElementById("ai-response");
-    const responseContent = document.getElementById("ai-response-content");
-
-    if (!responseContainer || !responseContent) return;
-
-    responseContent.innerHTML =
-      '<div class="loading-spinner"></div> Processing...';
-    responseContainer.classList.remove("hidden");
-
-    try {
-      const response = await fetch("/api/ui/docs/ai/" + action, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, action }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        responseContent.innerHTML =
-          data.result || data.content || "No response generated.";
-      } else {
-        responseContent.innerHTML = "AI processing failed. Please try again.";
+  function undo() {
+    if (state.historyIndex > 0) {
+      state.historyIndex--;
+      if (elements.editorContent) {
+        elements.editorContent.innerHTML = state.history[state.historyIndex];
       }
-    } catch (e) {
-      console.error("AI error:", e);
-      responseContent.innerHTML = "Unable to connect to AI service.";
+      state.isDirty = true;
+      updateWordCount();
     }
   }
 
-  // =============================================================================
-  // SIDEBAR
-  // =============================================================================
-
-  function toggleSidebar() {
-    if (elements.sidebar) {
-      elements.sidebar.classList.toggle("open");
+  function redo() {
+    if (state.historyIndex < state.history.length - 1) {
+      state.historyIndex++;
+      if (elements.editorContent) {
+        elements.editorContent.innerHTML = state.history[state.historyIndex];
+      }
+      state.isDirty = true;
+      updateWordCount();
     }
   }
-
-  // =============================================================================
-  // MODALS
-  // =============================================================================
-
-  function showModal(id) {
-    const modal = document.getElementById(id);
-    if (modal) modal.classList.remove("hidden");
-  }
-
-  function hideModal(id) {
-    const modal = document.getElementById(id);
-    if (modal) modal.classList.add("hidden");
-  }
-
-  function closeModals() {
-    document.querySelectorAll(".modal").forEach((modal) => {
-      modal.classList.add("hidden");
-    });
-  }
-
-  // =============================================================================
-  // WORD COUNT
-  // =============================================================================
 
   function updateWordCount() {
     if (!elements.editorContent) return;
-
     const text = elements.editorContent.innerText || "";
     const words = text
       .trim()
@@ -709,89 +385,92 @@
     const chars = text.length;
 
     if (elements.wordCount) {
-      elements.wordCount.textContent = words.length + " words";
+      elements.wordCount.textContent = `${words.length} word${words.length !== 1 ? "s" : ""}`;
     }
     if (elements.charCount) {
-      elements.charCount.textContent = chars + " characters";
+      elements.charCount.textContent = `${chars} character${chars !== 1 ? "s" : ""}`;
+    }
+
+    const pageHeight = 1056;
+    const contentHeight = elements.editorContent.scrollHeight || pageHeight;
+    const pages = Math.max(1, Math.ceil(contentHeight / pageHeight));
+    if (elements.pageInfo) {
+      elements.pageInfo.textContent = `Page 1 of ${pages}`;
     }
   }
 
-  // =============================================================================
-  // SAVE/LOAD
-  // =============================================================================
+  function zoomIn() {
+    if (state.zoom < 200) {
+      state.zoom += 10;
+      applyZoom();
+    }
+  }
+
+  function zoomOut() {
+    if (state.zoom > 50) {
+      state.zoom -= 10;
+      applyZoom();
+    }
+  }
+
+  function applyZoom() {
+    if (elements.editorPage) {
+      elements.editorPage.style.transform = `scale(${state.zoom / 100})`;
+      elements.editorPage.style.transformOrigin = "top center";
+    }
+    if (elements.zoomLevel) {
+      elements.zoomLevel.textContent = `${state.zoom}%`;
+    }
+  }
 
   function scheduleAutoSave() {
     if (state.autoSaveTimer) {
       clearTimeout(state.autoSaveTimer);
     }
-    state.autoSaveTimer = setTimeout(() => {
-      if (state.isDirty) {
-        saveDocument();
-      }
-    }, CONFIG.AUTOSAVE_DELAY);
+    state.autoSaveTimer = setTimeout(saveDocument, CONFIG.AUTOSAVE_DELAY);
+    if (elements.saveStatus) {
+      elements.saveStatus.textContent = "Saving...";
+    }
   }
 
   async function saveDocument() {
-    showSaveStatus("saving");
+    if (!state.isDirty) return;
+
+    const content = elements.editorContent?.innerHTML || "";
+    const title = state.docTitle;
 
     try {
-      const title = elements.editorTitle?.textContent || state.docTitle;
-      const content = elements.editorContent?.innerHTML || "";
-
-      const response = await fetch("/api/ui/docs/save", {
+      const response = await fetch("/api/docs/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: state.docId,
           title,
           content,
+          driveSource: state.driveSource,
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
-        if (data.id) {
-          state.docId = data.id;
+        const result = await response.json();
+        if (result.id) {
+          state.docId = result.id;
           window.history.replaceState({}, "", `#id=${state.docId}`);
         }
         state.isDirty = false;
-        showSaveStatus("saved");
-        updateLastEdited();
+        if (elements.saveStatus) {
+          elements.saveStatus.textContent = "Saved";
+        }
       } else {
-        showSaveStatus("error");
+        if (elements.saveStatus) {
+          elements.saveStatus.textContent = "Save failed";
+        }
       }
     } catch (e) {
-      console.error("Save failed:", e);
-      showSaveStatus("error");
-    }
-  }
-
-  function showSaveStatus(status) {
-    if (!elements.saveStatus) return;
-
-    elements.saveStatus.className = "save-status " + status;
-    elements.saveStatus.textContent =
-      status === "saved"
-        ? "Saved"
-        : status === "error"
-          ? "Save failed"
-          : "Saving...";
-
-    if (status === "saved") {
-      setTimeout(() => {
-        if (elements.saveStatus) {
-          elements.saveStatus.textContent = "";
-          elements.saveStatus.className = "save-status";
-        }
-      }, 2000);
-    }
-  }
-
-  function updateLastEdited() {
-    const lastEdited = document.getElementById("last-edited");
-    if (lastEdited) {
-      const now = new Date();
-      lastEdited.textContent = "Edited " + now.toLocaleTimeString();
+      console.error("Save error:", e);
+      if (elements.saveStatus) {
+        elements.saveStatus.textContent = "Save failed";
+      }
     }
   }
 
@@ -804,124 +483,173 @@
 
     if (hash) {
       const hashQueryIndex = hash.indexOf("?");
-      if (hashQueryIndex !== -1) {
-        const hashParams = new URLSearchParams(
-          hash.substring(hashQueryIndex + 1),
-        );
+      if (hashQueryIndex > -1) {
+        const hashParams = new URLSearchParams(hash.slice(hashQueryIndex + 1));
         docId = docId || hashParams.get("id");
         bucket = bucket || hashParams.get("bucket");
         path = path || hashParams.get("path");
+      } else if (hash.startsWith("#id=")) {
+        docId = hash.slice(4);
       }
     }
 
     if (bucket && path) {
+      state.driveSource = { bucket, path };
       await loadFromDrive(bucket, path);
     } else if (docId) {
       try {
-        const response = await fetch(`/api/ui/docs/${docId}`);
+        const response = await fetch(`/api/docs/${docId}`);
         if (response.ok) {
           const data = await response.json();
           state.docId = docId;
           state.docTitle = data.title || "Untitled Document";
-
-          if (elements.editorTitle) {
-            elements.editorTitle.textContent = state.docTitle;
-          }
-          if (elements.docTitleInput) {
-            elements.docTitleInput.value = state.docTitle;
-          }
-          if (elements.editorContent) {
+          if (elements.docName) elements.docName.value = state.docTitle;
+          if (elements.editorContent)
             elements.editorContent.innerHTML = data.content || "";
-          }
-
+          saveToHistory();
           updateWordCount();
         }
       } catch (e) {
         console.error("Load failed:", e);
       }
+    } else {
+      saveToHistory();
     }
   }
 
   async function loadFromDrive(bucket, path) {
-    const fileName = path.split("/").pop() || "document";
-    const ext = fileName.split(".").pop().toLowerCase();
-
-    state.driveSource = { bucket, path };
-    state.docTitle = fileName;
-
-    if (elements.editorTitle) {
-      elements.editorTitle.textContent = fileName;
-    }
-    if (elements.docTitleInput) {
-      elements.docTitleInput.value = fileName;
-    }
+    const fileName = path.split("/").pop() || "Document";
+    const ext = fileName.split(".").pop()?.toLowerCase();
 
     try {
-      const response = await fetch("/api/files/read", {
+      const response = await fetch("/api/drive/content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ bucket, path }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to load file: ${response.status}`);
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.content || "";
+
+        state.docTitle = fileName.replace(/\.[^.]+$/, "");
+        if (elements.docName) elements.docName.value = state.docTitle;
+
+        if (ext === "md") {
+          if (elements.editorContent) {
+            elements.editorContent.innerHTML = markdownToHtml(content);
+          }
+        } else if (ext === "txt") {
+          if (elements.editorContent) {
+            elements.editorContent.innerHTML = `<p>${escapeHtml(content).replace(/\n/g, "</p><p>")}</p>`;
+          }
+        } else {
+          if (elements.editorContent) {
+            elements.editorContent.innerHTML = content;
+          }
+        }
+
+        saveToHistory();
+        updateWordCount();
       }
-
-      const data = await response.json();
-      const content = data.content || "";
-
-      if (ext === "md" || ext === "markdown") {
-        if (elements.editorContent) {
-          elements.editorContent.innerHTML = markdownToHtml(content);
-        }
-      } else if (ext === "txt") {
-        if (elements.editorContent) {
-          elements.editorContent.innerHTML = `<p>${escapeHtml(content).replace(/\n/g, "</p><p>")}</p>`;
-        }
-      } else if (ext === "html" || ext === "htm") {
-        if (elements.editorContent) {
-          elements.editorContent.innerHTML = content;
-        }
-      } else {
-        if (elements.editorContent) {
-          elements.editorContent.innerHTML = `<p>${escapeHtml(content)}</p>`;
-        }
-      }
-
-      updateWordCount();
-      state.isDirty = false;
-    } catch (err) {
-      console.error("Failed to load file from drive:", err);
-      alert(`Failed to load file: ${err.message}`);
+    } catch (e) {
+      console.error("Drive load failed:", e);
     }
   }
 
   function markdownToHtml(md) {
     return md
-      .replace(/^### (.*$)/gim, "<h3>$1</h3>")
-      .replace(/^## (.*$)/gim, "<h2>$1</h2>")
-      .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+      .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+      .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+      .replace(/^# (.+)$/gm, "<h1>$1</h1>")
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.+?)\*/g, "<em>$1</em>")
       .replace(/`(.+?)`/g, "<code>$1</code>")
-      .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
-      .replace(/\n\n/g, "</p><p>")
-      .replace(/\n/g, "<br>")
-      .replace(/^(.+)$/gm, "<p>$1</p>");
+      .replace(/\n/g, "<br>");
   }
 
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
+  function showModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.remove("hidden");
   }
 
-  // =============================================================================
-  // EXPORT
-  // =============================================================================
+  function hideModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add("hidden");
+  }
+
+  function closeModals() {
+    document
+      .querySelectorAll(".modal")
+      .forEach((m) => m.classList.add("hidden"));
+  }
+
+  function insertLink() {
+    const url = document.getElementById("linkUrl")?.value;
+    const text = document.getElementById("linkText")?.value || url;
+    if (url) {
+      elements.editorContent?.focus();
+      document.execCommand(
+        "insertHTML",
+        false,
+        `<a href="${escapeHtml(url)}" target="_blank">${escapeHtml(text)}</a>`,
+      );
+      hideModal("linkModal");
+      saveToHistory();
+      state.isDirty = true;
+    }
+  }
+
+  function insertImage() {
+    const url = document.getElementById("imageUrl")?.value;
+    const alt = document.getElementById("imageAlt")?.value || "Image";
+    if (url) {
+      elements.editorContent?.focus();
+      document.execCommand(
+        "insertHTML",
+        false,
+        `<img src="${escapeHtml(url)}" alt="${escapeHtml(alt)}" style="max-width:100%">`,
+      );
+      hideModal("imageModal");
+      saveToHistory();
+      state.isDirty = true;
+    }
+  }
+
+  function insertTable() {
+    const rows = parseInt(document.getElementById("tableRows")?.value, 10) || 3;
+    const cols = parseInt(document.getElementById("tableCols")?.value, 10) || 3;
+
+    let html = '<table style="border-collapse:collapse;width:100%">';
+    for (let r = 0; r < rows; r++) {
+      html += "<tr>";
+      for (let c = 0; c < cols; c++) {
+        const cell = r === 0 ? "th" : "td";
+        html += `<${cell} style="border:1px solid var(--sentient-border,#e0e0e0);padding:8px">${r === 0 ? "Header" : ""}</${cell}>`;
+      }
+      html += "</tr>";
+    }
+    html += "</table><p></p>";
+
+    elements.editorContent?.focus();
+    document.execCommand("insertHTML", false, html);
+    hideModal("tableModal");
+    saveToHistory();
+    state.isDirty = true;
+  }
+
+  function copyShareLink() {
+    const linkInput = document.getElementById("shareLink");
+    if (linkInput) {
+      const shareUrl = `${window.location.origin}${window.location.pathname}#id=${state.docId || "new"}`;
+      linkInput.value = shareUrl;
+      linkInput.select();
+      navigator.clipboard.writeText(shareUrl);
+    }
+  }
 
   function exportDocument(format) {
-    const title = elements.editorTitle?.textContent || state.docTitle;
+    const title = state.docTitle || "document";
     const content = elements.editorContent?.innerHTML || "";
 
     switch (format) {
@@ -941,8 +669,7 @@
         exportAsMarkdown(title);
         break;
     }
-
-    hideModal("export-modal");
+    hideModal("exportModal");
   }
 
   function exportAsPDF(title, content) {
@@ -954,14 +681,14 @@
         <head>
           <title>${escapeHtml(title)}</title>
           <style>
-            body { font-family: Georgia, serif; max-width: 800px; margin: 40px auto; padding: 20px; }
-            h1 { font-size: 28px; margin-bottom: 24px; }
+            body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+            h1, h2, h3 { margin-top: 1em; }
+            p { line-height: 1.6; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #ccc; padding: 8px; }
           </style>
         </head>
-        <body>
-          <h1>${escapeHtml(title)}</h1>
-          ${content}
-        </body>
+        <body>${content}</body>
         </html>
       `);
       printWindow.document.close();
@@ -970,95 +697,308 @@
   }
 
   function exportAsDocx(title, content) {
-    alert("DOCX export requires server-side processing. Please use the API.");
+    addChatMessage(
+      "assistant",
+      "DOCX export requires server-side processing. Feature coming soon!",
+    );
   }
 
   function exportAsHTML(title, content) {
     const html = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>${escapeHtml(title)}</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-    h1 { font-size: 28px; }
-    h2 { font-size: 24px; }
-    h3 { font-size: 20px; }
-    blockquote { border-left: 4px solid #3b82f6; padding-left: 16px; margin-left: 0; color: #64748b; }
-    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; }
-    pre { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; overflow-x: auto; }
+    body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+    h1, h2, h3 { margin-top: 1em; }
+    p { line-height: 1.6; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 8px; }
   </style>
 </head>
 <body>
-  <h1>${escapeHtml(title)}</h1>
-  ${content}
+${content}
 </body>
 </html>`;
-
-    downloadFile(title + ".html", html, "text/html");
+    downloadFile(html, `${title}.html`, "text/html");
   }
 
   function exportAsTxt(title) {
     const text = elements.editorContent?.innerText || "";
-    downloadFile(title + ".txt", title + "\n\n" + text, "text/plain");
+    downloadFile(text, `${title}.txt`, "text/plain");
   }
 
   function exportAsMarkdown(title) {
     const text = elements.editorContent?.innerText || "";
-    const md = "# " + title + "\n\n" + text;
-    downloadFile(title + ".md", md, "text/markdown");
+    const md = `# ${title}\n\n${text}`;
+    downloadFile(md, `${title}.md`, "text/markdown");
   }
 
-  function downloadFile(filename, content, type) {
-    const blob = new Blob([content], { type });
+  function downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
     URL.revokeObjectURL(url);
   }
 
-  // =============================================================================
-  // FOCUS MODE
-  // =============================================================================
+  function connectWebSocket() {
+    if (!state.docId) return;
 
-  function toggleFocusMode() {
-    if (elements.container) {
-      elements.container.classList.toggle("focus-mode");
-      state.focusMode = elements.container.classList.contains("focus-mode");
+    try {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/api/docs/ws/${state.docId}`;
+      state.ws = new WebSocket(wsUrl);
+
+      state.ws.onopen = () => {
+        state.ws.send(
+          JSON.stringify({
+            type: "join",
+            userId: getUserId(),
+            userName: getUserName(),
+          }),
+        );
+      };
+
+      state.ws.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          handleWebSocketMessage(msg);
+        } catch (err) {
+          console.error("WS message error:", err);
+        }
+      };
+
+      state.ws.onclose = () => {
+        setTimeout(connectWebSocket, CONFIG.WS_RECONNECT_DELAY);
+      };
+    } catch (e) {
+      console.error("WebSocket failed:", e);
     }
   }
 
-  // =============================================================================
-  // NEW DOCUMENT
-  // =============================================================================
-
-  function createNewDocument() {
-    state.docId = null;
-    state.docTitle = "Untitled Document";
-    state.isDirty = false;
-
-    if (elements.editorTitle) {
-      elements.editorTitle.textContent = state.docTitle;
+  function handleWebSocketMessage(msg) {
+    switch (msg.type) {
+      case "user_joined":
+        addCollaborator(msg.user);
+        break;
+      case "user_left":
+        removeCollaborator(msg.userId);
+        break;
+      case "content_update":
+        if (msg.userId !== getUserId() && elements.editorContent) {
+          const selection = window.getSelection();
+          const range =
+            selection?.rangeCount > 0 ? selection.getRangeAt(0) : null;
+          elements.editorContent.innerHTML = msg.content;
+          if (range) {
+            try {
+              selection?.removeAllRanges();
+              selection?.addRange(range);
+            } catch (e) {
+              // Ignore selection restoration errors
+            }
+          }
+        }
+        break;
     }
-    if (elements.docTitleInput) {
-      elements.docTitleInput.value = state.docTitle;
-    }
-    if (elements.editorContent) {
-      elements.editorContent.innerHTML = "";
-    }
-
-    window.history.replaceState({}, "", window.location.pathname);
-    updateWordCount();
-    elements.editorContent?.focus();
   }
 
-  // =============================================================================
-  // UTILITIES
-  // =============================================================================
+  function broadcastChange() {
+    if (state.ws && state.ws.readyState === WebSocket.OPEN) {
+      state.ws.send(
+        JSON.stringify({
+          type: "content_update",
+          userId: getUserId(),
+          content: elements.editorContent?.innerHTML || "",
+        }),
+      );
+    }
+  }
+
+  function addCollaborator(user) {
+    if (!state.collaborators.find((u) => u.id === user.id)) {
+      state.collaborators.push(user);
+      renderCollaborators();
+    }
+  }
+
+  function removeCollaborator(userId) {
+    state.collaborators = state.collaborators.filter((u) => u.id !== userId);
+    renderCollaborators();
+  }
+
+  function renderCollaborators() {
+    if (!elements.collaborators) return;
+    elements.collaborators.innerHTML = state.collaborators
+      .slice(0, 4)
+      .map(
+        (u) => `
+        <div class="collaborator-avatar" style="background:${u.color || "#4285f4"}" title="${escapeHtml(u.name)}">
+          ${u.name.charAt(0).toUpperCase()}
+        </div>
+      `,
+      )
+      .join("");
+  }
+
+  function getUserId() {
+    let id = localStorage.getItem("gb-user-id");
+    if (!id) {
+      id = "user-" + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("gb-user-id", id);
+    }
+    return id;
+  }
+
+  function getUserName() {
+    return localStorage.getItem("gb-user-name") || "Anonymous";
+  }
+
+  function toggleChatPanel() {
+    state.chatPanelOpen = !state.chatPanelOpen;
+    elements.chatPanel?.classList.toggle("collapsed", !state.chatPanelOpen);
+  }
+
+  function handleChatSubmit(e) {
+    e.preventDefault();
+    const message = elements.chatInput?.value.trim();
+    if (!message) return;
+
+    addChatMessage("user", message);
+    if (elements.chatInput) elements.chatInput.value = "";
+
+    processAICommand(message);
+  }
+
+  function handleSuggestionClick(action) {
+    const commands = {
+      shorter: "Make the selected text shorter",
+      grammar: "Fix grammar and spelling in the document",
+      formal: "Make the text more formal",
+      summarize: "Summarize this document",
+    };
+
+    const message = commands[action] || action;
+    addChatMessage("user", message);
+    processAICommand(message);
+  }
+
+  function addChatMessage(role, content) {
+    if (!elements.chatMessages) return;
+    const div = document.createElement("div");
+    div.className = `chat-message ${role}`;
+    div.innerHTML = `<div class="message-bubble">${escapeHtml(content)}</div>`;
+    elements.chatMessages.appendChild(div);
+    elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+  }
+
+  async function processAICommand(command) {
+    const lower = command.toLowerCase();
+    const selectedText = window.getSelection()?.toString() || "";
+    let response = "";
+
+    if (lower.includes("shorter") || lower.includes("concise")) {
+      if (selectedText) {
+        response = await callAI("shorten", selectedText);
+      } else {
+        response =
+          "Please select some text first, then ask me to make it shorter.";
+      }
+    } else if (
+      lower.includes("grammar") ||
+      lower.includes("spelling") ||
+      lower.includes("fix")
+    ) {
+      const text = selectedText || elements.editorContent?.innerText || "";
+      response = await callAI("grammar", text);
+    } else if (lower.includes("formal")) {
+      if (selectedText) {
+        response = await callAI("formal", selectedText);
+      } else {
+        response =
+          "Please select some text first, then ask me to make it formal.";
+      }
+    } else if (lower.includes("casual") || lower.includes("informal")) {
+      if (selectedText) {
+        response = await callAI("casual", selectedText);
+      } else {
+        response =
+          "Please select some text first, then ask me to make it casual.";
+      }
+    } else if (lower.includes("summarize") || lower.includes("summary")) {
+      const text = selectedText || elements.editorContent?.innerText || "";
+      response = await callAI("summarize", text);
+    } else if (lower.includes("translate")) {
+      const langMatch = lower.match(/to (\w+)/);
+      const lang = langMatch ? langMatch[1] : "Spanish";
+      const text = selectedText || elements.editorContent?.innerText || "";
+      response = await callAI("translate", text, lang);
+    } else if (lower.includes("expand") || lower.includes("longer")) {
+      if (selectedText) {
+        response = await callAI("expand", selectedText);
+      } else {
+        response = "Please select some text first, then ask me to expand it.";
+      }
+    } else if (lower.includes("heading") || lower.includes("title")) {
+      execCommand("formatBlock", "h1");
+      response = "Applied heading format to selected text.";
+    } else if (lower.includes("bullet") || lower.includes("list")) {
+      execCommand("insertUnorderedList");
+      response = "Created a bullet list.";
+    } else if (lower.includes("number") && lower.includes("list")) {
+      execCommand("insertOrderedList");
+      response = "Created a numbered list.";
+    } else if (lower.includes("bold")) {
+      execCommand("bold");
+      response = "Applied bold formatting.";
+    } else if (lower.includes("italic")) {
+      execCommand("italic");
+      response = "Applied italic formatting.";
+    } else if (lower.includes("underline")) {
+      execCommand("underline");
+      response = "Applied underline formatting.";
+    } else {
+      try {
+        const res = await fetch("/api/docs/ai", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            command,
+            selectedText,
+            docId: state.docId,
+          }),
+        });
+        const data = await res.json();
+        response = data.response || "I processed your request.";
+      } catch {
+        response =
+          "I can help you with:\n• Make text shorter or longer\n• Fix grammar and spelling\n• Translate to another language\n• Change tone (formal/casual)\n• Summarize the document\n• Format as heading, list, etc.";
+      }
+    }
+
+    addChatMessage("assistant", response);
+  }
+
+  async function callAI(action, text, extra = "") {
+    try {
+      const res = await fetch("/api/docs/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, text, extra, docId: state.docId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.result || data.response || "Done!";
+      }
+      return "AI processing failed. Please try again.";
+    } catch {
+      return "Unable to connect to AI service. Please try again later.";
+    }
+  }
 
   function escapeHtml(str) {
     if (!str) return "";
@@ -1067,38 +1007,33 @@
     return div.innerHTML;
   }
 
-  function renameDocument(name) {
-    state.docTitle = name;
-    if (elements.editorTitle) {
-      elements.editorTitle.textContent = name;
-    }
-    state.isDirty = true;
-    scheduleAutoSave();
-  }
+  function createNewDocument() {
+    state.docId = null;
+    state.docTitle = "Untitled Document";
+    state.isDirty = false;
+    state.history = [];
+    state.historyIndex = -1;
 
-  // =============================================================================
-  // PUBLIC API
-  // =============================================================================
+    if (elements.docName) elements.docName.value = state.docTitle;
+    if (elements.editorContent) elements.editorContent.innerHTML = "";
+
+    window.history.replaceState({}, "", window.location.pathname);
+    saveToHistory();
+    updateWordCount();
+    elements.editorContent?.focus();
+  }
 
   window.gbDocs = {
     init,
-    toggleSidebar,
     createNewDocument,
     saveDocument,
     exportDocument,
     showModal,
     hideModal,
     closeModals,
-    toggleFocusMode,
-    renameDocument,
-    openAIPanel,
-    closeAIPanel,
-    executeToolbarCommand,
+    toggleChatPanel,
+    execCommand,
   };
-
-  // =============================================================================
-  // INITIALIZE ON DOM READY
-  // =============================================================================
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
