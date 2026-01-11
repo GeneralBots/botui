@@ -4,7 +4,8 @@ const ThemeManager = (() => {
   let subscribers = [];
 
   const themes = [
-    { id: "default", name: "🎨 Default", file: null },
+    { id: "default", name: "🎨 Default", file: "light.css" },
+    { id: "light", name: "☀️ Light", file: "light.css" },
     { id: "orange", name: "🍊 Orange", file: "orange.css" },
     { id: "cyberpunk", name: "🌃 Cyberpunk", file: "cyberpunk.css" },
     { id: "retrowave", name: "🌴 Retrowave", file: "retrowave.css" },
@@ -17,16 +18,24 @@ const ThemeManager = (() => {
     { id: "jazzage", name: "🎺 Jazz", file: "jazzage.css" },
     { id: "mellowgold", name: "🌻 Mellow", file: "mellowgold.css" },
     { id: "midcenturymod", name: "🏠 Mid Century", file: "midcenturymod.css" },
-    { id: "polaroidmemories", name: "📷 Polaroid", file: "polaroidmemories.css" },
-    { id: "saturdaycartoons", name: "📺 Cartoons", file: "saturdaycartoons.css" },
+    {
+      id: "polaroidmemories",
+      name: "📷 Polaroid",
+      file: "polaroidmemories.css",
+    },
+    {
+      id: "saturdaycartoons",
+      name: "📺 Cartoons",
+      file: "saturdaycartoons.css",
+    },
     { id: "seasidepostcard", name: "🏖️ Seaside", file: "seasidepostcard.css" },
     { id: "typewriter", name: "⌨️ Typewriter", file: "typewriter.css" },
     { id: "xeroxui", name: "📠 Xerox", file: "xeroxui.css" },
-    { id: "xtreegold", name: "📁 XTree", file: "xtreegold.css" }
+    { id: "xtreegold", name: "📁 XTree", file: "xtreegold.css" },
   ];
 
   function loadTheme(id) {
-    const theme = themes.find(t => t.id === id);
+    const theme = themes.find((t) => t.id === id);
     if (!theme) {
       console.warn("Theme not found:", id);
       return;
@@ -51,7 +60,7 @@ const ThemeManager = (() => {
       currentThemeId = id;
       localStorage.setItem("gb-theme", id);
       updateDropdown();
-      subscribers.forEach(cb => cb({ themeId: id, themeName: theme.name }));
+      subscribers.forEach((cb) => cb({ themeId: id, themeName: theme.name }));
     };
     link.onerror = () => console.error("✗ Failed:", theme.name);
     document.head.appendChild(link);
@@ -66,7 +75,7 @@ const ThemeManager = (() => {
     const select = document.createElement("select");
     select.id = "themeDropdown";
     select.className = "theme-dropdown";
-    themes.forEach(t => {
+    themes.forEach((t) => {
       const opt = document.createElement("option");
       opt.value = t.id;
       opt.textContent = t.name;
@@ -79,25 +88,27 @@ const ThemeManager = (() => {
 
   function init() {
     let saved = localStorage.getItem("gb-theme") || "default";
-    if (!themes.find(t => t.id === saved)) saved = "default";
+    if (!themes.find((t) => t.id === saved)) saved = "default";
     currentThemeId = saved;
     loadTheme(saved);
-    
+
     const container = document.getElementById("themeSelectorContainer");
     if (container) container.appendChild(createDropdown());
-    
+
     console.log("✓ Theme Manager initialized");
   }
 
   function setThemeFromServer(data) {
     if (data.logo_url) {
-      document.querySelectorAll(".logo-icon, .assistant-avatar").forEach(el => {
-        el.style.backgroundImage = `url("${data.logo_url}")`;
-      });
+      document
+        .querySelectorAll(".logo-icon, .assistant-avatar")
+        .forEach((el) => {
+          el.style.backgroundImage = `url("${data.logo_url}")`;
+        });
     }
     if (data.title) document.title = data.title;
     if (data.logo_text) {
-      document.querySelectorAll(".logo-text").forEach(el => {
+      document.querySelectorAll(".logo-text").forEach((el) => {
         el.textContent = data.logo_text;
       });
     }
@@ -111,7 +122,14 @@ const ThemeManager = (() => {
     subscribers.push(cb);
   }
 
-  return { init, loadTheme, setThemeFromServer, applyCustomizations, subscribe, getAvailableThemes: () => themes };
+  return {
+    init,
+    loadTheme,
+    setThemeFromServer,
+    applyCustomizations,
+    subscribe,
+    getAvailableThemes: () => themes,
+  };
 })();
 
 window.ThemeManager = ThemeManager;
