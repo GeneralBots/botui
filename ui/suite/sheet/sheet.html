@@ -46,6 +46,46 @@
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
+                <button
+                    class="btn-icon"
+                    id="printPreviewBtn"
+                    title="Print Preview"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path
+                            d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                        ></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="findReplaceBtn"
+                    title="Find & Replace (Ctrl+H)"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
                 <select
                     class="toolbar-select font-family"
                     id="fontFamily"
@@ -198,6 +238,66 @@
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
+                <select
+                    class="toolbar-select number-format"
+                    id="numberFormat"
+                    title="Number Format"
+                >
+                    <option value="general">General</option>
+                    <option value="number">Number (1,234.56)</option>
+                    <option value="currency">Currency ($1,234.56)</option>
+                    <option value="accounting">Accounting</option>
+                    <option value="percent">Percent (12.34%)</option>
+                    <option value="scientific">Scientific (1.23E+03)</option>
+                    <option value="date_short">Date (1/15/2024)</option>
+                    <option value="date_long">Date (January 15, 2024)</option>
+                    <option value="time">Time (3:45 PM)</option>
+                    <option value="datetime">Date & Time</option>
+                    <option value="fraction">Fraction (1/4)</option>
+                    <option value="text">Text</option>
+                    <option value="custom">Custom...</option>
+                </select>
+                <button
+                    class="btn-icon"
+                    id="decreaseDecimalBtn"
+                    title="Decrease Decimal"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <text x="2" y="16" font-size="10" fill="currentColor">
+                            .0
+                        </text>
+                        <path d="M18 8l-4 4 4 4"></path>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="increaseDecimalBtn"
+                    title="Increase Decimal"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <text x="2" y="16" font-size="10" fill="currentColor">
+                            .00
+                        </text>
+                        <path d="M14 8l4 4-4 4"></path>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
                 <button class="btn-icon" id="mergeCellsBtn" title="Merge Cells">
                     <svg
                         width="16"
@@ -216,17 +316,151 @@
                 </button>
                 <button
                     class="btn-icon"
-                    id="formatCurrencyBtn"
-                    title="Format as Currency"
+                    id="conditionalFormatBtn"
+                    title="Conditional Formatting"
                 >
-                    <span>$</span>
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="7"
+                            height="7"
+                            fill="#4CAF50"
+                        ></rect>
+                        <rect
+                            x="14"
+                            y="3"
+                            width="7"
+                            height="7"
+                            fill="#FFC107"
+                        ></rect>
+                        <rect
+                            x="3"
+                            y="14"
+                            width="7"
+                            height="7"
+                            fill="#F44336"
+                        ></rect>
+                        <rect
+                            x="14"
+                            y="14"
+                            width="7"
+                            height="7"
+                            fill="#2196F3"
+                        ></rect>
+                    </svg>
                 </button>
                 <button
                     class="btn-icon"
-                    id="formatPercentBtn"
-                    title="Format as Percent"
+                    id="dataValidationBtn"
+                    title="Data Validation"
                 >
-                    <span>%</span>
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path
+                            d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                        ></path>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
+                <button
+                    class="btn-icon"
+                    id="insertChartBtn"
+                    title="Insert Chart"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="12" width="4" height="9"></rect>
+                        <rect x="10" y="6" width="4" height="15"></rect>
+                        <rect x="17" y="3" width="4" height="18"></rect>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="insertImageBtn"
+                    title="Insert Image"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        ></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="filterBtn" title="Filter">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polygon
+                            points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
+                        ></polygon>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="sortAscBtn" title="Sort A→Z">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M11 5h10M11 9h7M11 13h4"></path>
+                        <path d="M3 17l3 3 3-3M6 18V4"></path>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="sortDescBtn" title="Sort Z→A">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M11 5h4M11 9h7M11 13h10"></path>
+                        <path d="M3 7l3-3 3 3M6 6v12"></path>
+                    </svg>
                 </button>
             </div>
         </div>
@@ -296,6 +530,14 @@
                         <div
                             class="cursor-indicators"
                             id="cursorIndicators"
+                        ></div>
+                        <div
+                            class="charts-container"
+                            id="chartsContainer"
+                        ></div>
+                        <div
+                            class="images-container"
+                            id="imagesContainer"
                         ></div>
                     </div>
                 </div>
@@ -598,9 +840,469 @@
                 <button class="btn-secondary" id="cancelChartBtn">
                     Cancel
                 </button>
-                <button class="btn-primary" id="insertChartBtn">
+                <button class="btn-primary" id="insertChartBtnConfirm">
                     Insert Chart
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="findReplaceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Find & Replace</h3>
+            <button class="btn-close" id="closeFindReplaceModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="find-replace-group">
+                <label>Find:</label>
+                <input
+                    type="text"
+                    id="findInput"
+                    placeholder="Search text..."
+                    autofocus
+                />
+            </div>
+            <div class="find-replace-group">
+                <label>Replace:</label>
+                <input
+                    type="text"
+                    id="replaceInput"
+                    placeholder="Replace with..."
+                />
+            </div>
+            <div class="find-replace-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="findMatchCase" />
+                    Match case
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="findWholeCell" />
+                    Match entire cell contents
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="findRegex" />
+                    Use regular expressions
+                </label>
+            </div>
+            <div class="find-results" id="findResults">
+                <span>0 matches found</span>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="findPrevBtn">Previous</button>
+                <button class="btn-secondary" id="findNextBtn">Next</button>
+                <button class="btn-primary" id="replaceBtn">Replace</button>
+                <button class="btn-primary" id="replaceAllBtn">
+                    Replace All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="conditionalFormatModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>Conditional Formatting</h3>
+            <button class="btn-close" id="closeConditionalFormatModal">
+                ×
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="cf-section">
+                <label>Apply to range:</label>
+                <input type="text" id="cfRange" placeholder="e.g., A1:D10" />
+            </div>
+            <div class="cf-section">
+                <label>Format cells if:</label>
+                <select id="cfRuleType">
+                    <option value="greater_than">Greater than</option>
+                    <option value="less_than">Less than</option>
+                    <option value="equal_to">Equal to</option>
+                    <option value="between">Between</option>
+                    <option value="text_contains">Text contains</option>
+                    <option value="text_starts">Text starts with</option>
+                    <option value="text_ends">Text ends with</option>
+                    <option value="duplicate">Duplicate values</option>
+                    <option value="unique">Unique values</option>
+                    <option value="blank">Is blank</option>
+                    <option value="not_blank">Is not blank</option>
+                    <option value="top_n">Top N values</option>
+                    <option value="bottom_n">Bottom N values</option>
+                    <option value="above_average">Above average</option>
+                    <option value="below_average">Below average</option>
+                    <option value="color_scale">Color scale</option>
+                    <option value="data_bar">Data bars</option>
+                    <option value="icon_set">Icon set</option>
+                </select>
+            </div>
+            <div class="cf-section cf-values" id="cfValuesSection">
+                <input type="text" id="cfValue1" placeholder="Value" />
+                <input
+                    type="text"
+                    id="cfValue2"
+                    placeholder="and"
+                    class="hidden"
+                />
+            </div>
+            <div class="cf-section">
+                <label>Formatting style:</label>
+                <div class="cf-style-options">
+                    <div class="cf-style-row">
+                        <label>Background:</label>
+                        <input type="color" id="cfBgColor" value="#ffeb3b" />
+                    </div>
+                    <div class="cf-style-row">
+                        <label>Text color:</label>
+                        <input type="color" id="cfTextColor" value="#000000" />
+                    </div>
+                    <div class="cf-style-row">
+                        <label>Bold:</label>
+                        <input type="checkbox" id="cfBold" />
+                    </div>
+                    <div class="cf-style-row">
+                        <label>Italic:</label>
+                        <input type="checkbox" id="cfItalic" />
+                    </div>
+                </div>
+            </div>
+            <div class="cf-preview">
+                <label>Preview:</label>
+                <div class="cf-preview-cell" id="cfPreviewCell">Sample</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelCfBtn">Cancel</button>
+                <button class="btn-primary" id="applyCfBtn">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="dataValidationModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>Data Validation</h3>
+            <button class="btn-close" id="closeDataValidationModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="dv-tabs">
+                <button class="dv-tab active" data-tab="settings">
+                    Settings
+                </button>
+                <button class="dv-tab" data-tab="input">Input Message</button>
+                <button class="dv-tab" data-tab="error">Error Alert</button>
+            </div>
+            <div class="dv-tab-content active" id="dvSettingsTab">
+                <div class="dv-section">
+                    <label>Apply to range:</label>
+                    <input
+                        type="text"
+                        id="dvRange"
+                        placeholder="e.g., A1:A100"
+                    />
+                </div>
+                <div class="dv-section">
+                    <label>Allow:</label>
+                    <select id="dvType">
+                        <option value="any">Any value</option>
+                        <option value="whole_number">Whole number</option>
+                        <option value="decimal">Decimal</option>
+                        <option value="list">List</option>
+                        <option value="date">Date</option>
+                        <option value="time">Time</option>
+                        <option value="text_length">Text length</option>
+                        <option value="custom">Custom formula</option>
+                    </select>
+                </div>
+                <div class="dv-section dv-criteria" id="dvCriteriaSection">
+                    <label>Data:</label>
+                    <select id="dvOperator">
+                        <option value="between">between</option>
+                        <option value="not_between">not between</option>
+                        <option value="equal">equal to</option>
+                        <option value="not_equal">not equal to</option>
+                        <option value="greater">greater than</option>
+                        <option value="less">less than</option>
+                        <option value="greater_equal">
+                            greater than or equal to
+                        </option>
+                        <option value="less_equal">
+                            less than or equal to
+                        </option>
+                    </select>
+                </div>
+                <div class="dv-section dv-values" id="dvValuesSection">
+                    <div class="dv-value-row">
+                        <label id="dvValue1Label">Minimum:</label>
+                        <input type="text" id="dvValue1" />
+                    </div>
+                    <div class="dv-value-row" id="dvValue2Row">
+                        <label>Maximum:</label>
+                        <input type="text" id="dvValue2" />
+                    </div>
+                </div>
+                <div class="dv-section dv-list hidden" id="dvListSection">
+                    <label>Source (comma-separated):</label>
+                    <textarea
+                        id="dvListSource"
+                        placeholder="Option 1, Option 2, Option 3"
+                    ></textarea>
+                </div>
+                <div class="dv-section">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="dvIgnoreBlank" checked />
+                        Ignore blank
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="dvShowDropdown" checked />
+                        In-cell dropdown
+                    </label>
+                </div>
+            </div>
+            <div class="dv-tab-content" id="dvInputTab">
+                <div class="dv-section">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="dvShowInput" checked />
+                        Show input message when cell is selected
+                    </label>
+                </div>
+                <div class="dv-section">
+                    <label>Title:</label>
+                    <input
+                        type="text"
+                        id="dvInputTitle"
+                        placeholder="Input title"
+                    />
+                </div>
+                <div class="dv-section">
+                    <label>Input message:</label>
+                    <textarea
+                        id="dvInputMessage"
+                        placeholder="Enter instructions for the user"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="dv-tab-content" id="dvErrorTab">
+                <div class="dv-section">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="dvShowError" checked />
+                        Show error alert after invalid data is entered
+                    </label>
+                </div>
+                <div class="dv-section">
+                    <label>Style:</label>
+                    <select id="dvErrorStyle">
+                        <option value="stop">Stop</option>
+                        <option value="warning">Warning</option>
+                        <option value="information">Information</option>
+                    </select>
+                </div>
+                <div class="dv-section">
+                    <label>Title:</label>
+                    <input
+                        type="text"
+                        id="dvErrorTitle"
+                        placeholder="Error title"
+                    />
+                </div>
+                <div class="dv-section">
+                    <label>Error message:</label>
+                    <textarea
+                        id="dvErrorMessage"
+                        placeholder="Enter error message"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="clearDvBtn">Clear All</button>
+                <button class="btn-secondary" id="cancelDvBtn">Cancel</button>
+                <button class="btn-primary" id="applyDvBtn">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="printPreviewModal">
+    <div class="modal-content modal-fullscreen">
+        <div class="modal-header">
+            <h3>Print Preview</h3>
+            <div class="print-toolbar">
+                <select id="printOrientation">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+                <select id="printPaperSize">
+                    <option value="letter">Letter (8.5" x 11")</option>
+                    <option value="a4">A4 (210mm x 297mm)</option>
+                    <option value="legal">Legal (8.5" x 14")</option>
+                    <option value="tabloid">Tabloid (11" x 17")</option>
+                </select>
+                <select id="printScale">
+                    <option value="100">100%</option>
+                    <option value="fit_width">Fit to width</option>
+                    <option value="fit_page">Fit to page</option>
+                    <option value="75">75%</option>
+                    <option value="50">50%</option>
+                </select>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="printGridlines" />
+                    Gridlines
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="printHeaders" />
+                    Row/Column headers
+                </label>
+            </div>
+            <button class="btn-close" id="closePrintPreviewModal">×</button>
+        </div>
+        <div class="modal-body print-preview-body">
+            <div class="print-preview-container" id="printPreviewContainer">
+                <div class="print-page" id="printPage">
+                    <div class="print-content" id="printContent"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" id="cancelPrintBtn">Cancel</button>
+            <button class="btn-primary" id="printBtn">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path
+                        d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                    ></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="customNumberFormatModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Custom Number Format</h3>
+            <button class="btn-close" id="closeCustomFormatModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="cnf-section">
+                <label>Category:</label>
+                <select id="cnfCategory">
+                    <option value="number">Number</option>
+                    <option value="currency">Currency</option>
+                    <option value="date">Date</option>
+                    <option value="time">Time</option>
+                    <option value="percentage">Percentage</option>
+                    <option value="fraction">Fraction</option>
+                    <option value="scientific">Scientific</option>
+                    <option value="text">Text</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="cnf-section">
+                <label>Format code:</label>
+                <input type="text" id="cnfFormatCode" placeholder="#,##0.00" />
+            </div>
+            <div class="cnf-section">
+                <label>Preview:</label>
+                <div class="cnf-preview" id="cnfPreview">1,234.56</div>
+            </div>
+            <div class="cnf-section">
+                <label>Common formats:</label>
+                <div class="cnf-formats-list" id="cnfFormatsList">
+                    <div class="cnf-format-item" data-format="#,##0">1,235</div>
+                    <div class="cnf-format-item" data-format="#,##0.00">
+                        1,234.56
+                    </div>
+                    <div class="cnf-format-item" data-format="$#,##0.00">
+                        $1,234.56
+                    </div>
+                    <div class="cnf-format-item" data-format="0%">12%</div>
+                    <div class="cnf-format-item" data-format="0.00%">
+                        12.34%
+                    </div>
+                    <div class="cnf-format-item" data-format="0.00E+00">
+                        1.23E+03
+                    </div>
+                    <div class="cnf-format-item" data-format="MM/DD/YYYY">
+                        01/15/2024
+                    </div>
+                    <div class="cnf-format-item" data-format="MMMM D, YYYY">
+                        January 15, 2024
+                    </div>
+                    <div class="cnf-format-item" data-format="HH:MM:SS">
+                        14:30:00
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelCnfBtn">Cancel</button>
+                <button class="btn-primary" id="applyCnfBtn">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="insertImageModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Insert Image</h3>
+            <button class="btn-close" id="closeInsertImageModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="img-tabs">
+                <button class="img-tab active" data-tab="url">From URL</button>
+                <button class="img-tab" data-tab="upload">Upload</button>
+            </div>
+            <div class="img-tab-content active" id="imgUrlTab">
+                <div class="img-section">
+                    <label>Image URL:</label>
+                    <input type="text" id="imgUrl" placeholder="https://..." />
+                </div>
+            </div>
+            <div class="img-tab-content" id="imgUploadTab">
+                <div class="img-section">
+                    <label>Select file:</label>
+                    <input type="file" id="imgFile" accept="image/*" />
+                </div>
+                <div class="img-drop-zone" id="imgDropZone">
+                    <svg
+                        width="48"
+                        height="48"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1"
+                    >
+                        <rect
+                            x="3"
+                            y="3"
+                            width="18"
+                            height="18"
+                            rx="2"
+                            ry="2"
+                        ></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <p>Drag and drop an image here</p>
+                </div>
+            </div>
+            <div class="img-preview-container hidden" id="imgPreviewContainer">
+                <label>Preview:</label>
+                <img id="imgPreview" src="" alt="Preview" />
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelImgBtn">Cancel</button>
+                <button class="btn-primary" id="insertImgBtn">Insert</button>
             </div>
         </div>
     </div>

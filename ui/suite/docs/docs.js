@@ -20,6 +20,8 @@
     chatPanelOpen: true,
     driveSource: null,
     zoom: 100,
+    findMatches: [],
+    findMatchIndex: -1,
   };
 
   const elements = {};
@@ -54,6 +56,11 @@
     elements.imageModal = document.getElementById("imageModal");
     elements.tableModal = document.getElementById("tableModal");
     elements.exportModal = document.getElementById("exportModal");
+    elements.findReplaceModal = document.getElementById("findReplaceModal");
+    elements.printPreviewModal = document.getElementById("printPreviewModal");
+    elements.headerFooterModal = document.getElementById("headerFooterModal");
+    elements.editorHeader = document.getElementById("editorHeader");
+    elements.editorFooter = document.getElementById("editorFooter");
   }
 
   function bindEvents() {
@@ -206,6 +213,94 @@
     document.querySelectorAll(".export-option").forEach((btn) => {
       btn.addEventListener("click", () => exportDocument(btn.dataset.format));
     });
+
+    document
+      .getElementById("findReplaceBtn")
+      ?.addEventListener("click", showFindReplaceModal);
+    document
+      .getElementById("closeFindReplaceModal")
+      ?.addEventListener("click", () => hideModal("findReplaceModal"));
+    document.getElementById("findNextBtn")?.addEventListener("click", findNext);
+    document.getElementById("findPrevBtn")?.addEventListener("click", findPrev);
+    document
+      .getElementById("replaceBtn")
+      ?.addEventListener("click", replaceOne);
+    document
+      .getElementById("replaceAllBtn")
+      ?.addEventListener("click", replaceAll);
+    document
+      .getElementById("findInput")
+      ?.addEventListener("input", performFind);
+
+    document
+      .getElementById("printPreviewBtn")
+      ?.addEventListener("click", showPrintPreview);
+    document
+      .getElementById("closePrintPreviewModal")
+      ?.addEventListener("click", () => hideModal("printPreviewModal"));
+    document
+      .getElementById("printBtn")
+      ?.addEventListener("click", printDocument);
+    document
+      .getElementById("cancelPrintBtn")
+      ?.addEventListener("click", () => hideModal("printPreviewModal"));
+    document
+      .getElementById("printOrientation")
+      ?.addEventListener("change", updatePrintPreview);
+    document
+      .getElementById("printPaperSize")
+      ?.addEventListener("change", updatePrintPreview);
+    document
+      .getElementById("printHeaders")
+      ?.addEventListener("change", updatePrintPreview);
+
+    document
+      .getElementById("pageBreakBtn")
+      ?.addEventListener("click", insertPageBreak);
+
+    document
+      .getElementById("headerFooterBtn")
+      ?.addEventListener("click", showHeaderFooterModal);
+    document
+      .getElementById("closeHeaderFooterModal")
+      ?.addEventListener("click", () => hideModal("headerFooterModal"));
+    document
+      .getElementById("applyHeaderFooterBtn")
+      ?.addEventListener("click", applyHeaderFooter);
+    document
+      .getElementById("cancelHeaderFooterBtn")
+      ?.addEventListener("click", () => hideModal("headerFooterModal"));
+    document
+      .getElementById("removeHeaderFooterBtn")
+      ?.addEventListener("click", removeHeaderFooter);
+    document.querySelectorAll(".hf-tab").forEach((tab) => {
+      tab.addEventListener("click", () => switchHfTab(tab.dataset.tab));
+    });
+    document
+      .getElementById("insertPageNum")
+      ?.addEventListener("click", () => insertHfField("header", "pageNum"));
+    document
+      .getElementById("insertDate")
+      ?.addEventListener("click", () => insertHfField("header", "date"));
+    document
+      .getElementById("insertDocTitle")
+      ?.addEventListener("click", () => insertHfField("header", "title"));
+    document
+      .getElementById("insertFooterPageNum")
+      ?.addEventListener("click", () => insertHfField("footer", "pageNum"));
+    document
+      .getElementById("insertFooterDate")
+      ?.addEventListener("click", () => insertHfField("footer", "date"));
+    document
+      .getElementById("insertFooterDocTitle")
+      ?.addEventListener("click", () => insertHfField("footer", "title"));
+
+    if (elements.editorHeader) {
+      elements.editorHeader.addEventListener("input", handleHeaderFooterInput);
+    }
+    if (elements.editorFooter) {
+      elements.editorFooter.addEventListener("input", handleHeaderFooterInput);
+    }
 
     window.addEventListener("beforeunload", handleBeforeUnload);
   }
@@ -1005,6 +1100,421 @@ ${content}
     const div = document.createElement("div");
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  function showFindReplaceModal() {
+    showModal("findReplaceModal");
+    document.getElementById("findInput")?.focus();
+    state.findMatches = [];
+    state.findMatchIndex = -1;
+    clearFindHighlights();
+  }
+
+  function performFind() {
+    const searchText = document.getElementById("findInput")?.value || "";
+    const matchCase = document.getElementById("findMatchCase")?.checked;
+    const wholeWord = document.getElementById("findWholeWord")?.checked;
+
+    clearFindHighlights();
+    state.findMatches = [];
+    state.findMatchIndex = -1;
+
+    if (!searchText || !elements.editorContent) {
+      updateFindResults();
+      return;
+    }
+
+    const content = elements.editorContent.innerHTML;
+    let flags = "g";
+    if (!matchCase) flags += "i";
+
+    let searchPattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (wholeWord) {
+      searchPattern = `\\b${searchPattern}\\b`;
+    }
+
+    const regex = new RegExp(searchPattern, flags);
+    const textContent = elements.editorContent.textContent;
+    let match;
+
+    while ((match = regex.exec(textContent)) !== null) {
+      state.findMatches.push({
+        index: match.index,
+        length: match[0].length,
+        text: match[0],
+      });
+    }
+
+    if (state.findMatches.length > 0) {
+      state.findMatchIndex = 0;
+      highlightAllMatches(searchText, matchCase, wholeWord);
+      scrollToMatch();
+    }
+
+    updateFindResults();
+  }
+
+  function highlightAllMatches(searchText, matchCase, wholeWord) {
+    if (!elements.editorContent) return;
+
+    const walker = document.createTreeWalker(
+      elements.editorContent,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false,
+    );
+
+    const textNodes = [];
+    let node;
+    while ((node = walker.nextNode())) {
+      textNodes.push(node);
+    }
+
+    let flags = "g";
+    if (!matchCase) flags += "i";
+    let searchPattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (wholeWord) {
+      searchPattern = `\\b${searchPattern}\\b`;
+    }
+    const regex = new RegExp(`(${searchPattern})`, flags);
+
+    textNodes.forEach((textNode) => {
+      const text = textNode.textContent;
+      if (regex.test(text)) {
+        const span = document.createElement("span");
+        span.innerHTML = text.replace(
+          regex,
+          '<mark class="find-highlight">$1</mark>',
+        );
+        textNode.parentNode.replaceChild(span, textNode);
+      }
+    });
+
+    updateCurrentHighlight();
+  }
+
+  function updateCurrentHighlight() {
+    const highlights =
+      elements.editorContent?.querySelectorAll(".find-highlight");
+    if (!highlights) return;
+
+    highlights.forEach((el, index) => {
+      el.classList.toggle("current", index === state.findMatchIndex);
+    });
+  }
+
+  function clearFindHighlights() {
+    if (!elements.editorContent) return;
+
+    const highlights =
+      elements.editorContent.querySelectorAll(".find-highlight");
+    highlights.forEach((el) => {
+      const parent = el.parentNode;
+      parent.replaceChild(document.createTextNode(el.textContent), el);
+      parent.normalize();
+    });
+
+    const wrapperSpans = elements.editorContent.querySelectorAll("span:empty");
+    wrapperSpans.forEach((span) => {
+      if (span.childNodes.length === 0) {
+        span.remove();
+      }
+    });
+  }
+
+  function updateFindResults() {
+    const resultsEl = document.getElementById("findResults");
+    if (resultsEl) {
+      const count = state.findMatches.length;
+      const span = resultsEl.querySelector("span");
+      if (span) {
+        span.textContent =
+          count === 0
+            ? "0 matches found"
+            : `${state.findMatchIndex + 1} of ${count} matches`;
+      }
+    }
+  }
+
+  function scrollToMatch() {
+    const highlights =
+      elements.editorContent?.querySelectorAll(".find-highlight");
+    if (highlights && highlights[state.findMatchIndex]) {
+      highlights[state.findMatchIndex].scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }
+
+  function findNext() {
+    if (state.findMatches.length === 0) return;
+    state.findMatchIndex =
+      (state.findMatchIndex + 1) % state.findMatches.length;
+    updateCurrentHighlight();
+    scrollToMatch();
+    updateFindResults();
+  }
+
+  function findPrev() {
+    if (state.findMatches.length === 0) return;
+    state.findMatchIndex =
+      (state.findMatchIndex - 1 + state.findMatches.length) %
+      state.findMatches.length;
+    updateCurrentHighlight();
+    scrollToMatch();
+    updateFindResults();
+  }
+
+  function replaceOne() {
+    if (state.findMatches.length === 0 || state.findMatchIndex < 0) return;
+
+    const replaceText = document.getElementById("replaceInput")?.value || "";
+    const highlights =
+      elements.editorContent?.querySelectorAll(".find-highlight");
+
+    if (highlights && highlights[state.findMatchIndex]) {
+      const highlight = highlights[state.findMatchIndex];
+      highlight.replaceWith(document.createTextNode(replaceText));
+      elements.editorContent.normalize();
+
+      state.findMatches.splice(state.findMatchIndex, 1);
+      if (state.findMatches.length > 0) {
+        state.findMatchIndex = state.findMatchIndex % state.findMatches.length;
+        updateCurrentHighlight();
+        scrollToMatch();
+      } else {
+        state.findMatchIndex = -1;
+      }
+      updateFindResults();
+
+      state.isDirty = true;
+      scheduleAutoSave();
+    }
+  }
+
+  function replaceAll() {
+    if (state.findMatches.length === 0) return;
+
+    const replaceText = document.getElementById("replaceInput")?.value || "";
+    const highlights =
+      elements.editorContent?.querySelectorAll(".find-highlight");
+
+    if (highlights) {
+      const count = highlights.length;
+      highlights.forEach((highlight) => {
+        highlight.replaceWith(document.createTextNode(replaceText));
+      });
+      elements.editorContent.normalize();
+
+      state.findMatches = [];
+      state.findMatchIndex = -1;
+      updateFindResults();
+
+      state.isDirty = true;
+      scheduleAutoSave();
+      addChatMessage("assistant", `Replaced ${count} occurrences.`);
+    }
+  }
+
+  function showPrintPreview() {
+    showModal("printPreviewModal");
+    updatePrintPreview();
+  }
+
+  function updatePrintPreview() {
+    const orientation =
+      document.getElementById("printOrientation")?.value || "portrait";
+    const showHeaders = document.getElementById("printHeaders")?.checked;
+    const printPage = document.getElementById("printPage");
+    const printContent = document.getElementById("printContent");
+    const printHeader = document.getElementById("printHeader");
+    const printFooter = document.getElementById("printFooter");
+
+    if (printPage) {
+      printPage.className = `print-page ${orientation}`;
+    }
+
+    if (printHeader) {
+      printHeader.innerHTML = showHeaders ? state.docTitle : "";
+      printHeader.style.display = showHeaders ? "block" : "none";
+    }
+
+    if (printFooter) {
+      printFooter.innerHTML = showHeaders ? "Page 1" : "";
+      printFooter.style.display = showHeaders ? "block" : "none";
+    }
+
+    if (printContent && elements.editorContent) {
+      printContent.innerHTML = elements.editorContent.innerHTML;
+    }
+  }
+
+  function printDocument() {
+    const orientation =
+      document.getElementById("printOrientation")?.value || "portrait";
+    const showHeaders = document.getElementById("printHeaders")?.checked;
+    const content = elements.editorContent?.innerHTML || "";
+
+    const printWindow = window.open("", "_blank");
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${state.docTitle}</title>
+        <style>
+          @page { size: ${orientation}; margin: 1in; }
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+            color: #000;
+          }
+          h1 { font-size: 24pt; margin-bottom: 12pt; }
+          h2 { font-size: 18pt; margin-bottom: 10pt; }
+          h3 { font-size: 14pt; margin-bottom: 8pt; }
+          p { margin-bottom: 12pt; }
+          table { border-collapse: collapse; width: 100%; margin: 12pt 0; }
+          td, th { border: 1px solid #ccc; padding: 8px; }
+          .page-break { page-break-after: always; }
+          ${showHeaders ? `.header { text-align: center; font-size: 10pt; color: #666; margin-bottom: 24pt; }` : ""}
+        </style>
+      </head>
+      <body>
+        ${showHeaders ? `<div class="header">${state.docTitle}</div>` : ""}
+        ${content}
+      </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+
+    hideModal("printPreviewModal");
+  }
+
+  function insertPageBreak() {
+    if (!elements.editorContent) return;
+
+    const pageBreak = document.createElement("div");
+    pageBreak.className = "page-break";
+    pageBreak.contentEditable = "false";
+
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(pageBreak);
+
+      const newParagraph = document.createElement("p");
+      newParagraph.innerHTML = "<br>";
+      pageBreak.after(newParagraph);
+
+      range.setStartAfter(newParagraph);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } else {
+      elements.editorContent.appendChild(pageBreak);
+    }
+
+    state.isDirty = true;
+    scheduleAutoSave();
+  }
+
+  function showHeaderFooterModal() {
+    showModal("headerFooterModal");
+
+    const headerEditor = document.getElementById("headerEditor");
+    const footerEditor = document.getElementById("footerEditor");
+
+    if (headerEditor && elements.editorHeader) {
+      headerEditor.innerHTML = elements.editorHeader.innerHTML;
+    }
+    if (footerEditor && elements.editorFooter) {
+      footerEditor.innerHTML = elements.editorFooter.innerHTML;
+    }
+  }
+
+  function switchHfTab(tabName) {
+    document.querySelectorAll(".hf-tab").forEach((tab) => {
+      tab.classList.toggle("active", tab.dataset.tab === tabName);
+    });
+    document
+      .getElementById("hfHeaderTab")
+      ?.classList.toggle("active", tabName === "header");
+    document
+      .getElementById("hfFooterTab")
+      ?.classList.toggle("active", tabName === "footer");
+  }
+
+  function insertHfField(type, field) {
+    const editorId = type === "header" ? "headerEditor" : "footerEditor";
+    const editor = document.getElementById(editorId);
+    if (!editor) return;
+
+    let fieldContent = "";
+    switch (field) {
+      case "pageNum":
+        fieldContent =
+          '<span class="hf-field" data-field="pageNum">[Page #]</span>';
+        break;
+      case "date":
+        fieldContent = `<span class="hf-field" data-field="date">${new Date().toLocaleDateString()}</span>`;
+        break;
+      case "title":
+        fieldContent = `<span class="hf-field" data-field="title">${state.docTitle}</span>`;
+        break;
+    }
+
+    editor.focus();
+    document.execCommand("insertHTML", false, fieldContent);
+  }
+
+  function applyHeaderFooter() {
+    const headerEditor = document.getElementById("headerEditor");
+    const footerEditor = document.getElementById("footerEditor");
+
+    if (elements.editorHeader && headerEditor) {
+      elements.editorHeader.innerHTML = headerEditor.innerHTML;
+    }
+    if (elements.editorFooter && footerEditor) {
+      elements.editorFooter.innerHTML = footerEditor.innerHTML;
+    }
+
+    hideModal("headerFooterModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage("assistant", "Header and footer updated!");
+  }
+
+  function removeHeaderFooter() {
+    if (elements.editorHeader) {
+      elements.editorHeader.innerHTML = "";
+    }
+    if (elements.editorFooter) {
+      elements.editorFooter.innerHTML = "";
+    }
+
+    const headerEditor = document.getElementById("headerEditor");
+    const footerEditor = document.getElementById("footerEditor");
+    if (headerEditor) headerEditor.innerHTML = "";
+    if (footerEditor) footerEditor.innerHTML = "";
+
+    hideModal("headerFooterModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage("assistant", "Header and footer removed.");
+  }
+
+  function handleHeaderFooterInput() {
+    state.isDirty = true;
+    scheduleAutoSave();
   }
 
   function createNewDocument() {

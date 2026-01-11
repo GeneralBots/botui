@@ -37,6 +37,9 @@
     isDirty: false,
     autoSaveTimer: null,
     chatPanelOpen: true,
+    findMatches: [],
+    findMatchIndex: -1,
+    decimalPlaces: 2,
   };
 
   const elements = {};
@@ -50,6 +53,8 @@
     connectChatWebSocket();
     selectCell(0, 0);
     updateCellAddress();
+    renderCharts();
+    renderImages();
   }
 
   function cacheElements() {
@@ -76,6 +81,18 @@
     elements.chatMessages = document.getElementById("chatMessages");
     elements.chatInput = document.getElementById("chatInput");
     elements.chatForm = document.getElementById("chatForm");
+    elements.findReplaceModal = document.getElementById("findReplaceModal");
+    elements.conditionalFormatModal = document.getElementById(
+      "conditionalFormatModal",
+    );
+    elements.dataValidationModal = document.getElementById(
+      "dataValidationModal",
+    );
+    elements.printPreviewModal = document.getElementById("printPreviewModal");
+    elements.customNumberFormatModal = document.getElementById(
+      "customNumberFormatModal",
+    );
+    elements.insertImageModal = document.getElementById("insertImageModal");
   }
 
   function renderGrid() {
@@ -233,11 +250,14 @@
       .getElementById("mergeCellsBtn")
       ?.addEventListener("click", mergeCells);
     document
-      .getElementById("formatCurrencyBtn")
-      ?.addEventListener("click", () => formatCells("currency"));
+      .getElementById("numberFormat")
+      ?.addEventListener("change", handleNumberFormatChange);
     document
-      .getElementById("formatPercentBtn")
-      ?.addEventListener("click", () => formatCells("percent"));
+      .getElementById("decreaseDecimalBtn")
+      ?.addEventListener("click", decreaseDecimal);
+    document
+      .getElementById("increaseDecimalBtn")
+      ?.addEventListener("click", increaseDecimal);
 
     document
       .getElementById("textColorInput")
@@ -281,6 +301,157 @@
       ?.addEventListener("click", addWorksheet);
     document.getElementById("zoomInBtn")?.addEventListener("click", zoomIn);
     document.getElementById("zoomOutBtn")?.addEventListener("click", zoomOut);
+
+    document
+      .getElementById("findReplaceBtn")
+      ?.addEventListener("click", showFindReplaceModal);
+    document
+      .getElementById("closeFindReplaceModal")
+      ?.addEventListener("click", () => hideModal("findReplaceModal"));
+    document.getElementById("findNextBtn")?.addEventListener("click", findNext);
+    document.getElementById("findPrevBtn")?.addEventListener("click", findPrev);
+    document
+      .getElementById("replaceBtn")
+      ?.addEventListener("click", replaceOne);
+    document
+      .getElementById("replaceAllBtn")
+      ?.addEventListener("click", replaceAll);
+    document
+      .getElementById("findInput")
+      ?.addEventListener("input", performFind);
+
+    document
+      .getElementById("conditionalFormatBtn")
+      ?.addEventListener("click", showConditionalFormatModal);
+    document
+      .getElementById("closeConditionalFormatModal")
+      ?.addEventListener("click", () => hideModal("conditionalFormatModal"));
+    document
+      .getElementById("applyCfBtn")
+      ?.addEventListener("click", applyConditionalFormat);
+    document
+      .getElementById("cancelCfBtn")
+      ?.addEventListener("click", () => hideModal("conditionalFormatModal"));
+    document
+      .getElementById("cfRuleType")
+      ?.addEventListener("change", handleCfRuleTypeChange);
+    document
+      .getElementById("cfBgColor")
+      ?.addEventListener("input", updateCfPreview);
+    document
+      .getElementById("cfTextColor")
+      ?.addEventListener("input", updateCfPreview);
+    document
+      .getElementById("cfBold")
+      ?.addEventListener("change", updateCfPreview);
+    document
+      .getElementById("cfItalic")
+      ?.addEventListener("change", updateCfPreview);
+
+    document
+      .getElementById("dataValidationBtn")
+      ?.addEventListener("click", showDataValidationModal);
+    document
+      .getElementById("closeDataValidationModal")
+      ?.addEventListener("click", () => hideModal("dataValidationModal"));
+    document
+      .getElementById("applyDvBtn")
+      ?.addEventListener("click", applyDataValidation);
+    document
+      .getElementById("cancelDvBtn")
+      ?.addEventListener("click", () => hideModal("dataValidationModal"));
+    document
+      .getElementById("clearDvBtn")
+      ?.addEventListener("click", clearDataValidation);
+    document
+      .getElementById("dvType")
+      ?.addEventListener("change", handleDvTypeChange);
+    document
+      .getElementById("dvOperator")
+      ?.addEventListener("change", handleDvOperatorChange);
+    document.querySelectorAll(".dv-tab").forEach((tab) => {
+      tab.addEventListener("click", () => switchDvTab(tab.dataset.tab));
+    });
+
+    document
+      .getElementById("printPreviewBtn")
+      ?.addEventListener("click", showPrintPreview);
+    document
+      .getElementById("closePrintPreviewModal")
+      ?.addEventListener("click", () => hideModal("printPreviewModal"));
+    document.getElementById("printBtn")?.addEventListener("click", printSheet);
+    document
+      .getElementById("cancelPrintBtn")
+      ?.addEventListener("click", () => hideModal("printPreviewModal"));
+    document
+      .getElementById("printOrientation")
+      ?.addEventListener("change", updatePrintPreview);
+    document
+      .getElementById("printPaperSize")
+      ?.addEventListener("change", updatePrintPreview);
+    document
+      .getElementById("printScale")
+      ?.addEventListener("change", updatePrintPreview);
+    document
+      .getElementById("printGridlines")
+      ?.addEventListener("change", updatePrintPreview);
+    document
+      .getElementById("printHeaders")
+      ?.addEventListener("change", updatePrintPreview);
+
+    document
+      .getElementById("insertChartBtn")
+      ?.addEventListener("click", () => showModal("chartModal"));
+    document
+      .getElementById("insertChartBtnConfirm")
+      ?.addEventListener("click", insertChart);
+    document
+      .getElementById("cancelChartBtn")
+      ?.addEventListener("click", () => hideModal("chartModal"));
+
+    document
+      .getElementById("insertImageBtn")
+      ?.addEventListener("click", showInsertImageModal);
+    document
+      .getElementById("closeInsertImageModal")
+      ?.addEventListener("click", () => hideModal("insertImageModal"));
+    document
+      .getElementById("insertImgBtn")
+      ?.addEventListener("click", insertImage);
+    document
+      .getElementById("cancelImgBtn")
+      ?.addEventListener("click", () => hideModal("insertImageModal"));
+    document.querySelectorAll(".img-tab").forEach((tab) => {
+      tab.addEventListener("click", () => switchImgTab(tab.dataset.tab));
+    });
+
+    document
+      .getElementById("filterBtn")
+      ?.addEventListener("click", toggleFilter);
+    document
+      .getElementById("sortAscBtn")
+      ?.addEventListener("click", sortAscending);
+    document
+      .getElementById("sortDescBtn")
+      ?.addEventListener("click", sortDescending);
+
+    document
+      .getElementById("closeCustomFormatModal")
+      ?.addEventListener("click", () => hideModal("customNumberFormatModal"));
+    document
+      .getElementById("applyCnfBtn")
+      ?.addEventListener("click", applyCustomNumberFormat);
+    document
+      .getElementById("cancelCnfBtn")
+      ?.addEventListener("click", () => hideModal("customNumberFormatModal"));
+    document.querySelectorAll(".cnf-format-item").forEach((item) => {
+      item.addEventListener("click", () =>
+        selectCustomFormat(item.dataset.format),
+      );
+    });
+    document
+      .getElementById("cnfFormatCode")
+      ?.addEventListener("input", updateCnfPreview);
 
     document
       .getElementById("chatToggle")
@@ -1053,7 +1224,41 @@
   }
 
   function mergeCells() {
-    addChatMessage("assistant", "Merge cells feature coming soon!");
+    const { start, end } = state.selection;
+    if (start.row === end.row && start.col === end.col) {
+      addChatMessage("assistant", "Select multiple cells to merge.");
+      return;
+    }
+
+    saveToHistory();
+    const ws = state.worksheets[state.activeWorksheet];
+
+    const firstKey = `${start.row},${start.col}`;
+    let mergedValue = "";
+    for (let r = start.row; r <= end.row; r++) {
+      for (let c = start.col; c <= end.col; c++) {
+        const key = `${r},${c}`;
+        const cellData = ws.data[key];
+        if (cellData?.value && !mergedValue) {
+          mergedValue = cellData.value;
+        }
+        if (r !== start.row || c !== start.col) {
+          delete ws.data[key];
+        }
+      }
+    }
+
+    if (!ws.data[firstKey]) ws.data[firstKey] = {};
+    ws.data[firstKey].value = mergedValue;
+    ws.data[firstKey].merged = {
+      rowSpan: end.row - start.row + 1,
+      colSpan: end.col - start.col + 1,
+    };
+
+    renderAllCells();
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage("assistant", "Cells merged successfully!");
   }
 
   function saveToHistory() {
@@ -1696,6 +1901,1330 @@
 
   function connectChatWebSocket() {
     // Chat uses main WebSocket connection
+  }
+
+  function handleNumberFormatChange(e) {
+    const format = e.target.value;
+    if (format === "custom") {
+      showModal("customNumberFormatModal");
+      return;
+    }
+    applyNumberFormat(format);
+  }
+
+  function applyNumberFormat(format) {
+    saveToHistory();
+    const { start, end } = state.selection;
+    const ws = state.worksheets[state.activeWorksheet];
+
+    for (let r = start.row; r <= end.row; r++) {
+      for (let c = start.col; c <= end.col; c++) {
+        const key = `${r},${c}`;
+        if (!ws.data[key]) ws.data[key] = { value: "" };
+        ws.data[key].format = format;
+
+        const rawValue = ws.data[key].rawValue || ws.data[key].value;
+        if (rawValue) {
+          ws.data[key].rawValue = rawValue;
+          ws.data[key].value = formatValue(rawValue, format);
+        }
+        renderCell(r, c);
+      }
+    }
+
+    state.isDirty = true;
+    scheduleAutoSave();
+  }
+
+  function formatValue(value, format) {
+    const num = parseFloat(value);
+    if (isNaN(num) && format !== "text") return value;
+
+    switch (format) {
+      case "number":
+        return num.toLocaleString("en-US", {
+          minimumFractionDigits: state.decimalPlaces,
+          maximumFractionDigits: state.decimalPlaces,
+        });
+      case "currency":
+        return num.toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: state.decimalPlaces,
+        });
+      case "accounting":
+        const formatted = Math.abs(num).toLocaleString("en-US", {
+          style: "currency",
+          currency: "USD",
+        });
+        return num < 0 ? `(${formatted})` : formatted;
+      case "percent":
+        return (num * 100).toFixed(state.decimalPlaces) + "%";
+      case "scientific":
+        return num.toExponential(state.decimalPlaces);
+      case "date_short":
+        const d1 = new Date(num);
+        return isNaN(d1.getTime()) ? value : d1.toLocaleDateString("en-US");
+      case "date_long":
+        const d2 = new Date(num);
+        return isNaN(d2.getTime())
+          ? value
+          : d2.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            });
+      case "time":
+        const d3 = new Date(num);
+        return isNaN(d3.getTime())
+          ? value
+          : d3.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+            });
+      case "datetime":
+        const d4 = new Date(num);
+        return isNaN(d4.getTime()) ? value : d4.toLocaleString("en-US");
+      case "fraction":
+        return toFraction(num);
+      case "text":
+        return String(value);
+      default:
+        return value;
+    }
+  }
+
+  function toFraction(decimal) {
+    const tolerance = 1e-6;
+    let h1 = 1,
+      h2 = 0,
+      k1 = 0,
+      k2 = 1;
+    let b = decimal;
+    do {
+      const a = Math.floor(b);
+      let aux = h1;
+      h1 = a * h1 + h2;
+      h2 = aux;
+      aux = k1;
+      k1 = a * k1 + k2;
+      k2 = aux;
+      b = 1 / (b - a);
+    } while (Math.abs(decimal - h1 / k1) > decimal * tolerance);
+
+    if (k1 === 1) return String(h1);
+    const whole = Math.floor(h1 / k1);
+    const remainder = h1 % k1;
+    if (whole === 0) return `${remainder}/${k1}`;
+    return `${whole} ${remainder}/${k1}`;
+  }
+
+  function decreaseDecimal() {
+    if (state.decimalPlaces > 0) {
+      state.decimalPlaces--;
+      reapplyFormats();
+    }
+  }
+
+  function increaseDecimal() {
+    if (state.decimalPlaces < 10) {
+      state.decimalPlaces++;
+      reapplyFormats();
+    }
+  }
+
+  function reapplyFormats() {
+    const { start, end } = state.selection;
+    const ws = state.worksheets[state.activeWorksheet];
+
+    for (let r = start.row; r <= end.row; r++) {
+      for (let c = start.col; c <= end.col; c++) {
+        const key = `${r},${c}`;
+        const cellData = ws.data[key];
+        if (cellData?.format && cellData?.rawValue) {
+          cellData.value = formatValue(cellData.rawValue, cellData.format);
+          renderCell(r, c);
+        }
+      }
+    }
+  }
+
+  function showFindReplaceModal() {
+    showModal("findReplaceModal");
+    document.getElementById("findInput")?.focus();
+    state.findMatches = [];
+    state.findMatchIndex = -1;
+  }
+
+  function performFind() {
+    const searchText = document.getElementById("findInput")?.value || "";
+    const matchCase = document.getElementById("findMatchCase")?.checked;
+    const wholeCell = document.getElementById("findWholeCell")?.checked;
+    const useRegex = document.getElementById("findRegex")?.checked;
+
+    state.findMatches = [];
+    state.findMatchIndex = -1;
+
+    if (!searchText) {
+      updateFindResults();
+      return;
+    }
+
+    const ws = state.worksheets[state.activeWorksheet];
+    let pattern;
+
+    if (useRegex) {
+      try {
+        pattern = new RegExp(searchText, matchCase ? "" : "i");
+      } catch (e) {
+        updateFindResults();
+        return;
+      }
+    }
+
+    for (let r = 0; r < CONFIG.ROWS; r++) {
+      for (let c = 0; c < CONFIG.COLS; c++) {
+        const key = `${r},${c}`;
+        const cellData = ws.data[key];
+        const cellValue = cellData?.value || "";
+
+        if (!cellValue) continue;
+
+        let matches = false;
+        const compareValue = matchCase ? cellValue : cellValue.toLowerCase();
+        const compareSearch = matchCase ? searchText : searchText.toLowerCase();
+
+        if (useRegex) {
+          matches = pattern.test(cellValue);
+        } else if (wholeCell) {
+          matches = compareValue === compareSearch;
+        } else {
+          matches = compareValue.includes(compareSearch);
+        }
+
+        if (matches) {
+          state.findMatches.push({ row: r, col: c });
+        }
+      }
+    }
+
+    updateFindResults();
+    if (state.findMatches.length > 0) {
+      state.findMatchIndex = 0;
+      highlightFindMatch();
+    }
+  }
+
+  function updateFindResults() {
+    const resultsEl = document.getElementById("findResults");
+    if (resultsEl) {
+      const count = state.findMatches.length;
+      resultsEl.querySelector("span").textContent =
+        count === 0
+          ? "0 matches found"
+          : `${state.findMatchIndex + 1} of ${count} matches`;
+    }
+  }
+
+  function highlightFindMatch() {
+    if (state.findMatches.length === 0) return;
+    const match = state.findMatches[state.findMatchIndex];
+    selectCell(match.row, match.col);
+    updateFindResults();
+  }
+
+  function findNext() {
+    if (state.findMatches.length === 0) return;
+    state.findMatchIndex =
+      (state.findMatchIndex + 1) % state.findMatches.length;
+    highlightFindMatch();
+  }
+
+  function findPrev() {
+    if (state.findMatches.length === 0) return;
+    state.findMatchIndex =
+      (state.findMatchIndex - 1 + state.findMatches.length) %
+      state.findMatches.length;
+    highlightFindMatch();
+  }
+
+  function replaceOne() {
+    if (state.findMatches.length === 0 || state.findMatchIndex < 0) return;
+
+    const replaceText = document.getElementById("replaceInput")?.value || "";
+    const match = state.findMatches[state.findMatchIndex];
+    const ws = state.worksheets[state.activeWorksheet];
+    const key = `${match.row},${match.col}`;
+
+    saveToHistory();
+
+    const searchText = document.getElementById("findInput")?.value || "";
+    const matchCase = document.getElementById("findMatchCase")?.checked;
+    const useRegex = document.getElementById("findRegex")?.checked;
+    const cellValue = ws.data[key]?.value || "";
+
+    let newValue;
+    if (useRegex) {
+      const pattern = new RegExp(searchText, matchCase ? "g" : "gi");
+      newValue = cellValue.replace(pattern, replaceText);
+    } else {
+      const flags = matchCase ? "g" : "gi";
+      const escapedSearch = searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      newValue = cellValue.replace(
+        new RegExp(escapedSearch, flags),
+        replaceText,
+      );
+    }
+
+    if (!ws.data[key]) ws.data[key] = {};
+    ws.data[key].value = newValue;
+    renderCell(match.row, match.col);
+
+    state.findMatches.splice(state.findMatchIndex, 1);
+    if (state.findMatches.length > 0) {
+      state.findMatchIndex = state.findMatchIndex % state.findMatches.length;
+      highlightFindMatch();
+    } else {
+      state.findMatchIndex = -1;
+      updateFindResults();
+    }
+
+    state.isDirty = true;
+    scheduleAutoSave();
+  }
+
+  function replaceAll() {
+    if (state.findMatches.length === 0) return;
+
+    const replaceText = document.getElementById("replaceInput")?.value || "";
+    const searchText = document.getElementById("findInput")?.value || "";
+    const matchCase = document.getElementById("findMatchCase")?.checked;
+    const useRegex = document.getElementById("findRegex")?.checked;
+    const ws = state.worksheets[state.activeWorksheet];
+
+    saveToHistory();
+
+    let count = 0;
+    for (const match of state.findMatches) {
+      const key = `${match.row},${match.col}`;
+      const cellValue = ws.data[key]?.value || "";
+
+      let newValue;
+      if (useRegex) {
+        const pattern = new RegExp(searchText, matchCase ? "g" : "gi");
+        newValue = cellValue.replace(pattern, replaceText);
+      } else {
+        const flags = matchCase ? "g" : "gi";
+        const escapedSearch = searchText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        newValue = cellValue.replace(
+          new RegExp(escapedSearch, flags),
+          replaceText,
+        );
+      }
+
+      if (!ws.data[key]) ws.data[key] = {};
+      ws.data[key].value = newValue;
+      renderCell(match.row, match.col);
+      count++;
+    }
+
+    state.findMatches = [];
+    state.findMatchIndex = -1;
+    updateFindResults();
+
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage("assistant", `Replaced ${count} occurrences.`);
+  }
+
+  function showConditionalFormatModal() {
+    const { start, end } = state.selection;
+    const range = `${getColName(start.col)}${start.row + 1}:${getColName(end.col)}${end.row + 1}`;
+    const rangeInput = document.getElementById("cfRange");
+    if (rangeInput) rangeInput.value = range;
+    showModal("conditionalFormatModal");
+    handleCfRuleTypeChange();
+    updateCfPreview();
+  }
+
+  function handleCfRuleTypeChange() {
+    const ruleType = document.getElementById("cfRuleType")?.value;
+    const value2 = document.getElementById("cfValue2");
+    const valuesSection = document.getElementById("cfValuesSection");
+
+    if (value2) {
+      if (ruleType === "between") {
+        value2.classList.remove("hidden");
+        value2.placeholder = "and";
+      } else {
+        value2.classList.add("hidden");
+      }
+    }
+
+    const noValueTypes = [
+      "duplicate",
+      "unique",
+      "blank",
+      "not_blank",
+      "above_average",
+      "below_average",
+      "color_scale",
+      "data_bar",
+      "icon_set",
+    ];
+    if (valuesSection) {
+      if (noValueTypes.includes(ruleType)) {
+        valuesSection.style.display = "none";
+      } else {
+        valuesSection.style.display = "flex";
+      }
+    }
+  }
+
+  function updateCfPreview() {
+    const bgColor = document.getElementById("cfBgColor")?.value || "#ffeb3b";
+    const textColor =
+      document.getElementById("cfTextColor")?.value || "#000000";
+    const bold = document.getElementById("cfBold")?.checked;
+    const italic = document.getElementById("cfItalic")?.checked;
+
+    const previewCell = document.getElementById("cfPreviewCell");
+    if (previewCell) {
+      previewCell.style.background = bgColor;
+      previewCell.style.color = textColor;
+      previewCell.style.fontWeight = bold ? "bold" : "normal";
+      previewCell.style.fontStyle = italic ? "italic" : "normal";
+    }
+  }
+
+  function applyConditionalFormat() {
+    const rangeStr = document.getElementById("cfRange")?.value;
+    if (!rangeStr) {
+      alert("Please specify a range.");
+      return;
+    }
+
+    const ruleType = document.getElementById("cfRuleType")?.value;
+    const value1 = document.getElementById("cfValue1")?.value;
+    const value2 = document.getElementById("cfValue2")?.value;
+    const bgColor = document.getElementById("cfBgColor")?.value;
+    const textColor = document.getElementById("cfTextColor")?.value;
+    const bold = document.getElementById("cfBold")?.checked;
+    const italic = document.getElementById("cfItalic")?.checked;
+
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.conditionalFormats) ws.conditionalFormats = [];
+
+    const rule = {
+      id: `cf_${Date.now()}`,
+      range: rangeStr,
+      ruleType,
+      value1,
+      value2,
+      style: {
+        background: bgColor,
+        color: textColor,
+        fontWeight: bold ? "bold" : "normal",
+        fontStyle: italic ? "italic" : "normal",
+      },
+    };
+
+    ws.conditionalFormats.push(rule);
+    applyConditionalFormatsToRange(rule);
+
+    hideModal("conditionalFormatModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage("assistant", "Conditional formatting applied!");
+  }
+
+  function applyConditionalFormatsToRange(rule) {
+    const ws = state.worksheets[state.activeWorksheet];
+    const rangeParts = rule.range.split(":");
+    if (rangeParts.length !== 2) return;
+
+    const startRef = parseCellRef(rangeParts[0]);
+    const endRef = parseCellRef(rangeParts[1]);
+    if (!startRef || !endRef) return;
+
+    for (let r = startRef.row; r <= endRef.row; r++) {
+      for (let c = startRef.col; c <= endRef.col; c++) {
+        const key = `${r},${c}`;
+        const cellData = ws.data[key];
+        const cellValue = parseFloat(cellData?.value) || 0;
+
+        let conditionMet = false;
+        switch (rule.ruleType) {
+          case "greater_than":
+            conditionMet = cellValue > parseFloat(rule.value1);
+            break;
+          case "less_than":
+            conditionMet = cellValue < parseFloat(rule.value1);
+            break;
+          case "equal_to":
+            conditionMet = cellValue === parseFloat(rule.value1);
+            break;
+          case "between":
+            conditionMet =
+              cellValue >= parseFloat(rule.value1) &&
+              cellValue <= parseFloat(rule.value2);
+            break;
+          case "text_contains":
+            conditionMet = (cellData?.value || "")
+              .toLowerCase()
+              .includes(rule.value1.toLowerCase());
+            break;
+          case "blank":
+            conditionMet = !cellData?.value;
+            break;
+          case "not_blank":
+            conditionMet = !!cellData?.value;
+            break;
+          default:
+            conditionMet = false;
+        }
+
+        if (conditionMet && cellData) {
+          if (!cellData.style) cellData.style = {};
+          Object.assign(cellData.style, rule.style);
+          renderCell(r, c);
+        }
+      }
+    }
+  }
+
+  function showDataValidationModal() {
+    const { start, end } = state.selection;
+    const range = `${getColName(start.col)}${start.row + 1}:${getColName(end.col)}${end.row + 1}`;
+    const rangeInput = document.getElementById("dvRange");
+    if (rangeInput) rangeInput.value = range;
+    showModal("dataValidationModal");
+    handleDvTypeChange();
+  }
+
+  function switchDvTab(tabName) {
+    document.querySelectorAll(".dv-tab").forEach((tab) => {
+      tab.classList.toggle("active", tab.dataset.tab === tabName);
+    });
+    document.querySelectorAll(".dv-tab-content").forEach((content) => {
+      const contentId = content.id
+        .replace("dv", "")
+        .replace("Tab", "")
+        .toLowerCase();
+      content.classList.toggle("active", contentId === tabName);
+    });
+  }
+
+  function handleDvTypeChange() {
+    const dvType = document.getElementById("dvType")?.value;
+    const criteriaSection = document.getElementById("dvCriteriaSection");
+    const valuesSection = document.getElementById("dvValuesSection");
+    const listSection = document.getElementById("dvListSection");
+    const value2Row = document.getElementById("dvValue2Row");
+    const value1Label = document.getElementById("dvValue1Label");
+
+    if (criteriaSection) {
+      criteriaSection.style.display =
+        dvType === "any" || dvType === "list" || dvType === "custom"
+          ? "none"
+          : "block";
+    }
+
+    if (valuesSection) {
+      valuesSection.style.display =
+        dvType === "any" || dvType === "list" ? "none" : "block";
+    }
+
+    if (listSection) {
+      listSection.classList.toggle("hidden", dvType !== "list");
+    }
+
+    if (value1Label) {
+      value1Label.textContent = dvType === "custom" ? "Formula:" : "Minimum:";
+    }
+  }
+
+  function handleDvOperatorChange() {
+    const operator = document.getElementById("dvOperator")?.value;
+    const value2Row = document.getElementById("dvValue2Row");
+    const value1Label = document.getElementById("dvValue1Label");
+
+    if (value2Row) {
+      value2Row.style.display =
+        operator === "between" || operator === "not_between" ? "block" : "none";
+    }
+
+    if (value1Label) {
+      if (operator === "between" || operator === "not_between") {
+        value1Label.textContent = "Minimum:";
+      } else {
+        value1Label.textContent = "Value:";
+      }
+    }
+  }
+
+  function applyDataValidation() {
+    const rangeStr = document.getElementById("dvRange")?.value;
+    if (!rangeStr) {
+      alert("Please specify a range.");
+      return;
+    }
+
+    const dvType = document.getElementById("dvType")?.value;
+    const operator = document.getElementById("dvOperator")?.value;
+    const value1 = document.getElementById("dvValue1")?.value;
+    const value2 = document.getElementById("dvValue2")?.value;
+    const listSource = document.getElementById("dvListSource")?.value;
+    const showInput = document.getElementById("dvShowInput")?.checked;
+    const inputTitle = document.getElementById("dvInputTitle")?.value;
+    const inputMessage = document.getElementById("dvInputMessage")?.value;
+    const showError = document.getElementById("dvShowError")?.checked;
+    const errorStyle = document.getElementById("dvErrorStyle")?.value;
+    const errorTitle = document.getElementById("dvErrorTitle")?.value;
+    const errorMessage = document.getElementById("dvErrorMessage")?.value;
+
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.validations) ws.validations = {};
+
+    const validation = {
+      type: dvType,
+      operator,
+      value1,
+      value2,
+      listValues: listSource ? listSource.split(",").map((s) => s.trim()) : [],
+      showInput,
+      inputTitle,
+      inputMessage,
+      showError,
+      errorStyle,
+      errorTitle,
+      errorMessage,
+    };
+
+    const rangeParts = rangeStr.split(":");
+    const startRef = parseCellRef(rangeParts[0]);
+    const endRef =
+      rangeParts.length > 1 ? parseCellRef(rangeParts[1]) : startRef;
+
+    if (startRef && endRef) {
+      for (let r = startRef.row; r <= endRef.row; r++) {
+        for (let c = startRef.col; c <= endRef.col; c++) {
+          ws.validations[`${r},${c}`] = validation;
+        }
+      }
+    }
+
+    hideModal("dataValidationModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage("assistant", "Data validation applied!");
+  }
+
+  function clearDataValidation() {
+    const rangeStr = document.getElementById("dvRange")?.value;
+    if (!rangeStr) return;
+
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.validations) return;
+
+    const rangeParts = rangeStr.split(":");
+    const startRef = parseCellRef(rangeParts[0]);
+    const endRef =
+      rangeParts.length > 1 ? parseCellRef(rangeParts[1]) : startRef;
+
+    if (startRef && endRef) {
+      for (let r = startRef.row; r <= endRef.row; r++) {
+        for (let c = startRef.col; c <= endRef.col; c++) {
+          delete ws.validations[`${r},${c}`];
+        }
+      }
+    }
+
+    hideModal("dataValidationModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+  }
+
+  function showPrintPreview() {
+    showModal("printPreviewModal");
+    updatePrintPreview();
+  }
+
+  function updatePrintPreview() {
+    const orientation =
+      document.getElementById("printOrientation")?.value || "portrait";
+    const showGridlines = document.getElementById("printGridlines")?.checked;
+    const showHeaders = document.getElementById("printHeaders")?.checked;
+    const printPage = document.getElementById("printPage");
+    const printContent = document.getElementById("printContent");
+
+    if (printPage) {
+      printPage.className = `print-page ${orientation}`;
+    }
+
+    if (!printContent) return;
+
+    const ws = state.worksheets[state.activeWorksheet];
+    let html = "<table>";
+
+    if (showHeaders) {
+      html += "<thead><tr><th></th>";
+      for (let c = 0; c < CONFIG.COLS; c++) {
+        html += `<th>${getColName(c)}</th>`;
+      }
+      html += "</tr></thead>";
+    }
+
+    html += "<tbody>";
+    let hasData = false;
+    let maxRow = 0;
+    let maxCol = 0;
+
+    for (const key in ws.data) {
+      if (ws.data[key]?.value) {
+        hasData = true;
+        const [r, c] = key.split(",").map(Number);
+        maxRow = Math.max(maxRow, r);
+        maxCol = Math.max(maxCol, c);
+      }
+    }
+
+    if (!hasData) {
+      maxRow = 10;
+      maxCol = 5;
+    }
+
+    for (let r = 0; r <= maxRow; r++) {
+      html += "<tr>";
+      if (showHeaders) {
+        html += `<th>${r + 1}</th>`;
+      }
+      for (let c = 0; c <= maxCol; c++) {
+        const key = `${r},${c}`;
+        const cellData = ws.data[key];
+        const value = cellData?.value || "";
+        const style = cellData?.style || {};
+        let styleStr = "";
+
+        if (style.fontWeight) styleStr += `font-weight:${style.fontWeight};`;
+        if (style.fontStyle) styleStr += `font-style:${style.fontStyle};`;
+        if (style.textAlign) styleStr += `text-align:${style.textAlign};`;
+        if (style.color) styleStr += `color:${style.color};`;
+        if (style.background) styleStr += `background:${style.background};`;
+
+        const borderStyle = showGridlines ? "" : "border:none;";
+        html += `<td style="${styleStr}${borderStyle}">${escapeHtml(value)}</td>`;
+      }
+      html += "</tr>";
+    }
+
+    html += "</tbody></table>";
+    printContent.innerHTML = html;
+  }
+
+  function printSheet() {
+    const printContent = document.getElementById("printContent")?.innerHTML;
+    if (!printContent) return;
+
+    const orientation =
+      document.getElementById("printOrientation")?.value || "portrait";
+    const printWindow = window.open("", "_blank");
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${state.sheetName}</title>
+        <style>
+          @page { size: ${orientation}; margin: 0.5in; }
+          body { font-family: Arial, sans-serif; font-size: 10pt; }
+          table { width: 100%; border-collapse: collapse; }
+          td, th { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+          th { background: #f5f5f5; font-weight: 600; }
+        </style>
+      </head>
+      <body>
+        ${printContent}
+      </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+
+    hideModal("printPreviewModal");
+  }
+
+  function insertChart() {
+    const chartType =
+      document.querySelector(".chart-type-btn.active")?.dataset.type || "bar";
+    const dataRange = document.getElementById("chartDataRange")?.value;
+    const chartTitle = document.getElementById("chartTitle")?.value || "Chart";
+
+    if (!dataRange) {
+      alert("Please specify a data range.");
+      return;
+    }
+
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.charts) ws.charts = [];
+
+    const chart = {
+      id: `chart_${Date.now()}`,
+      type: chartType,
+      title: chartTitle,
+      dataRange,
+      position: {
+        row: state.activeCell.row,
+        col: state.activeCell.col,
+        width: 400,
+        height: 300,
+      },
+    };
+
+    ws.charts.push(chart);
+    hideModal("chartModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage(
+      "assistant",
+      `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} chart created!`,
+    );
+  }
+
+  function showInsertImageModal() {
+    showModal("insertImageModal");
+  }
+
+  function switchImgTab(tabName) {
+    document.querySelectorAll(".img-tab").forEach((tab) => {
+      tab.classList.toggle("active", tab.dataset.tab === tabName);
+    });
+    document.querySelectorAll(".img-tab-content").forEach((content) => {
+      const contentId = content.id
+        .replace("img", "")
+        .replace("Tab", "")
+        .toLowerCase();
+      content.classList.toggle("active", contentId === tabName);
+    });
+  }
+
+  function insertImage() {
+    const urlTab = document.getElementById("imgUrlTab");
+    const isUrlTab = urlTab?.classList.contains("active");
+    let imageUrl;
+
+    if (isUrlTab) {
+      imageUrl = document.getElementById("imgUrl")?.value;
+    } else {
+      const fileInput = document.getElementById("imgFile");
+      if (fileInput?.files?.[0]) {
+        addChatMessage(
+          "assistant",
+          "Image upload coming soon! Please use a URL for now.",
+        );
+        return;
+      }
+    }
+
+    if (!imageUrl) {
+      alert("Please enter an image URL.");
+      return;
+    }
+
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.images) ws.images = [];
+
+    const image = {
+      id: `img_${Date.now()}`,
+      url: imageUrl,
+      position: {
+        row: state.activeCell.row,
+        col: state.activeCell.col,
+        width: 200,
+        height: 150,
+      },
+    };
+
+    ws.images.push(image);
+    hideModal("insertImageModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+    addChatMessage("assistant", "Image inserted!");
+  }
+
+  function toggleFilter() {
+    const ws = state.worksheets[state.activeWorksheet];
+    ws.filterEnabled = !ws.filterEnabled;
+    addChatMessage(
+      "assistant",
+      ws.filterEnabled
+        ? "Filter enabled. Click column headers to filter."
+        : "Filter disabled.",
+    );
+  }
+
+  function selectCustomFormat(formatCode) {
+    document.querySelectorAll(".cnf-format-item").forEach((item) => {
+      item.classList.toggle("selected", item.dataset.format === formatCode);
+    });
+    const formatInput = document.getElementById("cnfFormatCode");
+    if (formatInput) {
+      formatInput.value = formatCode;
+    }
+    updateCnfPreview();
+  }
+
+  function updateCnfPreview() {
+    const formatCode =
+      document.getElementById("cnfFormatCode")?.value || "#,##0.00";
+    const previewEl = document.getElementById("cnfPreview");
+    if (!previewEl) return;
+
+    const sampleValue = 1234.5678;
+    let formatted;
+
+    if (formatCode.includes("$")) {
+      formatted = sampleValue.toLocaleString("en-US", {
+        style: "currency",
+        currency: "USD",
+      });
+    } else if (formatCode.includes("%")) {
+      formatted = (sampleValue * 100).toFixed(2) + "%";
+    } else if (formatCode.includes("E")) {
+      formatted = sampleValue.toExponential(2);
+    } else if (formatCode.includes("MM") || formatCode.includes("DD")) {
+      formatted = new Date().toLocaleDateString();
+    } else if (formatCode.includes("HH")) {
+      formatted = new Date().toLocaleTimeString();
+    } else {
+      const decimals = (formatCode.match(/0+$/)?.[0] || "").length;
+      formatted = sampleValue.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
+    }
+
+    previewEl.textContent = formatted;
+  }
+
+  function applyCustomNumberFormat() {
+    const formatCode = document.getElementById("cnfFormatCode")?.value;
+    if (!formatCode) return;
+
+    saveToHistory();
+    const { start, end } = state.selection;
+    const ws = state.worksheets[state.activeWorksheet];
+
+    for (let r = start.row; r <= end.row; r++) {
+      for (let c = start.col; c <= end.col; c++) {
+        const key = `${r},${c}`;
+        if (!ws.data[key]) ws.data[key] = { value: "" };
+        ws.data[key].customFormat = formatCode;
+        renderCell(r, c);
+      }
+    }
+
+    hideModal("customNumberFormatModal");
+    state.isDirty = true;
+    scheduleAutoSave();
+  }
+
+  function renderCharts() {
+    const chartsContainer = document.getElementById("chartsContainer");
+    if (!chartsContainer) return;
+
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.charts || ws.charts.length === 0) {
+      chartsContainer.innerHTML = "";
+      return;
+    }
+
+    chartsContainer.innerHTML = ws.charts
+      .map((chart) => renderChartHTML(chart))
+      .join("");
+
+    chartsContainer.querySelectorAll(".chart-wrapper").forEach((wrapper) => {
+      const chartId = wrapper.dataset.chartId;
+      wrapper.addEventListener("click", () => selectChart(chartId));
+      wrapper.querySelector(".chart-delete")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteChart(chartId);
+      });
+      wrapper
+        .querySelector(".chart-header")
+        ?.addEventListener("mousedown", (e) => {
+          startDragChart(e, chartId);
+        });
+    });
+  }
+
+  function renderChartHTML(chart) {
+    const { id, type, title, position, dataRange } = chart;
+    const left = position?.col ? position.col * CONFIG.COL_WIDTH : 100;
+    const top = position?.row ? position.row * CONFIG.ROW_HEIGHT : 100;
+    const width = position?.width || 400;
+    const height = position?.height || 300;
+
+    const data = getChartData(dataRange);
+    let chartContent = "";
+
+    switch (type) {
+      case "bar":
+        chartContent = renderBarChart(data, height - 80);
+        break;
+      case "line":
+        chartContent = renderLineChart(data, width - 32, height - 80);
+        break;
+      case "pie":
+        chartContent = renderPieChart(data, Math.min(width, height) - 100);
+        break;
+      default:
+        chartContent = renderBarChart(data, height - 80);
+    }
+
+    return `
+      <div class="chart-wrapper" data-chart-id="${id}" style="left:${left}px;top:${top}px;width:${width}px;height:${height}px;">
+        <div class="chart-header">
+          <h4 class="chart-title">${escapeHtml(title || "Chart")}</h4>
+          <div class="chart-actions">
+            <button class="chart-delete" title="Delete">×</button>
+          </div>
+        </div>
+        <div class="chart-content">
+          ${chartContent}
+        </div>
+        ${renderChartLegend(data)}
+      </div>
+    `;
+  }
+
+  function getChartData(dataRange) {
+    if (!dataRange) return { labels: [], values: [] };
+
+    const ws = state.worksheets[state.activeWorksheet];
+    const rangeParts = dataRange.split(":");
+    if (rangeParts.length !== 2) return { labels: [], values: [] };
+
+    const startRef = parseCellRef(rangeParts[0]);
+    const endRef = parseCellRef(rangeParts[1]);
+    if (!startRef || !endRef) return { labels: [], values: [] };
+
+    const labels = [];
+    const values = [];
+
+    if (startRef.col === endRef.col) {
+      for (let r = startRef.row; r <= endRef.row; r++) {
+        const key = `${r},${startRef.col}`;
+        const cellData = ws.data[key];
+        const val = parseFloat(cellData?.value) || 0;
+        values.push(val);
+        labels.push(`Row ${r + 1}`);
+      }
+    } else {
+      for (let c = startRef.col; c <= endRef.col; c++) {
+        const key = `${startRef.row},${c}`;
+        const cellData = ws.data[key];
+        const val = parseFloat(cellData?.value) || 0;
+        values.push(val);
+        labels.push(getColName(c));
+      }
+    }
+
+    return { labels, values };
+  }
+
+  function renderBarChart(data, maxHeight) {
+    if (!data.values.length) return '<div class="chart-empty">No data</div>';
+
+    const maxVal = Math.max(...data.values, 1);
+    const bars = data.values
+      .map((val, i) => {
+        const height = (val / maxVal) * maxHeight;
+        return `<div class="chart-bar" style="height:${height}px;" title="${data.labels[i]}: ${val}"></div>`;
+      })
+      .join("");
+
+    return `<div class="chart-bar-container" style="height:${maxHeight}px;">${bars}</div>`;
+  }
+
+  function renderLineChart(data, width, height) {
+    if (!data.values.length) return '<div class="chart-empty">No data</div>';
+
+    const maxVal = Math.max(...data.values, 1);
+    const padding = 20;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    const points = data.values.map((val, i) => {
+      const x = padding + (i / (data.values.length - 1 || 1)) * chartWidth;
+      const y = padding + chartHeight - (val / maxVal) * chartHeight;
+      return `${x},${y}`;
+    });
+
+    const circles = data.values
+      .map((val, i) => {
+        const x = padding + (i / (data.values.length - 1 || 1)) * chartWidth;
+        const y = padding + chartHeight - (val / maxVal) * chartHeight;
+        return `<circle class="chart-line-point" cx="${x}" cy="${y}" r="4"/>`;
+      })
+      .join("");
+
+    return `
+      <svg class="chart-canvas" viewBox="0 0 ${width} ${height}">
+        <polyline class="chart-line" points="${points.join(" ")}"/>
+        ${circles}
+      </svg>
+    `;
+  }
+
+  function renderPieChart(data, size) {
+    if (!data.values.length) return '<div class="chart-empty">No data</div>';
+
+    const total = data.values.reduce((a, b) => a + b, 0) || 1;
+    const colors = [
+      "#4285f4",
+      "#34a853",
+      "#fbbc04",
+      "#ea4335",
+      "#9c27b0",
+      "#00bcd4",
+      "#ff5722",
+    ];
+    const cx = size / 2;
+    const cy = size / 2;
+    const r = size / 2 - 10;
+
+    let startAngle = 0;
+    const slices = data.values
+      .map((val, i) => {
+        const angle = (val / total) * 360;
+        const endAngle = startAngle + angle;
+        const largeArc = angle > 180 ? 1 : 0;
+
+        const x1 = cx + r * Math.cos((startAngle * Math.PI) / 180);
+        const y1 = cy + r * Math.sin((startAngle * Math.PI) / 180);
+        const x2 = cx + r * Math.cos((endAngle * Math.PI) / 180);
+        const y2 = cy + r * Math.sin((endAngle * Math.PI) / 180);
+
+        const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+        startAngle = endAngle;
+
+        return `<path d="${path}" fill="${colors[i % colors.length]}" stroke="white" stroke-width="2"/>`;
+      })
+      .join("");
+
+    return `
+      <div class="chart-pie-container">
+        <svg class="chart-canvas" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+          ${slices}
+        </svg>
+      </div>
+    `;
+  }
+
+  function renderChartLegend(data) {
+    const colors = [
+      "#4285f4",
+      "#34a853",
+      "#fbbc04",
+      "#ea4335",
+      "#9c27b0",
+      "#00bcd4",
+      "#ff5722",
+    ];
+    const items = data.labels
+      .map(
+        (label, i) =>
+          `<div class="legend-item"><span class="legend-color" style="background:${colors[i % colors.length]}"></span>${escapeHtml(label)}</div>`,
+      )
+      .join("");
+
+    return `<div class="chart-legend">${items}</div>`;
+  }
+
+  function selectChart(chartId) {
+    document.querySelectorAll(".chart-wrapper").forEach((el) => {
+      el.classList.toggle("selected", el.dataset.chartId === chartId);
+    });
+  }
+
+  function deleteChart(chartId) {
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.charts) return;
+
+    ws.charts = ws.charts.filter((c) => c.id !== chartId);
+    renderCharts();
+    state.isDirty = true;
+    scheduleAutoSave();
+  }
+
+  function startDragChart(e, chartId) {
+    const wrapper = document.querySelector(`[data-chart-id="${chartId}"]`);
+    if (!wrapper) return;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startLeft = parseInt(wrapper.style.left) || 0;
+    const startTop = parseInt(wrapper.style.top) || 0;
+
+    const onMouseMove = (moveEvent) => {
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
+      wrapper.style.left = `${startLeft + dx}px`;
+      wrapper.style.top = `${startTop + dy}px`;
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+
+      const ws = state.worksheets[state.activeWorksheet];
+      const chart = ws.charts?.find((c) => c.id === chartId);
+      if (chart) {
+        chart.position.col = Math.round(
+          parseInt(wrapper.style.left) / CONFIG.COL_WIDTH,
+        );
+        chart.position.row = Math.round(
+          parseInt(wrapper.style.top) / CONFIG.ROW_HEIGHT,
+        );
+        state.isDirty = true;
+        scheduleAutoSave();
+      }
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  }
+
+  function renderImages() {
+    const imagesContainer = document.getElementById("imagesContainer");
+    if (!imagesContainer) return;
+
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws.images || ws.images.length === 0) {
+      imagesContainer.innerHTML = "";
+      return;
+    }
+
+    imagesContainer.innerHTML = ws.images
+      .map((img) => {
+        const left = img.position?.col
+          ? img.position.col * CONFIG.COL_WIDTH
+          : 100;
+        const top = img.position?.row
+          ? img.position.row * CONFIG.ROW_HEIGHT
+          : 100;
+        const width = img.position?.width || 200;
+        const height = img.position?.height || 150;
+
+        return `
+          <div class="image-wrapper" data-image-id="${img.id}" style="left:${left}px;top:${top}px;width:${width}px;height:${height}px;">
+            <img src="${escapeHtml(img.url)}" alt="Embedded image" />
+            <div class="image-resize-handle"></div>
+          </div>
+        `;
+      })
+      .join("");
+
+    imagesContainer.querySelectorAll(".image-wrapper").forEach((wrapper) => {
+      const imageId = wrapper.dataset.imageId;
+      wrapper.addEventListener("click", () => selectImage(imageId));
+      wrapper.addEventListener("mousedown", (e) => {
+        if (e.target.classList.contains("image-resize-handle")) {
+          startResizeImage(e, imageId);
+        } else {
+          startDragImage(e, imageId);
+        }
+      });
+    });
+  }
+
+  function selectImage(imageId) {
+    document.querySelectorAll(".image-wrapper").forEach((el) => {
+      el.classList.toggle("selected", el.dataset.imageId === imageId);
+    });
+  }
+
+  function startDragImage(e, imageId) {
+    const wrapper = document.querySelector(`[data-image-id="${imageId}"]`);
+    if (!wrapper) return;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startLeft = parseInt(wrapper.style.left) || 0;
+    const startTop = parseInt(wrapper.style.top) || 0;
+
+    const onMouseMove = (moveEvent) => {
+      const dx = moveEvent.clientX - startX;
+      const dy = moveEvent.clientY - startY;
+      wrapper.style.left = `${startLeft + dx}px`;
+      wrapper.style.top = `${startTop + dy}px`;
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+
+      const ws = state.worksheets[state.activeWorksheet];
+      const img = ws.images?.find((i) => i.id === imageId);
+      if (img) {
+        img.position.col = Math.round(
+          parseInt(wrapper.style.left) / CONFIG.COL_WIDTH,
+        );
+        img.position.row = Math.round(
+          parseInt(wrapper.style.top) / CONFIG.ROW_HEIGHT,
+        );
+        state.isDirty = true;
+        scheduleAutoSave();
+      }
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    e.preventDefault();
+  }
+
+  function startResizeImage(e, imageId) {
+    const wrapper = document.querySelector(`[data-image-id="${imageId}"]`);
+    if (!wrapper) return;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startWidth = parseInt(wrapper.style.width) || 200;
+    const startHeight = parseInt(wrapper.style.height) || 150;
+    const aspectRatio = startWidth / startHeight;
+
+    const onMouseMove = (moveEvent) => {
+      const dx = moveEvent.clientX - startX;
+      const newWidth = Math.max(50, startWidth + dx);
+      const newHeight = newWidth / aspectRatio;
+      wrapper.style.width = `${newWidth}px`;
+      wrapper.style.height = `${newHeight}px`;
+    };
+
+    const onMouseUp = () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+
+      const ws = state.worksheets[state.activeWorksheet];
+      const img = ws.images?.find((i) => i.id === imageId);
+      if (img) {
+        img.position.width = parseInt(wrapper.style.width);
+        img.position.height = parseInt(wrapper.style.height);
+        state.isDirty = true;
+        scheduleAutoSave();
+      }
+    };
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+    e.preventDefault();
+    e.stopPropagation();
   }
 
   if (document.readyState === "loading") {

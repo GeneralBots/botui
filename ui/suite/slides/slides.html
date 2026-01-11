@@ -112,6 +112,46 @@
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
+                <button
+                    class="btn-icon"
+                    id="transitionsBtn"
+                    title="Slide Transitions"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="2" y="3" width="8" height="14" rx="1"></rect>
+                        <rect x="14" y="7" width="8" height="14" rx="1"></rect>
+                        <path d="M10 10l4 4m0-4l-4 4"></path>
+                    </svg>
+                </button>
+                <button class="btn-icon" id="animationsBtn" title="Animations">
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 2v4m0 12v4m10-10h-4M6 12H2"></path>
+                        <path
+                            d="M19.07 4.93l-2.83 2.83m-8.48 8.48l-2.83 2.83"
+                        ></path>
+                        <path
+                            d="M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83"
+                        ></path>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
                 <select
                     class="toolbar-select font-family"
                     id="fontFamily"
@@ -250,6 +290,63 @@
         </div>
         <div class="toolbar-right">
             <div class="collaborators" id="collaborators"></div>
+            <button
+                class="btn-icon"
+                id="masterSlideBtn"
+                title="Edit Master Slide"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <rect x="3" y="3" width="18" height="14" rx="2"></rect>
+                    <path d="M3 7h18"></path>
+                    <circle cx="7" cy="5" r="1" fill="currentColor"></circle>
+                    <circle cx="10" cy="5" r="1" fill="currentColor"></circle>
+                </svg>
+            </button>
+            <button
+                class="btn-icon"
+                id="slideSorterBtn"
+                title="Slide Sorter View"
+            >
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <rect x="3" y="3" width="7" height="5" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                    <rect x="3" y="10" width="7" height="5" rx="1"></rect>
+                    <rect x="14" y="10" width="7" height="5" rx="1"></rect>
+                    <rect x="3" y="17" width="7" height="5" rx="1"></rect>
+                    <rect x="14" y="17" width="7" height="5" rx="1"></rect>
+                </svg>
+            </button>
+            <button class="btn-icon" id="exportPdfBtn" title="Export to PDF">
+                <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                    ></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <path d="M9 15h6"></path>
+                    <path d="M12 12v6"></path>
+                </svg>
+            </button>
             <button class="btn-icon" id="presentBtn" title="Present (F5)">
                 <svg
                     width="18"
@@ -801,6 +898,526 @@
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="transitionsModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>Slide Transitions</h3>
+            <button class="btn-close" id="closeTransitionsModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="transitions-section">
+                <label>Transition Effect:</label>
+                <div class="transitions-grid">
+                    <button
+                        class="transition-btn active"
+                        data-transition="none"
+                        title="None"
+                    >
+                        <div class="transition-preview none"></div>
+                        <span>None</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="fade"
+                        title="Fade"
+                    >
+                        <div class="transition-preview fade"></div>
+                        <span>Fade</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="slide-left"
+                        title="Slide Left"
+                    >
+                        <div class="transition-preview slide-left"></div>
+                        <span>Slide Left</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="slide-right"
+                        title="Slide Right"
+                    >
+                        <div class="transition-preview slide-right"></div>
+                        <span>Slide Right</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="slide-up"
+                        title="Slide Up"
+                    >
+                        <div class="transition-preview slide-up"></div>
+                        <span>Slide Up</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="slide-down"
+                        title="Slide Down"
+                    >
+                        <div class="transition-preview slide-down"></div>
+                        <span>Slide Down</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="zoom-in"
+                        title="Zoom In"
+                    >
+                        <div class="transition-preview zoom-in"></div>
+                        <span>Zoom In</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="zoom-out"
+                        title="Zoom Out"
+                    >
+                        <div class="transition-preview zoom-out"></div>
+                        <span>Zoom Out</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="flip"
+                        title="Flip"
+                    >
+                        <div class="transition-preview flip"></div>
+                        <span>Flip</span>
+                    </button>
+                    <button
+                        class="transition-btn"
+                        data-transition="cube"
+                        title="Cube"
+                    >
+                        <div class="transition-preview cube"></div>
+                        <span>Cube</span>
+                    </button>
+                </div>
+            </div>
+            <div class="transitions-section">
+                <label>Duration:</label>
+                <div class="duration-control">
+                    <input
+                        type="range"
+                        id="transitionDuration"
+                        min="0.1"
+                        max="3"
+                        step="0.1"
+                        value="0.5"
+                    />
+                    <span id="durationValue">0.5s</span>
+                </div>
+            </div>
+            <div class="transitions-section">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="applyToAllSlides" />
+                    Apply to all slides
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelTransitionsBtn">
+                    Cancel
+                </button>
+                <button class="btn-primary" id="applyTransitionsBtn">
+                    Apply
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="animationsModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>Animations</h3>
+            <button class="btn-close" id="closeAnimationsModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="animations-section">
+                <label>Select element on slide to animate</label>
+                <div class="selected-element-info" id="selectedElementInfo">
+                    No element selected
+                </div>
+            </div>
+            <div class="animations-section">
+                <label>Entrance Animation:</label>
+                <select id="entranceAnimation">
+                    <option value="none">None</option>
+                    <option value="fade-in">Fade In</option>
+                    <option value="fly-in-left">Fly In (Left)</option>
+                    <option value="fly-in-right">Fly In (Right)</option>
+                    <option value="fly-in-top">Fly In (Top)</option>
+                    <option value="fly-in-bottom">Fly In (Bottom)</option>
+                    <option value="zoom-in">Zoom In</option>
+                    <option value="bounce-in">Bounce In</option>
+                    <option value="spin-in">Spin In</option>
+                    <option value="wipe-left">Wipe (Left)</option>
+                    <option value="wipe-right">Wipe (Right)</option>
+                </select>
+            </div>
+            <div class="animations-section">
+                <label>Emphasis Animation:</label>
+                <select id="emphasisAnimation">
+                    <option value="none">None</option>
+                    <option value="pulse">Pulse</option>
+                    <option value="shake">Shake</option>
+                    <option value="bounce">Bounce</option>
+                    <option value="spin">Spin</option>
+                    <option value="grow">Grow/Shrink</option>
+                    <option value="flash">Flash</option>
+                </select>
+            </div>
+            <div class="animations-section">
+                <label>Exit Animation:</label>
+                <select id="exitAnimation">
+                    <option value="none">None</option>
+                    <option value="fade-out">Fade Out</option>
+                    <option value="fly-out-left">Fly Out (Left)</option>
+                    <option value="fly-out-right">Fly Out (Right)</option>
+                    <option value="fly-out-top">Fly Out (Top)</option>
+                    <option value="fly-out-bottom">Fly Out (Bottom)</option>
+                    <option value="zoom-out">Zoom Out</option>
+                    <option value="spin-out">Spin Out</option>
+                </select>
+            </div>
+            <div class="animations-section">
+                <div class="animation-timing">
+                    <div class="timing-group">
+                        <label>Start:</label>
+                        <select id="animationStart">
+                            <option value="on-click">On Click</option>
+                            <option value="with-previous">With Previous</option>
+                            <option value="after-previous">
+                                After Previous
+                            </option>
+                        </select>
+                    </div>
+                    <div class="timing-group">
+                        <label>Duration:</label>
+                        <input
+                            type="number"
+                            id="animationDuration"
+                            value="0.5"
+                            min="0.1"
+                            max="5"
+                            step="0.1"
+                        />
+                        <span>sec</span>
+                    </div>
+                    <div class="timing-group">
+                        <label>Delay:</label>
+                        <input
+                            type="number"
+                            id="animationDelay"
+                            value="0"
+                            min="0"
+                            max="10"
+                            step="0.1"
+                        />
+                        <span>sec</span>
+                    </div>
+                </div>
+            </div>
+            <div class="animations-section">
+                <label>Animation Order:</label>
+                <div class="animation-order-list" id="animationOrderList">
+                    <p class="no-animations">No animations added yet</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="previewAnimationBtn">
+                    Preview
+                </button>
+                <button class="btn-secondary" id="cancelAnimationsBtn">
+                    Cancel
+                </button>
+                <button class="btn-primary" id="applyAnimationsBtn">
+                    Apply
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="slideSorterModal">
+    <div class="modal-content modal-fullscreen">
+        <div class="modal-header">
+            <h3>Slide Sorter</h3>
+            <div class="sorter-toolbar">
+                <button class="btn-secondary" id="sorterAddSlide">
+                    <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Slide
+                </button>
+                <button class="btn-secondary" id="sorterDuplicateSlide">
+                    Duplicate
+                </button>
+                <button class="btn-secondary" id="sorterDeleteSlide">
+                    Delete
+                </button>
+            </div>
+            <button class="btn-close" id="closeSlideSorterModal">×</button>
+        </div>
+        <div class="modal-body sorter-body">
+            <div class="sorter-grid" id="sorterGrid"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" id="cancelSorterBtn">Cancel</button>
+            <button class="btn-primary" id="applySorterBtn">Apply</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="exportPdfModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Export to PDF</h3>
+            <button class="btn-close" id="closeExportPdfModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="export-section">
+                <label>Slide Range:</label>
+                <div class="export-range-options">
+                    <label class="radio-label">
+                        <input
+                            type="radio"
+                            name="slideRange"
+                            value="all"
+                            checked
+                        />
+                        All slides
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="slideRange" value="current" />
+                        Current slide
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="slideRange" value="custom" />
+                        Custom range:
+                        <input
+                            type="text"
+                            id="customRange"
+                            placeholder="e.g., 1-5, 8"
+                            class="range-input"
+                        />
+                    </label>
+                </div>
+            </div>
+            <div class="export-section">
+                <label>Layout:</label>
+                <select id="pdfLayout">
+                    <option value="full">Full page slides</option>
+                    <option value="notes">Slides with notes</option>
+                    <option value="handout-2">Handouts (2 per page)</option>
+                    <option value="handout-4">Handouts (4 per page)</option>
+                    <option value="handout-6">Handouts (6 per page)</option>
+                    <option value="outline">Outline only</option>
+                </select>
+            </div>
+            <div class="export-section">
+                <label>Orientation:</label>
+                <select id="pdfOrientation">
+                    <option value="landscape">Landscape</option>
+                    <option value="portrait">Portrait</option>
+                </select>
+            </div>
+            <div class="export-section">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="pdfIncludeHidden" />
+                    Include hidden slides
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelExportPdfBtn">
+                    Cancel
+                </button>
+                <button class="btn-primary" id="exportPdfBtnConfirm">
+                    Export PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="masterSlideModal">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>Edit Master Slide</h3>
+            <button class="btn-close" id="closeMasterSlideModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="master-layout">
+                <div class="master-sidebar">
+                    <h4>Master Layouts</h4>
+                    <div class="master-layout-list" id="masterLayoutList">
+                        <div
+                            class="master-layout-item active"
+                            data-layout="title"
+                        >
+                            <div class="layout-preview title-preview">
+                                <div class="preview-title"></div>
+                                <div class="preview-subtitle"></div>
+                            </div>
+                            <span>Title Slide</span>
+                        </div>
+                        <div
+                            class="master-layout-item"
+                            data-layout="title_content"
+                        >
+                            <div class="layout-preview title-content-preview">
+                                <div class="preview-title small"></div>
+                                <div class="preview-content"></div>
+                            </div>
+                            <span>Title and Content</span>
+                        </div>
+                        <div
+                            class="master-layout-item"
+                            data-layout="two_content"
+                        >
+                            <div class="layout-preview two-content-preview">
+                                <div class="preview-title small"></div>
+                                <div class="preview-columns">
+                                    <div class="preview-col"></div>
+                                    <div class="preview-col"></div>
+                                </div>
+                            </div>
+                            <span>Two Content</span>
+                        </div>
+                        <div class="master-layout-item" data-layout="section">
+                            <div class="layout-preview section-preview">
+                                <div class="preview-section-title"></div>
+                            </div>
+                            <span>Section Header</span>
+                        </div>
+                        <div class="master-layout-item" data-layout="blank">
+                            <div class="layout-preview blank-preview"></div>
+                            <span>Blank</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="master-editor">
+                    <div class="master-section">
+                        <h4>Theme Colors</h4>
+                        <div class="color-grid">
+                            <div class="color-item">
+                                <label>Primary:</label>
+                                <input
+                                    type="color"
+                                    id="masterPrimaryColor"
+                                    value="#4285f4"
+                                />
+                            </div>
+                            <div class="color-item">
+                                <label>Secondary:</label>
+                                <input
+                                    type="color"
+                                    id="masterSecondaryColor"
+                                    value="#34a853"
+                                />
+                            </div>
+                            <div class="color-item">
+                                <label>Accent:</label>
+                                <input
+                                    type="color"
+                                    id="masterAccentColor"
+                                    value="#fbbc04"
+                                />
+                            </div>
+                            <div class="color-item">
+                                <label>Background:</label>
+                                <input
+                                    type="color"
+                                    id="masterBgColor"
+                                    value="#ffffff"
+                                />
+                            </div>
+                            <div class="color-item">
+                                <label>Text:</label>
+                                <input
+                                    type="color"
+                                    id="masterTextColor"
+                                    value="#212121"
+                                />
+                            </div>
+                            <div class="color-item">
+                                <label>Text Light:</label>
+                                <input
+                                    type="color"
+                                    id="masterTextLightColor"
+                                    value="#666666"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="master-section">
+                        <h4>Theme Fonts</h4>
+                        <div class="font-grid">
+                            <div class="font-item">
+                                <label>Heading Font:</label>
+                                <select id="masterHeadingFont">
+                                    <option value="Arial">Arial</option>
+                                    <option value="Helvetica">Helvetica</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Times New Roman">
+                                        Times New Roman
+                                    </option>
+                                    <option value="Verdana">Verdana</option>
+                                    <option value="Trebuchet MS">
+                                        Trebuchet MS
+                                    </option>
+                                    <option value="Impact">Impact</option>
+                                </select>
+                            </div>
+                            <div class="font-item">
+                                <label>Body Font:</label>
+                                <select id="masterBodyFont">
+                                    <option value="Arial">Arial</option>
+                                    <option value="Helvetica">Helvetica</option>
+                                    <option value="Georgia">Georgia</option>
+                                    <option value="Times New Roman">
+                                        Times New Roman
+                                    </option>
+                                    <option value="Verdana">Verdana</option>
+                                    <option value="Calibri">Calibri</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="master-section">
+                        <h4>Preview</h4>
+                        <div class="master-preview" id="masterPreview">
+                            <div class="preview-slide">
+                                <h2 class="preview-heading" id="previewHeading">
+                                    Title Text
+                                </h2>
+                                <p class="preview-body" id="previewBody">
+                                    Body text example
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="resetMasterBtn">
+                    Reset to Default
+                </button>
+                <button class="btn-secondary" id="cancelMasterBtn">
+                    Cancel
+                </button>
+                <button class="btn-primary" id="applyMasterBtn">
+                    Apply to All Slides
+                </button>
+            </div>
         </div>
     </div>
 </div>

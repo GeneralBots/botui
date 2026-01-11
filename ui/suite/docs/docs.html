@@ -13,6 +13,46 @@
         </div>
         <div class="toolbar-center">
             <div class="toolbar-group">
+                <button
+                    class="btn-icon"
+                    id="printPreviewBtn"
+                    title="Print Preview"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path
+                            d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                        ></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="findReplaceBtn"
+                    title="Find & Replace (Ctrl+H)"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+            <span class="toolbar-divider"></span>
+            <div class="toolbar-group">
                 <button class="btn-icon" id="undoBtn" title="Undo (Ctrl+Z)">
                     <svg
                         width="16"
@@ -316,6 +356,40 @@
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
+                <button
+                    class="btn-icon"
+                    id="headerFooterBtn"
+                    title="Edit Header & Footer"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                        <line x1="3" y1="7" x2="21" y2="7"></line>
+                        <line x1="3" y1="17" x2="21" y2="17"></line>
+                    </svg>
+                </button>
+                <button
+                    class="btn-icon"
+                    id="pageBreakBtn"
+                    title="Insert Page Break"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path d="M3 12h4l3-9 4 18 3-9h4"></path>
+                    </svg>
+                </button>
                 <button class="btn-icon" id="linkBtn" title="Insert Link">
                     <svg
                         width="16"
@@ -416,11 +490,23 @@
         <div class="docs-canvas">
             <div class="editor-page" id="editorPage">
                 <div
+                    class="editor-header"
+                    id="editorHeader"
+                    contenteditable="true"
+                    data-placeholder="Click to add header"
+                ></div>
+                <div
                     class="editor-content"
                     id="editorContent"
                     contenteditable="true"
                     spellcheck="true"
                     data-placeholder="Start typing..."
+                ></div>
+                <div
+                    class="editor-footer"
+                    id="editorFooter"
+                    contenteditable="true"
+                    data-placeholder="Click to add footer"
                 ></div>
             </div>
         </div>
@@ -725,6 +811,216 @@
                 <button class="export-option" data-format="md">
                     <div class="export-icon">✏️</div>
                     <div class="export-label">Markdown</div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="findReplaceModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Find & Replace</h3>
+            <button class="btn-close" id="closeFindReplaceModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="find-replace-group">
+                <label>Find:</label>
+                <input
+                    type="text"
+                    id="findInput"
+                    placeholder="Search text..."
+                    autofocus
+                />
+            </div>
+            <div class="find-replace-group">
+                <label>Replace:</label>
+                <input
+                    type="text"
+                    id="replaceInput"
+                    placeholder="Replace with..."
+                />
+            </div>
+            <div class="find-replace-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="findMatchCase" />
+                    Match case
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="findWholeWord" />
+                    Whole words only
+                </label>
+            </div>
+            <div class="find-results" id="findResults">
+                <span>0 matches found</span>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="findPrevBtn">Previous</button>
+                <button class="btn-secondary" id="findNextBtn">Next</button>
+                <button class="btn-primary" id="replaceBtn">Replace</button>
+                <button class="btn-primary" id="replaceAllBtn">
+                    Replace All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="printPreviewModal">
+    <div class="modal-content modal-fullscreen">
+        <div class="modal-header">
+            <h3>Print Preview</h3>
+            <div class="print-toolbar">
+                <select id="printOrientation">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                </select>
+                <select id="printPaperSize">
+                    <option value="letter">Letter (8.5" x 11")</option>
+                    <option value="a4">A4 (210mm x 297mm)</option>
+                    <option value="legal">Legal (8.5" x 14")</option>
+                </select>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="printHeaders" />
+                    Headers & Footers
+                </label>
+            </div>
+            <button class="btn-close" id="closePrintPreviewModal">×</button>
+        </div>
+        <div class="modal-body print-preview-body">
+            <div class="print-preview-container" id="printPreviewContainer">
+                <div class="print-page" id="printPage">
+                    <div class="print-header" id="printHeader"></div>
+                    <div class="print-content" id="printContent"></div>
+                    <div class="print-footer" id="printFooter"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" id="cancelPrintBtn">Cancel</button>
+            <button class="btn-primary" id="printBtn">
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path
+                        d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
+                    ></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal hidden" id="headerFooterModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Header & Footer</h3>
+            <button class="btn-close" id="closeHeaderFooterModal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="hf-tabs">
+                <button class="hf-tab active" data-tab="header">Header</button>
+                <button class="hf-tab" data-tab="footer">Footer</button>
+            </div>
+            <div class="hf-tab-content active" id="hfHeaderTab">
+                <div class="form-group">
+                    <label>Header Content:</label>
+                    <div
+                        class="hf-editor"
+                        id="headerEditor"
+                        contenteditable="true"
+                        data-placeholder="Enter header text..."
+                    ></div>
+                </div>
+                <div class="hf-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showHeaderFirstPage" />
+                        Different first page
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showHeaderOddEven" />
+                        Different odd & even pages
+                    </label>
+                </div>
+                <div class="hf-insert-options">
+                    <label>Insert:</label>
+                    <div class="hf-insert-btns">
+                        <button class="btn-secondary btn-sm" id="insertPageNum">
+                            Page Number
+                        </button>
+                        <button class="btn-secondary btn-sm" id="insertDate">
+                            Date
+                        </button>
+                        <button
+                            class="btn-secondary btn-sm"
+                            id="insertDocTitle"
+                        >
+                            Document Title
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="hf-tab-content" id="hfFooterTab">
+                <div class="form-group">
+                    <label>Footer Content:</label>
+                    <div
+                        class="hf-editor"
+                        id="footerEditor"
+                        contenteditable="true"
+                        data-placeholder="Enter footer text..."
+                    ></div>
+                </div>
+                <div class="hf-options">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showFooterFirstPage" />
+                        Different first page
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="showFooterOddEven" />
+                        Different odd & even pages
+                    </label>
+                </div>
+                <div class="hf-insert-options">
+                    <label>Insert:</label>
+                    <div class="hf-insert-btns">
+                        <button
+                            class="btn-secondary btn-sm"
+                            id="insertFooterPageNum"
+                        >
+                            Page Number
+                        </button>
+                        <button
+                            class="btn-secondary btn-sm"
+                            id="insertFooterDate"
+                        >
+                            Date
+                        </button>
+                        <button
+                            class="btn-secondary btn-sm"
+                            id="insertFooterDocTitle"
+                        >
+                            Document Title
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="removeHeaderFooterBtn">
+                    Remove All
+                </button>
+                <button class="btn-secondary" id="cancelHeaderFooterBtn">
+                    Cancel
+                </button>
+                <button class="btn-primary" id="applyHeaderFooterBtn">
+                    Apply
                 </button>
             </div>
         </div>
