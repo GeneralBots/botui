@@ -79,6 +79,71 @@
     --border-hsl: 0 0% 17%;
     --input-hsl: 0 0% 17%;
     --ring: 67 96% 49%;
+
+    /* ============================================ */
+    /* SENTIENT BRIDGE VARIABLES                   */
+    /* For Sheet, Docs, Slides theme support       */
+    /* ============================================ */
+
+    /* Backgrounds */
+    --sentient-bg-primary: #0a0a0a;
+    --sentient-bg-secondary: #111111;
+    --sentient-bg-tertiary: #1a1a1a;
+    --sentient-bg-hover: rgba(212, 245, 5, 0.08);
+    --sentient-bg-active: rgba(212, 245, 5, 0.15);
+
+    /* Text */
+    --sentient-text-primary: #ffffff;
+    --sentient-text-secondary: #888888;
+    --sentient-text-tertiary: #666666;
+    --sentient-text-muted: #444444;
+
+    /* Accent Colors */
+    --sentient-accent: #d4f505;
+    --sentient-accent-hover: #bfdd04;
+    --sentient-accent-light: rgba(212, 245, 5, 0.15);
+    --sentient-accent-dark: #9ab504;
+
+    /* Borders */
+    --sentient-border: #2a2a2a;
+    --sentient-border-light: #222222;
+    --sentient-border-accent: rgba(212, 245, 5, 0.3);
+
+    /* Surfaces */
+    --sentient-surface: #161616;
+    --sentient-surface-hover: #1e1e1e;
+    --sentient-surface-active: #252525;
+    --sentient-surface-elevated: #1a1a1a;
+
+    /* Inputs */
+    --sentient-input-bg: #1a1a1a;
+    --sentient-input-border: #2a2a2a;
+    --sentient-input-focus: #d4f505;
+
+    /* Status Colors */
+    --sentient-success: #22c55e;
+    --sentient-success-bg: rgba(34, 197, 94, 0.15);
+    --sentient-warning: #f59e0b;
+    --sentient-warning-bg: rgba(245, 158, 11, 0.15);
+    --sentient-error: #ef4444;
+    --sentient-error-bg: rgba(239, 68, 68, 0.15);
+
+    /* Typography */
+    --sentient-font-family:
+        "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        sans-serif;
+
+    /* Shadows */
+    --sentient-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --sentient-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --sentient-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+
+    /* Border Radius */
+    --sentient-radius: 0.5rem;
+    --sentient-radius-sm: 0.25rem;
+    --sentient-radius-md: 0.5rem;
+    --sentient-radius-lg: 0.75rem;
+    --sentient-radius-xl: 1rem;
 }
 
 /* ============================================ */
