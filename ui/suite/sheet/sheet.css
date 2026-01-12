@@ -8,9 +8,6 @@
    ============================================================================= */
 
 :root {
-    --sheet-grid-border: var(--sentient-border, #e0e0e0);
-    --sheet-header-bg: var(--sentient-bg-secondary, #f5f5f5);
-    --sheet-cell-selected: var(--sentient-accent, #4285f4);
     --sheet-cell-range: rgba(66, 133, 244, 0.1);
 }
 
@@ -394,9 +391,9 @@
 }
 
 .grid-corner {
-    background: var(--sheet-header-bg);
-    border-right: 1px solid var(--sheet-grid-border);
-    border-bottom: 1px solid var(--sheet-grid-border);
+    background: var(--sentient-bg-secondary, #f5f5f5);
+    border-right: 1px solid var(--sentient-border, #e0e0e0);
+    border-bottom: 1px solid var(--sentient-border, #e0e0e0);
     position: sticky;
     top: 0;
     left: 0;
@@ -412,7 +409,7 @@
     position: sticky;
     top: 0;
     z-index: 20;
-    background: var(--sheet-header-bg);
+    background: var(--sentient-bg-secondary, #f5f5f5);
 }
 
 .column-header {
@@ -422,8 +419,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid var(--sheet-grid-border);
-    border-bottom: 1px solid var(--sheet-grid-border);
+    border-right: 1px solid var(--sentient-border, #e0e0e0);
+    border-bottom: 1px solid var(--sentient-border, #e0e0e0);
     font-size: 12px;
     font-weight: 500;
     color: var(--sentient-text-secondary, #666);
@@ -438,7 +435,7 @@
 }
 
 .column-header.selected {
-    background: var(--sheet-cell-selected);
+    background: var(--sentient-accent, #4285f4);
     color: white;
 }
 
@@ -453,7 +450,7 @@
 }
 
 .column-resize:hover {
-    background: var(--sheet-cell-selected);
+    background: var(--sentient-accent, #4285f4);
 }
 
 /* =============================================================================
@@ -466,7 +463,7 @@
     position: sticky;
     left: 0;
     z-index: 20;
-    background: var(--sheet-header-bg);
+    background: var(--sentient-bg-secondary, #f5f5f5);
 }
 
 .row-header {
@@ -476,8 +473,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid var(--sheet-grid-border);
-    border-bottom: 1px solid var(--sheet-grid-border);
+    border-right: 1px solid var(--sentient-border, #e0e0e0);
+    border-bottom: 1px solid var(--sentient-border, #e0e0e0);
     font-size: 12px;
     font-weight: 500;
     color: var(--sentient-text-secondary, #666);
@@ -491,7 +488,7 @@
 }
 
 .row-header.selected {
-    background: var(--sheet-cell-selected);
+    background: var(--sentient-accent, #4285f4);
     color: white;
 }
 
@@ -517,8 +514,8 @@
     padding: 0 6px;
     display: flex;
     align-items: center;
-    border-right: 1px solid var(--sheet-grid-border);
-    border-bottom: 1px solid var(--sheet-grid-border);
+    border-right: 1px solid var(--sentient-border, #e0e0e0);
+    border-bottom: 1px solid var(--sentient-border, #e0e0e0);
     font-size: 13px;
     background: var(--sentient-bg-primary, #ffffff);
     color: var(--sentient-text-primary, #212121);
@@ -534,7 +531,7 @@
 }
 
 .cell.selected {
-    outline: 2px solid var(--sheet-cell-selected);
+    outline: 2px solid var(--sentient-accent, #4285f4);
     outline-offset: -1px;
     z-index: 5;
 }
@@ -552,7 +549,7 @@
     width: 100%;
     height: 100%;
     border: none;
-    outline: 2px solid var(--sheet-cell-selected);
+    outline: 2px solid var(--sentient-accent, #4285f4);
     padding: 0 6px;
     font-size: 13px;
     font-family: inherit;
@@ -566,8 +563,8 @@
 
 .selection-box {
     position: absolute;
-    border: 2px solid var(--sheet-cell-selected);
-    background: var(--sheet-cell-range);
+    border: 2px solid var(--sentient-accent, #4285f4);
+    background: var(--sentient-accent-light, rgba(66, 133, 244, 0.1));
     pointer-events: none;
     z-index: 10;
     display: none;
@@ -575,7 +572,7 @@
 
 .copy-box {
     position: absolute;
-    border: 2px dashed var(--sheet-cell-selected);
+    border: 2px dashed var(--sentient-accent, #4285f4);
     pointer-events: none;
     z-index: 11;
 }
@@ -588,7 +585,7 @@
     position: absolute;
     width: 8px;
     height: 8px;
-    background: var(--sheet-cell-selected);
+    background: var(--sentient-accent, #4285f4);
     border: 1px solid var(--sentient-bg-primary, #ffffff);
     cursor: crosshair;
     z-index: 15;
