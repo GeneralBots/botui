@@ -86,36 +86,21 @@
     <div class="social-layout">
         <aside class="social-sidebar">
             <div class="sidebar-section">
-                <h3 data-i18n="social-my-communities">My Communities</h3>
-                <div
-                    id="my-communities"
-                    hx-get="/api/ui/social/my-communities"
-                    hx-trigger="load"
-                    hx-swap="innerHTML"
-                >
-                    <div class="loading-placeholder"></div>
+                <h3>My Communities</h3>
+                <div id="my-communities">
+                    <p class="empty-state">No communities yet</p>
                 </div>
             </div>
             <div class="sidebar-section">
-                <h3 data-i18n="social-trending">Trending</h3>
-                <div
-                    id="trending-topics"
-                    hx-get="/api/ui/social/trending"
-                    hx-trigger="load"
-                    hx-swap="innerHTML"
-                >
-                    <div class="loading-placeholder"></div>
+                <h3>Trending</h3>
+                <div id="trending-topics">
+                    <p class="empty-state">No trending topics</p>
                 </div>
             </div>
             <div class="sidebar-section">
-                <h3 data-i18n="social-suggested">Suggested Communities</h3>
-                <div
-                    id="suggested-communities"
-                    hx-get="/api/ui/social/suggested"
-                    hx-trigger="load"
-                    hx-swap="innerHTML"
-                >
-                    <div class="loading-placeholder"></div>
+                <h3>Suggested Communities</h3>
+                <div id="suggested-communities">
+                    <p class="empty-state">No suggestions</p>
                 </div>
             </div>
         </aside>
@@ -183,40 +168,24 @@
                 </div>
             </div>
 
-            <div
-                id="social-content"
-                hx-get="/api/ui/social/feed"
-                hx-trigger="load"
-                hx-swap="innerHTML"
-            >
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <span data-i18n="loading">Loading...</span>
+            <div id="social-content">
+                <div class="empty-feed">
+                    <p>No posts yet. Be the first to share something!</p>
                 </div>
             </div>
         </main>
 
         <aside class="social-right-sidebar">
             <div class="sidebar-section">
-                <h3 data-i18n="social-recent-activity">Recent Activity</h3>
-                <div
-                    id="recent-activity"
-                    hx-get="/api/ui/social/activity"
-                    hx-trigger="load"
-                    hx-swap="innerHTML"
-                >
-                    <div class="loading-placeholder"></div>
+                <h3>Recent Activity</h3>
+                <div id="recent-activity">
+                    <p class="empty-state">No recent activity</p>
                 </div>
             </div>
             <div class="sidebar-section">
-                <h3 data-i18n="social-people">People to Follow</h3>
-                <div
-                    id="people-suggestions"
-                    hx-get="/api/ui/social/people"
-                    hx-trigger="load"
-                    hx-swap="innerHTML"
-                >
-                    <div class="loading-placeholder"></div>
+                <h3>People to Follow</h3>
+                <div id="people-suggestions">
+                    <p class="empty-state">No suggestions</p>
                 </div>
             </div>
         </aside>
