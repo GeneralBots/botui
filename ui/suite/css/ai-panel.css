@@ -27,7 +27,7 @@ body:not(.ai-panel-collapsed) #main-content {
 .ai-assistant-panel {
     position: fixed;
     right: 0;
-    top: 56px; /* Below header */
+    top: 40px; /* Below header - matches --header-height */
     bottom: 0;
     width: 320px;
     display: flex;
@@ -47,10 +47,20 @@ body.ai-panel-collapsed #main-content {
     margin-right: 0;
 }
 
-/* Hide on Chat app */
+/* Hide on Chat app (has its own chat interface) */
 body[data-app="chat"] .ai-assistant-panel,
 body[data-app="chat"] .ai-panel-fab {
     display: none !important;
+}
+
+/* Hide on Docs app (has its own AI chat panel) */
+body[data-app="docs"] .ai-assistant-panel,
+body[data-app="docs"] .ai-panel-fab {
+    display: none !important;
+}
+
+body[data-app="docs"] #main-content {
+    margin-right: 0 !important;
 }
 
 /* =============================================================================
@@ -206,8 +216,16 @@ body[data-app="chat"] .ai-panel-fab {
 }
 
 @keyframes ai-typing {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-4px); opacity: 1; }
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
 }
 
 /* =============================================================================
@@ -369,7 +387,7 @@ body.ai-panel-collapsed .ai-panel-fab {
         width: 100%;
         max-width: 320px;
     }
-    
+
     body:not(.ai-panel-collapsed) #main-content {
         margin-right: 0;
     }
@@ -381,7 +399,7 @@ body.ai-panel-collapsed .ai-panel-fab {
         max-width: none;
         top: 56px;
     }
-    
+
     .ai-panel-fab {
         right: 16px;
         bottom: 16px;

@@ -80,9 +80,23 @@
   function confirmSchedule() {
     var dateInput = document.getElementById("schedule-date");
     var timeInput = document.getElementById("schedule-time");
-    if (dateInput && timeInput) {
+    if (dateInput && timeInput && dateInput.value && timeInput.value) {
       var scheduledDate = new Date(dateInput.value + "T" + timeInput.value);
+      if (isNaN(scheduledDate.getTime())) {
+        if (typeof window.showNotification === "function") {
+          window.showNotification(
+            "Please select a valid date and time",
+            "error",
+          );
+        }
+        return;
+      }
       confirmScheduleSend(scheduledDate);
+    } else {
+      if (typeof window.showNotification === "function") {
+        window.showNotification("Please select a date and time", "error");
+      }
+      return;
     }
     closeScheduleModal();
   }
@@ -368,14 +382,14 @@
   }
 
   function openAddAccount() {
-    var modal = document.getElementById("account-modal");
+    var modal = document.getElementById("add-account-modal");
     if (modal && modal.showModal) {
       modal.showModal();
     }
   }
 
   function closeAddAccount() {
-    var modal = document.getElementById("account-modal");
+    var modal = document.getElementById("add-account-modal");
     if (modal && modal.close) {
       modal.close();
     }
