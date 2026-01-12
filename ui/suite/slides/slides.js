@@ -452,40 +452,6 @@
     }
   }
 
-  function cacheElements() {
-    elements.container = document.querySelector(".slides-container");
-    elements.sidebar = document.getElementById("slides-sidebar");
-    elements.thumbnails = document.getElementById("slide-thumbnails");
-    elements.canvas = document.getElementById("slide-canvas");
-    elements.canvasContainer = document.getElementById("canvas-container");
-    elements.selectionHandles = document.getElementById("selection-handles");
-    elements.propertiesPanel = document.getElementById("properties-panel");
-    elements.presentationName = document.getElementById("presentation-name");
-    elements.collaborators = document.getElementById("collaborators");
-    elements.contextMenu = document.getElementById("context-menu");
-    elements.slideContextMenu = document.getElementById("slide-context-menu");
-    elements.cursorIndicators = document.getElementById("cursor-indicators");
-  }
-
-  function bindEvents() {
-    elements.canvas.addEventListener("mousedown", handleCanvasMouseDown);
-    elements.canvas.addEventListener("dblclick", handleCanvasDoubleClick);
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("click", hideContextMenus);
-    elements.canvas.addEventListener("contextmenu", handleContextMenu);
-
-    const handles = elements.selectionHandles.querySelectorAll(
-      ".handle, .rotate-handle",
-    );
-    handles.forEach((handle) => {
-      handle.addEventListener("mousedown", handleResizeStart);
-    });
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-  }
-
   function createNewPresentation() {
     const titleSlide = createSlide("title");
     state.slides = [titleSlide];

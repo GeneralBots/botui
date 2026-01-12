@@ -56,6 +56,11 @@ const SUITE_DIRS: &[&str] = &[
     "goals",
     "player",
     "canvas",
+    "people",
+    "crm",
+    "billing",
+    "products",
+    "tickets",
 ];
 
 pub async fn index() -> impl IntoResponse {

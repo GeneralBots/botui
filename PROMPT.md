@@ -569,25 +569,30 @@ pub fn list_files(path: &str) -> Result<Vec<FileItem>, String> {
 
 ---
 
-## Final Steps Before Commit
+## COMPILATION POLICY - CRITICAL
 
-```bash
-# Check for warnings
-cargo check 2>&1 | grep warning
+**NEVER compile during development. NEVER run `cargo build` or `cargo check`. Use static analysis only.**
 
-# Audit dependencies (must be 0 warnings)
-cargo audit
+### Workflow
 
-# Build both modes
-cargo build
-cargo build --features desktop
+1. Make all code changes
+2. Use `diagnostics` tool for static analysis (NOT compilation)
+3. Fix any errors found by diagnostics
+4. **At the end**, inform user what needs restart
 
-# Verify no dead code with _ prefixes
-grep -r "let _" src/ --include="*.rs"
+### After All Changes Complete
 
-# Verify no CDN references
-grep -r "unpkg.com\|cdnjs\|jsdelivr" ui/
-```
+| Change Type | User Action Required |
+|-------------|----------------------|
+| Rust code (`.rs` files) | "Recompile and restart **botui**" |
+| HTML templates (`.html` in ui/) | "Browser refresh only" |
+| CSS/JS files | "Browser refresh only" |
+| Askama templates (`.html` in src/) | "Recompile and restart **botui**" |
+| Cargo.toml changes | "Recompile and restart **botui**" |
+
+**Format:** At the end of your response, always state:
+- ✅ **No restart needed** - browser refresh only
+- 🔄 **Restart botui** - recompile required
 
 ---
 

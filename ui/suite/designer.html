@@ -1747,6 +1747,11 @@
             const toolboxItems = document.querySelectorAll('.toolbox-item');
             const canvas = document.getElementById('canvas-inner');
 
+            if (!canvas) {
+                console.warn('initDragAndDrop: canvas-inner not found');
+                return;
+            }
+
             toolboxItems.forEach(item => {
                 item.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('nodeType', item.dataset.nodeType);
@@ -1778,6 +1783,11 @@
         function initCanvasInteraction() {
             const canvas = document.getElementById('canvas');
             const container = document.getElementById('canvas-container');
+
+            if (!canvas || !container) {
+                console.warn('initCanvasInteraction: canvas or canvas-container not found');
+                return;
+            }
 
             // Pan with middle mouse or space+drag
             let isPanning = false;
@@ -2295,6 +2305,11 @@
             const canvas = document.getElementById('canvas');
             const contextMenu = document.getElementById('context-menu');
 
+            if (!canvas || !contextMenu) {
+                console.warn('initContextMenu: canvas or context-menu not found');
+                return;
+            }
+
             canvas.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 const nodeEl = e.target.closest('.node');
@@ -2312,7 +2327,10 @@
         }
 
         function hideContextMenu() {
-            document.getElementById('context-menu').classList.remove('visible');
+            const menu = document.getElementById('context-menu');
+            if (menu) {
+                menu.classList.remove('visible');
+            }
         }
 
         // Context Menu Actions
@@ -2353,14 +2371,20 @@
 
         // Modal Management
         function showModal(id) {
-            document.getElementById(id).classList.add('visible');
-            if (id === 'open-modal') {
-                htmx.trigger('#file-list-content', 'load');
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.add('visible');
+                if (id === 'open-modal') {
+                    htmx.trigger('#file-list-content', 'load');
+                }
             }
         }
 
         function hideModal(id) {
-            document.getElementById(id).classList.remove('visible');
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('visible');
+            }
         }
 
         // Save Design
@@ -2579,7 +2603,10 @@
         }
 
         function hideMagicPanel() {
-            document.getElementById('magic-panel').classList.remove('visible');
+            const panel = document.getElementById('magic-panel');
+            if (panel) {
+                panel.classList.remove('visible');
+            }
         }
 
         async function analyzeMagicSuggestions() {

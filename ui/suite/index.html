@@ -10,35 +10,37 @@
         />
         <meta name="theme-color" content="#d4f505" />
 
-        <!-- Styles -->
+        <!-- Critical CSS - minimal styles for shell/layout (loaded sync) -->
         <link rel="stylesheet" href="css/app.css" />
-        <link rel="stylesheet" href="css/apps-extended.css" />
-        <link rel="stylesheet" href="css/components.css" />
         <link rel="stylesheet" href="css/base.css" />
-        <link rel="stylesheet" href="css/partials.css" />
         <link rel="stylesheet" href="css/theme-sentient.css" />
 
-        <!-- App-specific CSS -->
-        <link rel="stylesheet" href="chat/chat.css" />
-        <link rel="stylesheet" href="calendar/calendar.css" />
-        <link rel="stylesheet" href="drive/drive.css" />
-        <link rel="stylesheet" href="mail/mail.css" />
-        <link rel="stylesheet" href="meet/meet.css" />
-        <link rel="stylesheet" href="paper/paper.css" />
-        <link rel="stylesheet" href="sheet/sheet.css" />
-        <link rel="stylesheet" href="slides/slides.css" />
-        <link rel="stylesheet" href="research/research.css" />
-        <link rel="stylesheet" href="tasks/tasks.css?v=20251230" />
-        <link rel="stylesheet" href="tasks/taskmd.css?v=20251230" />
-        <link rel="stylesheet" href="analytics/analytics.css" />
-        <link rel="stylesheet" href="dashboards/dashboards.css" />
-        <link rel="stylesheet" href="monitoring/monitoring.css" />
-        <link rel="stylesheet" href="crm/crm.css" />
-        <link rel="stylesheet" href="billing/billing.css" />
-        <link rel="stylesheet" href="products/products.css" />
-        <link rel="stylesheet" href="tickets/tickets.css" />
-        <link rel="stylesheet" href="docs/docs.css" />
-        <link rel="stylesheet" href="social/social.css" />
+        <!-- Non-critical CSS - loaded async for faster initial paint -->
+        <link
+            rel="stylesheet"
+            href="css/components.css"
+            media="print"
+            onload="this.media='all'"
+        />
+        <link
+            rel="stylesheet"
+            href="css/partials.css"
+            media="print"
+            onload="this.media='all'"
+        />
+        <link
+            rel="stylesheet"
+            href="css/apps-extended.css"
+            media="print"
+            onload="this.media='all'"
+        />
+        <noscript>
+            <link rel="stylesheet" href="css/components.css" />
+            <link rel="stylesheet" href="css/partials.css" />
+            <link rel="stylesheet" href="css/apps-extended.css" />
+        </noscript>
+
+        <!-- App-specific CSS loaded lazily by each view via CSSLoader -->
 
         <!-- Local Libraries (no external CDN dependencies) -->
         <script src="js/vendor/htmx.min.js"></script>
@@ -52,6 +54,9 @@
 
         <!-- i18n -->
         <script src="js/i18n.js"></script>
+
+        <!-- CSS Lazy Loader - enables per-screen CSS loading -->
+        <script src="js/css-loader.js"></script>
 
         <!-- Enable HTMX to process inline scripts in swapped content -->
         <script>
@@ -3286,7 +3291,6 @@
                                         e,
                                     );
                                     currentLoadedSection = null;
-                                } finally {
                                     isLoadingSection = false;
                                 }
                             }
@@ -3316,13 +3320,39 @@
                     }
                 });
 
+                // Also listen for response errors
+                document.body.addEventListener(
+                    "htmx:responseError",
+                    (event) => {
+                        if (
+                            event.detail.target &&
+                            event.detail.target.id === "main-content"
+                        ) {
+                            isLoadingSection = false;
+                            currentLoadedSection = null;
+                        }
+                    },
+                );
+
                 // Load initial content based on hash or default to chat
                 window.addEventListener("hashchange", handleHashChange);
 
-                // Initial load
-                setTimeout(() => {
-                    handleHashChange();
-                }, 100);
+                // Initial load - wait for HTMX to be ready
+                function initialLoad() {
+                    if (typeof htmx !== "undefined" && htmx.ajax) {
+                        handleHashChange();
+                    } else {
+                        setTimeout(initialLoad, 50);
+                    }
+                }
+
+                if (document.readyState === "complete") {
+                    setTimeout(initialLoad, 50);
+                } else {
+                    window.addEventListener("load", () => {
+                        setTimeout(initialLoad, 50);
+                    });
+                }
 
                 // ==========================================================================
                 // GBAlerts - Global Notification System
