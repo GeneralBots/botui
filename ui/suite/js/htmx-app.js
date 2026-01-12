@@ -392,6 +392,11 @@
       section = getCurrentSection();
     }
 
+    // Set data-app attribute on body for CSS targeting (e.g., docs app styling)
+    if (section) {
+      document.body.setAttribute("data-app", section);
+    }
+
     // First, remove ALL active classes from all tabs, items, and apps button
     document.querySelectorAll(".app-tab.active").forEach((item) => {
       item.classList.remove("active");

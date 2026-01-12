@@ -18,36 +18,32 @@
 
 /* =============================================================================
    MAIN LAYOUT - Full height, light background
+   Use body[data-app="docs"] for reliable targeting
    ============================================================================= */
+
+/* When docs app is active - force light theme */
+body[data-app="docs"] {
+    overflow: hidden !important;
+}
+
+body[data-app="docs"] #main-content {
+    background: #f8f9fa !important;
+    background-color: #f8f9fa !important;
+    overflow: hidden !important;
+    height: calc(100vh - 40px) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
 
 .docs-app {
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 100%;
-    background: #f8f9fa !important;
+    width: 100%;
+    background: #f8f9fa;
     color: #202124;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     overflow: hidden;
-    position: relative;
-}
-
-/* Force light background everywhere */
-html:has(.docs-app),
-body:has(.docs-app),
-#main-content:has(.docs-app),
-.app-main:has(.docs-app),
-.suite-content-panel:has(.docs-app),
-[data-app="docs"] {
-    overflow: hidden !important;
-    background: #f8f9fa !important;
-    background-color: #f8f9fa !important;
-}
-
-#main-content:has(.docs-app) {
-    height: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
 }
 
 /* =============================================================================
@@ -321,12 +317,10 @@ body:has(.docs-app),
 .docs-main {
     display: flex;
     flex-direction: row;
-    flex: 1 1 auto;
+    flex: 1;
     overflow: hidden;
-    background: #f8f9fa !important;
+    background: #f8f9fa;
     min-height: 0;
-    width: 100%;
-    position: relative;
 }
 
 /* =============================================================================
@@ -334,16 +328,14 @@ body:has(.docs-app),
    ============================================================================= */
 
 .docs-canvas {
-    flex: 1 1 auto;
+    flex: 1;
     overflow-y: auto;
     overflow-x: auto;
     padding: 20px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background: #f8f9fa !important;
-    min-height: 0;
-    min-width: 0;
+    background: #f8f9fa;
 }
 
 .editor-page {
@@ -538,30 +530,20 @@ body:has(.docs-app),
 }
 
 /* =============================================================================
-   CHAT PANEL - RIGHT SIDE (MUST BE FLEX CHILD OF docs-main)
+   CHAT PANEL - RIGHT SIDE
    ============================================================================= */
 
 .chat-panel {
     width: 280px;
-    min-width: 280px;
-    max-width: 280px;
     flex: 0 0 280px;
     display: flex;
     flex-direction: column;
     background: #ffffff;
     border-left: 1px solid #e0e0e0;
-    height: 100%;
     overflow: hidden;
-    order: 2; /* Ensure it's on the right */
 }
 
 .chat-panel.collapsed {
-    width: 0;
-    min-width: 0;
-    max-width: 0;
-    flex: 0 0 0;
-    overflow: hidden;
-    border-left: none;
     display: none;
 }
 
