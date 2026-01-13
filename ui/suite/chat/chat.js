@@ -740,6 +740,33 @@ function parseMarkdown(text) {
     .replace(/`([^`]+)`/gim, "<code>$1</code>")
     .replace(/\n/gim, "<br>");
 }
+// Export projector functions for onclick handlers in projector.html
+window.openProjector = openProjector;
+window.closeProjector = closeProjector;
+window.closeProjectorOnOverlay = closeProjectorOnOverlay;
+window.toggleFullscreen = toggleFullscreen;
+window.downloadContent = downloadContent;
+window.shareContent = shareContent;
+window.togglePlayPause = togglePlayPause;
+window.mediaSeekBack = mediaSeekBack;
+window.mediaSeekForward = mediaSeekForward;
+window.toggleMute = toggleMute;
+window.setVolume = setVolume;
+window.toggleLoop = toggleLoop;
+window.prevSlide = prevSlide;
+window.nextSlide = nextSlide;
+window.goToSlide = goToSlide;
+window.zoomIn = zoomIn;
+window.zoomOut = zoomOut;
+window.prevImage = prevImage;
+window.nextImage = nextImage;
+window.rotateImage = rotateImage;
+window.fitToScreen = fitToScreen;
+window.toggleLineNumbers = toggleLineNumbers;
+window.toggleWordWrap = toggleWordWrap;
+window.setCodeTheme = setCodeTheme;
+window.copyCode = copyCode;
+
 if (window.htmx) {
   htmx.on("htmx:wsMessage", function (event) {
     try {

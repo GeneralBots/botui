@@ -1214,6 +1214,140 @@
     loadFiles(currentPath, currentBucket);
   }
 
+  // =============================================================================
+  // MISSING FUNCTIONS FOR HTML ONCLICK HANDLERS
+  // =============================================================================
+
+  function toggleView(type) {
+    setView(type);
+  }
+
+  function setView(type) {
+    const gridBtn = document.getElementById("grid-view-btn");
+    const listBtn = document.getElementById("list-view-btn");
+    const fileGrid = document.getElementById("file-grid");
+    const fileList = document.getElementById("file-list");
+    const fileView = document.getElementById("file-view");
+
+    if (type === "grid") {
+      gridBtn?.classList.add("active");
+      listBtn?.classList.remove("active");
+      if (fileGrid) fileGrid.style.display = "grid";
+      if (fileList) fileList.style.display = "none";
+      if (fileView) fileView.className = "file-grid";
+    } else {
+      gridBtn?.classList.remove("active");
+      listBtn?.classList.add("active");
+      if (fileGrid) fileGrid.style.display = "none";
+      if (fileList) fileList.style.display = "block";
+      if (fileView) fileView.className = "file-list";
+    }
+  }
+
+  function openFolder(el) {
+    const path =
+      el?.dataset?.path || el?.querySelector(".file-name")?.textContent;
+    if (path) {
+      currentPath = path.startsWith("/") ? path : currentPath + "/" + path;
+      loadFiles(currentPath);
+    }
+  }
+
+  function selectFile(el) {
+    const path = el?.dataset?.path;
+    if (path) {
+      toggleSelection(path);
+      el.classList.toggle("selected", selectedFiles.has(path));
+    } else {
+      // Toggle visual selection
+      document.querySelectorAll(".file-item.selected").forEach((item) => {
+        if (item !== el) item.classList.remove("selected");
+      });
+      el.classList.toggle("selected");
+    }
+    updateSelectionUI();
+  }
+
+  function setActiveNav(el) {
+    document.querySelectorAll(".nav-item").forEach((item) => {
+      item.classList.remove("active");
+    });
+    el.classList.add("active");
+  }
+
+  function toggleInfoPanel() {
+    const panel =
+      document.getElementById("info-panel") ||
+      document.getElementById("details-panel");
+    if (panel) {
+      panel.classList.toggle("open");
+      panel.classList.toggle("hidden");
+    }
+  }
+
+  function toggleAIPanel() {
+    const panel =
+      document.getElementById("ai-panel") ||
+      document.querySelector(".ai-panel");
+    if (panel) {
+      panel.classList.toggle("open");
+    }
+  }
+
+  function aiAction(action) {
+    const messages = {
+      organize:
+        "I'll help you organize your files. What folder would you like to organize?",
+      find: "What file are you looking for?",
+      analyze: "Select a file and I'll analyze its contents.",
+      share: "Select files to share. Who would you like to share with?",
+    };
+    addAIMessage("assistant", messages[action] || "How can I help you?");
+  }
+
+  function sendAIMessage() {
+    const input = document.getElementById("ai-input");
+    if (!input || !input.value.trim()) return;
+
+    const message = input.value.trim();
+    input.value = "";
+
+    addAIMessage("user", message);
+    // Simulate AI response
+    setTimeout(() => {
+      addAIMessage("assistant", `Processing your request: "${message}"`);
+    }, 500);
+  }
+
+  function addAIMessage(type, content) {
+    const container =
+      document.getElementById("ai-messages") ||
+      document.querySelector(".ai-messages");
+    if (!container) return;
+
+    const div = document.createElement("div");
+    div.className = `ai-message ${type}`;
+    div.innerHTML = `<div class="ai-message-bubble">${content}</div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function updateSelectionUI() {
+    const count = selectedFiles.size;
+    const bulkActions = document.getElementById("bulk-actions");
+    if (bulkActions) {
+      bulkActions.style.display = count > 0 ? "flex" : "none";
+    }
+    const countEl = document.getElementById("selection-count");
+    if (countEl) {
+      countEl.textContent = `${count} selected`;
+    }
+  }
+
+  function uploadFile() {
+    triggerUpload();
+  }
+
   window.DriveModule = {
     init,
     loadFiles,
@@ -1237,6 +1371,18 @@
     showContextMenuFor,
     navigateUp,
   };
+
+  // Export functions for HTML onclick handlers
+  window.toggleView = toggleView;
+  window.setView = setView;
+  window.openFolder = openFolder;
+  window.selectFile = selectFile;
+  window.setActiveNav = setActiveNav;
+  window.toggleInfoPanel = toggleInfoPanel;
+  window.toggleAIPanel = toggleAIPanel;
+  window.aiAction = aiAction;
+  window.sendAIMessage = sendAIMessage;
+  window.uploadFile = uploadFile;
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);

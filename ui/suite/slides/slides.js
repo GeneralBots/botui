@@ -1060,7 +1060,7 @@
       }
     } else if (e.key === "Escape") {
       clearSelection();
-      hideContextMenus();
+      hideAllContextMenus();
       if (state.isPresenting) {
         exitPresentation();
       }
@@ -1704,6 +1704,14 @@
   function hideAllContextMenus() {
     elements.contextMenu?.classList.add("hidden");
     elements.slideContextMenu?.classList.add("hidden");
+  }
+
+  function showSlideContextMenu(e, slideIndex) {
+    e.preventDefault();
+    e.stopPropagation();
+    state.currentSlideIndex = slideIndex;
+    hideAllContextMenus();
+    showContextMenu(elements.slideContextMenu, e.clientX, e.clientY);
   }
 
   function showContextMenu(menu, x, y) {
@@ -2865,7 +2873,7 @@
     updateMasterPreview();
   }
 
-  window.gbSlides = {
+  window.slidesApp = {
     init,
     addSlide,
     addTextBox,
@@ -2885,6 +2893,7 @@
     showSlideSorter,
     exportToPdf,
     showMasterSlideModal,
+    showSlideContextMenu,
   };
 
   if (document.readyState === "loading") {
