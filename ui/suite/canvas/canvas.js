@@ -1066,6 +1066,251 @@
   }
 
   // =============================================================================
+  // SHARING & COLLABORATION
+  // =============================================================================
+
+  function shareCanvas() {
+    if (!state.canvasId) {
+      // Save canvas first if not saved
+      saveCanvas().then(() => {
+        showShareDialog();
+      });
+    } else {
+      showShareDialog();
+    }
+  }
+
+  function showShareDialog() {
+    const modal = document.getElementById("share-modal");
+    if (modal) {
+      if (modal.showModal) {
+        modal.showModal();
+      } else {
+        modal.classList.add("open");
+        modal.style.display = "flex";
+      }
+      // Generate share link
+      const shareUrl = `${window.location.origin}/canvas?id=${state.canvasId}`;
+      const shareLinkInput = document.getElementById("share-link");
+      if (shareLinkInput) {
+        shareLinkInput.value = shareUrl;
+      }
+    } else {
+      // Fallback: copy link to clipboard
+      const shareUrl = `${window.location.origin}/canvas?id=${state.canvasId || "new"}`;
+      navigator.clipboard
+        .writeText(shareUrl)
+        .then(() => {
+          showNotification("Share link copied to clipboard", "success");
+        })
+        .catch(() => {
+          showNotification(
+            "Canvas ID: " + (state.canvasId || "unsaved"),
+            "info",
+          );
+        });
+    }
+  }
+
+  // =============================================================================
+  // PROPERTIES PANEL
+  // =============================================================================
+
+  function togglePropertiesPanel() {
+    const panel = document.getElementById("properties-panel");
+    if (panel) {
+      panel.classList.toggle("collapsed");
+      const isCollapsed = panel.classList.contains("collapsed");
+      // Update toggle button icon if needed
+      const toggleBtn = panel.querySelector(".panel-toggle span");
+      if (toggleBtn) {
+        toggleBtn.textContent = isCollapsed ? "⚙️" : "✕";
+      }
+    }
+  }
+
+  // =============================================================================
+  // LAYERS MANAGEMENT
+  // =============================================================================
+
+  let layers = [
+    { id: "layer_1", name: "Layer 1", visible: true, locked: false },
+  ];
+  let activeLayerId = "layer_1";
+
+  function addLayer() {
+    const newId = "layer_" + (layers.length + 1);
+    const newLayer = {
+      id: newId,
+      name: "Layer " + (layers.length + 1),
+      visible: true,
+      locked: false,
+    };
+    layers.push(newLayer);
+    activeLayerId = newId;
+    renderLayers();
+    showNotification("Layer added", "success");
+  }
+
+  function renderLayers() {
+    const layersList = document.getElementById("layers-list");
+    if (!layersList) return;
+
+    layersList.innerHTML = layers
+      .map(
+        (layer) => `
+        <div class="layer-item ${layer.id === activeLayerId ? "active" : ""}"
+             data-layer-id="${layer.id}"
+             onclick="selectLayer('${layer.id}')">
+            <span class="layer-visibility" onclick="event.stopPropagation(); toggleLayerVisibility('${layer.id}')">${layer.visible ? "👁️" : "👁️‍🗨️"}</span>
+            <span class="layer-name">${layer.name}</span>
+            <span class="layer-lock" onclick="event.stopPropagation(); toggleLayerLock('${layer.id}')">${layer.locked ? "🔒" : "🔓"}</span>
+        </div>
+      `,
+      )
+      .join("");
+  }
+
+  function selectLayer(layerId) {
+    activeLayerId = layerId;
+    renderLayers();
+  }
+
+  function toggleLayerVisibility(layerId) {
+    const layer = layers.find((l) => l.id === layerId);
+    if (layer) {
+      layer.visible = !layer.visible;
+      renderLayers();
+      render();
+    }
+  }
+
+  function toggleLayerLock(layerId) {
+    const layer = layers.find((l) => l.id === layerId);
+    if (layer) {
+      layer.locked = !layer.locked;
+      renderLayers();
+    }
+  }
+
+  // =============================================================================
+  // CLIPBOARD & DUPLICATE
+  // =============================================================================
+
+  function duplicateSelected() {
+    if (!state.selectedElement) {
+      showNotification("No element selected", "warning");
+      return;
+    }
+
+    const original = state.selectedElement;
+    const duplicate = JSON.parse(JSON.stringify(original));
+    duplicate.id = generateId();
+    // Offset the duplicate slightly
+    if (duplicate.x !== undefined) duplicate.x += 20;
+    if (duplicate.y !== undefined) duplicate.y += 20;
+
+    state.elements.push(duplicate);
+    state.selectedElement = duplicate;
+    saveToHistory();
+    render();
+    showNotification("Element duplicated", "success");
+  }
+
+  function copySelected() {
+    if (!state.selectedElement) {
+      showNotification("No element selected", "warning");
+      return;
+    }
+    state.clipboard = JSON.parse(JSON.stringify(state.selectedElement));
+    showNotification("Element copied", "success");
+  }
+
+  function pasteClipboard() {
+    if (!state.clipboard) {
+      showNotification("Nothing to paste", "warning");
+      return;
+    }
+
+    const pasted = JSON.parse(JSON.stringify(state.clipboard));
+    pasted.id = generateId();
+    // Offset the pasted element
+    if (pasted.x !== undefined) pasted.x += 20;
+    if (pasted.y !== undefined) pasted.y += 20;
+
+    state.elements.push(pasted);
+    state.selectedElement = pasted;
+    saveToHistory();
+    render();
+    showNotification("Element pasted", "success");
+  }
+
+  // =============================================================================
+  // ELEMENT ORDERING
+  // =============================================================================
+
+  function bringToFront() {
+    if (!state.selectedElement) return;
+    const index = state.elements.findIndex(
+      (e) => e.id === state.selectedElement.id,
+    );
+    if (index !== -1 && index < state.elements.length - 1) {
+      state.elements.splice(index, 1);
+      state.elements.push(state.selectedElement);
+      saveToHistory();
+      render();
+    }
+  }
+
+  function sendToBack() {
+    if (!state.selectedElement) return;
+    const index = state.elements.findIndex(
+      (e) => e.id === state.selectedElement.id,
+    );
+    if (index > 0) {
+      state.elements.splice(index, 1);
+      state.elements.unshift(state.selectedElement);
+      saveToHistory();
+      render();
+    }
+  }
+
+  // =============================================================================
+  // EXPORT MODAL
+  // =============================================================================
+
+  function showExportModal() {
+    const modal = document.getElementById("export-modal");
+    if (modal) {
+      if (modal.showModal) {
+        modal.showModal();
+      } else {
+        modal.classList.add("open");
+        modal.style.display = "flex";
+      }
+    }
+  }
+
+  function closeExportModal() {
+    const modal = document.getElementById("export-modal");
+    if (modal) {
+      if (modal.close) {
+        modal.close();
+      } else {
+        modal.classList.remove("open");
+        modal.style.display = "none";
+      }
+    }
+  }
+
+  function doExport() {
+    const formatSelect = document.getElementById("export-format");
+    const format = formatSelect ? formatSelect.value : "png";
+    exportCanvas(format);
+    closeExportModal();
+  }
+
+  // =============================================================================
   // UTILITIES
   // =============================================================================
 
@@ -1107,6 +1352,32 @@
   window.copyElement = copyElement;
   window.cutElement = cutElement;
   window.pasteElement = pasteElement;
+
+  // Sharing & Collaboration
+  window.shareCanvas = shareCanvas;
+
+  // Properties Panel
+  window.togglePropertiesPanel = togglePropertiesPanel;
+
+  // Layers
+  window.addLayer = addLayer;
+  window.selectLayer = selectLayer;
+  window.toggleLayerVisibility = toggleLayerVisibility;
+  window.toggleLayerLock = toggleLayerLock;
+
+  // Clipboard & Duplicate
+  window.duplicateSelected = duplicateSelected;
+  window.copySelected = copySelected;
+  window.pasteClipboard = pasteClipboard;
+
+  // Element Ordering
+  window.bringToFront = bringToFront;
+  window.sendToBack = sendToBack;
+
+  // Export Modal
+  window.showExportModal = showExportModal;
+  window.closeExportModal = closeExportModal;
+  window.doExport = doExport;
 
   // =============================================================================
   // INITIALIZE
