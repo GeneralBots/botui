@@ -42,7 +42,25 @@ function applyProductConfig(config) {
 
   // Filter apps based on enabled list
   if (config.apps && Array.isArray(config.apps)) {
-    filterAppsByConfig(config.apps);
+    let effectiveApps = config.apps;
+
+    // Check if we have compiled_features info to filter even further
+    // This ensures we don't show apps that are enabled in config but not compiled in binary
+    if (config.compiled_features && Array.isArray(config.compiled_features)) {
+      const compiledSet = new Set(config.compiled_features.map(f => f.toLowerCase()));
+      effectiveApps = effectiveApps.filter(app =>
+        compiledSet.has(app.toLowerCase()) ||
+        app.toLowerCase() === 'settings' ||
+        app.toLowerCase() === 'auth' ||
+        app.toLowerCase() === 'admin' // Admin usually contains settings which is always there
+      );
+
+      // Also call a helper to hide UI elements for non-compiled features explicitly
+      // This handles features that might not be "apps" but are UI sections
+      hideNonCompiledUI(compiledSet);
+    }
+
+    filterAppsByConfig(effectiveApps);
   }
 
   // Apply custom logo
@@ -72,6 +90,28 @@ function applyProductConfig(config) {
       el.textContent = config.copyright;
     });
   }
+}
+
+// Hide UI elements that require features not compiled in the binary
+function hideNonCompiledUI(compiledSet) {
+  // Hide elements with data-feature attribute that aren't in compiled set
+  document.querySelectorAll('[data-feature]').forEach(el => {
+    const feature = el.getAttribute('data-feature').toLowerCase();
+    // Allow settings/admin as they are usually core
+    if (!compiledSet.has(feature) && feature !== 'settings' && feature !== 'admin') {
+      el.style.display = 'none';
+      el.classList.add('hidden-uncompiled');
+    }
+  });
+
+  // Also look for specific sections that might map to features
+  // e.g. .feature-mail, .feature-meet classes
+  compiledSet.forEach(feature => {
+    // This loop defines what IS available. 
+    // Logic should be inverse: find all feature- classes and hide if not in set
+    // But scanning all classes is expensive. 
+    // Better to rely on data-feature or explicit app hiding which filterAppsByConfig does.
+  });
 }
 
 // Filter visible apps based on enabled list

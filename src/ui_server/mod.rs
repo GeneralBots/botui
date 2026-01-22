@@ -61,6 +61,7 @@ const SUITE_DIRS: &[&str] = &[
     "billing",
     "products",
     "tickets",
+    "about",
 ];
 
 pub async fn index() -> impl IntoResponse {
