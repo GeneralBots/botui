@@ -9,7 +9,7 @@ keywords = ["chatbot", "ui", "web-interface", "general-bots"]
 categories = ["web-programming", "gui"]
 
 [dependencies.botlib]
-path = "../botlib"
+workspace = true
 features = ["http-client"]
 
 [features]
@@ -48,42 +48,43 @@ canvas = []
 people = []
 billing = []
 products = []
+editor = []
 tickets = []
 
 [dependencies]
-anyhow = "1.0"
-async-trait = "0.1"
-axum = { version = "0.7.5", features = ["ws", "multipart", "macros"] }
-base64 = "0.22"
-bytes = "1.8"
-chrono = { version = "0.4", features = ["serde"] }
-diesel = { version = "2.1", features = ["sqlite"] }
-dirs = "5.0"
-env_logger = "0.11"
-futures = "0.3"
-futures-util = "0.3"
-hostname = "0.4"
-jsonwebtoken = "9.3"
-local-ip-address = "0.6.5"
-log = "0.4"
-mime_guess = "2.0"
-native-tls = "0.2"
-rand = "0.8"
-regex = "1.10"
-reqwest = { version = "0.12", features = ["json"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-time = "0.3"
-tokio = { version = "1.41", features = ["full"] }
-tokio-stream = "0.1"
-tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
-tower = "0.4"
-tower-http = { version = "0.5", features = ["cors", "fs", "trace"] }
-tower-cookies = "0.10"
-tracing = "0.1"
-urlencoding = "2.1"
-uuid = { version = "1.11", features = ["serde", "v4"] }
-webbrowser = "0.8"
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+axum = { workspace = true }
+base64 = { workspace = true }
+bytes = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+diesel = { workspace = true, features = ["sqlite"] }
+dirs = { workspace = true }
+env_logger = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+hostname = { workspace = true }
+jsonwebtoken = { workspace = true }
+local-ip-address = { workspace = true }
+log = { workspace = true }
+mime_guess = { workspace = true }
+native-tls = { workspace = true }
+rand = { workspace = true }
+regex = { workspace = true }
+reqwest = { workspace = true, features = ["json"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+time = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tokio-stream = { workspace = true }
+tokio-tungstenite = { workspace = true, features = ["native-tls"] }
+tower = { workspace = true }
+tower-http = { workspace = true, features = ["cors", "fs", "trace"] }
+tower-cookies = { workspace = true }
+tracing = { workspace = true }
+urlencoding = { workspace = true }
+uuid = { workspace = true, features = ["serde", "v4"] }
+webbrowser = { workspace = true }
 
 [lints]
 workspace = true
