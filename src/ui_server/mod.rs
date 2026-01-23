@@ -25,43 +25,94 @@ const SUITE_DIRS: &[&str] = &[
     "js",
     "css",
     "public",
-    "drive",
-    "chat",
-    "mail",
-    "tasks",
-    "calendar",
-    "meet",
-    "paper",
-    "sheet",
-    "slides",
-    "docs",
-    "research",
-    "analytics",
-    "monitoring",
-    "admin",
-    "auth",
-    "settings",
-    "sources",
-    "attendant",
-    "tools",
     "assets",
     "partials",
-    "video",
-    "learn",
-    "social",
-    "dashboards",
-    "designer",
-    "workspace",
-    "project",
-    "goals",
-    "player",
-    "canvas",
-    "people",
-    "crm",
-    "billing",
-    "products",
-    "tickets",
+    // Core & Support
+    "settings", 
+    "auth",
     "about",
+    
+    // Core Apps
+    #[cfg(feature = "drive")]
+    "drive",
+    #[cfg(feature = "chat")]
+    "chat",
+    #[cfg(feature = "mail")]
+    "mail",
+    #[cfg(feature = "tasks")]
+    "tasks",
+    #[cfg(feature = "calendar")]
+    "calendar",
+    #[cfg(feature = "meet")]
+    "meet",
+    
+    // Document Apps
+    #[cfg(feature = "paper")]
+    "paper",
+    #[cfg(feature = "sheet")]
+    "sheet",
+    #[cfg(feature = "slides")]
+    "slides",
+    #[cfg(feature = "docs")]
+    "docs",
+    
+    // Research & Learning
+    #[cfg(feature = "research")]
+    "research",
+    #[cfg(feature = "sources")]
+    "sources",
+    #[cfg(feature = "learn")]
+    "learn",
+    
+    // Analytics
+    #[cfg(feature = "analytics")]
+    "analytics",
+    #[cfg(feature = "dashboards")]
+    "dashboards",
+    #[cfg(feature = "monitoring")]
+    "monitoring",
+    
+    // Admin & Tools
+    #[cfg(feature = "admin")]
+    "admin",
+    #[cfg(feature = "attendant")]
+    "attendant",
+    #[cfg(feature = "tools")]
+    "tools",
+    
+    // Media
+    #[cfg(feature = "video")]
+    "video",
+    #[cfg(feature = "player")]
+    "player",
+    #[cfg(feature = "canvas")]
+    "canvas",
+    
+    // Social
+    #[cfg(feature = "social")]
+    "social",
+    #[cfg(feature = "people")]
+    "people",
+    #[cfg(feature = "people")]
+    "crm",
+    #[cfg(feature = "tickets")]
+    "tickets",
+    
+    // Business
+    #[cfg(feature = "billing")]
+    "billing",
+    #[cfg(feature = "products")]
+    "products",
+    
+    // Development
+    #[cfg(feature = "designer")]
+    "designer",
+    #[cfg(feature = "workspace")]
+    "workspace",
+    #[cfg(feature = "project")]
+    "project",
+    #[cfg(feature = "goals")]
+    "goals",
 ];
 
 pub async fn index() -> impl IntoResponse {
@@ -604,9 +655,6 @@ pub fn configure_router() -> Router {
     router = add_static_routes(router, &suite_path);
 
     router
-        .fallback_service(
-            ServeDir::new(suite_path.clone())
-                .fallback(ServeDir::new(suite_path).append_index_html_on_directories(true)),
-        )
+        .fallback(get(index))
         .with_state(state)
 }
