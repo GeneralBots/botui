@@ -36,7 +36,7 @@
     isSelecting: false,
     isDirty: false,
     autoSaveTimer: null,
-    chatPanelOpen: true,
+
     findMatches: [],
     findMatchIndex: -1,
     decimalPlaces: 2,
@@ -50,7 +50,7 @@
     bindEvents();
     loadFromUrlParams();
     connectWebSocket();
-    connectChatWebSocket();
+
     selectCell(0, 0);
     updateCellAddress();
     renderCharts();
@@ -77,10 +77,7 @@
     elements.calculationResult = document.getElementById("calculationResult");
     elements.saveStatus = document.getElementById("saveStatus");
     elements.zoomLevel = document.getElementById("zoomLevel");
-    elements.chatPanel = document.getElementById("chatPanel");
-    elements.chatMessages = document.getElementById("chatMessages");
-    elements.chatInput = document.getElementById("chatInput");
-    elements.chatForm = document.getElementById("chatForm");
+
     elements.findReplaceModal = document.getElementById("findReplaceModal");
     elements.conditionalFormatModal = document.getElementById(
       "conditionalFormatModal",
@@ -453,19 +450,7 @@
       .getElementById("cnfFormatCode")
       ?.addEventListener("input", updateCnfPreview);
 
-    document
-      .getElementById("chatToggle")
-      ?.addEventListener("click", toggleChatPanel);
-    document
-      .getElementById("chatClose")
-      ?.addEventListener("click", toggleChatPanel);
-    elements.chatForm?.addEventListener("submit", handleChatSubmit);
 
-    document.querySelectorAll(".suggestion-btn").forEach((btn) => {
-      btn.addEventListener("click", () =>
-        handleSuggestionClick(btn.dataset.action),
-      );
-    });
 
     document.querySelectorAll(".context-item").forEach((item) => {
       item.addEventListener("click", () =>
@@ -1970,18 +1955,18 @@
         return isNaN(d2.getTime())
           ? value
           : d2.toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            });
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
       case "time":
         const d3 = new Date(num);
         return isNaN(d3.getTime())
           ? value
           : d3.toLocaleTimeString("en-US", {
-              hour: "numeric",
-              minute: "2-digit",
-            });
+            hour: "numeric",
+            minute: "2-digit",
+          });
       case "datetime":
         const d4 = new Date(num);
         return isNaN(d4.getTime()) ? value : d4.toLocaleString("en-US");

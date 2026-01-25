@@ -3,49 +3,19 @@
 <div class="docs-app" id="docs-app">
     <div class="docs-toolbar">
         <div class="toolbar-left">
-            <input
-                type="text"
-                class="doc-name-input"
-                id="docName"
-                value="Untitled Document"
-                spellcheck="false"
-            />
+            <input type="text" class="doc-name-input" id="docName" value="Untitled Document" spellcheck="false" />
         </div>
         <div class="toolbar-center">
             <div class="toolbar-group">
-                <button
-                    class="btn-icon"
-                    id="printPreviewBtn"
-                    title="Print Preview"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                <button class="btn-icon" id="printPreviewBtn" title="Print Preview">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                        <path
-                            d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
-                        ></path>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                         <rect x="6" y="14" width="12" height="8"></rect>
                     </svg>
                 </button>
-                <button
-                    class="btn-icon"
-                    id="findReplaceBtn"
-                    title="Find & Replace (Ctrl+H)"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                <button class="btn-icon" id="findReplaceBtn" title="Find & Replace (Ctrl+H)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
@@ -54,42 +24,21 @@
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
                 <button class="btn-icon" id="undoBtn" title="Undo (Ctrl+Z)">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 7v6h6"></path>
-                        <path
-                            d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"
-                        ></path>
+                        <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
                     </svg>
                 </button>
                 <button class="btn-icon" id="redoBtn" title="Redo (Ctrl+Y)">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 7v6h-6"></path>
-                        <path
-                            d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"
-                        ></path>
+                        <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"></path>
                     </svg>
                 </button>
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
-                <select
-                    class="toolbar-select heading-select"
-                    id="headingSelect"
-                >
+                <select class="toolbar-select heading-select" id="headingSelect">
                     <option value="p">Normal</option>
                     <option value="h1">Heading 1</option>
                     <option value="h2">Heading 2</option>
@@ -120,11 +69,7 @@
                 <button class="btn-icon" id="italicBtn" title="Italic (Ctrl+I)">
                     <em>I</em>
                 </button>
-                <button
-                    class="btn-icon"
-                    id="underlineBtn"
-                    title="Underline (Ctrl+U)"
-                >
+                <button class="btn-icon" id="underlineBtn" title="Underline (Ctrl+U)">
                     <u>U</u>
                 </button>
                 <button class="btn-icon" id="strikeBtn" title="Strikethrough">
@@ -133,107 +78,45 @@
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
-                <button
-                    class="btn-icon color-btn"
-                    id="textColorBtn"
-                    title="Text Color"
-                >
+                <button class="btn-icon color-btn" id="textColorBtn" title="Text Color">
                     <span class="color-letter">A</span>
-                    <span
-                        class="color-indicator"
-                        id="textColorIndicator"
-                    ></span>
-                    <input
-                        type="color"
-                        class="color-input"
-                        id="textColorInput"
-                        value="#000000"
-                    />
+                    <span class="color-indicator" id="textColorIndicator"></span>
+                    <input type="color" class="color-input" id="textColorInput" value="#000000" />
                 </button>
-                <button
-                    class="btn-icon color-btn"
-                    id="highlightBtn"
-                    title="Highlight"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                    >
+                <button class="btn-icon color-btn" id="highlightBtn" title="Highlight">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                         <path
-                            d="M15.243 4.515l-6.738 6.737-.707 2.121-1.04 1.041 2.828 2.828 1.04-1.04 2.122-.707 6.737-6.738-4.242-4.242zm6.364 3.536a1 1 0 0 1 0 1.414l-7.778 7.778-2.122.707-1.414 1.414a1 1 0 0 1-1.414 0l-4.243-4.243a1 1 0 0 1 0-1.414l1.414-1.414.707-2.121 7.778-7.778a1 1 0 0 1 1.414 0l5.657 5.657z"
-                        />
+                            d="M15.243 4.515l-6.738 6.737-.707 2.121-1.04 1.041 2.828 2.828 1.04-1.04 2.122-.707 6.737-6.738-4.242-4.242zm6.364 3.536a1 1 0 0 1 0 1.414l-7.778 7.778-2.122.707-1.414 1.414a1 1 0 0 1-1.414 0l-4.243-4.243a1 1 0 0 1 0-1.414l1.414-1.414.707-2.121 7.778-7.778a1 1 0 0 1 1.414 0l5.657 5.657z" />
                     </svg>
-                    <span
-                        class="color-indicator bg-indicator"
-                        id="highlightIndicator"
-                    ></span>
-                    <input
-                        type="color"
-                        class="color-input"
-                        id="highlightInput"
-                        value="#ffff00"
-                    />
+                    <span class="color-indicator bg-indicator" id="highlightIndicator"></span>
+                    <input type="color" class="color-input" id="highlightInput" value="#ffff00" />
                 </button>
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
                 <button class="btn-icon" id="alignLeftBtn" title="Align Left">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="3" y1="12" x2="15" y2="12"></line>
                         <line x1="3" y1="18" x2="18" y2="18"></line>
                     </svg>
                 </button>
-                <button
-                    class="btn-icon"
-                    id="alignCenterBtn"
-                    title="Align Center"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                <button class="btn-icon" id="alignCenterBtn" title="Align Center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="6" y1="12" x2="18" y2="12"></line>
                         <line x1="4" y1="18" x2="20" y2="18"></line>
                     </svg>
                 </button>
                 <button class="btn-icon" id="alignRightBtn" title="Align Right">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="9" y1="12" x2="21" y2="12"></line>
                         <line x1="6" y1="18" x2="21" y2="18"></line>
                     </svg>
                 </button>
                 <button class="btn-icon" id="justifyBtn" title="Justify">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="3" y1="12" x2="21" y2="12"></line>
                         <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -243,110 +126,41 @@
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
                 <button class="btn-icon" id="bulletListBtn" title="Bullet List">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="9" y1="6" x2="21" y2="6"></line>
                         <line x1="9" y1="12" x2="21" y2="12"></line>
                         <line x1="9" y1="18" x2="21" y2="18"></line>
-                        <circle
-                            cx="4"
-                            cy="6"
-                            r="2"
-                            fill="currentColor"
-                        ></circle>
-                        <circle
-                            cx="4"
-                            cy="12"
-                            r="2"
-                            fill="currentColor"
-                        ></circle>
-                        <circle
-                            cx="4"
-                            cy="18"
-                            r="2"
-                            fill="currentColor"
-                        ></circle>
+                        <circle cx="4" cy="6" r="2" fill="currentColor"></circle>
+                        <circle cx="4" cy="12" r="2" fill="currentColor"></circle>
+                        <circle cx="4" cy="18" r="2" fill="currentColor"></circle>
                     </svg>
                 </button>
-                <button
-                    class="btn-icon"
-                    id="numberListBtn"
-                    title="Numbered List"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                <button class="btn-icon" id="numberListBtn" title="Numbered List">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="10" y1="6" x2="21" y2="6"></line>
                         <line x1="10" y1="12" x2="21" y2="12"></line>
                         <line x1="10" y1="18" x2="21" y2="18"></line>
-                        <text
-                            x="2"
-                            y="8"
-                            font-size="8"
-                            fill="currentColor"
-                            stroke="none"
-                        >
+                        <text x="2" y="8" font-size="8" fill="currentColor" stroke="none">
                             1
                         </text>
-                        <text
-                            x="2"
-                            y="14"
-                            font-size="8"
-                            fill="currentColor"
-                            stroke="none"
-                        >
+                        <text x="2" y="14" font-size="8" fill="currentColor" stroke="none">
                             2
                         </text>
-                        <text
-                            x="2"
-                            y="20"
-                            font-size="8"
-                            fill="currentColor"
-                            stroke="none"
-                        >
+                        <text x="2" y="20" font-size="8" fill="currentColor" stroke="none">
                             3
                         </text>
                     </svg>
                 </button>
                 <button class="btn-icon" id="indentBtn" title="Increase Indent">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="9" y1="12" x2="21" y2="12"></line>
                         <line x1="9" y1="18" x2="21" y2="18"></line>
                         <polyline points="3 10 6 12 3 14"></polyline>
                     </svg>
                 </button>
-                <button
-                    class="btn-icon"
-                    id="outdentBtn"
-                    title="Decrease Indent"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                <button class="btn-icon" id="outdentBtn" title="Decrease Indent">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="3" y1="6" x2="21" y2="6"></line>
                         <line x1="9" y1="12" x2="21" y2="12"></line>
                         <line x1="9" y1="18" x2="21" y2="18"></line>
@@ -356,87 +170,33 @@
             </div>
             <span class="toolbar-divider"></span>
             <div class="toolbar-group">
-                <button
-                    class="btn-icon"
-                    id="headerFooterBtn"
-                    title="Edit Header & Footer"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                <button class="btn-icon" id="headerFooterBtn" title="Edit Header & Footer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                         <line x1="3" y1="7" x2="21" y2="7"></line>
                         <line x1="3" y1="17" x2="21" y2="17"></line>
                     </svg>
                 </button>
-                <button
-                    class="btn-icon"
-                    id="pageBreakBtn"
-                    title="Insert Page Break"
-                >
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                <button class="btn-icon" id="pageBreakBtn" title="Insert Page Break">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 12h4l3-9 4 18 3-9h4"></path>
                     </svg>
                 </button>
                 <button class="btn-icon" id="linkBtn" title="Insert Link">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <path
-                            d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
-                        ></path>
-                        <path
-                            d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
-                        ></path>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                     </svg>
                 </button>
                 <button class="btn-icon" id="imageBtn" title="Insert Image">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <rect
-                            x="3"
-                            y="3"
-                            width="18"
-                            height="18"
-                            rx="2"
-                            ry="2"
-                        ></rect>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                         <polyline points="21 15 16 10 5 21"></polyline>
                     </svg>
                 </button>
                 <button class="btn-icon" id="tableBtn" title="Insert Table">
-                    <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2"></rect>
                         <line x1="3" y1="9" x2="21" y2="9"></line>
                         <line x1="3" y1="15" x2="21" y2="15"></line>
@@ -449,14 +209,7 @@
         <div class="toolbar-right">
             <div class="collaborators" id="collaborators"></div>
             <button class="btn-primary" id="shareBtn">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="18" cy="5" r="3"></circle>
                     <circle cx="6" cy="12" r="3"></circle>
                     <circle cx="18" cy="19" r="3"></circle>
@@ -465,139 +218,19 @@
                 </svg>
                 <span>Share</span>
             </button>
-            <button
-                class="btn-icon chat-toggle"
-                id="chatToggle"
-                title="Toggle AI Chat"
-            >
-                <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
-                    <path
-                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                    ></path>
-                </svg>
-            </button>
+
         </div>
     </div>
 
     <div class="docs-main">
         <div class="docs-canvas">
             <div class="editor-page" id="editorPage">
-                <div
-                    class="editor-content"
-                    id="editorContent"
-                    contenteditable="true"
-                    spellcheck="true"
-                    data-placeholder="Start typing..."
-                ></div>
+                <div class="editor-content" id="editorContent" contenteditable="true" spellcheck="true"
+                    data-placeholder="Start typing..."></div>
             </div>
         </div>
 
-        <aside class="chat-panel" id="chatPanel">
-            <div class="chat-header">
-                <div class="chat-title">
-                    <div class="chat-avatar">
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path
-                                d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"
-                            />
-                            <circle cx="12" cy="10" r="3" />
-                            <path
-                                d="M12 15c-3 0-5 1.5-5 3v1h10v-1c0-1.5-2-3-5-3z"
-                            />
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>AI Assistant</h3>
-                        <span class="chat-status">Ready to help</span>
-                    </div>
-                </div>
-                <button class="chat-close" id="chatClose" title="Close">
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="chat-message assistant">
-                    <div class="message-bubble">
-                        <p>
-                            Hi! I can help you edit your document. Try asking me
-                            to:
-                        </p>
-                        <ul>
-                            <li>Make text shorter or longer</li>
-                            <li>Fix grammar and spelling</li>
-                            <li>Translate to another language</li>
-                            <li>Change the tone (formal/casual)</li>
-                            <li>Add a summary</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="chat-suggestions" id="chatSuggestions">
-                <button class="suggestion-btn" data-action="shorter">
-                    Make shorter
-                </button>
-                <button class="suggestion-btn" data-action="grammar">
-                    Fix grammar
-                </button>
-                <button class="suggestion-btn" data-action="formal">
-                    Make formal
-                </button>
-                <button class="suggestion-btn" data-action="summarize">
-                    Summarize
-                </button>
-            </div>
-            <form class="chat-input-container" id="chatForm">
-                <input
-                    type="text"
-                    class="chat-input"
-                    id="chatInput"
-                    placeholder="Ask me to edit your document..."
-                    autocomplete="off"
-                />
-                <button
-                    type="submit"
-                    class="chat-send"
-                    id="chatSend"
-                    title="Send"
-                >
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
-        </aside>
+
     </div>
 
     <div class="docs-status-bar">
@@ -628,11 +261,7 @@
         </div>
         <div class="modal-body">
             <div class="share-input-group">
-                <input
-                    type="email"
-                    placeholder="Enter email address"
-                    id="shareEmail"
-                />
+                <input type="email" placeholder="Enter email address" id="shareEmail" />
                 <select id="sharePermission">
                     <option value="view">Can view</option>
                     <option value="comment">Can comment</option>
@@ -645,24 +274,10 @@
                 <div class="share-link-group">
                     <input type="text" readonly id="shareLink" />
                     <button class="btn-icon" id="copyLinkBtn" title="Copy link">
-                        <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <rect
-                                x="9"
-                                y="9"
-                                width="13"
-                                height="13"
-                                rx="2"
-                            ></rect>
-                            <path
-                                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                            ></path>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                         </svg>
                     </button>
                 </div>
@@ -680,11 +295,7 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>URL</label>
-                <input
-                    type="url"
-                    id="linkUrl"
-                    placeholder="https://example.com"
-                />
+                <input type="url" id="linkUrl" placeholder="https://example.com" />
             </div>
             <div class="form-group">
                 <label>Text (optional)</label>
@@ -707,19 +318,11 @@
         <div class="modal-body">
             <div class="form-group">
                 <label>Image URL</label>
-                <input
-                    type="url"
-                    id="imageUrl"
-                    placeholder="https://example.com/image.jpg"
-                />
+                <input type="url" id="imageUrl" placeholder="https://example.com/image.jpg" />
             </div>
             <div class="form-group">
                 <label>Alt text</label>
-                <input
-                    type="text"
-                    id="imageAlt"
-                    placeholder="Image description"
-                />
+                <input type="text" id="imageAlt" placeholder="Image description" />
             </div>
             <div class="modal-actions">
                 <button class="btn-secondary" id="cancelImageBtn">
@@ -742,23 +345,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Rows</label>
-                        <input
-                            type="number"
-                            id="tableRows"
-                            value="3"
-                            min="1"
-                            max="20"
-                        />
+                        <input type="number" id="tableRows" value="3" min="1" max="20" />
                     </div>
                     <div class="form-group">
                         <label>Columns</label>
-                        <input
-                            type="number"
-                            id="tableCols"
-                            value="3"
-                            min="1"
-                            max="10"
-                        />
+                        <input type="number" id="tableCols" value="3" min="1" max="10" />
                     </div>
                 </div>
             </div>
@@ -782,19 +373,9 @@
             <div class="export-options">
                 <button class="export-option" data-format="pdf">
                     <div class="export-icon">
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path
-                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                            />
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                             <polyline points="14 2 14 8 20 8" />
                             <path d="M9 15v-2h1.5a1.5 1.5 0 0 1 0 3H9" />
                             <path d="M13 13h1.5a1.5 1.5 0 0 1 0 3H13v-3z" />
@@ -804,19 +385,9 @@
                 </button>
                 <button class="export-option" data-format="docx">
                     <div class="export-icon">
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path
-                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                            />
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                             <polyline points="14 2 14 8 20 8" />
                             <line x1="8" y1="13" x2="16" y2="13" />
                             <line x1="8" y1="17" x2="14" y2="17" />
@@ -826,40 +397,21 @@
                 </button>
                 <button class="export-option" data-format="html">
                     <div class="export-icon">
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10" />
                             <line x1="2" y1="12" x2="22" y2="12" />
                             <path
-                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-                            />
+                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                         </svg>
                     </div>
                     <div class="export-label">HTML</div>
                 </button>
                 <button class="export-option" data-format="txt">
                     <div class="export-icon">
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path
-                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                            />
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                             <polyline points="14 2 14 8 20 8" />
                         </svg>
                     </div>
@@ -867,19 +419,9 @@
                 </button>
                 <button class="export-option" data-format="md">
                     <div class="export-icon">
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path
-                                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                            />
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                             <polyline points="14 2 14 8 20 8" />
                             <path d="M7 15l2-2 2 2" />
                             <line x1="9" y1="13" x2="9" y2="17" />
@@ -903,20 +445,11 @@
         <div class="modal-body">
             <div class="find-replace-group">
                 <label>Find:</label>
-                <input
-                    type="text"
-                    id="findInput"
-                    placeholder="Search text..."
-                    autofocus
-                />
+                <input type="text" id="findInput" placeholder="Search text..." autofocus />
             </div>
             <div class="find-replace-group">
                 <label>Replace:</label>
-                <input
-                    type="text"
-                    id="replaceInput"
-                    placeholder="Replace with..."
-                />
+                <input type="text" id="replaceInput" placeholder="Replace with..." />
             </div>
             <div class="find-replace-options">
                 <label class="checkbox-label">
@@ -976,18 +509,9 @@
         <div class="modal-actions">
             <button class="btn-secondary" id="cancelPrintBtn">Cancel</button>
             <button class="btn-primary" id="printBtn">
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                    <path
-                        d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"
-                    ></path>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
                     <rect x="6" y="14" width="12" height="8"></rect>
                 </svg>
                 Print
@@ -1010,12 +534,8 @@
             <div class="hf-tab-content active" id="hfHeaderTab">
                 <div class="form-group">
                     <label>Header Content:</label>
-                    <div
-                        class="hf-editor"
-                        id="headerEditor"
-                        contenteditable="true"
-                        data-placeholder="Enter header text..."
-                    ></div>
+                    <div class="hf-editor" id="headerEditor" contenteditable="true"
+                        data-placeholder="Enter header text..."></div>
                 </div>
                 <div class="hf-options">
                     <label class="checkbox-label">
@@ -1036,10 +556,7 @@
                         <button class="btn-secondary btn-sm" id="insertDate">
                             Date
                         </button>
-                        <button
-                            class="btn-secondary btn-sm"
-                            id="insertDocTitle"
-                        >
+                        <button class="btn-secondary btn-sm" id="insertDocTitle">
                             Document Title
                         </button>
                     </div>
@@ -1048,12 +565,8 @@
             <div class="hf-tab-content" id="hfFooterTab">
                 <div class="form-group">
                     <label>Footer Content:</label>
-                    <div
-                        class="hf-editor"
-                        id="footerEditor"
-                        contenteditable="true"
-                        data-placeholder="Enter footer text..."
-                    ></div>
+                    <div class="hf-editor" id="footerEditor" contenteditable="true"
+                        data-placeholder="Enter footer text..."></div>
                 </div>
                 <div class="hf-options">
                     <label class="checkbox-label">
@@ -1068,22 +581,13 @@
                 <div class="hf-insert-options">
                     <label>Insert:</label>
                     <div class="hf-insert-btns">
-                        <button
-                            class="btn-secondary btn-sm"
-                            id="insertFooterPageNum"
-                        >
+                        <button class="btn-secondary btn-sm" id="insertFooterPageNum">
                             Page Number
                         </button>
-                        <button
-                            class="btn-secondary btn-sm"
-                            id="insertFooterDate"
-                        >
+                        <button class="btn-secondary btn-sm" id="insertFooterDate">
                             Date
                         </button>
-                        <button
-                            class="btn-secondary btn-sm"
-                            id="insertFooterDocTitle"
-                        >
+                        <button class="btn-secondary btn-sm" id="insertFooterDocTitle">
                             Document Title
                         </button>
                     </div>

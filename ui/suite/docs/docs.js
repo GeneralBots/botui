@@ -17,7 +17,7 @@
     autoSaveTimer: null,
     ws: null,
     collaborators: [],
-    chatPanelOpen: true,
+
     driveSource: null,
     zoom: 100,
     findMatches: [],
@@ -47,10 +47,7 @@
     elements.charCount = document.getElementById("charCount");
     elements.saveStatus = document.getElementById("saveStatus");
     elements.zoomLevel = document.getElementById("zoomLevel");
-    elements.chatPanel = document.getElementById("chatPanel");
-    elements.chatMessages = document.getElementById("chatMessages");
-    elements.chatInput = document.getElementById("chatInput");
-    elements.chatForm = document.getElementById("chatForm");
+
     elements.shareModal = document.getElementById("shareModal");
     elements.linkModal = document.getElementById("linkModal");
     elements.imageModal = document.getElementById("imageModal");
@@ -161,19 +158,7 @@
     document.getElementById("zoomInBtn")?.addEventListener("click", zoomIn);
     document.getElementById("zoomOutBtn")?.addEventListener("click", zoomOut);
 
-    document
-      .getElementById("chatToggle")
-      ?.addEventListener("click", toggleChatPanel);
-    document
-      .getElementById("chatClose")
-      ?.addEventListener("click", toggleChatPanel);
-    elements.chatForm?.addEventListener("submit", handleChatSubmit);
 
-    document.querySelectorAll(".suggestion-btn").forEach((btn) => {
-      btn.addEventListener("click", () =>
-        handleSuggestionClick(btn.dataset.action),
-      );
-    });
 
     document.querySelectorAll(".btn-close, .modal").forEach((el) => {
       el.addEventListener("click", (e) => {
