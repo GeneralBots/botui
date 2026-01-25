@@ -136,6 +136,7 @@ pub async fn serve_minimal() -> impl IntoResponse {
 pub async fn serve_suite() -> impl IntoResponse {
     match fs::read_to_string("ui/suite/index.html") {
         Ok(raw_html) => {
+            #[allow(unused_mut)] // Mutable required for feature-gated blocks
             let mut html = raw_html;
 
             // Core Apps
@@ -208,7 +209,7 @@ pub async fn serve_suite() -> impl IntoResponse {
     }
 }
 
-fn remove_section(html: &str, section: &str) -> String {
+pub fn remove_section(html: &str, section: &str) -> String {
     let start_marker = format!("<!-- SECTION:{} -->", section);
     let end_marker = format!("<!-- ENDSECTION:{} -->", section);
     
