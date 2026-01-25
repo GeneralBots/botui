@@ -15,7 +15,7 @@ use log::{debug, error, info};
 use serde::Deserialize;
 use std::{fs, path::Path, path::PathBuf};
 use tokio_tungstenite::{
-    connect_async_tls_with_config, tungstenite::protocol::Message as TungsteniteMessage,
+    connect_async_tls_with_config, tungstenite, tungstenite::protocol::Message as TungsteniteMessage,
 };
 use tower_http::services::ServeDir;
 
@@ -135,7 +135,68 @@ pub async fn serve_minimal() -> impl IntoResponse {
 
 pub async fn serve_suite() -> impl IntoResponse {
     match fs::read_to_string("ui/suite/index.html") {
-        Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
+        Ok(raw_html) => {
+            let mut html = raw_html;
+
+            // Core Apps
+            #[cfg(not(feature = "chat"))] { html = remove_section(&html, "chat"); }
+            #[cfg(not(feature = "mail"))] { html = remove_section(&html, "mail"); }
+            #[cfg(not(feature = "calendar"))] { html = remove_section(&html, "calendar"); }
+            #[cfg(not(feature = "drive"))] { html = remove_section(&html, "drive"); }
+            #[cfg(not(feature = "tasks"))] { html = remove_section(&html, "tasks"); }
+            #[cfg(not(feature = "meet"))] { html = remove_section(&html, "meet"); }
+            
+            // Documents
+            #[cfg(not(feature = "docs"))] { html = remove_section(&html, "docs"); }
+            #[cfg(not(feature = "sheet"))] { html = remove_section(&html, "sheet"); }
+            #[cfg(not(feature = "slides"))] { html = remove_section(&html, "slides"); }
+            #[cfg(not(feature = "paper"))] { html = remove_section(&html, "paper"); }
+            
+            // Research
+            #[cfg(not(feature = "research"))] { html = remove_section(&html, "research"); }
+            #[cfg(not(feature = "sources"))] { html = remove_section(&html, "sources"); }
+            #[cfg(not(feature = "learn"))] { html = remove_section(&html, "learn"); }
+            
+            // Analytics
+            #[cfg(not(feature = "analytics"))] { html = remove_section(&html, "analytics"); }
+            #[cfg(not(feature = "dashboards"))] { html = remove_section(&html, "dashboards"); }
+            #[cfg(not(feature = "monitoring"))] { html = remove_section(&html, "monitoring"); }
+            
+            // Business
+            #[cfg(not(feature = "people"))] { 
+                html = remove_section(&html, "people"); 
+                html = remove_section(&html, "crm"); 
+            }
+            #[cfg(not(feature = "billing"))] { html = remove_section(&html, "billing"); }
+            #[cfg(not(feature = "products"))] { html = remove_section(&html, "products"); }
+            #[cfg(not(feature = "tickets"))] { html = remove_section(&html, "tickets"); }
+            
+            // Media
+            #[cfg(not(feature = "video"))] { html = remove_section(&html, "video"); }
+            #[cfg(not(feature = "player"))] { html = remove_section(&html, "player"); }
+            #[cfg(not(feature = "canvas"))] { html = remove_section(&html, "canvas"); }
+            
+            // Social & Project
+            #[cfg(not(feature = "social"))] { html = remove_section(&html, "social"); }
+            #[cfg(not(feature = "project"))] { html = remove_section(&html, "project"); }
+            #[cfg(not(feature = "goals"))] { html = remove_section(&html, "goals"); }
+            #[cfg(not(feature = "workspace"))] { html = remove_section(&html, "workspace"); }
+            
+            // Admin/Tools
+            #[cfg(not(feature = "admin"))] { 
+                html = remove_section(&html, "admin"); 
+            }
+            // Mapped security to tools feature
+            #[cfg(not(feature = "tools"))] { 
+                html = remove_section(&html, "security");
+            }
+            #[cfg(not(feature = "attendant"))] { html = remove_section(&html, "attendant"); }
+            #[cfg(not(feature = "designer"))] { html = remove_section(&html, "designer"); }
+            #[cfg(not(feature = "editor"))] { html = remove_section(&html, "editor"); }
+            #[cfg(not(feature = "settings"))] { html = remove_section(&html, "settings"); }
+
+            (StatusCode::OK, [("content-type", "text/html")], Html(html))
+        },
         Err(e) => {
             error!("Failed to load suite UI: {e}");
             (
@@ -145,6 +206,37 @@ pub async fn serve_suite() -> impl IntoResponse {
             )
         }
     }
+}
+
+fn remove_section(html: &str, section: &str) -> String {
+    let start_marker = format!("<!-- SECTION:{} -->", section);
+    let end_marker = format!("<!-- ENDSECTION:{} -->", section);
+    
+    let mut result = String::with_capacity(html.len());
+    let mut current_pos = 0;
+    
+    // Process multiple occurrences of the section
+    while let Some(start_idx) = html[current_pos..].find(&start_marker) {
+        let abs_start = current_pos + start_idx;
+        // Append content up to the marker
+        result.push_str(&html[current_pos..abs_start]);
+        
+        // Find end marker
+        if let Some(end_idx) = html[abs_start..].find(&end_marker) {
+            // Skip past the end marker
+            current_pos = abs_start + end_idx + end_marker.len();
+        } else {
+            // No end marker? This shouldn't happen with our script, 
+            // but if it does, just skip the start marker and continue
+            // or consume everything? 
+            // Safety: Skip start marker only
+            current_pos = abs_start + start_marker.len();
+        }
+    }
+    
+    // Append remaining content
+    result.push_str(&html[current_pos..]);
+    result
 }
 
 async fn health(State(state): State<AppState>) -> (StatusCode, axum::Json<serde_json::Value>) {
@@ -369,7 +461,7 @@ async fn handle_task_progress_ws_proxy(
     let backend_result =
         connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
 
-    let backend_socket = match backend_result {
+    let backend_socket: tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>> = match backend_result {
         Ok((socket, _)) => socket,
         Err(e) => {
             error!("Failed to connect to backend task-progress WebSocket: {e}");
@@ -386,38 +478,34 @@ async fn handle_task_progress_ws_proxy(
         while let Some(msg) = client_rx.next().await {
             match msg {
                 Ok(AxumMessage::Text(text)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Text(text))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Binary(data)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Binary(data))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Ping(data)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Ping(data))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Pong(data)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Pong(data))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
@@ -427,7 +515,7 @@ async fn handle_task_progress_ws_proxy(
     };
 
     let backend_to_client = async {
-        while let Some(msg) = backend_rx.next().await {
+        while let Some(msg) = backend_rx.next().await as Option<Result<TungsteniteMessage, tungstenite::Error>> {
             match msg {
                 Ok(TungsteniteMessage::Text(text)) => {
                     // Log manifest_update messages for debugging
@@ -505,7 +593,7 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
     let backend_result =
         connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
 
-    let backend_socket = match backend_result {
+    let backend_socket: tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>> = match backend_result {
         Ok((socket, _)) => socket,
         Err(e) => {
             error!("Failed to connect to backend WebSocket: {e}");
@@ -522,38 +610,34 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         while let Some(msg) = client_rx.next().await {
             match msg {
                 Ok(AxumMessage::Text(text)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Text(text))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Binary(data)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Binary(data))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Ping(data)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Ping(data))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Pong(data)) => {
-                    if backend_tx
+                    let res: Result<(), tungstenite::Error> = backend_tx
                         .send(TungsteniteMessage::Pong(data))
-                        .await
-                        .is_err()
-                    {
+                        .await;
+                    if res.is_err() {
                         break;
                     }
                 }
