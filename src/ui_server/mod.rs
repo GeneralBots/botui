@@ -209,6 +209,7 @@ pub async fn serve_suite() -> impl IntoResponse {
     }
 }
 
+#[allow(dead_code)]
 pub fn remove_section(html: &str, section: &str) -> String {
     let start_marker = format!("<!-- SECTION:{} -->", section);
     let end_marker = format!("<!-- ENDSECTION:{} -->", section);
