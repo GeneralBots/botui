@@ -14,7 +14,6 @@ use log::{debug, error, info};
 #[cfg(feature = "embed-ui")]
 use rust_embed::RustEmbed;
 use serde::Deserialize;
-#[cfg(not(feature = "embed-ui"))]
 use std::fs;
 use std::path::{Path, PathBuf};
 use tokio_tungstenite::{
@@ -201,9 +200,21 @@ pub async fn serve_suite() -> impl IntoResponse {
     let raw_html_res = {
         #[cfg(feature = "embed-ui")]
         {
-            Assets::get("suite/index.html")
-                .map(|f| String::from_utf8(f.data.into_owned()).map_err(|e| e.to_string()))
-                .unwrap_or(Err("Asset not found".to_string()))
+            match Assets::get("suite/index.html") {
+                Some(f) => String::from_utf8(f.data.into_owned()).map_err(|e| e.to_string()),
+                None => {
+                    let path = get_ui_root().join("suite/index.html");
+                    log::warn!("Asset 'suite/index.html' not found in embedded binary, falling back to filesystem: {:?}", path);
+                    fs::read_to_string(&path).map_err(|e| {
+                        format!(
+                            "Asset not found in binary AND failed to read {:?} (CWD: {:?}): {}",
+                            path,
+                            std::env::current_dir(),
+                            e
+                        )
+                    })
+                }
+            }
         }
         #[cfg(not(feature = "embed-ui"))]
         {
