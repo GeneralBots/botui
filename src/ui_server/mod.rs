@@ -13,11 +13,21 @@ use axum::{
 use futures_util::{SinkExt, StreamExt};
 use log::{debug, error, info};
 use serde::Deserialize;
-use std::{fs, path::Path, path::PathBuf};
+#[cfg(not(feature = "embed-ui"))]
+use std::fs;
+use std::path::{Path, PathBuf};
 use tokio_tungstenite::{
     connect_async_tls_with_config, tungstenite, tungstenite::protocol::Message as TungsteniteMessage,
 };
-use tower_http::services::ServeDir;
+#[cfg(not(feature = "embed-ui"))]
+use tower_http::services::{ServeDir, ServeFile};
+#[cfg(feature = "embed-ui")]
+use rust_embed::RustEmbed;
+
+#[cfg(feature = "embed-ui")]
+#[derive(RustEmbed)]
+#[folder = "ui"]
+struct Assets;
 
 use crate::shared::AppState;
 
@@ -115,12 +125,44 @@ const SUITE_DIRS: &[&str] = &[
     "goals",
 ];
 
+const ROOT_FILES: &[&str] = &[
+    "designer.html", "designer.css", "designer.js",
+    "editor.html", "editor.css", "editor.js",
+    "home.html",
+    "base.html", "base-layout.html", "base-layout.css",
+    "default.gbui", "single.gbui",
+];
+
 pub async fn index() -> impl IntoResponse {
     serve_suite().await
 }
 
+pub fn get_ui_root() -> PathBuf {
+    if Path::new("ui").exists() {
+        PathBuf::from("ui")
+    } else if Path::new("botui/ui").exists() {
+        PathBuf::from("botui/ui")
+    } else {
+        PathBuf::from("ui")
+    }
+}
+
 pub async fn serve_minimal() -> impl IntoResponse {
-    match fs::read_to_string("ui/minimal/index.html") {
+    let html_res = {
+        #[cfg(feature = "embed-ui")]
+        {
+            Assets::get("minimal/index.html")
+                .map(|f| String::from_utf8(f.data.into_owned()).map_err(|e| e.to_string()))
+                .unwrap_or(Err("Asset not found".to_string()))
+        }
+        #[cfg(not(feature = "embed-ui"))]
+        {
+             fs::read_to_string(get_ui_root().join("minimal/index.html"))
+                 .map_err(|e| e.to_string())
+        }
+    };
+
+    match html_res {
         Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
         Err(e) => {
             error!("Failed to load minimal UI: {e}");
@@ -134,7 +176,20 @@ pub async fn serve_minimal() -> impl IntoResponse {
 }
 
 pub async fn serve_suite() -> impl IntoResponse {
-    match fs::read_to_string("ui/suite/index.html") {
+    let raw_html_res = {
+        #[cfg(feature = "embed-ui")]
+        {
+            Assets::get("suite/index.html")
+                .map(|f| String::from_utf8(f.data.into_owned()).map_err(|e| e.to_string()))
+                .unwrap_or(Err("Asset not found".to_string()))
+        }
+        #[cfg(not(feature = "embed-ui"))]
+        {
+            fs::read_to_string(get_ui_root().join("suite/index.html")).map_err(|e| e.to_string())
+        }
+    };
+
+    match raw_html_res {
         Ok(raw_html) => {
             #[allow(unused_mut)] // Mutable required for feature-gated blocks
             let mut html = raw_html;
@@ -699,32 +754,111 @@ fn create_ui_router() -> Router<AppState> {
 }
 
 async fn serve_favicon() -> impl IntoResponse {
-    let favicon_path = PathBuf::from("./ui/suite/public/favicon.ico");
-    match tokio::fs::read(&favicon_path).await {
-        Ok(bytes) => (
-            StatusCode::OK,
-            [("content-type", "image/x-icon")],
-            bytes,
-        ).into_response(),
-        Err(_) => StatusCode::NOT_FOUND.into_response(),
+    #[cfg(feature = "embed-ui")]
+    {
+        match Assets::get("suite/public/favicon.ico") {
+            Some(content) => (
+                StatusCode::OK,
+                [("content-type", "image/x-icon")],
+                content.data,
+            ).into_response(),
+            None => StatusCode::NOT_FOUND.into_response(),
+        }
+    }
+    #[cfg(not(feature = "embed-ui"))]
+    {
+        let favicon_path = get_ui_root().join("suite/public/favicon.ico");
+        match tokio::fs::read(&favicon_path).await {
+            Ok(bytes) => (
+                StatusCode::OK,
+                [("content-type", "image/x-icon")],
+                bytes,
+            ).into_response(),
+            Err(_) => StatusCode::NOT_FOUND.into_response(),
+        }
     }
 }
 
-fn add_static_routes(router: Router<AppState>, suite_path: &Path) -> Router<AppState> {
-    let mut r = router;
-
-    for dir in SUITE_DIRS {
-        let path = suite_path.join(dir);
-        r = r
-            .nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()))
-            .nest_service(&format!("/{dir}"), ServeDir::new(path));
+#[cfg(feature = "embed-ui")]
+async fn handle_embedded_asset(
+    axum::extract::Path((dir, path)): axum::extract::Path<(String, String)>,
+) -> impl IntoResponse {
+    if !SUITE_DIRS.contains(&dir.as_str()) {
+        return StatusCode::NOT_FOUND.into_response();
     }
 
-    r
+    let asset_path = format!("suite/{}/{}", dir, path);
+    match Assets::get(&asset_path) {
+        Some(content) => {
+            let mime = mime_guess::from_path(&asset_path).first_or_octet_stream();
+            (
+                [(axum::http::header::CONTENT_TYPE, mime.as_ref())],
+                content.data,
+            )
+                .into_response()
+        }
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
+#[cfg(feature = "embed-ui")]
+async fn handle_embedded_root_asset(
+    axum::extract::Path(filename): axum::extract::Path<String>,
+) -> impl IntoResponse {
+    if !ROOT_FILES.contains(&filename.as_str()) {
+         return StatusCode::NOT_FOUND.into_response();
+    }
+
+    let asset_path = format!("suite/{}", filename);
+    match Assets::get(&asset_path) {
+        Some(content) => {
+            let mime = mime_guess::from_path(&asset_path).first_or_octet_stream();
+            (
+                [(axum::http::header::CONTENT_TYPE, mime.as_ref())],
+                content.data,
+            )
+                .into_response()
+        }
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
+fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<AppState> {
+    #[cfg(feature = "embed-ui")]
+    {
+        let mut r = router
+            .route("/suite/:dir/*path", get(handle_embedded_asset))
+            .route("/:dir/*path", get(handle_embedded_asset));
+        
+        // Add root files
+        for file in ROOT_FILES {
+             r = r.route(&format!("/{}", file), get(handle_embedded_root_asset))
+                  .route(&format!("/suite/{}", file), get(handle_embedded_root_asset));
+        }
+        r
+    }
+    #[cfg(not(feature = "embed-ui"))]
+    {
+        let mut r = router;
+        for dir in SUITE_DIRS {
+            let path = _suite_path.join(dir);
+            r = r
+                .nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()))
+                .nest_service(&format!("/{dir}"), ServeDir::new(path));
+        }
+        
+        for file in ROOT_FILES {
+            let path = _suite_path.join(file);
+            r = r
+                .nest_service(&format!("/{}", file), ServeFile::new(path.clone()))
+                .nest_service(&format!("/suite/{}", file), ServeFile::new(path));
+        }
+        r
+    }
 }
 
 pub fn configure_router() -> Router {
-    let suite_path = PathBuf::from("./ui/suite");
+    let suite_path = get_ui_root().join("suite");
     let state = AppState::new();
 
     let mut router = Router::new()
