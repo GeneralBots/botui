@@ -1,4 +1,3 @@
-
 use axum::{
     body::Body,
     extract::{
@@ -12,17 +11,18 @@ use axum::{
 };
 use futures_util::{SinkExt, StreamExt};
 use log::{debug, error, info};
+#[cfg(feature = "embed-ui")]
+use rust_embed::RustEmbed;
 use serde::Deserialize;
 #[cfg(not(feature = "embed-ui"))]
 use std::fs;
 use std::path::{Path, PathBuf};
 use tokio_tungstenite::{
-    connect_async_tls_with_config, tungstenite, tungstenite::protocol::Message as TungsteniteMessage,
+    connect_async_tls_with_config, tungstenite,
+    tungstenite::protocol::Message as TungsteniteMessage,
 };
 #[cfg(not(feature = "embed-ui"))]
 use tower_http::services::{ServeDir, ServeFile};
-#[cfg(feature = "embed-ui")]
-use rust_embed::RustEmbed;
 
 #[cfg(feature = "embed-ui")]
 #[derive(RustEmbed)]
@@ -38,10 +38,9 @@ const SUITE_DIRS: &[&str] = &[
     "assets",
     "partials",
     // Core & Support
-    "settings", 
+    "settings",
     "auth",
     "about",
-    
     // Core Apps
     #[cfg(feature = "drive")]
     "drive",
@@ -55,7 +54,6 @@ const SUITE_DIRS: &[&str] = &[
     "calendar",
     #[cfg(feature = "meet")]
     "meet",
-    
     // Document Apps
     #[cfg(feature = "paper")]
     "paper",
@@ -65,7 +63,6 @@ const SUITE_DIRS: &[&str] = &[
     "slides",
     #[cfg(feature = "docs")]
     "docs",
-    
     // Research & Learning
     #[cfg(feature = "research")]
     "research",
@@ -73,7 +70,6 @@ const SUITE_DIRS: &[&str] = &[
     "sources",
     #[cfg(feature = "learn")]
     "learn",
-    
     // Analytics
     #[cfg(feature = "analytics")]
     "analytics",
@@ -81,7 +77,6 @@ const SUITE_DIRS: &[&str] = &[
     "dashboards",
     #[cfg(feature = "monitoring")]
     "monitoring",
-    
     // Admin & Tools
     #[cfg(feature = "admin")]
     "admin",
@@ -89,7 +84,6 @@ const SUITE_DIRS: &[&str] = &[
     "attendant",
     #[cfg(feature = "tools")]
     "tools",
-    
     // Media
     #[cfg(feature = "video")]
     "video",
@@ -97,7 +91,6 @@ const SUITE_DIRS: &[&str] = &[
     "player",
     #[cfg(feature = "canvas")]
     "canvas",
-    
     // Social
     #[cfg(feature = "social")]
     "social",
@@ -107,13 +100,11 @@ const SUITE_DIRS: &[&str] = &[
     "crm",
     #[cfg(feature = "tickets")]
     "tickets",
-    
     // Business
     #[cfg(feature = "billing")]
     "billing",
     #[cfg(feature = "products")]
     "products",
-    
     // Development
     #[cfg(feature = "designer")]
     "designer",
@@ -126,11 +117,18 @@ const SUITE_DIRS: &[&str] = &[
 ];
 
 const ROOT_FILES: &[&str] = &[
-    "designer.html", "designer.css", "designer.js",
-    "editor.html", "editor.css", "editor.js",
+    "designer.html",
+    "designer.css",
+    "designer.js",
+    "editor.html",
+    "editor.css",
+    "editor.js",
     "home.html",
-    "base.html", "base-layout.html", "base-layout.css",
-    "default.gbui", "single.gbui",
+    "base.html",
+    "base-layout.html",
+    "base-layout.css",
+    "default.gbui",
+    "single.gbui",
 ];
 
 pub async fn index() -> impl IntoResponse {
@@ -138,13 +136,30 @@ pub async fn index() -> impl IntoResponse {
 }
 
 pub fn get_ui_root() -> PathBuf {
-    if Path::new("ui").exists() {
-        PathBuf::from("ui")
-    } else if Path::new("botui/ui").exists() {
-        PathBuf::from("botui/ui")
-    } else {
-        PathBuf::from("ui")
+    let candidates = [
+        "ui",
+        "botui/ui",
+        "../botui/ui",
+        "../../botui/ui",
+        "../../../botui/ui",
+    ];
+
+    for path_str in candidates {
+        let path = PathBuf::from(path_str);
+        if path.exists() {
+            info!("Found UI root at: {:?}", path);
+            return path;
+        }
     }
+
+    // Fallback to "ui" but log a warning
+    let default = PathBuf::from("ui");
+    error!(
+        "Could not find 'ui' directory in candidates: {:?}. Defaulting to 'ui' (CWD: {:?})",
+        candidates,
+        std::env::current_dir()
+    );
+    default
 }
 
 pub async fn serve_minimal() -> impl IntoResponse {
@@ -157,8 +172,15 @@ pub async fn serve_minimal() -> impl IntoResponse {
         }
         #[cfg(not(feature = "embed-ui"))]
         {
-             fs::read_to_string(get_ui_root().join("minimal/index.html"))
-                 .map_err(|e| e.to_string())
+            let path = get_ui_root().join("minimal/index.html");
+            fs::read_to_string(&path).map_err(|e| {
+                format!(
+                    "Failed to read {:?} (CWD: {:?}): {}",
+                    path,
+                    std::env::current_dir(),
+                    e
+                )
+            })
         }
     };
 
@@ -185,7 +207,15 @@ pub async fn serve_suite() -> impl IntoResponse {
         }
         #[cfg(not(feature = "embed-ui"))]
         {
-            fs::read_to_string(get_ui_root().join("suite/index.html")).map_err(|e| e.to_string())
+            let path = get_ui_root().join("suite/index.html");
+            fs::read_to_string(&path).map_err(|e| {
+                format!(
+                    "Failed to read {:?} (CWD: {:?}): {}",
+                    path,
+                    std::env::current_dir(),
+                    e
+                )
+            })
         }
     };
 
@@ -195,64 +225,157 @@ pub async fn serve_suite() -> impl IntoResponse {
             let mut html = raw_html;
 
             // Core Apps
-            #[cfg(not(feature = "chat"))] { html = remove_section(&html, "chat"); }
-            #[cfg(not(feature = "mail"))] { html = remove_section(&html, "mail"); }
-            #[cfg(not(feature = "calendar"))] { html = remove_section(&html, "calendar"); }
-            #[cfg(not(feature = "drive"))] { html = remove_section(&html, "drive"); }
-            #[cfg(not(feature = "tasks"))] { html = remove_section(&html, "tasks"); }
-            #[cfg(not(feature = "meet"))] { html = remove_section(&html, "meet"); }
-            
-            // Documents
-            #[cfg(not(feature = "docs"))] { html = remove_section(&html, "docs"); }
-            #[cfg(not(feature = "sheet"))] { html = remove_section(&html, "sheet"); }
-            #[cfg(not(feature = "slides"))] { html = remove_section(&html, "slides"); }
-            #[cfg(not(feature = "paper"))] { html = remove_section(&html, "paper"); }
-            
-            // Research
-            #[cfg(not(feature = "research"))] { html = remove_section(&html, "research"); }
-            #[cfg(not(feature = "sources"))] { html = remove_section(&html, "sources"); }
-            #[cfg(not(feature = "learn"))] { html = remove_section(&html, "learn"); }
-            
-            // Analytics
-            #[cfg(not(feature = "analytics"))] { html = remove_section(&html, "analytics"); }
-            #[cfg(not(feature = "dashboards"))] { html = remove_section(&html, "dashboards"); }
-            #[cfg(not(feature = "monitoring"))] { html = remove_section(&html, "monitoring"); }
-            
-            // Business
-            #[cfg(not(feature = "people"))] { 
-                html = remove_section(&html, "people"); 
-                html = remove_section(&html, "crm"); 
+            #[cfg(not(feature = "chat"))]
+            {
+                html = remove_section(&html, "chat");
             }
-            #[cfg(not(feature = "billing"))] { html = remove_section(&html, "billing"); }
-            #[cfg(not(feature = "products"))] { html = remove_section(&html, "products"); }
-            #[cfg(not(feature = "tickets"))] { html = remove_section(&html, "tickets"); }
-            
+            #[cfg(not(feature = "mail"))]
+            {
+                html = remove_section(&html, "mail");
+            }
+            #[cfg(not(feature = "calendar"))]
+            {
+                html = remove_section(&html, "calendar");
+            }
+            #[cfg(not(feature = "drive"))]
+            {
+                html = remove_section(&html, "drive");
+            }
+            #[cfg(not(feature = "tasks"))]
+            {
+                html = remove_section(&html, "tasks");
+            }
+            #[cfg(not(feature = "meet"))]
+            {
+                html = remove_section(&html, "meet");
+            }
+
+            // Documents
+            #[cfg(not(feature = "docs"))]
+            {
+                html = remove_section(&html, "docs");
+            }
+            #[cfg(not(feature = "sheet"))]
+            {
+                html = remove_section(&html, "sheet");
+            }
+            #[cfg(not(feature = "slides"))]
+            {
+                html = remove_section(&html, "slides");
+            }
+            #[cfg(not(feature = "paper"))]
+            {
+                html = remove_section(&html, "paper");
+            }
+
+            // Research
+            #[cfg(not(feature = "research"))]
+            {
+                html = remove_section(&html, "research");
+            }
+            #[cfg(not(feature = "sources"))]
+            {
+                html = remove_section(&html, "sources");
+            }
+            #[cfg(not(feature = "learn"))]
+            {
+                html = remove_section(&html, "learn");
+            }
+
+            // Analytics
+            #[cfg(not(feature = "analytics"))]
+            {
+                html = remove_section(&html, "analytics");
+            }
+            #[cfg(not(feature = "dashboards"))]
+            {
+                html = remove_section(&html, "dashboards");
+            }
+            #[cfg(not(feature = "monitoring"))]
+            {
+                html = remove_section(&html, "monitoring");
+            }
+
+            // Business
+            #[cfg(not(feature = "people"))]
+            {
+                html = remove_section(&html, "people");
+                html = remove_section(&html, "crm");
+            }
+            #[cfg(not(feature = "billing"))]
+            {
+                html = remove_section(&html, "billing");
+            }
+            #[cfg(not(feature = "products"))]
+            {
+                html = remove_section(&html, "products");
+            }
+            #[cfg(not(feature = "tickets"))]
+            {
+                html = remove_section(&html, "tickets");
+            }
+
             // Media
-            #[cfg(not(feature = "video"))] { html = remove_section(&html, "video"); }
-            #[cfg(not(feature = "player"))] { html = remove_section(&html, "player"); }
-            #[cfg(not(feature = "canvas"))] { html = remove_section(&html, "canvas"); }
-            
+            #[cfg(not(feature = "video"))]
+            {
+                html = remove_section(&html, "video");
+            }
+            #[cfg(not(feature = "player"))]
+            {
+                html = remove_section(&html, "player");
+            }
+            #[cfg(not(feature = "canvas"))]
+            {
+                html = remove_section(&html, "canvas");
+            }
+
             // Social & Project
-            #[cfg(not(feature = "social"))] { html = remove_section(&html, "social"); }
-            #[cfg(not(feature = "project"))] { html = remove_section(&html, "project"); }
-            #[cfg(not(feature = "goals"))] { html = remove_section(&html, "goals"); }
-            #[cfg(not(feature = "workspace"))] { html = remove_section(&html, "workspace"); }
-            
+            #[cfg(not(feature = "social"))]
+            {
+                html = remove_section(&html, "social");
+            }
+            #[cfg(not(feature = "project"))]
+            {
+                html = remove_section(&html, "project");
+            }
+            #[cfg(not(feature = "goals"))]
+            {
+                html = remove_section(&html, "goals");
+            }
+            #[cfg(not(feature = "workspace"))]
+            {
+                html = remove_section(&html, "workspace");
+            }
+
             // Admin/Tools
-            #[cfg(not(feature = "admin"))] { 
-                html = remove_section(&html, "admin"); 
+            #[cfg(not(feature = "admin"))]
+            {
+                html = remove_section(&html, "admin");
             }
             // Mapped security to tools feature
-            #[cfg(not(feature = "tools"))] { 
+            #[cfg(not(feature = "tools"))]
+            {
                 html = remove_section(&html, "security");
             }
-            #[cfg(not(feature = "attendant"))] { html = remove_section(&html, "attendant"); }
-            #[cfg(not(feature = "designer"))] { html = remove_section(&html, "designer"); }
-            #[cfg(not(feature = "editor"))] { html = remove_section(&html, "editor"); }
-            #[cfg(not(feature = "settings"))] { html = remove_section(&html, "settings"); }
+            #[cfg(not(feature = "attendant"))]
+            {
+                html = remove_section(&html, "attendant");
+            }
+            #[cfg(not(feature = "designer"))]
+            {
+                html = remove_section(&html, "designer");
+            }
+            #[cfg(not(feature = "editor"))]
+            {
+                html = remove_section(&html, "editor");
+            }
+            #[cfg(not(feature = "settings"))]
+            {
+                html = remove_section(&html, "settings");
+            }
 
             (StatusCode::OK, [("content-type", "text/html")], Html(html))
-        },
+        }
         Err(e) => {
             error!("Failed to load suite UI: {e}");
             (
@@ -268,29 +391,29 @@ pub async fn serve_suite() -> impl IntoResponse {
 pub fn remove_section(html: &str, section: &str) -> String {
     let start_marker = format!("<!-- SECTION:{} -->", section);
     let end_marker = format!("<!-- ENDSECTION:{} -->", section);
-    
+
     let mut result = String::with_capacity(html.len());
     let mut current_pos = 0;
-    
+
     // Process multiple occurrences of the section
     while let Some(start_idx) = html[current_pos..].find(&start_marker) {
         let abs_start = current_pos + start_idx;
         // Append content up to the marker
         result.push_str(&html[current_pos..abs_start]);
-        
+
         // Find end marker
         if let Some(end_idx) = html[abs_start..].find(&end_marker) {
             // Skip past the end marker
             current_pos = abs_start + end_idx + end_marker.len();
         } else {
-            // No end marker? This shouldn't happen with our script, 
+            // No end marker? This shouldn't happen with our script,
             // but if it does, just skip the start marker and continue
-            // or consume everything? 
+            // or consume everything?
             // Safety: Skip start marker only
             current_pos = abs_start + start_marker.len();
         }
     }
-    
+
     // Append remaining content
     result.push_str(&html[current_pos..]);
     result
@@ -518,7 +641,9 @@ async fn handle_task_progress_ws_proxy(
     let backend_result =
         connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
 
-    let backend_socket: tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>> = match backend_result {
+    let backend_socket: tokio_tungstenite::WebSocketStream<
+        tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>,
+    > = match backend_result {
         Ok((socket, _)) => socket,
         Err(e) => {
             error!("Failed to connect to backend task-progress WebSocket: {e}");
@@ -535,33 +660,29 @@ async fn handle_task_progress_ws_proxy(
         while let Some(msg) = client_rx.next().await {
             match msg {
                 Ok(AxumMessage::Text(text)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Text(text))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Text(text)).await;
                     if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Binary(data)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Binary(data))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Binary(data)).await;
                     if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Ping(data)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Ping(data))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Ping(data)).await;
                     if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Pong(data)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Pong(data))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Pong(data)).await;
                     if res.is_err() {
                         break;
                     }
@@ -572,13 +693,18 @@ async fn handle_task_progress_ws_proxy(
     };
 
     let backend_to_client = async {
-        while let Some(msg) = backend_rx.next().await as Option<Result<TungsteniteMessage, tungstenite::Error>> {
+        while let Some(msg) =
+            backend_rx.next().await as Option<Result<TungsteniteMessage, tungstenite::Error>>
+        {
             match msg {
                 Ok(TungsteniteMessage::Text(text)) => {
                     // Log manifest_update messages for debugging
                     let is_manifest = text.contains("manifest_update");
                     if is_manifest {
-                        info!("[WS_PROXY] Forwarding manifest_update to client: {}...", &text[..text.len().min(200)]);
+                        info!(
+                            "[WS_PROXY] Forwarding manifest_update to client: {}...",
+                            &text[..text.len().min(200)]
+                        );
                     } else if text.contains("task_progress") {
                         debug!("[WS_PROXY] Forwarding task_progress to client");
                     }
@@ -650,7 +776,9 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
     let backend_result =
         connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
 
-    let backend_socket: tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>> = match backend_result {
+    let backend_socket: tokio_tungstenite::WebSocketStream<
+        tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>,
+    > = match backend_result {
         Ok((socket, _)) => socket,
         Err(e) => {
             error!("Failed to connect to backend WebSocket: {e}");
@@ -667,33 +795,29 @@ async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQu
         while let Some(msg) = client_rx.next().await {
             match msg {
                 Ok(AxumMessage::Text(text)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Text(text))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Text(text)).await;
                     if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Binary(data)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Binary(data))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Binary(data)).await;
                     if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Ping(data)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Ping(data))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Ping(data)).await;
                     if res.is_err() {
                         break;
                     }
                 }
                 Ok(AxumMessage::Pong(data)) => {
-                    let res: Result<(), tungstenite::Error> = backend_tx
-                        .send(TungsteniteMessage::Pong(data))
-                        .await;
+                    let res: Result<(), tungstenite::Error> =
+                        backend_tx.send(TungsteniteMessage::Pong(data)).await;
                     if res.is_err() {
                         break;
                     }
@@ -761,7 +885,8 @@ async fn serve_favicon() -> impl IntoResponse {
                 StatusCode::OK,
                 [("content-type", "image/x-icon")],
                 content.data,
-            ).into_response(),
+            )
+                .into_response(),
             None => StatusCode::NOT_FOUND.into_response(),
         }
     }
@@ -769,11 +894,9 @@ async fn serve_favicon() -> impl IntoResponse {
     {
         let favicon_path = get_ui_root().join("suite/public/favicon.ico");
         match tokio::fs::read(&favicon_path).await {
-            Ok(bytes) => (
-                StatusCode::OK,
-                [("content-type", "image/x-icon")],
-                bytes,
-            ).into_response(),
+            Ok(bytes) => {
+                (StatusCode::OK, [("content-type", "image/x-icon")], bytes).into_response()
+            }
             Err(_) => StatusCode::NOT_FOUND.into_response(),
         }
     }
@@ -806,7 +929,7 @@ async fn handle_embedded_root_asset(
     axum::extract::Path(filename): axum::extract::Path<String>,
 ) -> impl IntoResponse {
     if !ROOT_FILES.contains(&filename.as_str()) {
-         return StatusCode::NOT_FOUND.into_response();
+        return StatusCode::NOT_FOUND.into_response();
     }
 
     let asset_path = format!("suite/{}", filename);
@@ -829,11 +952,12 @@ fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<App
         let mut r = router
             .route("/suite/:dir/*path", get(handle_embedded_asset))
             .route("/:dir/*path", get(handle_embedded_asset));
-        
+
         // Add root files
         for file in ROOT_FILES {
-             r = r.route(&format!("/{}", file), get(handle_embedded_root_asset))
-                  .route(&format!("/suite/{}", file), get(handle_embedded_root_asset));
+            r = r
+                .route(&format!("/{}", file), get(handle_embedded_root_asset))
+                .route(&format!("/suite/{}", file), get(handle_embedded_root_asset));
         }
         r
     }
@@ -846,7 +970,7 @@ fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<App
                 .nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()))
                 .nest_service(&format!("/{dir}"), ServeDir::new(path));
         }
-        
+
         for file in ROOT_FILES {
             let path = _suite_path.join(file);
             r = r
@@ -874,7 +998,5 @@ pub fn configure_router() -> Router {
 
     router = add_static_routes(router, &suite_path);
 
-    router
-        .fallback(get(index))
-        .with_state(state)
+    router.fallback(get(index)).with_state(state)
 }
