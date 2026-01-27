@@ -1,4 +1,3 @@
-
 use log::info;
 use std::net::SocketAddr;
 
@@ -6,7 +5,7 @@ mod shared;
 mod ui_server;
 
 fn init_logging() {
-    botlib::logging::init_compact_logger("info");
+    botlib::logging::init_compact_logger("trace");
 }
 
 fn get_port() -> u16 {
