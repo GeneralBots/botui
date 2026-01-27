@@ -5,7 +5,7 @@ mod shared;
 mod ui_server;
 
 fn init_logging() {
-    botlib::logging::init_compact_logger("trace");
+    botlib::logging::init_compact_logger("info");
 }
 
 fn get_port() -> u16 {
