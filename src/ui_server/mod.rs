@@ -595,6 +595,7 @@ fn create_api_router() -> Router<AppState> {
 struct WsQuery {
     session_id: String,
     user_id: String,
+    bot_name: Option<String>,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -605,9 +606,28 @@ struct OptionalWsQuery {
 async fn ws_proxy(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
+    OriginalUri(uri): OriginalUri,
     Query(params): Query<WsQuery>,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| handle_ws_proxy(socket, state, params))
+    // Extract bot_name from URL path (e.g., /edu, /chat/edu)
+    let path_parts: Vec<&str> = uri.path().split('/').collect();
+    let bot_name = params
+        .bot_name
+        .or_else(|| {
+            // Try to extract from path like /edu or /app/edu
+            path_parts
+                .iter()
+                .find(|part| !part.is_empty() && *part != "chat" && *part != "app")
+                .map(|s| s.to_string())
+        })
+        .unwrap_or_else(|| "default".to_string());
+
+    let params_with_bot = WsQuery {
+        bot_name: Some(bot_name),
+        ..params
+    };
+
+    ws.on_upgrade(move |socket| handle_ws_proxy(socket, state, params_with_bot))
 }
 
 async fn ws_task_progress_proxy(
@@ -761,14 +781,15 @@ async fn handle_task_progress_ws_proxy(
 #[allow(clippy::too_many_lines)]
 async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQuery) {
     let backend_url = format!(
-        "{}/ws?session_id={}&user_id={}",
+        "{}/ws?session_id={}&user_id={}&bot_name={}",
         state
             .client
             .base_url()
             .replace("https://", "wss://")
             .replace("http://", "ws://"),
         params.session_id,
-        params.user_id
+        params.user_id,
+        params.bot_name.unwrap_or_else(|| "default".to_string())
     );
 
     info!("Proxying WebSocket to: {backend_url}");
@@ -975,11 +996,12 @@ fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<App
     #[cfg(not(feature = "embed-ui"))]
     {
         let mut r = router;
+        // Serve suite directories ONLY through /suite/{dir} path
+        // This prevents duplicate routes that cause ServeDir to return index.html for file requests
         for dir in SUITE_DIRS {
             let path = _suite_path.join(dir);
-            r = r
-                .nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()))
-                .nest_service(&format!("/{dir}"), ServeDir::new(path));
+            info!("Adding route for /suite/{} -> {:?}", dir, path);
+            r = r.nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()));
         }
 
         for file in ROOT_FILES {
@@ -1005,7 +1027,8 @@ pub fn configure_router() -> Router {
         .route("/", get(index))
         .route("/minimal", get(serve_minimal))
         .route("/suite", get(serve_suite))
-        .route("/favicon.ico", get(serve_favicon));
+        .route("/favicon.ico", get(serve_favicon))
+        .nest_service("/auth", ServeDir::new(suite_path.join("auth")));
 
     router = add_static_routes(router, &suite_path);
 

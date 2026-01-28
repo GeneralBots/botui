@@ -13,7 +13,7 @@ workspace = true
 features = ["http-client"]
 
 [features]
-default = ["ui-server", "chat", "drive", "tasks"]
+default = ["ui-server", "chat", "drive", "tasks", "admin"]
 ui-server = []
 embed-ui = ["rust-embed"]
 
