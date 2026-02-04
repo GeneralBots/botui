@@ -1264,12 +1264,18 @@
 
                             // Successful login - redirect
                             if (response.redirect || response.success) {
-                                window.location.href = response.redirect || "/";
+                                // Check for redirect parameter in URL
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const redirectUrl = urlParams.get('redirect') || response.redirect || "/#chat";
+                                window.location.href = redirectUrl;
                             }
                         } catch (e) {
                             // If response is not JSON, check for redirect header
                             if (event.detail.xhr.status === 200) {
-                                window.location.href = "/";
+                                // Check for redirect parameter in URL
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const redirectUrl = urlParams.get('redirect') || "/#chat";
+                                window.location.href = redirectUrl;
                             }
                         }
                     } else {
