@@ -1266,16 +1266,16 @@
                             if (response.redirect || response.success) {
                                 // Check for redirect parameter in URL
                                 const urlParams = new URLSearchParams(window.location.search);
-                                const redirectUrl = urlParams.get('redirect') || response.redirect || "/#chat";
-                                window.location.href = redirectUrl;
+                                const redirectUrl = urlParams.get('redirect') || response.redirect;
+                                window.location.href = redirectUrl ? redirectUrl : window.location.origin + "/#chat";
                             }
                         } catch (e) {
                             // If response is not JSON, check for redirect header
                             if (event.detail.xhr.status === 200) {
                                 // Check for redirect parameter in URL
                                 const urlParams = new URLSearchParams(window.location.search);
-                                const redirectUrl = urlParams.get('redirect') || "/#chat";
-                                window.location.href = redirectUrl;
+                                const redirectUrl = urlParams.get('redirect');
+                                window.location.href = redirectUrl ? redirectUrl : window.location.origin + "/#chat";
                             }
                         }
                     } else {
