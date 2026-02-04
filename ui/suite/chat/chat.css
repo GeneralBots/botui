@@ -650,10 +650,24 @@ form.input-container {
     font-size: 15px;
     outline: none;
     transition: all 0.2s;
+    caret-color: var(--accent, #3b82f6);
 }
 
 #messageInput:focus {
     outline: none;
+}
+
+@keyframes cursor-blink {
+    0%, 50% {
+        caret-color: var(--accent, #3b82f6);
+    }
+    51%, 100% {
+        caret-color: transparent;
+    }
+}
+
+#messageInput:focus {
+    animation: cursor-blink 1s step-end infinite;
 }
 
 #messageInput::placeholder {

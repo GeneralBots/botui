@@ -28,6 +28,7 @@
                 id="voiceBtn"
                 title="Voice"
                 data-i18n-title="chat-voice"
+                style="display: none"
             >
                 🎤
             </button>
@@ -81,7 +82,7 @@
 
         var WS_BASE_URL =
             window.location.protocol === "https:" ? "wss://" : "ws://";
-        var WS_URL = WS_BASE_URL + window.location.host;
+        var WS_URL = WS_BASE_URL + window.location.host + "/ws/chat";
 
         var MessageType = {
             EXTERNAL: 0,
@@ -148,6 +149,7 @@
         var currentSessionId = null;
         var currentUserId = null;
         var currentBotId = "default";
+        var currentBotName = "default";
         var isStreaming = false;
         var streamingMessageId = null;
         var currentStreamingContent = "";
@@ -733,10 +735,12 @@
 
             var url =
                 WS_URL +
-                "/ws?session_id=" +
+                "?session_id=" +
                 currentSessionId +
                 "&user_id=" +
-                currentUserId;
+                currentUserId +
+                "&bot_name=" +
+                currentBotName;
             ws = new WebSocket(url);
 
             ws.onopen = function () {
@@ -747,9 +751,43 @@
             ws.onmessage = function (event) {
                 try {
                     var data = JSON.parse(event.data);
+                    console.log("Chat WebSocket received:", data);
+
+                    // Ignore connection confirmation
                     if (data.type === "connected") return;
+
+                    // Ignore system events (theme changes, etc)
+                    if (data.event) {
+                        console.log(
+                            "System event received, ignoring:",
+                            data.event,
+                            data,
+                        );
+                        return;
+                    }
+
+                    // Check if content contains theme change events (JSON strings)
+                    if (data.content && typeof data.content === "string") {
+                        try {
+                            var contentObj = JSON.parse(data.content);
+                            if (contentObj.event === "change_theme") {
+                                console.log(
+                                    "Theme change event in content, ignoring:",
+                                    contentObj,
+                                );
+                                return;
+                            }
+                        } catch (e) {
+                            // Content is not JSON, continue processing
+                        }
+                    }
+
+                    // Only process bot responses
                     if (data.message_type === MessageType.BOT_RESPONSE) {
+                        console.log("Processing bot response:", data);
                         processMessage(data);
+                    } else {
+                        console.log("Ignoring non-bot message:", data);
                     }
                 } catch (e) {
                     console.error("WS message error:", e);
@@ -770,7 +808,12 @@
         }
 
         function initChat() {
-            var botName = "default";
+            // Just proceed with chat initialization - no auth check
+            proceedWithChatInit();
+        }
+
+        function proceedWithChatInit() {
+            var botName = window.__INITIAL_BOT_NAME__ || "default";
             fetch("/api/auth?bot_name=" + encodeURIComponent(botName))
                 .then(function (response) {
                     return response.json();
@@ -779,17 +822,19 @@
                     currentUserId = auth.user_id;
                     currentSessionId = auth.session_id;
                     currentBotId = auth.bot_id || "default";
+                    currentBotName = botName;
                     console.log("Auth:", {
                         currentUserId: currentUserId,
                         currentSessionId: currentSessionId,
                         currentBotId: currentBotId,
+                        currentBotName: currentBotName,
                     });
                     connectWebSocket();
                 })
                 .catch(function (e) {
                     console.error("Auth failed:", e);
                     notify("Failed to connect to chat server", "error");
-                    setTimeout(initChat, 3000);
+                    setTimeout(proceedWithChatInit, 3000);
                 });
         }
 
