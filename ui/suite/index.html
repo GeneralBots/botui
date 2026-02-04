@@ -52,6 +52,9 @@
         <!-- This provides centralized auth for ALL apps: HTMX, fetch, XHR -->
         <script src="suite/js/security-bootstrap.js?v=20260110"></script>
 
+        <!-- ERROR REPORTER - Captures JS errors and sends to server log -->
+        <script src="suite/js/error-reporter.js"></script>
+
         <!-- i18n -->
         <script src="suite/js/i18n.js"></script>
 
@@ -112,7 +115,7 @@
                     class="logo-wrapper"
                     hx-get="/suite/home.html"
                     hx-target="#main-content"
-                    hx-push-url="/#home"
+                    hx-push-url="#home"
                     title="General Bots"
                     aria-label="General Bots - Home"
                 >
@@ -171,7 +174,7 @@
                         data-section="chat"
                         hx-get="/suite/chat/chat.html"
                         hx-target="#main-content"
-                        hx-push-url="/#chat"
+                        hx-push-url="#chat"
                     >
                         <svg
                             width="18"
@@ -195,7 +198,7 @@
                         data-section="mail"
                         hx-get="/suite/mail/mail.html"
                         hx-target="#main-content"
-                        hx-push-url="/#mail"
+                        hx-push-url="#mail"
                     >
                         <svg
                             width="18"
@@ -220,7 +223,7 @@
                         data-section="calendar"
                         hx-get="/suite/calendar/calendar.html"
                         hx-target="#main-content"
-                        hx-push-url="/#calendar"
+                        hx-push-url="#calendar"
                     >
                         <svg
                             width="18"
@@ -252,7 +255,7 @@
                         data-section="drive"
                         hx-get="/suite/drive/drive.html"
                         hx-target="#main-content"
-                        hx-push-url="/#drive"
+                        hx-push-url="#drive"
                     >
                         <svg
                             width="18"
@@ -274,9 +277,9 @@
                         class="app-tab"
                         href="#tasks"
                         data-section="tasks"
-                        hx-get="/suite/tasks/tasks.html"
+                        hx-get="/suite/tasks/autotask.html"
                         hx-target="#main-content"
-                        hx-push-url="/#tasks"
+                        hx-push-url="#tasks"
                     >
                         <svg
                             width="18"
@@ -301,7 +304,7 @@
                         data-section="crm"
                         hx-get="/suite/crm/crm.html"
                         hx-target="#main-content"
-                        hx-push-url="/#crm"
+                        hx-push-url="#crm"
                     >
                         <svg
                             width="18"
@@ -328,7 +331,7 @@
                         data-section="docs"
                         hx-get="/suite/docs/docs.html"
                         hx-target="#main-content"
-                        hx-push-url="/#docs"
+                        hx-push-url="#docs"
                     >
                         <svg
                             width="18"
@@ -355,7 +358,7 @@
                         data-section="sheet"
                         hx-get="/suite/sheet/sheet.html"
                         hx-target="#main-content"
-                        hx-push-url="/#sheet"
+                        hx-push-url="#sheet"
                     >
                         <svg
                             width="18"
@@ -388,7 +391,7 @@
                         data-section="slides"
                         hx-get="/suite/slides/slides.html"
                         hx-target="#main-content"
-                        hx-push-url="/#slides"
+                        hx-push-url="#slides"
                     >
                         <svg
                             width="18"
@@ -419,7 +422,7 @@
                         data-section="social"
                         hx-get="/suite/social/social.html"
                         hx-target="#main-content"
-                        hx-push-url="/#social"
+                        hx-push-url="#social"
                     >
                         <svg
                             width="18"
@@ -493,7 +496,7 @@
                                 aria-label="Chat application"
                                 hx-get="/suite/chat/chat.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#chat"
+                                hx-push-url="#chat"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -523,7 +526,7 @@
                                 aria-label="Mail application"
                                 hx-get="/suite/mail/mail.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#mail"
+                                hx-push-url="#mail"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -554,7 +557,7 @@
                                 aria-label="Calendar application"
                                 hx-get="/suite/calendar/calendar.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#calendar"
+                                hx-push-url="#calendar"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -592,7 +595,7 @@
                                 aria-label="Drive application"
                                 hx-get="/suite/drive/drive.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#drive"
+                                hx-push-url="#drive"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -620,9 +623,9 @@
                                 data-section="tasks"
                                 role="menuitem"
                                 aria-label="Tasks application"
-                                hx-get="/suite/tasks/tasks.html"
+                                hx-get="/suite/tasks/autotask.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#tasks"
+                                hx-push-url="#tasks"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -653,7 +656,7 @@
                                 aria-label="Docs - Documents"
                                 hx-get="/suite/docs/docs.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#docs"
+                                hx-push-url="#docs"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -686,7 +689,7 @@
                                 aria-label="Sheet - Spreadsheets"
                                 hx-get="/suite/sheet/sheet.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#sheet"
+                                hx-push-url="#sheet"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -725,7 +728,7 @@
                                 aria-label="Slides - Presentations"
                                 hx-get="/suite/slides/slides.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#slides"
+                                hx-push-url="#slides"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -764,7 +767,7 @@
                                 aria-label="Social Network"
                                 hx-get="/suite/social/social.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#social"
+                                hx-push-url="#social"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -801,7 +804,7 @@
                                 aria-label="People - Contacts"
                                 hx-get="/suite/people/people.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#people"
+                                hx-push-url="#people"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -834,7 +837,7 @@
                                 aria-label="CRM - Customer Relationship Management"
                                 hx-get="/suite/crm/crm.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#crm"
+                                hx-push-url="#crm"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -869,7 +872,7 @@
                                 aria-label="Billing - Invoices & Payments"
                                 hx-get="/suite/billing/billing.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#billing"
+                                hx-push-url="#billing"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -905,7 +908,7 @@
                                 aria-label="Products - Product & Service Catalog"
                                 hx-get="/suite/products/products.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#products"
+                                hx-push-url="#products"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -944,7 +947,7 @@
                                 aria-label="Tickets - Support Cases"
                                 hx-get="/suite/tickets/tickets.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#tickets"
+                                hx-push-url="#tickets"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -977,7 +980,7 @@
                                 aria-label="Paper"
                                 hx-get="/suite/paper/paper.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#paper"
+                                hx-push-url="#paper"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1011,7 +1014,7 @@
                                 aria-label="Editor - Code & Text"
                                 hx-get="/editor.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#editor"
+                                hx-push-url="#editor"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1041,7 +1044,7 @@
                                 aria-label="Research application"
                                 hx-get="/suite/research/research.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#research"
+                                hx-push-url="#research"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1072,7 +1075,7 @@
                                 aria-label="Meet application"
                                 hx-get="/suite/meet/meet.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#meet"
+                                hx-push-url="#meet"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1110,7 +1113,7 @@
                                 aria-label="Analytics Dashboard"
                                 hx-get="/suite/analytics/analytics.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#analytics"
+                                hx-push-url="#analytics"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1140,7 +1143,7 @@
                                 aria-label="Custom Dashboards"
                                 hx-get="/suite/dashboards/dashboards.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#dashboards"
+                                hx-push-url="#dashboards"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1197,7 +1200,7 @@
                                 aria-label="System Monitoring"
                                 hx-get="/suite/monitoring/monitoring.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#monitoring"
+                                hx-push-url="#monitoring"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1229,7 +1232,7 @@
                                 aria-label="Data Sources"
                                 hx-get="/suite/sources/index.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#sources"
+                                hx-push-url="#sources"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1263,7 +1266,7 @@
                                 aria-label="Security"
                                 hx-get="/suite/tools/security.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#security"
+                                hx-push-url="#security"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1294,7 +1297,7 @@
                                 aria-label="Dialog Designer"
                                 hx-get="/designer.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#designer"
+                                hx-push-url="#designer"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1324,7 +1327,7 @@
                                 aria-label="Attendant"
                                 hx-get="/suite/attendant/index.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#attendant"
+                                hx-push-url="#attendant"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1356,7 +1359,7 @@
                                 aria-label="Project Management"
                                 hx-get="/suite/project/project.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#project"
+                                hx-push-url="#project"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1393,7 +1396,7 @@
                                 aria-label="Canvas Whiteboard"
                                 hx-get="/suite/canvas/canvas.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#canvas"
+                                hx-push-url="#canvas"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1429,7 +1432,7 @@
                                 aria-label="Goals & OKRs"
                                 hx-get="/suite/goals/goals.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#goals"
+                                hx-push-url="#goals"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1459,7 +1462,7 @@
                                 aria-label="Media Player"
                                 hx-get="/suite/player/player.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#player"
+                                hx-push-url="#player"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1487,7 +1490,7 @@
                                 aria-label="Workspace"
                                 hx-get="/suite/workspace/workspace.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#workspace"
+                                hx-push-url="#workspace"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1525,7 +1528,7 @@
                                 aria-label="Video"
                                 hx-get="/suite/video/video.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#video"
+                                hx-push-url="#video"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1563,7 +1566,7 @@
                                 aria-label="Learn"
                                 hx-get="/suite/learn/learn.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#learn"
+                                hx-push-url="#learn"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -1596,7 +1599,7 @@
                                 aria-label="Settings"
                                 hx-get="/suite/settings/index.html"
                                 hx-target="#main-content"
-                                hx-push-url="/#settings"
+                                hx-push-url="#settings"
                             >
                                 <div class="app-icon" aria-hidden="true">
                                     <svg
@@ -2333,97 +2336,6 @@
 
                     <!-- User Menu Dropdown -->
                     <div class="user-menu" id="userMenu" style="display: none">
-                        <div class="user-menu-header">
-                            <div class="user-avatar-large" id="userAvatarLarge">
-                                U
-                            </div>
-                            <div class="user-info">
-                                <div class="user-name" id="userName">User</div>
-                                <div class="user-email" id="userEmail">
-                                    user@example.com
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="user-menu-divider"></div>
-
-                        <nav class="user-menu-nav">
-                            <a
-                                href="#settings"
-                                class="user-menu-item"
-                                hx-get="/suite/settings/index.html"
-                                hx-target="#main-content"
-                                hx-push-url="/#settings"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <path
-                                        d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                                    ></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                                <span>Profile</span>
-                            </a>
-
-                            <a
-                                href="#settings"
-                                class="user-menu-item"
-                                hx-get="/suite/settings/index.html"
-                                hx-target="#main-content"
-                                hx-push-url="/#settings"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                    <path
-                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-                                    ></path>
-                                </svg>
-                                <span>Settings</span>
-                            </a>
-
-                            <a
-                                href="https://docs.pragmatismo.com.br"
-                                target="_blank"
-                                class="user-menu-item"
-                            >
-                                <svg
-                                    width="18"
-                                    height="18"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path
-                                        d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"
-                                    ></path>
-                                    <line
-                                        x1="12"
-                                        y1="17"
-                                        x2="12.01"
-                                        y2="17"
-                                    ></line>
-                                </svg>
-                                <span>Help & Support</span>
-                            </a>
-                        </nav>
-
-                        <div class="user-menu-divider"></div>
-
                         <a
                             href="/auth/login.html"
                             class="user-menu-item login-item"
@@ -2462,7 +2374,6 @@
         <script src="suite/js/theme-manager.js"></script>
         <script src="suite/js/htmx-app.js"></script>
         <script src="suite/js/base.js"></script>
-        <script src="suite/tasks/tasks.js?v=20260102"></script>
 
         <!-- Admin module functions (button handlers for HTMX-loaded admin views) -->
         <script src="suite/admin/admin.js"></script>
