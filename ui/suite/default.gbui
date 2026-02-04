@@ -156,34 +156,34 @@
         <!-- Application initialization -->
         <script>
             // Initialize application
-            (function initApp() {
-                "use strict";
+        (function initApp() {
+            "use strict";
 
-                // Initialize ThemeManager
-                document.addEventListener("DOMContentLoaded", () => {
-                    console.log("🚀 Initializing General Bots Desktop...");
+            // Initialize ThemeManager
+            document.addEventListener("DOMContentLoaded", () => {
+                console.log("🚀 Initializing General Bots Desktop...");
 
-                    // Initialize theme system
-                    if (window.ThemeManager) {
-                        ThemeManager.init();
-                        console.log("✓ Theme Manager initialized");
-                    } else {
-                        console.warn("⚠ ThemeManager not found");
+                // Initialize theme system
+                if (window.ThemeManager) {
+                    ThemeManager.init();
+                    console.log("✓ Theme Manager initialized");
+                } else {
+                    console.warn("⚠ ThemeManager not found");
+                }
+
+                // Initialize apps menu
+                initAppsMenu();
+
+                // Hide loading overlay after initialization
+                setTimeout(() => {
+                    const loadingOverlay =
+                        document.getElementById("loadingOverlay");
+                    if (loadingOverlay) {
+                        loadingOverlay.classList.add("hidden");
+                        console.log("✓ Application ready");
                     }
-
-                    // Initialize apps menu
-                    initAppsMenu();
-
-                    // Hide loading overlay after initialization
-                    setTimeout(() => {
-                        const loadingOverlay =
-                            document.getElementById("loadingOverlay");
-                        if (loadingOverlay) {
-                            loadingOverlay.classList.add("hidden");
-                            console.log("✓ Application ready");
-                        }
-                    }, 500);
-                });
+                }, 500);
+            });
 
                 // Apps menu functionality
                 function initAppsMenu() {

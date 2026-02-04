@@ -7,10 +7,10 @@ use axum::{
     http::{Request, StatusCode},
     response::{Html, IntoResponse, Response},
     routing::{any, get},
-    Router,
+    Json, Router,
 };
 use futures_util::{SinkExt, StreamExt};
-use log::{debug, error, info};
+use log::{debug, error, info, warn};
 #[cfg(feature = "embed-ui")]
 use rust_embed::RustEmbed;
 use serde::Deserialize;
@@ -130,8 +130,98 @@ const ROOT_FILES: &[&str] = &[
     "single.gbui",
 ];
 
-pub async fn index() -> impl IntoResponse {
-    serve_suite().await
+pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
+    let path = uri.path();
+    
+    // Check if path contains static asset directories - serve them directly
+    let path_lower = path.to_lowercase();
+    if path_lower.contains("/js/") 
+        || path_lower.contains("/css/")
+        || path_lower.contains("/vendor/")
+        || path_lower.contains("/assets/")
+        || path_lower.contains("/public/")
+        || path_lower.contains("/partials/")
+        || path_lower.ends_with(".js") 
+        || path_lower.ends_with(".css") 
+        || path_lower.ends_with(".png") 
+        || path_lower.ends_with(".jpg") 
+        || path_lower.ends_with(".jpeg") 
+        || path_lower.ends_with(".gif") 
+        || path_lower.ends_with(".svg") 
+        || path_lower.ends_with(".ico") 
+        || path_lower.ends_with(".woff") 
+        || path_lower.ends_with(".woff2") 
+        || path_lower.ends_with(".ttf") 
+        || path_lower.ends_with(".eot")
+        || path_lower.ends_with(".mp4") 
+        || path_lower.ends_with(".webm")
+        || path_lower.ends_with(".mp3")
+        || path_lower.ends_with(".wav")
+    {
+        // Remove bot name prefix if present (e.g., /edu/suite/js/file.js -> suite/js/file.js)
+        let path_parts: Vec<&str> = path.split('/').collect();
+        let fs_path = if path_parts.len() > 1 {
+            let mut start_idx = 1;
+            let known_dirs = ["suite", "js", "css", "vendor", "assets", "public", "partials", "settings", "auth", "about", "drive", "chat", "tasks", "admin", "mail", "calendar", "meet", "docs", "sheet", "slides", "paper", "research", "sources", "learn", "analytics", "dashboards", "monitoring", "people", "crm", "tickets", "billing", "products", "video", "player", "canvas", "social", "project", "goals", "workspace", "designer"];
+            
+            if path_parts.len() > start_idx && !known_dirs.contains(&path_parts[start_idx]) {
+                start_idx += 1;
+            }
+            
+            path_parts[start_idx..].join("/")
+        } else {
+            path.to_string()
+        };
+        
+        let full_path = get_ui_root().join(&fs_path);
+        
+        debug!("index: Serving static file: {} -> {:?} (fs_path: {})", path, full_path, fs_path);
+        
+        #[cfg(feature = "embed-ui")]
+        {
+            let asset_path = fs_path.trim_start_matches('/');
+            if let Some(content) = Assets::get(asset_path) {
+                let mime = mime_guess::from_path(asset_path).first_or_octet_stream();
+                return ([(axum::http::header::CONTENT_TYPE, mime.as_ref())], content.data).into_response();
+            }
+        }
+        
+        #[cfg(not(feature = "embed-ui"))]
+        {
+            if let Ok(bytes) = tokio::fs::read(&full_path).await {
+                let mime = mime_guess::from_path(&full_path).first_or_octet_stream();
+                return (StatusCode::OK, [("content-type", mime.as_ref())], bytes).into_response();
+            }
+        }
+        
+        warn!("index: Static file not found: {} -> {:?}", path, full_path);
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    
+    let path_parts: Vec<&str> = path.split('/').collect();
+    let bot_name = path_parts
+        .iter()
+        .rev()
+        .find(|part| {
+            !part.is_empty()
+                && **part != "chat"
+                && **part != "app"
+                && **part != "ws"
+                && **part != "ui"
+                && **part != "api"
+                && **part != "auth"
+                && **part != "suite"
+                && !part.ends_with(".js")
+                && !part.ends_with(".css")
+        })
+        .map(|s| s.to_string());
+
+    info!(
+        "index: Extracted bot_name: {:?} from path: {}",
+        bot_name,
+        path
+    );
+    serve_suite(bot_name).await.into_response()
 }
 
 pub fn get_ui_root() -> PathBuf {
@@ -196,7 +286,7 @@ pub async fn serve_minimal() -> impl IntoResponse {
     }
 }
 
-pub async fn serve_suite() -> impl IntoResponse {
+pub async fn serve_suite(bot_name: Option<String>) -> impl IntoResponse {
     let raw_html_res = {
         #[cfg(feature = "embed-ui")]
         {
@@ -234,6 +324,32 @@ pub async fn serve_suite() -> impl IntoResponse {
         Ok(raw_html) => {
             #[allow(unused_mut)] // Mutable required for feature-gated blocks
             let mut html = raw_html;
+
+            // Inject base tag and bot_name into the page
+            if let Some(head_end) = html.find("</head>") {
+                // Set base href to include bot context if present (e.g., /edu/)
+                let base_href = if let Some(ref name) = bot_name {
+                    format!("/{}/", name)
+                } else {
+                    "/".to_string()
+                };
+                let base_tag = format!(r#"<base href="{}">"#, base_href);
+                html.insert_str(head_end, &base_tag);
+                
+                if let Some(name) = bot_name {
+                    info!("serve_suite: Injecting bot_name '{}' into page with base href='{}'", name, base_href);
+                    let bot_script = format!(
+                        r#"<script>window.__INITIAL_BOT_NAME__ = "{}";</script>"#,
+                        &name
+                    );
+                    html.insert_str(head_end + base_tag.len(), &bot_script);
+                    info!("serve_suite: Successfully injected base tag and bot_name script");
+                } else {
+                    info!("serve_suite: Successfully injected base tag (no bot_name)");
+                }
+            } else {
+                error!("serve_suite: Failed to find </head> tag to inject content");
+            }
 
             // Core Apps
             #[cfg(not(feature = "chat"))]
@@ -452,14 +568,26 @@ async fn health(State(state): State<AppState>) -> (StatusCode, axum::Json<serde_
     }
 }
 
-async fn api_health() -> (StatusCode, axum::Json<serde_json::Value>) {
-    (
-        StatusCode::OK,
-        axum::Json(serde_json::json!({
-            "status": "ok",
-            "version": env!("CARGO_PKG_VERSION")
-        })),
-    )
+async fn api_health(State(state): State<AppState>) -> (StatusCode, axum::Json<serde_json::Value>) {
+    if state.health_check().await {
+        (
+            StatusCode::OK,
+            axum::Json(serde_json::json!({
+                "status": "ok",
+                "botserver": "healthy",
+                "version": env!("CARGO_PKG_VERSION")
+            })),
+        )
+    } else {
+        (
+            StatusCode::SERVICE_UNAVAILABLE,
+            axum::Json(serde_json::json!({
+                "status": "error",
+                "botserver": "unhealthy",
+                "version": env!("CARGO_PKG_VERSION")
+            })),
+        )
+    }
 }
 
 fn extract_app_context(headers: &axum::http::HeaderMap, path: &str) -> Option<String> {
@@ -588,6 +716,7 @@ async fn build_proxy_response(resp: reqwest::Response) -> Response<Body> {
 fn create_api_router() -> Router<AppState> {
     Router::new()
         .route("/health", get(api_health))
+        .route("/client-error", axum::routing::post(handle_client_error))
         .fallback(any(proxy_api))
 }
 
@@ -596,6 +725,35 @@ struct WsQuery {
     session_id: String,
     user_id: String,
     bot_name: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ClientError {
+    message: String,
+    stack: Option<String>,
+    source: String,
+    url: String,
+    user_agent: String,
+    timestamp: String,
+}
+
+async fn handle_client_error(Json(error): Json<ClientError>) -> impl IntoResponse {
+    warn!(
+        "CLIENT:{}: {} at {} ({}) - {}", 
+        error.source.to_uppercase(),
+        error.message,
+        error.url,
+        error.timestamp,
+        error.user_agent
+    );
+    
+    if let Some(stack) = &error.stack {
+        if !stack.is_empty() {
+            warn!("CLIENT:STACK: {}", stack);
+        }
+    }
+    
+    StatusCode::OK
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -613,11 +771,14 @@ async fn ws_proxy(
     let path_parts: Vec<&str> = uri.path().split('/').collect();
     let bot_name = params
         .bot_name
+        .filter(|name| name != "ws" && !name.is_empty())
         .or_else(|| {
             // Try to extract from path like /edu or /app/edu
             path_parts
                 .iter()
-                .find(|part| !part.is_empty() && *part != "chat" && *part != "app")
+                .find(|part| {
+                    !part.is_empty() && **part != "chat" && **part != "app" && **part != "ws"
+                })
                 .map(|s| s.to_string())
         })
         .unwrap_or_else(|| "default".to_string());
@@ -996,10 +1157,12 @@ fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<App
     #[cfg(not(feature = "embed-ui"))]
     {
         let mut r = router;
-        // Serve suite directories ONLY through /suite/{dir} path
-        // This prevents duplicate routes that cause ServeDir to return index.html for file requests
+        // Serve suite directories at BOTH root level and /suite/{dir} path
+        // This allows HTML files to reference js/vendor/file.js directly
         for dir in SUITE_DIRS {
             let path = _suite_path.join(dir);
+            info!("Adding route for /{} -> {:?}", dir, path);
+            r = r.nest_service(&format!("/{dir}"), ServeDir::new(path.clone()));
             info!("Adding route for /suite/{} -> {:?}", dir, path);
             r = r.nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()));
         }
@@ -1024,13 +1187,14 @@ pub fn configure_router() -> Router {
         .nest("/ui", create_ui_router())
         .nest("/ws", create_ws_router())
         .nest("/apps", create_apps_router())
-        .route("/", get(index))
-        .route("/minimal", get(serve_minimal))
-        .route("/suite", get(serve_suite))
-        .route("/favicon.ico", get(serve_favicon))
-        .nest_service("/auth", ServeDir::new(suite_path.join("auth")));
+        .route("/favicon.ico", get(serve_favicon));
 
     router = add_static_routes(router, &suite_path);
 
-    router.fallback(get(index)).with_state(state)
+    router
+        .route("/", get(index))
+        .route("/minimal", get(serve_minimal))
+        .route("/suite", get(serve_suite))
+        .fallback(get(index))
+        .with_state(state)
 }

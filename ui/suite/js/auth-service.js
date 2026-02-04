@@ -351,8 +351,8 @@
       this.clearAuth();
       this.emit("tokenExpired");
 
-      const currentPath = window.location.pathname;
-      if (!currentPath.startsWith("/auth/")) {
+      const currentPath = window.location.pathname + window.location.hash;
+      if (!window.location.pathname.startsWith("/auth/")) {
         window.location.href =
           "/auth/login.html?expired=1&redirect=" +
           encodeURIComponent(currentPath);

@@ -213,8 +213,10 @@ function setupIntentInputHandlers() {
 }
 
 // Task polling for async task creation
-let activePollingTaskId = null;
-let pollingInterval = null;
+if (typeof activePollingTaskId === "undefined") {
+  var activePollingTaskId = null;
+  var pollingInterval = null;
+}
 
 function startTaskPolling(taskId) {
   // Stop any existing polling
@@ -629,7 +631,9 @@ function handleWebSocketMessage(data) {
 }
 
 // Store pending manifest updates for tasks whose elements aren't loaded yet
-const pendingManifestUpdates = new Map();
+if (typeof pendingManifestUpdates === "undefined") {
+  var pendingManifestUpdates = new Map();
+}
 
 function renderManifestProgress(
   taskId,
@@ -2759,8 +2763,9 @@ function formatTime(seconds) {
 // GLOBAL STYLES FOR TOAST ANIMATIONS
 // =============================================================================
 
-const style = document.createElement("style");
-style.textContent = `
+if (typeof taskStyleElement === "undefined") {
+  var taskStyleElement = document.createElement("style");
+  taskStyleElement.textContent = `
     @keyframes slideIn {
         from {
             opacity: 0;
@@ -2805,7 +2810,8 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
+  document.head.appendChild(taskStyleElement);
+}
 
 // =============================================================================
 // GOALS, PENDING INFO, SCHEDULERS, MONITORS

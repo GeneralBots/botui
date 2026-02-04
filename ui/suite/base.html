@@ -10,6 +10,9 @@
         <script src="/js/vendor/htmx-ws.js"></script>
         <script src="/js/vendor/htmx-json-enc.js"></script>
 
+        <!-- ERROR REPORTER - Captures JS errors and sends to server log -->
+        <script src="/js/error-reporter.js"></script>
+
         <!-- i18n -->
         <script src="/js/i18n.js"></script>
 
@@ -116,7 +119,7 @@
                                 href="#tasks"
                                 class="app-item"
                                 role="menuitem"
-                                hx-get="/tasks/tasks.html"
+                                hx-get="/suite/tasks/autotask.html"
                                 hx-target="#main-content"
                                 hx-push-url="true"
                             >

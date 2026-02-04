@@ -295,6 +295,12 @@
       });
 
       window.addEventListener("gb:auth:expired", function (event) {
+        // Check if current bot is public - if so, skip redirect
+        if (window.__BOT_IS_PUBLIC__ === true) {
+          console.log("[GBSecurity] Bot is public, skipping auth redirect");
+          return;
+        }
+
         console.log(
           "[GBSecurity] Auth expired, clearing tokens and redirecting",
         );
