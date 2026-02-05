@@ -224,30 +224,37 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
 }
 
 pub fn get_ui_root() -> PathBuf {
-    let candidates = [
-        "ui",
-        "botui/ui",
-        "../botui/ui",
-        "../../botui/ui",
-        "../../../botui/ui",
-    ];
-
-    for path_str in candidates {
-        let path = PathBuf::from(path_str);
-        if path.exists() {
-            info!("Found UI root at: {:?}", path);
-            return path;
-        }
+    #[cfg(feature = "embed-ui")]
+    {
+        PathBuf::from("ui")
     }
 
-    // Fallback to "ui" but log a warning
-    let default = PathBuf::from("ui");
-    error!(
-        "Could not find 'ui' directory in candidates: {:?}. Defaulting to 'ui' (CWD: {:?})",
-        candidates,
-        std::env::current_dir()
-    );
-    default
+    #[cfg(not(feature = "embed-ui"))]
+    {
+        let candidates = [
+            "ui",
+            "botui/ui",
+            "../botui/ui",
+            "../../botui/ui",
+            "../../../botui/ui",
+        ];
+
+        for path_str in candidates {
+            let path = PathBuf::from(path_str);
+            if path.exists() {
+                info!("Found UI root at: {:?}", path);
+                return path;
+            }
+        }
+
+        let default = PathBuf::from("ui");
+        error!(
+            "Could not find 'ui' directory in candidates: {:?}. Defaulting to 'ui' (CWD: {:?})",
+            candidates,
+            std::env::current_dir()
+        );
+        default
+    }
 }
 
 pub async fn serve_minimal() -> impl IntoResponse {
