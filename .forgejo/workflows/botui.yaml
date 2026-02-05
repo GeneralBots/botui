@@ -16,7 +16,6 @@ on:
 
 env:
   CARGO_BUILD_JOBS: 8
-  CARGO_INCREMENTAL: 0
   CARGO_NET_RETRY: 10
 
 jobs:
