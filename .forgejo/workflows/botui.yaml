@@ -6,13 +6,13 @@ on:
     paths:
       - "botui/**"
       - "botlib/**"
-      - ".github/workflows/botui.yaml"
+      - ".forgejo/workflows/botui.yaml"
   pull_request:
     branches: ["main"]
     paths:
       - "botui/**"
       - "botlib/**"
-      - ".github/workflows/botui.yaml"
+      - ".forgejo/workflows/botui.yaml"
 
 env:
   CARGO_BUILD_JOBS: 8
