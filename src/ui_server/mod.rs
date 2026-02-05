@@ -20,7 +20,6 @@ use tokio_tungstenite::{
     connect_async_tls_with_config, tungstenite,
     tungstenite::protocol::Message as TungsteniteMessage,
 };
-#[cfg(not(feature = "embed-ui"))]
 use tower_http::services::{ServeDir, ServeFile};
 
 #[cfg(feature = "embed-ui")]
