@@ -3,16 +3,8 @@ name: BotUI CI
 on:
   push:
     branches: ["main"]
-    paths:
-      - "botui/**"
-      - "botlib/**"
-      - ".forgejo/workflows/botui.yaml"
   pull_request:
     branches: ["main"]
-    paths:
-      - "botui/**"
-      - "botlib/**"
-      - ".forgejo/workflows/botui.yaml"
 
 env:
   CARGO_BUILD_JOBS: 6
