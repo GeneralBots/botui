@@ -107,4 +107,4 @@ jobs:
           sudo cp target/debug/botui /opt/gbo/bin/system/
           sudo chmod +x /opt/gbo/bin/system/botui
           
-          lxc exec bot:pragmatismo-system -- systemctl start ui || true
+          lxc exec bot:pragmatismo-system -- systemctl start ui || true# CI trigger: Fri Feb  6 10:57:04 AM -03 2026
