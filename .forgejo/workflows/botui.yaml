@@ -81,8 +81,8 @@ jobs:
       - name: Build BotUI
         working-directory: workspace
         run: |
-          cargo build -p botui --features embed-ui -j 8 2>&1 | tee /tmp/build.log
-          ls -lh target/debug/botui
+          cargo build --release -p botui --features embed-ui -j 8 2>&1 | tee /tmp/build.log
+          ls -lh target/release/botui
           sccache --show-stats || true
 
       - name: Save build log
@@ -96,7 +96,7 @@ jobs:
         run: |
           lxc exec bot:pragmatismo-system -- systemctl stop ui || true
           
-          sudo cp target/debug/botui /opt/gbo/bin/system/
+          sudo cp target/release/botui /opt/gbo/bin/system/
           sudo chmod +x /opt/gbo/bin/system/botui
           
           lxc exec bot:pragmatismo-system -- systemctl start ui || true# CI trigger: Fri Feb  6 10:57:04 AM -03 2026
