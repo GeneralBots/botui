@@ -164,7 +164,11 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
             let mut start_idx = 1;
             let known_dirs = ["suite", "js", "css", "vendor", "assets", "public", "partials", "settings", "auth", "about", "drive", "chat", "tasks", "admin", "mail", "calendar", "meet", "docs", "sheet", "slides", "paper", "research", "sources", "learn", "analytics", "dashboards", "monitoring", "people", "crm", "tickets", "billing", "products", "video", "player", "canvas", "social", "project", "goals", "workspace", "designer"];
             
-            if path_parts.len() > start_idx && !known_dirs.contains(&path_parts[start_idx]) {
+            // Skip bot name if present (first segment is not a known dir, second segment is)
+            if path_parts.len() > start_idx + 1 
+                && !known_dirs.contains(&path_parts[start_idx]) 
+                && known_dirs.contains(&path_parts[start_idx + 1])
+            {
                 start_idx += 1;
             }
             
@@ -175,7 +179,7 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
         
         let full_path = get_ui_root().join(&fs_path);
         
-        debug!("index: Serving static file: {} -> {:?} (fs_path: {})", path, full_path, fs_path);
+        info!("index: Serving static file: {} -> {:?} (fs_path: {})", path, full_path, fs_path);
         
         #[cfg(feature = "embed-ui")]
         {
@@ -1149,36 +1153,28 @@ async fn handle_embedded_root_asset(
 fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<AppState> {
     #[cfg(feature = "embed-ui")]
     {
-        let mut r = router
-            .route("/suite/:dir/*path", get(handle_embedded_asset))
-            .route("/:dir/*path", get(handle_embedded_asset));
+        let mut r = router.route("/suite/:dir/*path", get(handle_embedded_asset));
 
-        // Add root files
+        // Add root files only under /suite/
         for file in ROOT_FILES {
-            r = r
-                .route(&format!("/{}", file), get(handle_embedded_root_asset))
-                .route(&format!("/suite/{}", file), get(handle_embedded_root_asset));
+            r = r.route(&format!("/suite/{}", file), get(handle_embedded_root_asset));
         }
         r
     }
     #[cfg(not(feature = "embed-ui"))]
     {
         let mut r = router;
-        // Serve suite directories at BOTH root level and /suite/{dir} path
-        // This allows HTML files to reference js/vendor/file.js directly
+        // Only serve suite directories under /suite/{dir} path
+        // Root-level paths (/:dir) are handled by fallback to support bot prefixes
         for dir in SUITE_DIRS {
             let path = _suite_path.join(dir);
-            info!("Adding route for /{} -> {:?}", dir, path);
-            r = r.nest_service(&format!("/{dir}"), ServeDir::new(path.clone()));
             info!("Adding route for /suite/{} -> {:?}", dir, path);
             r = r.nest_service(&format!("/suite/{dir}"), ServeDir::new(path.clone()));
         }
 
         for file in ROOT_FILES {
             let path = _suite_path.join(file);
-            r = r
-                .nest_service(&format!("/{}", file), ServeFile::new(path.clone()))
-                .nest_service(&format!("/suite/{}", file), ServeFile::new(path));
+            r = r.nest_service(&format!("/suite/{}", file), ServeFile::new(path));
         }
         r
     }
@@ -1190,18 +1186,16 @@ pub fn configure_router() -> Router {
 
     let mut router = Router::new()
         .route("/health", get(health))
+        .route("/favicon.ico", get(serve_favicon))
         .nest("/api", create_api_router())
         .nest("/ui", create_ui_router())
         .nest("/ws", create_ws_router())
         .nest("/apps", create_apps_router())
-        .route("/favicon.ico", get(serve_favicon));
+        .route("/", get(index))
+        .route("/minimal", get(serve_minimal))
+        .route("/suite", get(serve_suite));
 
     router = add_static_routes(router, &suite_path);
 
-    router
-        .route("/", get(index))
-        .route("/minimal", get(serve_minimal))
-        .route("/suite", get(serve_suite))
-        .fallback(get(index))
-        .with_state(state)
+    router.fallback(get(index)).with_state(state)
 }
