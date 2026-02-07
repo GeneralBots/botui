@@ -25,7 +25,7 @@ use tower_http::services::{ServeDir, ServeFile};
 
 #[cfg(feature = "embed-ui")]
 #[derive(RustEmbed)]
-#[folder = "$CARGO_MANIFEST_DIR/ui"]
+#[folder = "ui"]
 struct Assets;
 
 use crate::shared::AppState;
