@@ -210,10 +210,14 @@
         return originalFetch
           .call(window, input, init)
           .then(function (response) {
+            var url = typeof input === "string" ? input : input.url;
+
             if (response.status === 401) {
-              var url = typeof input === "string" ? input : input.url;
               self.handleUnauthorized(url);
+            } else if (!response.ok && window.ErrorReporter && window.ErrorReporter.reportNetworkError) {
+              window.ErrorReporter.reportNetworkError(url, response.status, response.statusText);
             }
+
             return response;
           });
       };

@@ -1024,7 +1024,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  if (document.readyState === "complete") {
+  // Skip SPA initialization on auth pages (login, register, etc.)
+  if (window.location.pathname.startsWith("/auth/")) {
+    console.log("[SPA] Skipping initialization on auth page");
+  } else if (document.readyState === "complete") {
     setTimeout(initialLoad, 50);
   } else {
     window.addEventListener("load", () => {

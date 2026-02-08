@@ -163,15 +163,19 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
         let fs_path = if path_parts.len() > 1 {
             let mut start_idx = 1;
             let known_dirs = ["suite", "js", "css", "vendor", "assets", "public", "partials", "settings", "auth", "about", "drive", "chat", "tasks", "admin", "mail", "calendar", "meet", "docs", "sheet", "slides", "paper", "research", "sources", "learn", "analytics", "dashboards", "monitoring", "people", "crm", "tickets", "billing", "products", "video", "player", "canvas", "social", "project", "goals", "workspace", "designer"];
-            
+
+            // Special case: /auth/suite/* should map to suite/* (auth is a route, not a directory)
+            if path_parts.get(1) == Some(&"auth") && path_parts.get(2) == Some(&"suite") {
+                start_idx = 2;
+            }
             // Skip bot name if present (first segment is not a known dir, second segment is)
-            if path_parts.len() > start_idx + 1 
-                && !known_dirs.contains(&path_parts[start_idx]) 
+            else if path_parts.len() > start_idx + 1
+                && !known_dirs.contains(&path_parts[start_idx])
                 && known_dirs.contains(&path_parts[start_idx + 1])
             {
                 start_idx += 1;
             }
-            
+
             path_parts[start_idx..].join("/")
         } else {
             path.to_string()
@@ -338,25 +342,39 @@ pub async fn serve_suite(bot_name: Option<String>) -> impl IntoResponse {
 
             // Inject base tag and bot_name into the page
             if let Some(head_end) = html.find("</head>") {
+                // Check if bot_name is actually an auth page (login.html, register.html, etc.)
+                // These are not actual bots, so we should use "/" as base href
+                let is_auth_page = bot_name.as_ref()
+                    .map(|n| n.ends_with(".html") || n == "login" || n == "register" || n == "forgot-password" || n == "reset-password")
+                    .unwrap_or(false);
+
                 // Set base href to include bot context if present (e.g., /edu/)
-                let base_href = if let Some(ref name) = bot_name {
+                // But NOT for auth pages - those use root
+                let base_href = if is_auth_page {
+                    "/".to_string()
+                } else if let Some(ref name) = bot_name {
                     format!("/{}/", name)
                 } else {
                     "/".to_string()
                 };
                 let base_tag = format!(r#"<base href="{}">"#, base_href);
                 html.insert_str(head_end, &base_tag);
-                
-                if let Some(name) = bot_name {
-                    info!("serve_suite: Injecting bot_name '{}' into page with base href='{}'", name, base_href);
-                    let bot_script = format!(
-                        r#"<script>window.__INITIAL_BOT_NAME__ = "{}";</script>"#,
-                        &name
-                    );
-                    html.insert_str(head_end + base_tag.len(), &bot_script);
-                    info!("serve_suite: Successfully injected base tag and bot_name script");
+
+                // Only inject bot_name script for actual bots, not auth pages
+                if !is_auth_page {
+                    if let Some(name) = bot_name {
+                        info!("serve_suite: Injecting bot_name '{}' into page with base href='{}'", name, base_href);
+                        let bot_script = format!(
+                            r#"<script>window.__INITIAL_BOT_NAME__ = "{}";</script>"#,
+                            &name
+                        );
+                        html.insert_str(head_end + base_tag.len(), &bot_script);
+                        info!("serve_suite: Successfully injected base tag and bot_name script");
+                    } else {
+                        info!("serve_suite: Successfully injected base tag (no bot_name)");
+                    }
                 } else {
-                    info!("serve_suite: Successfully injected base tag (no bot_name)");
+                    info!("serve_suite: Auth page detected, skipping bot_name injection (base href='{}')", base_href);
                 }
             } else {
                 error!("serve_suite: Failed to find </head> tag to inject content");
@@ -1150,6 +1168,23 @@ async fn handle_embedded_root_asset(
     }
 }
 
+#[cfg(feature = "embed-ui")]
+async fn handle_auth_asset(axum::extract::Path(path): axum::extract::Path<String>) -> impl IntoResponse {
+    let normalized_path = path.strip_prefix('/').unwrap_or(&path);
+    let asset_path = format!("suite/auth/{}", normalized_path);
+    match Assets::get(&asset_path) {
+        Some(content) => {
+            let mime = mime_guess::from_path(&asset_path).first_or_octet_stream();
+            (
+                [(axum::http::header::CONTENT_TYPE, mime.as_ref())],
+                content.data,
+            )
+                .into_response()
+        }
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
 fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<AppState> {
     #[cfg(feature = "embed-ui")]
     {
@@ -1194,6 +1229,16 @@ pub fn configure_router() -> Router {
         .route("/", get(index))
         .route("/minimal", get(serve_minimal))
         .route("/suite", get(serve_suite));
+
+    #[cfg(not(feature = "embed-ui"))]
+    {
+        router = router.nest_service("/auth", ServeDir::new(suite_path.join("auth")));
+    }
+
+    #[cfg(feature = "embed-ui")]
+    {
+        router = router.route("/auth/*path", get(handle_auth_asset));
+    }
 
     router = add_static_routes(router, &suite_path);
 
