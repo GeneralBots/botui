@@ -698,15 +698,20 @@ const Omnibox = {
 
 // Initialize Omnibox when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
-  // Detect bot name from pathname (e.g., /edu -> bot_name = "edu")
+  // Detect bot name from pathname (e.g., /bot/cristo -> bot_name = "cristo", /edu -> bot_name = "edu")
   const detectBotFromPath = () => {
     const pathname = window.location.pathname;
-    // Remove leading/trailing slashes and get first segment
+    // Remove leading/trailing slashes and split
     const segments = pathname.replace(/^\/|\/$/g, "").split("/");
-    const firstSegment = segments[0];
 
-    // If first segment is not a known route, treat it as bot name
-    const knownRoutes = ["suite", "auth", "api", "static", "public"];
+    // Handle /bot/{bot_name} pattern
+    if (segments[0] === "bot" && segments[1]) {
+      return segments[1];
+    }
+
+    // For other patterns, use first segment if it's not a known route
+    const firstSegment = segments[0];
+    const knownRoutes = ["suite", "auth", "api", "static", "public", "bot"];
     if (firstSegment && !knownRoutes.includes(firstSegment)) {
       return firstSegment;
     }
