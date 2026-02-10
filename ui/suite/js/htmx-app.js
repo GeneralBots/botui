@@ -204,9 +204,17 @@
   // Handle WebSocket messages
   function handleWebSocketMessage(message) {
     const messageType = message.type || message.event;
-    
+
     // Debug logging
     console.log("handleWebSocketMessage called with:", { messageType, message });
+
+    // Handle suggestions array from BotResponse
+    if (message.suggestions && Array.isArray(message.suggestions) && message.suggestions.length > 0) {
+      clearSuggestions();
+      message.suggestions.forEach(suggestion => {
+        addSuggestionButton(suggestion.text, suggestion.value || suggestion.text);
+      });
+    }
 
     switch (messageType) {
       case "message":
@@ -244,6 +252,31 @@
           console.log("Unknown message type:", messageType, message);
         }
     }
+  }
+
+  // Clear all suggestions
+  function clearSuggestions() {
+    const suggestionsEl = document.getElementById("suggestions");
+    if (suggestionsEl) {
+      suggestionsEl.innerHTML = '';
+    }
+  }
+
+  // Add suggestion button with value
+  function addSuggestionButton(text, value) {
+    const suggestionsEl = document.getElementById("suggestions");
+    if (!suggestionsEl) return;
+
+    const chip = document.createElement("button");
+    chip.className = "suggestion-chip";
+    chip.textContent = text;
+    chip.setAttribute("hx-post", "/api/sessions/current/message");
+    chip.setAttribute("hx-vals", JSON.stringify({ content: value }));
+    chip.setAttribute("hx-target", "#messages");
+    chip.setAttribute("hx-swap", "beforeend");
+
+    suggestionsEl.appendChild(chip);
+    htmx.process(chip);
   }
 
   // Append message to chat

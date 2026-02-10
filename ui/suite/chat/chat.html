@@ -1,6 +1,18 @@
 <link rel="stylesheet" href="/suite/chat/chat.css" />
 
 <div class="chat-layout" id="chat-app">
+    <!-- Connection Status -->
+    <div class="connection-status connecting" id="connectionStatus" style="display: none;">
+        <span class="connection-status-dot"></span>
+        <span class="connection-text">Connecting...</span>
+    </div>
+
+    <!-- Bot Header with Logo -->
+    <div class="chat-header" id="chatHeader">
+        <img class="bot-logo" id="botLogo" src="" alt="Bot Logo" />
+        <h1 class="bot-title" id="botTitle">Chat</h1>
+    </div>
+
     <main id="messages"></main>
 
     <footer>
@@ -42,7 +54,11 @@
             </button>
         </form>
     </footer>
-    <button class="scroll-to-bottom" id="scrollToBottom">↓</button>
+    <button class="scroll-to-bottom" id="scrollToBottom" title="Scroll to bottom">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+    </button>
 </div>
 
 <div class="entity-card-tooltip" id="entityCardTooltip">
@@ -155,6 +171,7 @@
         var currentStreamingContent = "";
         var reconnectAttempts = 0;
         var maxReconnectAttempts = 5;
+        var isUserScrolling = false;
 
         var mentionState = {
             active: false,
@@ -168,6 +185,61 @@
             var div = document.createElement("div");
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Scroll handling
+        function scrollToBottom(animate) {
+            var messages = document.getElementById("messages");
+            if (messages) {
+                if (animate) {
+                    messages.scrollTo({
+                        top: messages.scrollHeight,
+                        behavior: "smooth",
+                    });
+                } else {
+                    messages.scrollTop = messages.scrollHeight;
+                }
+            }
+        }
+
+        function updateScrollButton() {
+            var messages = document.getElementById("messages");
+            var scrollBtn = document.getElementById("scrollToBottom");
+            if (!messages || !scrollBtn) return;
+
+            var isNearBottom =
+                messages.scrollHeight - messages.scrollTop - messages.clientHeight <
+                100;
+
+            if (isNearBottom) {
+                scrollBtn.classList.remove("visible");
+            } else {
+                scrollBtn.classList.add("visible");
+            }
+        }
+
+        // Scroll-to-bottom button click
+        var scrollBtn = document.getElementById("scrollToBottom");
+        if (scrollBtn) {
+            scrollBtn.addEventListener("click", function () {
+                scrollToBottom(true);
+                isUserScrolling = false;
+            });
+        }
+
+        // Detect user scrolling
+        var messagesEl = document.getElementById("messages");
+        if (messagesEl) {
+            messagesEl.addEventListener("scroll", function () {
+                isUserScrolling = true;
+                updateScrollButton();
+
+                // Reset isUserScrolling after 2 seconds of no scrolling
+                clearTimeout(messagesEl.scrollTimeout);
+                messagesEl.scrollTimeout = setTimeout(function () {
+                    isUserScrolling = false;
+                }, 2000);
+            });
         }
 
         function renderMentionInMessage(content) {
@@ -227,7 +299,13 @@
             }
 
             messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
+
+            // Auto-scroll to bottom unless user is manually scrolling
+            if (!isUserScrolling) {
+                scrollToBottom(true);
+            } else {
+                updateScrollButton();
+            }
 
             setupMentionClickHandlers(div);
         }
@@ -675,6 +753,11 @@
                     addMessage("bot", data.content);
                 }
                 isStreaming = false;
+
+                // Render suggestions when message is complete
+                if (data.suggestions && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+                    renderSuggestions(data.suggestions);
+                }
             } else {
                 if (!isStreaming) {
                     isStreaming = true;
@@ -692,22 +775,83 @@
             }
         }
 
-        function sendMessage() {
+        // Render suggestion buttons
+        function renderSuggestions(suggestions) {
+            var suggestionsEl = document.getElementById("suggestions");
+            if (!suggestionsEl) {
+                console.warn("Suggestions container not found");
+                return;
+            }
+
+            // Clear existing suggestions
+            suggestionsEl.innerHTML = "";
+
+            console.log("Rendering " + suggestions.length + " suggestions");
+
+            suggestions.forEach(function (suggestion) {
+                var chip = document.createElement("button");
+                chip.className = "suggestion-chip";
+                chip.textContent = suggestion.text || "Suggestion";
+
+                // Use window.sendMessage which is already exposed
+                chip.onclick = (function(sugg) {
+                    return function() {
+                        console.log("Suggestion clicked:", sugg);
+                        // Check if there's an action to parse
+                        if (sugg.action) {
+                            try {
+                                var action = typeof sugg.action === "string"
+                                    ? JSON.parse(sugg.action)
+                                    : sugg.action;
+
+                                console.log("Parsed action:", action);
+
+                                if (action.type === "invoke_tool") {
+                                    // Send the tool name as text - the backend will handle tool invocation
+                                    window.sendMessage(action.tool);
+                                } else if (action.type === "send_message") {
+                                    window.sendMessage(action.message || sugg.text);
+                                } else if (action.type === "select_context") {
+                                    window.sendMessage(action.context);
+                                } else {
+                                    window.sendMessage(sugg.text);
+                                }
+                            } catch (e) {
+                                console.error("Failed to parse action:", e, "falling back to text");
+                                window.sendMessage(sugg.text);
+                            }
+                        } else {
+                            // No action, just send the text
+                            window.sendMessage(sugg.text);
+                        }
+                    };
+                })(suggestion);
+
+                suggestionsEl.appendChild(chip);
+            });
+        }
+
+        function sendMessage(messageContent) {
             var input = document.getElementById("messageInput");
             if (!input) {
                 console.error("Chat input not found");
                 return;
             }
 
-            var content = input.value.trim();
+            // If no messageContent provided, read from input
+            var content = messageContent || input.value.trim();
             if (!content) {
                 return;
             }
 
-            hideMentionDropdown();
+            // If called from input field (no messageContent provided), clear input
+            if (!messageContent) {
+                hideMentionDropdown();
+                input.value = "";
+                input.focus();
+            }
+
             addMessage("user", content);
-            input.value = "";
-            input.focus();
 
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(
@@ -728,10 +872,23 @@
 
         window.sendMessage = sendMessage;
 
+        // Expose session info for suggestion clicks
+        window.getChatSessionInfo = function() {
+            return {
+                ws: ws,
+                currentBotId: currentBotId,
+                currentUserId: currentUserId,
+                currentSessionId: currentSessionId,
+                currentBotName: currentBotName
+            };
+        };
+
         function connectWebSocket() {
             if (ws) {
                 ws.close();
             }
+
+            updateConnectionStatus("connecting");
 
             var url =
                 WS_URL +
@@ -746,6 +903,7 @@
             ws.onopen = function () {
                 console.log("WebSocket connected");
                 reconnectAttempts = 0;
+                updateConnectionStatus("connected");
             };
 
             ws.onmessage = function (event) {
@@ -756,13 +914,11 @@
                     // Ignore connection confirmation
                     if (data.type === "connected") return;
 
-                    // Ignore system events (theme changes, etc)
+                    // Process system events (theme changes, etc)
                     if (data.event) {
-                        console.log(
-                            "System event received, ignoring:",
-                            data.event,
-                            data,
-                        );
+                        if (data.event === "change_theme") {
+                            applyThemeData(data.data || {});
+                        }
                         return;
                     }
 
@@ -771,10 +927,7 @@
                         try {
                             var contentObj = JSON.parse(data.content);
                             if (contentObj.event === "change_theme") {
-                                console.log(
-                                    "Theme change event in content, ignoring:",
-                                    contentObj,
-                                );
+                                applyThemeData(contentObj.data || {});
                                 return;
                             }
                         } catch (e) {
@@ -795,19 +948,108 @@
             };
 
             ws.onclose = function () {
+                updateConnectionStatus("disconnected");
                 notify("Disconnected from chat server", "error");
                 if (reconnectAttempts < maxReconnectAttempts) {
                     reconnectAttempts++;
+                    updateConnectionStatus("connecting");
                     setTimeout(connectWebSocket, 1000 * reconnectAttempts);
                 }
             };
 
             ws.onerror = function (e) {
                 console.error("WebSocket error:", e);
+                updateConnectionStatus("disconnected");
             };
         }
 
+        // Apply theme data from WebSocket events
+        function applyThemeData(themeData) {
+            console.log("Applying theme data:", themeData);
+
+            var color1 = themeData.color1 || themeData.data?.color1 || "#8B4513";
+            var color2 = themeData.color2 || themeData.data?.color2 || "#F5DEB3";
+            var logo = themeData.logo_url || themeData.data?.logo_url || "";
+            var title = themeData.title || themeData.data?.title || window.__INITIAL_BOT_NAME__ || "Chat";
+
+            // Set CSS variables for colors
+            document.documentElement.style.setProperty("--chat-color1", color1);
+            document.documentElement.style.setProperty("--chat-color2", color2);
+
+            // Update suggestion button colors to match theme
+            document.documentElement.style.setProperty("--suggestion-color", color1);
+            document.documentElement.style.setProperty("--suggestion-bg", color2);
+
+            // Set logo
+            var logoEl = document.getElementById("botLogo");
+            if (logoEl) {
+                if (logo) {
+                    logoEl.src = logo;
+                    logoEl.style.display = "block";
+                } else {
+                    logoEl.style.display = "none";
+                }
+            }
+
+            // Set title
+            var titleEl = document.getElementById("botTitle");
+            if (titleEl) {
+                titleEl.textContent = title;
+            }
+
+            console.log("Theme applied:", { color1: color1, color2: color2, logo: logo, title: title });
+        }
+
+        // Load bot config and apply colors/logo
+        function loadBotConfig() {
+            var botName = window.__INITIAL_BOT_NAME__ || "default";
+
+            fetch("/api/bot/config?bot_name=" + encodeURIComponent(botName))
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(config) {
+                    if (!config) return;
+
+                    // Apply colors from config
+                    var color1 = config["theme-color1"] || config["Theme Color"] || "#8B4513";
+                    var color2 = config["theme-color2"] || "#F5DEB3";
+                    var logo = config["theme-logo"] || "";
+                    var title = config["theme-title"] || botName;
+
+                    // Set CSS variables for colors
+                    document.documentElement.style.setProperty("--chat-color1", color1);
+                    document.documentElement.style.setProperty("--chat-color2", color2);
+
+                    // Update suggestion button colors to match theme
+                    document.documentElement.style.setProperty("--suggestion-color", color1);
+                    document.documentElement.style.setProperty("--suggestion-bg", color2);
+
+                    // Set logo
+                    var logoEl = document.getElementById("botLogo");
+                    if (logoEl && logo) {
+                        logoEl.src = logo;
+                        logoEl.style.display = "block";
+                    } else if (logoEl) {
+                        logoEl.style.display = "none";
+                    }
+
+                    // Set title
+                    var titleEl = document.getElementById("botTitle");
+                    if (titleEl) {
+                        titleEl.textContent = title;
+                    }
+
+                    console.log("Bot config loaded:", { color1: color1, color2: color2, logo: logo, title: title });
+                })
+                .catch(function(e) {
+                    console.log("Could not load bot config:", e);
+                });
+        }
+
         function initChat() {
+            // Load bot config first
+            loadBotConfig();
             // Just proceed with chat initialization - no auth check
             proceedWithChatInit();
         }
@@ -836,6 +1078,31 @@
                     notify("Failed to connect to chat server", "error");
                     setTimeout(proceedWithChatInit, 3000);
                 });
+        }
+
+        function updateConnectionStatus(status) {
+            var statusEl = document.getElementById("connectionStatus");
+            if (!statusEl) return;
+
+            statusEl.className = "connection-status " + status;
+
+            var statusText = statusEl.querySelector(".connection-text");
+            if (statusText) {
+                switch (status) {
+                    case "connected":
+                        statusText.textContent = "Connected";
+                        statusEl.style.display = "none";
+                        break;
+                    case "disconnected":
+                        statusText.textContent = "Disconnected";
+                        statusEl.style.display = "flex";
+                        break;
+                    case "connecting":
+                        statusText.textContent = "Connecting...";
+                        statusEl.style.display = "flex";
+                        break;
+                }
+            }
         }
 
         function setupEventHandlers() {

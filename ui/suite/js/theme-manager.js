@@ -3,6 +3,27 @@ const ThemeManager = (() => {
   let currentThemeId = "default";
   let subscribers = [];
 
+  // Bot ID to theme mapping (configured via config.csv theme-base field)
+  const botThemeMap = {
+    // Default bot uses light theme with brown accents
+    "default": "light",
+    // Cristo bot uses mellowgold theme with earth tones
+    "cristo": "mellowgold",
+    // Salesianos bot uses light theme with blue accents
+    "salesianos": "light",
+  };
+
+  // Detect current bot from URL path
+  function getCurrentBotId() {
+    const path = window.location.pathname;
+    // Match patterns like /bot/cristo, /cristo, etc.
+    const match = path.match(/(?:\/bot\/)?([a-z0-9-]+)/i);
+    if (match && match[1]) {
+      return match[1].toLowerCase();
+    }
+    return "default";
+  }
+
   const themes = [
     { id: "default", name: "🎨 Default", file: "light.css" },
     { id: "light", name: "☀️ Light", file: "light.css" },
@@ -54,7 +75,7 @@ const ThemeManager = (() => {
     const link = document.createElement("link");
     link.id = "theme-css";
     link.rel = "stylesheet";
-    link.href = `public/themes/${theme.file}`;
+    link.href = `/public/themes/${theme.file}`;
     link.onload = () => {
       console.log("✓ Theme loaded:", theme.name);
       currentThemeId = id;
@@ -87,7 +108,19 @@ const ThemeManager = (() => {
   }
 
   function init() {
-    let saved = localStorage.getItem("gb-theme") || "default";
+    // First, load saved bot theme from config.csv (if available)
+    loadSavedTheme();
+
+    // Then load the UI theme (CSS theme)
+    // Priority: 1) localStorage user preference, 2) bot-specific theme, 3) default
+    let saved = localStorage.getItem("gb-theme");
+    if (!saved || !themes.find((t) => t.id === saved)) {
+      // No user preference, try bot-specific theme
+      const botId = getCurrentBotId();
+      saved = botThemeMap[botId] || "light";
+      // Save to localStorage so it persists
+      localStorage.setItem("gb-theme", saved);
+    }
     if (!themes.find((t) => t.id === saved)) saved = "default";
     currentThemeId = saved;
     loadTheme(saved);
@@ -99,18 +132,53 @@ const ThemeManager = (() => {
   }
 
   function setThemeFromServer(data) {
+    // Save theme to localStorage for persistence across page loads
+    localStorage.setItem("gb-theme-data", JSON.stringify(data));
+
+    // Load base theme if specified
+    if (data.theme_base) {
+      loadTheme(data.theme_base);
+    }
+
     if (data.logo_url) {
       document
         .querySelectorAll(".logo-icon, .assistant-avatar")
         .forEach((el) => {
           el.style.backgroundImage = `url("${data.logo_url}")`;
+          el.style.backgroundSize = "contain";
+          el.style.backgroundRepeat = "no-repeat";
+          el.style.backgroundPosition = "center";
+          // Clear emoji text content when logo image is applied
+          if (el.classList.contains("logo-icon")) {
+            el.textContent = "";
+          }
         });
+    }
+    if (data.color1) {
+      document.documentElement.style.setProperty("--color1", data.color1);
+    }
+    if (data.color2) {
+      document.documentElement.style.setProperty("--color2", data.color2);
     }
     if (data.title) document.title = data.title;
     if (data.logo_text) {
-      document.querySelectorAll(".logo-text").forEach((el) => {
+      document.querySelectorAll(".logo span, .logo-text").forEach((el) => {
         el.textContent = data.logo_text;
       });
+    }
+  }
+
+  // Load saved theme from localStorage on page load
+  function loadSavedTheme() {
+    const savedTheme = localStorage.getItem("gb-theme-data");
+    if (savedTheme) {
+      try {
+        const data = JSON.parse(savedTheme);
+        setThemeFromServer(data);
+        console.log("✓ Theme loaded from localStorage");
+      } catch (e) {
+        console.warn("Failed to load saved theme:", e);
+      }
     }
   }
 
@@ -126,6 +194,7 @@ const ThemeManager = (() => {
     init,
     loadTheme,
     setThemeFromServer,
+    loadSavedTheme,
     applyCustomizations,
     subscribe,
     getAvailableThemes: () => themes,
