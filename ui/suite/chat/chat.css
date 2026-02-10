@@ -94,38 +94,6 @@
     box-sizing: border-box;
 }
 
-/* Chat Header */
-.chat-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px 24px;
-    background: linear-gradient(135deg, var(--chat-color1, #8B4513) 0%, var(--chat-color2, #F5DEB3) 100%);
-    border-radius: 16px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.bot-logo {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.bot-title {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    flex: 1;
-}
-
 /* Connection Status - use shared styles from app.css */
 
 @keyframes pulse {
@@ -271,31 +239,16 @@
 }
 
 .user-message {
-    background: var(--accent, var(--primary, #3b82f6));
+    background: var(--chat-color1, var(--accent, var(--primary, #3b82f6)));
     color: #ffffff !important;
     border-bottom-right-radius: 4px;
 }
 
-/* Light accent themes need dark text on user messages */
-[data-theme="sentient"] .user-message,
-[data-theme="y2kglow"] .user-message,
-[data-theme="arcadeflash"] .user-message,
-[data-theme="green"] .user-message,
-[data-theme="jazzage"] .user-message,
-[data-theme="mellowgold"] .user-message,
-[data-theme="polaroidmemories"] .user-message,
-[data-theme="seasidepostcard"] .user-message,
-[data-theme="saturdaycartoons"] .user-message,
-[data-theme="light"] .user-message,
-[data-theme="typewriter"] .user-message,
-[data-theme="3dbevel"] .user-message {
-    color: #000000 !important;
-}
-
 .bot-message {
-    background: var(--surface, var(--card, #2a2a2a));
-    color: #ffffff !important;
+    background: var(--chat-color2, var(--surface, var(--card, #2a2a2a)));
+    color: #000000 !important;
     border-bottom-left-radius: 4px;
+    border: 1px solid var(--chat-color1, rgba(0, 0, 0, 0.2));
 }
 
 .bot-message,
@@ -309,56 +262,6 @@
 .bot-message h2,
 .bot-message h3,
 .bot-message h4 {
-    color: #ffffff !important;
-}
-
-/* Light background themes need dark bot message text */
-[data-theme="light"] .bot-message,
-[data-theme="light"] .bot-message p,
-[data-theme="light"] .bot-message span,
-[data-theme="light"] .bot-message li,
-[data-theme="light"] .bot-message a,
-[data-theme="light"] .bot-message strong,
-[data-theme="light"] .bot-message em,
-[data-theme="light"] .bot-message h1,
-[data-theme="light"] .bot-message h2,
-[data-theme="light"] .bot-message h3,
-[data-theme="light"] .bot-message h4,
-[data-theme="polaroidmemories"] .bot-message,
-[data-theme="polaroidmemories"] .bot-message p,
-[data-theme="polaroidmemories"] .bot-message span,
-[data-theme="polaroidmemories"] .bot-message li,
-[data-theme="polaroidmemories"] .bot-message a,
-[data-theme="polaroidmemories"] .bot-message h1,
-[data-theme="polaroidmemories"] .bot-message h2,
-[data-theme="seasidepostcard"] .bot-message,
-[data-theme="seasidepostcard"] .bot-message p,
-[data-theme="seasidepostcard"] .bot-message span,
-[data-theme="seasidepostcard"] .bot-message li,
-[data-theme="seasidepostcard"] .bot-message a,
-[data-theme="seasidepostcard"] .bot-message h1,
-[data-theme="seasidepostcard"] .bot-message h2,
-[data-theme="saturdaycartoons"] .bot-message,
-[data-theme="saturdaycartoons"] .bot-message p,
-[data-theme="saturdaycartoons"] .bot-message span,
-[data-theme="saturdaycartoons"] .bot-message li,
-[data-theme="saturdaycartoons"] .bot-message a,
-[data-theme="saturdaycartoons"] .bot-message h1,
-[data-theme="saturdaycartoons"] .bot-message h2,
-[data-theme="typewriter"] .bot-message,
-[data-theme="typewriter"] .bot-message p,
-[data-theme="typewriter"] .bot-message span,
-[data-theme="typewriter"] .bot-message li,
-[data-theme="typewriter"] .bot-message a,
-[data-theme="typewriter"] .bot-message h1,
-[data-theme="typewriter"] .bot-message h2,
-[data-theme="3dbevel"] .bot-message,
-[data-theme="3dbevel"] .bot-message p,
-[data-theme="3dbevel"] .bot-message span,
-[data-theme="3dbevel"] .bot-message li,
-[data-theme="3dbevel"] .bot-message a,
-[data-theme="3dbevel"] .bot-message h1,
-[data-theme="3dbevel"] .bot-message h2 {
     color: #000000 !important;
 }
 
@@ -644,9 +547,9 @@ footer {
 .suggestion-button {
     padding: 10px 18px;
     border-radius: 24px;
-    border: 2px solid var(--suggestion-color, #4a9eff);
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    border: 2px solid var(--chat-color1, var(--suggestion-color, #4a9eff));
+    background: var(--chat-color2, rgba(255, 255, 255, 0.15));
+    color: var(--chat-color1, #ffffff);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -658,7 +561,7 @@ footer {
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    text-shadow: none;
 }
 
 .suggestion-chip::before,
@@ -666,7 +569,7 @@ footer {
     content: "";
     position: absolute;
     inset: 0;
-    background: var(--accent, #3b82f6);
+    background: var(--chat-color1, var(--accent, #3b82f6));
     opacity: 0;
     transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: inherit;
@@ -675,9 +578,9 @@ footer {
 
 .suggestion-chip:hover,
 .suggestion-button:hover {
-    background: var(--suggestion-color, #4a9eff);
-    color: #000000;
-    border-color: var(--suggestion-color, #6bb3ff);
+    background: var(--chat-color1, var(--suggestion-color, #4a9eff));
+    color: #ffffff;
+    border-color: var(--chat-color1, var(--suggestion-color, #6bb3ff));
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     text-shadow: none;

@@ -7,12 +7,6 @@
         <span class="connection-text">Connecting...</span>
     </div>
 
-    <!-- Bot Header with Logo -->
-    <div class="chat-header" id="chatHeader">
-        <img class="bot-logo" id="botLogo" src="" alt="Bot Logo" />
-        <h1 class="bot-title" id="botTitle">Chat</h1>
-    </div>
-
     <main id="messages"></main>
 
     <footer>
@@ -967,35 +961,24 @@
         function applyThemeData(themeData) {
             console.log("Applying theme data:", themeData);
 
-            var color1 = themeData.color1 || themeData.data?.color1 || "#8B4513";
-            var color2 = themeData.color2 || themeData.data?.color2 || "#F5DEB3";
+            var color1 = themeData.color1 || themeData.data?.color1 || "#3b82f6";
+            var color2 = themeData.color2 || themeData.data?.color2 || "#f5deb3";
             var logo = themeData.logo_url || themeData.data?.logo_url || "";
             var title = themeData.title || themeData.data?.title || window.__INITIAL_BOT_NAME__ || "Chat";
 
-            // Set CSS variables for colors
+            // Set CSS variables for colors on document element
             document.documentElement.style.setProperty("--chat-color1", color1);
             document.documentElement.style.setProperty("--chat-color2", color2);
-
-            // Update suggestion button colors to match theme
             document.documentElement.style.setProperty("--suggestion-color", color1);
             document.documentElement.style.setProperty("--suggestion-bg", color2);
 
-            // Set logo
-            var logoEl = document.getElementById("botLogo");
-            if (logoEl) {
-                if (logo) {
-                    logoEl.src = logo;
-                    logoEl.style.display = "block";
-                } else {
-                    logoEl.style.display = "none";
-                }
-            }
+            // Also set on root for better cascading
+            document.documentElement.style.setProperty("--color1", color1);
+            document.documentElement.style.setProperty("--color2", color2);
 
-            // Set title
-            var titleEl = document.getElementById("botTitle");
-            if (titleEl) {
-                titleEl.textContent = title;
-            }
+            // Update suggestion button colors to match theme
+            document.documentElement.style.setProperty("--primary", color1);
+            document.documentElement.style.setProperty("--accent", color1);
 
             console.log("Theme applied:", { color1: color1, color2: color2, logo: logo, title: title });
         }
@@ -1012,35 +995,21 @@
                     if (!config) return;
 
                     // Apply colors from config
-                    var color1 = config["theme-color1"] || config["Theme Color"] || "#8B4513";
-                    var color2 = config["theme-color2"] || "#F5DEB3";
-                    var logo = config["theme-logo"] || "";
+                    var color1 = config["theme-color1"] || config["Theme Color"] || "#3b82f6";
+                    var color2 = config["theme-color2"] || "#f5deb3";
                     var title = config["theme-title"] || botName;
 
-                    // Set CSS variables for colors
+                    // Set CSS variables for colors on document element
                     document.documentElement.style.setProperty("--chat-color1", color1);
                     document.documentElement.style.setProperty("--chat-color2", color2);
-
-                    // Update suggestion button colors to match theme
                     document.documentElement.style.setProperty("--suggestion-color", color1);
                     document.documentElement.style.setProperty("--suggestion-bg", color2);
+                    document.documentElement.style.setProperty("--color1", color1);
+                    document.documentElement.style.setProperty("--color2", color2);
+                    document.documentElement.style.setProperty("--primary", color1);
+                    document.documentElement.style.setProperty("--accent", color1);
 
-                    // Set logo
-                    var logoEl = document.getElementById("botLogo");
-                    if (logoEl && logo) {
-                        logoEl.src = logo;
-                        logoEl.style.display = "block";
-                    } else if (logoEl) {
-                        logoEl.style.display = "none";
-                    }
-
-                    // Set title
-                    var titleEl = document.getElementById("botTitle");
-                    if (titleEl) {
-                        titleEl.textContent = title;
-                    }
-
-                    console.log("Bot config loaded:", { color1: color1, color2: color2, logo: logo, title: title });
+                    console.log("Bot config loaded:", { color1: color1, color2: color2, title: title });
                 })
                 .catch(function(e) {
                     console.log("Could not load bot config:", e);
