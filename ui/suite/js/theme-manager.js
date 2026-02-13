@@ -141,17 +141,24 @@ const ThemeManager = (() => {
     }
 
     if (data.logo_url) {
+      // For img elements - set src and show, hide SVG
+      const logoImg = document.querySelector('.logo-icon-img');
+      const logoSvg = document.querySelector('.logo-icon-svg');
+      if (logoImg && logoSvg) {
+        logoImg.src = data.logo_url;
+        logoImg.alt = data.title || 'Logo';
+        logoImg.style.display = 'block';
+        logoSvg.style.display = 'none';
+      }
+
+      // For elements that use background image
       document
-        .querySelectorAll(".logo-icon, .assistant-avatar")
+        .querySelectorAll(".assistant-avatar")
         .forEach((el) => {
           el.style.backgroundImage = `url("${data.logo_url}")`;
           el.style.backgroundSize = "contain";
           el.style.backgroundRepeat = "no-repeat";
           el.style.backgroundPosition = "center";
-          // Clear emoji text content when logo image is applied
-          if (el.classList.contains("logo-icon")) {
-            el.textContent = "";
-          }
         });
     }
     if (data.color1) {

@@ -10,10 +10,32 @@
         />
         <meta name="theme-color" content="#d4f505" />
 
+        <!-- Preemptive theme colors to prevent flash -->
+        <script>
+            (function() {
+                const path = window.location.pathname;
+                const botMatch = path.match(/(?:\/bot\/)?([a-z0-9-]+)/i);
+                const botId = botMatch ? botMatch[1].toLowerCase() : 'default';
+
+                // Bot-specific theme colors (from config.csv)
+                const botColors = {
+                    'cristo': { color1: '#8B4513', color2: '#FFF8E7' },
+                    'salesianos': { color1: '#1976D2', color2: '#E3F2FD' },
+                    'default': { color1: '#8B4513', color2: '#FFF8E7' }
+                };
+
+                const colors = botColors[botId] || botColors['default'];
+                document.documentElement.style.setProperty('--color1', colors.color1);
+                document.documentElement.style.setProperty('--color2', colors.color2);
+            })();
+        </script>
+
         <!-- Critical CSS - minimal styles for shell/layout (loaded sync) -->
         <link rel="stylesheet" href="suite/css/app.css" />
         <link rel="stylesheet" href="suite/css/base.css" />
         <link rel="stylesheet" href="suite/css/theme-sentient.css" />
+        <!-- Config color overrides - must load AFTER theme CSS -->
+        <link rel="stylesheet" href="suite/css/config-colors.css" />
 
         <!-- Non-critical CSS - loaded async for faster initial paint -->
         <link
@@ -119,8 +141,14 @@
                     title="General Bots"
                     aria-label="General Bots - Home"
                 >
+                    <img
+                        class="logo-icon logo-icon-img"
+                        src=""
+                        alt=""
+                        style="display: none;"
+                    />
                     <svg
-                        class="logo-icon"
+                        class="logo-icon logo-icon-svg"
                         width="32"
                         height="20"
                         viewBox="0 0 140 80"
@@ -1847,6 +1875,12 @@
 
             <!-- Right: Notifications + User -->
             <div class="header-right">
+                <!-- Theme dropdown selector -->
+                <div
+                    id="themeSelectorContainer"
+                    aria-label="Theme selector"
+                ></div>
+
                 <!-- Notifications Bell -->
                 <div class="notifications-menu">
                     <button

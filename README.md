@@ -18,7 +18,7 @@ For comprehensive documentation, see **[docs.pragmatismo.com.br](https://docs.pr
 ## Quick Start
 
 ```bash
-# Development mode - starts Axum server on port 3000
+# Development mode - starts Axum server on port 9000
 cargo run
 
 # Desktop mode (Tauri) - starts native window
@@ -27,7 +27,7 @@ cargo tauri dev
 
 ### Environment Variables
 
-- `BOTUI_PORT` - Server port (default: 3000)
+- `BOTUI_PORT` - Server port (default: 9000)
 
 ---
 
@@ -59,7 +59,7 @@ cargo tauri dev
 
 | Mode | Command | Description |
 |------|---------|-------------|
-| Web | `cargo run` | Axum server on port 3000 |
+| Web | `cargo run` | Axum server on port 9000 |
 | Desktop | `cargo tauri dev` | Tauri native window |
 
 ### Code Organization

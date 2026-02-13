@@ -232,16 +232,19 @@
 
 .message-content {
     max-width: 80%;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 16px;
-    line-height: 1.5;
+    line-height: 1.75;
     font-size: 14px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .user-message {
     background: var(--chat-color1, var(--accent, var(--primary, #3b82f6)));
     color: #ffffff !important;
     border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .bot-message {
@@ -249,6 +252,7 @@
     color: #000000 !important;
     border-bottom-left-radius: 4px;
     border: 1px solid var(--chat-color1, rgba(0, 0, 0, 0.2));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .bot-message,

@@ -233,14 +233,6 @@
         console.log("Processing change_theme event, not appending to chat");
         if (message.data) {
           ThemeManager.setThemeFromServer(message.data);
-
-          if (message.data.color1 || message.data.color2) {
-            const root = document.documentElement;
-            if (message.data.color1)
-              root.style.setProperty("--color1", message.data.color1);
-            if (message.data.color2)
-              root.style.setProperty("--color2", message.data.color2);
-          }
         }
         return; // Don't append theme events to chat
       default:

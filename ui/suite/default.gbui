@@ -12,6 +12,10 @@
 
         <!-- Styles -->
         <link rel="stylesheet" href="css/app.css" />
+        <!-- Config color overrides -->
+        <link rel="stylesheet" href="css/config-colors.css" />
+        <!-- Markdown message styling -->
+        <link rel="stylesheet" href="css/markdown-message.css" />
 
         <!-- Local Libraries (no external CDN dependencies) -->
         <script src="js/vendor/gsap.min.js"></script>

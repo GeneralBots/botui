@@ -395,3 +395,155 @@
         -webkit-line-clamp: 3;
     }
 }
+
+/* ============================================ */
+/* MARKDOWN MESSAGE STYLING                    */
+/* ============================================ */
+
+/* Lists in message content */
+.message-content ul,
+.message-content ol {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+/* List items with proper spacing from border */
+.message-content li {
+    margin: 8px 0;
+    line-height: 1.7;
+}
+
+/* Nested lists */
+.message-content ul ul,
+.message-content ol ol,
+.message-content ul ol,
+.message-content ol ul {
+    margin: 8px 0;
+}
+
+/* Bullet points */
+.message-content ul li {
+    list-style-type: disc;
+    padding-left: 8px;
+}
+
+.message-content ul li::marker {
+    color: var(--chat-color1, var(--accent, var(--primary, #3b82f6)));
+}
+
+/* Nested bullets */
+.message-content ul ul li {
+    list-style-type: circle;
+}
+
+.message-content ul ul ul li {
+    list-style-type: square;
+}
+
+/* Numbered lists */
+.message-content ol li {
+    list-style-type: decimal;
+}
+
+/* Nested numbered lists */
+.message-content ol ol li {
+    list-style-type: lower-alpha;
+}
+
+.message-content ol ol ol li {
+    list-style-type: lower-roman;
+}
+
+/* Lists in user messages */
+.message.user .message-content ul li::marker,
+.message.user .message-content ol li::marker {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Lists in bot messages */
+.message.bot .message-content ul li::marker,
+.message.bot .message-content ol li::marker {
+    color: var(--chat-color1, var(--accent, var(--primary, #3b82f6)));
+}
+
+/* Paragraphs in messages */
+.message-content p {
+    margin: 8px 0;
+    line-height: 1.7;
+}
+
+/* First and last paragraph spacing */
+.message-content p:first-child {
+    margin-top: 0;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Headings in messages */
+.message-content h1,
+.message-content h2,
+.message-content h3,
+.message-content h4,
+.message-content h5,
+.message-content h6 {
+    margin: 16px 0 8px 0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.message-content h1 { font-size: 1.5em; }
+.message-content h2 { font-size: 1.3em; }
+.message-content h3 { font-size: 1.15em; }
+.message-content h4 { font-size: 1.05em; }
+
+/* Code blocks */
+.message-content pre {
+    margin: 12px 0;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Inline code */
+.message-content code {
+    padding: 2px 6px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.message.user .message-content code {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Blockquotes */
+.message-content blockquote {
+    margin: 12px 0;
+    padding-left: 16px;
+    border-left: 3px solid var(--chat-color1, var(--accent, var(--primary, #3b82f6)));
+    font-style: italic;
+}
+
+/* Horizontal rules */
+.message-content hr {
+    margin: 16px 0;
+    border: none;
+    border-top: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+/* Links in messages */
+.message-content a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: rgba(128, 128, 128, 0.5);
+    transition: text-decoration-color 0.2s;
+}
+
+.message-content a:hover {
+    text-decoration-color: currentColor;
+}
