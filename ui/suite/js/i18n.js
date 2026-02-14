@@ -3,11 +3,12 @@
 
   const DEFAULT_LOCALE = "en";
   const STORAGE_KEY = "gb-locale";
-  const CACHE_VERSION = "v1";
+  const CACHE_VERSION = "v2";
   const CACHE_TTL_MS = 3600000;
 
   // IMPORTANT: Increment CACHE_VERSION when translation structure changes
   // to invalidate all user caches and force fresh API fetches
+  // v2: Invalidated cache to fix placeholder translations after i18n embed fix
 
   const MINIMAL_FALLBACK = {
     "label-loading": "Loading...",
