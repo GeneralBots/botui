@@ -962,8 +962,8 @@
         function applyThemeData(themeData) {
             console.log("Applying theme data:", themeData);
 
-            var color1 = themeData.color1 || themeData.data?.color1 || "#3b82f6";
-            var color2 = themeData.color2 || themeData.data?.color2 || "#f5deb3";
+            var color1 = themeData.color1 || themeData.data?.color1 || "black";
+            var color2 = themeData.color2 || themeData.data?.color2 || "white";
             var logo = themeData.logo_url || themeData.data?.logo_url || "";
             var title = themeData.title || themeData.data?.title || window.__INITIAL_BOT_NAME__ || "Chat";
 
@@ -995,10 +995,10 @@
                 .then(function(config) {
                     if (!config) return;
 
-                    // Apply colors from config
-                    var color1 = config["theme-color1"] || config["Theme Color"] || "#3b82f6";
-                    var color2 = config["theme-color2"] || "#f5deb3";
-                    var title = config["theme-title"] || botName;
+                    // Apply colors from config (API returns snake_case)
+                    var color1 = config.theme_color1 || config["theme-color1"] || config["Theme Color"] || "#3b82f6";
+                    var color2 = config.theme_color2 || config["theme-color2"] || "#f5deb3";
+                    var title = config.theme_title || config["theme-title"] || botName;
 
                     // Set CSS variables for colors on document element
                     document.documentElement.style.setProperty("--chat-color1", color1);
