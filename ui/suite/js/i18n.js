@@ -126,6 +126,10 @@
   function t(key, params) {
     let text = translations[key] || MINIMAL_FALLBACK[key] || key;
 
+    if (!translations[key] && !MINIMAL_FALLBACK[key]) {
+      console.warn(`i18n: Missing translation key: ${key}`);
+    }
+
     if (params && typeof params === "object") {
       Object.keys(params).forEach((param) => {
         text = text.replace(
