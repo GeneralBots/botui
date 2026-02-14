@@ -70,6 +70,7 @@
 
   async function fetchTranslations(locale) {
     try {
+      console.log(`i18n: Fetching translations for locale: ${locale}`);
       const response = await fetch(`/api/i18n/${locale}`, {
         headers: { Accept: "application/json" },
       });
@@ -79,9 +80,10 @@
       }
 
       const result = await response.json();
+      console.log(`i18n: Loaded ${Object.keys(result.translations || {}).length} translations for ${locale}`);
       return result.translations || {};
     } catch (e) {
-      console.warn(`i18n: Failed to fetch translations for ${locale}`, e);
+      console.error(`i18n: Failed to fetch translations for ${locale}`, e);
       return null;
     }
   }
@@ -232,14 +234,18 @@
   }
 
   async function init() {
+    console.log("i18n: Initialization started");
     if (isInitialized) {
+      console.log("i18n: Already initialized, skipping");
       return;
     }
 
     const locale = detectBrowserLocale();
+    console.log(`i18n: Detected locale: ${locale}`);
     await loadTranslations(locale);
 
     isInitialized = true;
+    console.log(`i18n: Initialization complete, current locale: ${currentLocale}`);
 
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", () => {
