@@ -3,7 +3,11 @@
 
   const DEFAULT_LOCALE = "en";
   const STORAGE_KEY = "gb-locale";
+  const CACHE_VERSION = "v1";
   const CACHE_TTL_MS = 3600000;
+
+  // IMPORTANT: Increment CACHE_VERSION when translation structure changes
+  // to invalidate all user caches and force fresh API fetches
 
   const MINIMAL_FALLBACK = {
     "label-loading": "Loading...",
@@ -36,7 +40,7 @@
   }
 
   function getCacheKey(locale) {
-    return `gb-i18n-cache-${locale}`;
+    return `gb-i18n-cache-${locale}}-${CACHE_VERSION}`;
   }
 
   function getCachedTranslations(locale) {
@@ -288,6 +292,7 @@
         localStorage.removeItem(key);
       }
     });
+    console.log("i18n: Cleared all translation caches");
   }
 
   window.i18n = {
