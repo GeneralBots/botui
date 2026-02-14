@@ -44,7 +44,9 @@
       const cached = localStorage.getItem(getCacheKey(locale));
       if (cached) {
         const { data, timestamp } = JSON.parse(cached);
-        if (Date.now() - timestamp < CACHE_TTL_MS) {
+        const age = Date.now() - timestamp;
+        console.log(`i18n: Cache check for ${locale}: age=${Math.round(age/1000)}s, valid=${age < CACHE_TTL_MS}, keys=${Object.keys(data || {}).length}`);
+        if (age < CACHE_TTL_MS) {
           return data;
         }
       }
@@ -89,13 +91,16 @@
   }
 
   async function loadTranslations(locale) {
+    console.log(`i18n: loadTranslations called for locale: ${locale}`);
     const cached = getCachedTranslations(locale);
     if (cached) {
+      console.log(`i18n: Using cached translations for ${locale}`);
       translations = cached;
       currentLocale = locale;
       return true;
     }
 
+    console.log(`i18n: Cache miss, fetching from API for ${locale}`);
     const fetched = await fetchTranslations(locale);
     if (fetched && Object.keys(fetched).length > 0) {
       translations = fetched;
@@ -109,6 +114,7 @@
       return loadTranslations(DEFAULT_LOCALE);
     }
 
+    console.warn(`i18n: No translations found, using minimal fallback`);
     translations = MINIMAL_FALLBACK;
     return false;
   }
