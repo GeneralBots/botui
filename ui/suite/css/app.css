@@ -1096,6 +1096,10 @@ body {
 /* Theme logo image - when src is set, show as image */
 .logo-icon.logo-icon-img[src:not=""]] {
     display: block;
+    width: auto;
+    height: 40px;
+    object-fit: contain;
+    filter: none;
 }
 
 /* Hide SVG when logo image is shown */

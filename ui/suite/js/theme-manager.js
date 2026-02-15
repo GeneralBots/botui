@@ -75,11 +75,25 @@ const ThemeManager = (() => {
     const link = document.createElement("link");
     link.id = "theme-css";
     link.rel = "stylesheet";
-    link.href = `/public/themes/${theme.file}`;
+    link.href = `/suite/public/themes/${theme.file}`;
     link.onload = () => {
       console.log("✓ Theme loaded:", theme.name);
       currentThemeId = id;
       localStorage.setItem("gb-theme", id);
+
+      // Get the theme's primary color from CSS variables
+      const rootStyle = getComputedStyle(document.documentElement);
+      const primaryColor = rootStyle.getPropertyValue("--primary")?.trim() || "#3b82f6";
+      const cardColor = rootStyle.getPropertyValue("--card")?.trim() || "#fafafa";
+
+      // Update chat-specific CSS variables to match the theme
+      document.documentElement.style.setProperty("--chat-color1", primaryColor);
+      document.documentElement.style.setProperty("--chat-color2", cardColor);
+      document.documentElement.style.setProperty("--suggestion-color", primaryColor);
+      document.documentElement.style.setProperty("--suggestion-bg", cardColor);
+
+      console.log("✓ Chat colors updated to match theme:", { primary: primaryColor, card: cardColor });
+
       updateDropdown();
       subscribers.forEach((cb) => cb({ themeId: id, themeName: theme.name }));
     };

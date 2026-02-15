@@ -31,15 +31,6 @@
                 autocomplete="off"
             />
             <button
-                type="button"
-                id="voiceBtn"
-                title="Voice"
-                data-i18n-title="chat-voice"
-                style="display: none"
-            >
-                🎤
-            </button>
-            <button
                 type="submit"
                 id="sendBtn"
                 title="Send"
@@ -166,6 +157,7 @@
         var currentStreamingContent = "";
         var reconnectAttempts = 0;
         var maxReconnectAttempts = 5;
+        var disconnectNotified = false;
         var isUserScrolling = false;
 
         var mentionState = {
@@ -898,6 +890,7 @@
             ws.onopen = function () {
                 console.log("WebSocket connected");
                 reconnectAttempts = 0;
+                disconnectNotified = false;
                 updateConnectionStatus("connected");
             };
 
@@ -944,7 +937,10 @@
 
             ws.onclose = function () {
                 updateConnectionStatus("disconnected");
-                notify("Disconnected from chat server", "error");
+                if (!disconnectNotified) {
+                    notify("Disconnected from chat server", "error");
+                    disconnectNotified = true;
+                }
                 if (reconnectAttempts < maxReconnectAttempts) {
                     reconnectAttempts++;
                     updateConnectionStatus("connecting");
@@ -995,22 +991,44 @@
                 .then(function(config) {
                     if (!config) return;
 
+                    // Check if user has explicitly selected a theme (not the default)
+                    var userTheme = localStorage.getItem("gb-theme");
+                    var useThemeColors = userTheme && userTheme !== "default" && userTheme !== "light";
+
                     // Apply colors from config (API returns snake_case)
                     var color1 = config.theme_color1 || config["theme-color1"] || config["Theme Color"] || "#3b82f6";
                     var color2 = config.theme_color2 || config["theme-color2"] || "#f5deb3";
                     var title = config.theme_title || config["theme-title"] || botName;
+                    var logo = config.theme_logo || config["theme-logo"] || "";
 
-                    // Set CSS variables for colors on document element
-                    document.documentElement.style.setProperty("--chat-color1", color1);
-                    document.documentElement.style.setProperty("--chat-color2", color2);
-                    document.documentElement.style.setProperty("--suggestion-color", color1);
-                    document.documentElement.style.setProperty("--suggestion-bg", color2);
-                    document.documentElement.style.setProperty("--color1", color1);
-                    document.documentElement.style.setProperty("--color2", color2);
-                    document.documentElement.style.setProperty("--primary", color1);
-                    document.documentElement.style.setProperty("--accent", color1);
+                    // Only set bot config colors if user hasn't selected a custom theme
+                    if (!useThemeColors) {
+                        document.documentElement.style.setProperty("--chat-color1", color1);
+                        document.documentElement.style.setProperty("--chat-color2", color2);
+                        document.documentElement.style.setProperty("--suggestion-color", color1);
+                        document.documentElement.style.setProperty("--suggestion-bg", color2);
+                        document.documentElement.style.setProperty("--color1", color1);
+                        document.documentElement.style.setProperty("--color2", color2);
+                        document.documentElement.style.setProperty("--primary", color1);
+                        document.documentElement.style.setProperty("--accent", color1);
+                    }
 
-                    console.log("Bot config loaded:", { color1: color1, color2: color2, title: title });
+                    // Update logo if provided
+                    if (logo) {
+                        var logoImg = document.querySelector(".logo-icon-img");
+                        if (logoImg) {
+                            logoImg.src = logo;
+                            logoImg.alt = title || botName;
+                            logoImg.style.display = "block";
+                        }
+                        // Hide the SVG logo when image logo is used
+                        var logoSvg = document.querySelector(".logo-icon-svg");
+                        if (logoSvg) {
+                            logoSvg.style.display = "none";
+                        }
+                    }
+
+                    console.log("Bot config loaded:", { color1: color1, color2: color2, title: title, logo: logo });
                 })
                 .catch(function(e) {
                     console.log("Could not load bot config:", e);
