@@ -68,6 +68,8 @@ const ThemeManager = (() => {
     if (!theme.file) {
       currentThemeId = "default";
       localStorage.setItem("gb-theme", "default");
+      // Re-enable sentient theme for default
+      document.documentElement.setAttribute("data-theme", "sentient");
       updateDropdown();
       return;
     }
@@ -81,24 +83,83 @@ const ThemeManager = (() => {
       currentThemeId = id;
       localStorage.setItem("gb-theme", id);
 
+      // Keep data-theme="sentient" on html so CSS selectors work
+      // The inline styles will override the colors
+      if (!document.documentElement.getAttribute("data-theme")) {
+        document.documentElement.setAttribute("data-theme", "sentient");
+      }
+
+      // Remove data-theme from body to prevent base.css theme rules from overriding
+      document.body.removeAttribute("data-theme");
+
       // Small delay to ensure CSS variables are applied
       setTimeout(() => {
-        // Get the theme's primary color from CSS variables
+        // Get the theme's colors from CSS variables
         const rootStyle = getComputedStyle(document.documentElement);
-        const primaryColor = rootStyle.getPropertyValue("--primary")?.trim() || "#3b82f6";
-        const cardColor = rootStyle.getPropertyValue("--card")?.trim() || "#fafafa";
+        const primary = rootStyle.getPropertyValue("--primary")?.trim() || "#3b82f6";
+        const background = rootStyle.getPropertyValue("--background")?.trim() || "0 0% 100%";
+        const foreground = rootStyle.getPropertyValue("--foreground")?.trim() || "222 47% 11%";
+        const card = rootStyle.getPropertyValue("--card")?.trim() || "0 0% 98%";
+        const border = rootStyle.getPropertyValue("--border")?.trim() || "214 32% 91%";
+
+        // Convert HSL values to hex format for app compatibility
+        const hslToHex = (h, s, l) => {
+          l /= 100;
+          const a = s * Math.min(l, 1 - l) / 100;
+          const f = n => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');
+          };
+          return `#${f(0)}${f(8)}${f(4)}`;
+        };
+
+        const parseHsl = (hslStr) => {
+          const match = hslStr.match(/(\d+)\s+(\d+)%\s+(\d+)%/);
+          if (match) {
+            return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
+          }
+          return null;
+        };
+
+        const bgHsl = parseHsl(background);
+        const fgHsl = parseHsl(foreground);
+        const cardHsl = parseHsl(card);
+        const borderHsl = parseHsl(border);
+
+        // Update the app's CSS variables with the theme colors
+        // These inline styles override the theme-sentient.css values
+        if (bgHsl) {
+          const bgHex = hslToHex(...bgHsl);
+          document.documentElement.style.setProperty("--bg", bgHex);
+          document.documentElement.style.setProperty("--primary-bg", `hsl(${background})`);
+          document.documentElement.style.setProperty("--header-bg", bgHex);
+        }
+        if (fgHsl) {
+          const textHex = hslToHex(...fgHsl);
+          document.documentElement.style.setProperty("--text", textHex);
+          document.documentElement.style.setProperty("--primary-fg", `hsl(${foreground})`);
+        }
+        if (cardHsl) {
+          const surfaceHex = hslToHex(...cardHsl);
+          document.documentElement.style.setProperty("--surface", surfaceHex);
+          document.documentElement.style.setProperty("--card-bg", surfaceHex);
+        }
+        if (borderHsl) {
+          const borderHex = hslToHex(...borderHsl);
+          document.documentElement.style.setProperty("--border", borderHex);
+        }
 
         // Update ALL color-related CSS variables to match the theme
         // This overrides any bot config colors
-        document.documentElement.style.setProperty("--chat-color1", primaryColor);
-        document.documentElement.style.setProperty("--chat-color2", cardColor);
-        document.documentElement.style.setProperty("--suggestion-color", primaryColor);
-        document.documentElement.style.setProperty("--suggestion-bg", cardColor);
-        document.documentElement.style.setProperty("--color1", primaryColor);
-        document.documentElement.style.setProperty("--color2", cardColor);
+        document.documentElement.style.setProperty("--chat-color1", `hsl(${primary})`);
+        document.documentElement.style.setProperty("--chat-color2", `hsl(${card})`);
+        document.documentElement.style.setProperty("--suggestion-color", `hsl(${primary})`);
+        document.documentElement.style.setProperty("--suggestion-bg", `hsl(${card})`);
+        document.documentElement.style.setProperty("--color1", `hsl(${primary})`);
+        document.documentElement.style.setProperty("--color2", `hsl(${card})`);
 
-        console.log("✓ Chat colors updated to match theme:", { primary: primaryColor, card: cardColor });
-
+        console.log("✓ Theme colors applied:", { bg: background, primary: primary });
         updateDropdown();
         subscribers.forEach((cb) => cb({ themeId: id, themeName: theme.name }));
       }, 50);
@@ -128,6 +189,11 @@ const ThemeManager = (() => {
   }
 
   function init() {
+    // Ensure data-theme is set on html element so CSS selectors work
+    if (!document.documentElement.getAttribute("data-theme")) {
+      document.documentElement.setAttribute("data-theme", "sentient");
+    }
+
     // First, load saved bot theme from config.csv (if available)
     loadSavedTheme();
 
