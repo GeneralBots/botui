@@ -7,7 +7,7 @@ const ThemeManager = (() => {
   const botThemeMap = {
     // Default bot uses light theme with brown accents
     "default": "light",
-    // Cristo bot uses mellowgold theme with earth tones
+    // Cristo bot uses mellowgold theme with earth tones (perfect for sanctuary/church)
     "cristo": "mellowgold",
     // Salesianos bot uses light theme with blue accents
     "salesianos": "light",
@@ -81,21 +81,27 @@ const ThemeManager = (() => {
       currentThemeId = id;
       localStorage.setItem("gb-theme", id);
 
-      // Get the theme's primary color from CSS variables
-      const rootStyle = getComputedStyle(document.documentElement);
-      const primaryColor = rootStyle.getPropertyValue("--primary")?.trim() || "#3b82f6";
-      const cardColor = rootStyle.getPropertyValue("--card")?.trim() || "#fafafa";
+      // Small delay to ensure CSS variables are applied
+      setTimeout(() => {
+        // Get the theme's primary color from CSS variables
+        const rootStyle = getComputedStyle(document.documentElement);
+        const primaryColor = rootStyle.getPropertyValue("--primary")?.trim() || "#3b82f6";
+        const cardColor = rootStyle.getPropertyValue("--card")?.trim() || "#fafafa";
 
-      // Update chat-specific CSS variables to match the theme
-      document.documentElement.style.setProperty("--chat-color1", primaryColor);
-      document.documentElement.style.setProperty("--chat-color2", cardColor);
-      document.documentElement.style.setProperty("--suggestion-color", primaryColor);
-      document.documentElement.style.setProperty("--suggestion-bg", cardColor);
+        // Update ALL color-related CSS variables to match the theme
+        // This overrides any bot config colors
+        document.documentElement.style.setProperty("--chat-color1", primaryColor);
+        document.documentElement.style.setProperty("--chat-color2", cardColor);
+        document.documentElement.style.setProperty("--suggestion-color", primaryColor);
+        document.documentElement.style.setProperty("--suggestion-bg", cardColor);
+        document.documentElement.style.setProperty("--color1", primaryColor);
+        document.documentElement.style.setProperty("--color2", cardColor);
 
-      console.log("✓ Chat colors updated to match theme:", { primary: primaryColor, card: cardColor });
+        console.log("✓ Chat colors updated to match theme:", { primary: primaryColor, card: cardColor });
 
-      updateDropdown();
-      subscribers.forEach((cb) => cb({ themeId: id, themeName: theme.name }));
+        updateDropdown();
+        subscribers.forEach((cb) => cb({ themeId: id, themeName: theme.name }));
+      }, 50);
     };
     link.onerror = () => console.error("✗ Failed:", theme.name);
     document.head.appendChild(link);

@@ -991,9 +991,26 @@
                 .then(function(config) {
                     if (!config) return;
 
-                    // Check if user has explicitly selected a theme (not the default)
-                    var userTheme = localStorage.getItem("gb-theme");
-                    var useThemeColors = userTheme && userTheme !== "default" && userTheme !== "light";
+                    // Get the theme manager's theme for this bot to check if user selected a different theme
+                    var botId = botName.toLowerCase();
+                    var botTheme = window.ThemeManager ? (
+                        // Get bot-specific theme from theme manager's mapping
+                        (window.ThemeManager.getAvailableThemes &&
+                         window.ThemeManager.getAvailableThemes().find(t => t.id === botId)) ||
+                        // Fallback to localStorage
+                        localStorage.getItem("gb-theme")
+                    ) : localStorage.getItem("gb-theme");
+
+                    // Check if bot config has a theme-base setting
+                    var configThemeBase = config.theme_base || config["theme-base"] || "light";
+
+                    // Only use bot config colors if:
+                    // 1. No theme has been explicitly selected by user (localStorage empty or default)
+                    // 2. AND the bot config's theme-base matches the current theme
+                    var localStorageTheme = localStorage.getItem("gb-theme");
+                    var useBotConfigColors = !localStorageTheme ||
+                                             localStorageTheme === "default" ||
+                                             localStorageTheme === configThemeBase;
 
                     // Apply colors from config (API returns snake_case)
                     var color1 = config.theme_color1 || config["theme-color1"] || config["Theme Color"] || "#3b82f6";
@@ -1001,8 +1018,8 @@
                     var title = config.theme_title || config["theme-title"] || botName;
                     var logo = config.theme_logo || config["theme-logo"] || "";
 
-                    // Only set bot config colors if user hasn't selected a custom theme
-                    if (!useThemeColors) {
+                    // Only set bot config colors if user hasn't selected a different theme
+                    if (useBotConfigColors) {
                         document.documentElement.style.setProperty("--chat-color1", color1);
                         document.documentElement.style.setProperty("--chat-color2", color2);
                         document.documentElement.style.setProperty("--suggestion-color", color1);
@@ -1011,6 +1028,9 @@
                         document.documentElement.style.setProperty("--color2", color2);
                         document.documentElement.style.setProperty("--primary", color1);
                         document.documentElement.style.setProperty("--accent", color1);
+                        console.log("Bot config colors applied:", {color1: color1, color2: color2});
+                    } else {
+                        console.log("Bot config colors skipped - user selected custom theme:", localStorageTheme);
                     }
 
                     // Update logo if provided

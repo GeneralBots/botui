@@ -1286,6 +1286,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (settingsBtn) settingsBtn.style.display = "";
     if (appsButton) appsButton.style.display = "";
     if (notificationsBtn) notificationsBtn.style.display = "";
+
+    // Show omnibox (search bar) when signed in
+    const omnibox = document.getElementById("omnibox");
+    if (omnibox) omnibox.style.display = "";
+
+    // Show Drive, Tasks, CRM, and Calendar navigation when signed in (all instances)
+    const driveTabs = document.querySelectorAll('[data-section="drive"]');
+    const tasksTabs = document.querySelectorAll('[data-section="tasks"]');
+    const crmTabs = document.querySelectorAll('[data-section="crm"]');
+    const calendarTabs = document.querySelectorAll('[data-section="calendar"]');
+
+    driveTabs.forEach(tab => tab.style.display = "");
+    tasksTabs.forEach(tab => tab.style.display = "");
+    crmTabs.forEach(tab => tab.style.display = "");
+    calendarTabs.forEach(tab => tab.style.display = "");
   }
 
   function loadUserProfile() {
@@ -1360,6 +1375,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (settingsBtn) settingsBtn.style.display = "none";
     if (appsButton) appsButton.style.display = "none";
     if (notificationsBtn) notificationsBtn.style.display = "none";
+
+    // Hide omnibox (search bar) when signed out
+    const omnibox = document.getElementById("omnibox");
+    if (omnibox) omnibox.style.display = "none";
+
+    // Hide Drive, Tasks, CRM, and Calendar navigation when signed out (all instances)
+    const driveTabs = document.querySelectorAll('[data-section="drive"]');
+    const tasksTabs = document.querySelectorAll('[data-section="tasks"]');
+    const crmTabs = document.querySelectorAll('[data-section="crm"]');
+    const calendarTabs = document.querySelectorAll('[data-section="calendar"]');
+
+    driveTabs.forEach(tab => tab.style.display = "none");
+    tasksTabs.forEach(tab => tab.style.display = "none");
+    crmTabs.forEach(tab => tab.style.display = "none");
+    calendarTabs.forEach(tab => tab.style.display = "none");
   }
 
   // Try to load cached user first
