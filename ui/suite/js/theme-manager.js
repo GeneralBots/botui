@@ -7,8 +7,8 @@ const ThemeManager = (() => {
   const botThemeMap = {
     // Default bot uses light theme with brown accents
     "default": "light",
-    // Cristo bot uses mellowgold theme with earth tones (perfect for sanctuary/church)
-    "cristo": "mellowgold",
+    // Cristo bot uses typewriter theme (classic typewriter style)
+    "cristo": "typewriter",
     // Salesianos bot uses light theme with blue accents
     "salesianos": "light",
   };

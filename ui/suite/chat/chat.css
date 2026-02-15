@@ -549,18 +549,18 @@ footer {
 
 .suggestion-chip,
 .suggestion-button {
-    padding: 10px 18px;
-    border-radius: 24px;
+    padding: 6px 12px;
+    border-radius: 20px;
     border: 2px solid var(--chat-color1, var(--suggestion-color, #4a9eff));
     background: var(--chat-color2, rgba(255, 255, 255, 0.15));
     color: var(--chat-color1, #ffffff);
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    min-height: 40px;
+    min-height: 30px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
