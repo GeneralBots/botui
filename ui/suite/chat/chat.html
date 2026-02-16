@@ -794,8 +794,9 @@
                                 console.log("Parsed action:", action);
 
                                 if (action.type === "invoke_tool") {
-                                    // Send the tool name as text - the backend will handle tool invocation
-                                    window.sendMessage(action.tool);
+                                    // Send the display text so it shows correctly in chat
+                                    // The backend will recognize this as a tool request
+                                    window.sendMessage(sugg.text);
                                 } else if (action.type === "send_message") {
                                     window.sendMessage(action.message || sugg.text);
                                 } else if (action.type === "select_context") {
