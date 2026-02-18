@@ -169,8 +169,7 @@ const ThemeManager = (() => {
   }
 
   function updateDropdown() {
-    const dd = document.getElementById("themeDropdown");
-    if (dd) dd.value = currentThemeId;
+    // Dropdown removed
   }
 
   function createDropdown() {
@@ -211,8 +210,9 @@ const ThemeManager = (() => {
     currentThemeId = saved;
     loadTheme(saved);
 
-    const container = document.getElementById("themeSelectorContainer");
-    if (container) container.appendChild(createDropdown());
+    // Dropdown injection removed
+    // const container = document.getElementById("themeSelectorContainer");
+    // if (container) container.appendChild(createDropdown());
 
     console.log("✓ Theme Manager initialized");
   }
