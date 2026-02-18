@@ -771,9 +771,7 @@
 <body>
     <div class="connection-status connecting" id="connectionStatus"></div>
     <div class="flash-overlay" id="flashOverlay"></div>
-    <div class="float-menu">
-        <div class="float-logo" id="floatLogo" title="Menu"></div>
-    </div>
+
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo"></div>
@@ -846,7 +844,6 @@
             document.getElementById("connectionStatus"),
             flashOverlay = document.getElementById("flashOverlay"),
             suggestionsContainer = document.getElementById("suggestions"),
-            floatLogo = document.getElementById("floatLogo"),
             sidebar = document.getElementById("sidebar"),
 
             scrollToBottomBtn = document.getElementById("scrollToBottom"),
@@ -858,7 +855,7 @@
             sidebarTitle = document.getElementById("sidebarTitle");
         marked.setOptions({ breaks: true, gfm: true });
 
-        floatLogo.addEventListener("click", toggleSidebar);
+
 
         function toggleSidebar() {
             sidebar.classList.toggle("open");
@@ -927,8 +924,7 @@
         document.addEventListener("click", function (e) {
             if (
                 sidebar.classList.contains("open") &&
-                !sidebar.contains(e.target) &&
-                !floatLogo.contains(e.target)
+                !sidebar.contains(e.target)
             ) {
                 sidebar.classList.remove("open");
             }
