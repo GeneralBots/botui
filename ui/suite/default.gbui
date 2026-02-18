@@ -51,10 +51,7 @@
             <!-- Right: Theme selector, Apps menu and user avatar -->
             <div class="header-right">
                 <!-- Theme dropdown selector -->
-                <div
-                    id="themeSelectorContainer"
-                    aria-label="Theme selector"
-                ></div>
+
 
                 <!-- Apps menu button -->
                 <button
