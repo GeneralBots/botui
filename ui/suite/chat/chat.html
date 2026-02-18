@@ -14,34 +14,21 @@
         <div class="suggestions-container" id="suggestions"></div>
         <div class="mention-dropdown" id="mentionDropdown">
             <div class="mention-header">
-                <span class="mention-title" data-i18n="chat-mention-title"
-                    >Reference Entity</span
-                >
+                <span class="mention-title" data-i18n="chat-mention-title">Reference Entity</span>
             </div>
             <div class="mention-results" id="mentionResults"></div>
         </div>
         <form class="input-container" id="chatForm">
-            <input
-                name="content"
-                id="messageInput"
-                type="text"
-                placeholder="Message... (type @ to mention)"
-                data-i18n-placeholder="chat-placeholder"
-                autofocus
-                autocomplete="off"
-            />
-            <button
-                type="submit"
-                id="sendBtn"
-                title="Send"
-                data-i18n-title="chat-send"
-            >
+            <input name="content" id="messageInput" type="text" placeholder="Message... (type @ to mention)"
+                data-i18n-placeholder="chat-placeholder" autofocus autocomplete="off" />
+            <button type="submit" id="sendBtn" title="Send" data-i18n-title="chat-send">
                 ↑
             </button>
         </form>
     </footer>
     <button class="scroll-to-bottom" id="scrollToBottom" title="Scroll to bottom">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
     </button>
@@ -55,11 +42,7 @@
     <div class="entity-card-title"></div>
     <div class="entity-card-details"></div>
     <div class="entity-card-actions">
-        <button
-            class="entity-card-btn"
-            data-action="view"
-            data-i18n="action-view"
-        >
+        <button class="entity-card-btn" data-action="view" data-i18n="action-view">
             View
         </button>
     </div>
@@ -372,9 +355,9 @@
         function fetchEntityDetails(type, name) {
             return fetch(
                 "/api/search/entity?type=" +
-                    encodeURIComponent(type) +
-                    "&name=" +
-                    encodeURIComponent(name),
+                encodeURIComponent(type) +
+                "&name=" +
+                encodeURIComponent(name),
             )
                 .then(function (r) {
                     return r.json();
@@ -460,9 +443,9 @@
         function fetchEntitiesOfType(type, searchTerm) {
             fetch(
                 "/api/search/entities?type=" +
-                    encodeURIComponent(type) +
-                    "&q=" +
-                    encodeURIComponent(searchTerm || ""),
+                encodeURIComponent(type) +
+                "&q=" +
+                encodeURIComponent(searchTerm || ""),
             )
                 .then(function (r) {
                     return r.json();
@@ -522,8 +505,8 @@
 
                     var subtitle = item.subtitle
                         ? '<span class="mention-item-subtitle">' +
-                          escapeHtml(item.subtitle) +
-                          "</span>"
+                        escapeHtml(item.subtitle) +
+                        "</span>"
                         : "";
                     var hint = item.isTypeHint
                         ? '<span class="mention-item-hint">Type : to search</span>'
@@ -737,7 +720,9 @@
                 if (isStreaming) {
                     finalizeStreaming();
                 } else {
-                    addMessage("bot", data.content);
+                    if (data.content && data.content.trim() !== "") {
+                        addMessage("bot", data.content);
+                    }
                 }
                 isStreaming = false;
 
@@ -781,8 +766,8 @@
                 chip.textContent = suggestion.text || "Suggestion";
 
                 // Use window.sendMessage which is already exposed
-                chip.onclick = (function(sugg) {
-                    return function() {
+                chip.onclick = (function (sugg) {
+                    return function () {
                         console.log("Suggestion clicked:", sugg);
                         // Check if there's an action to parse
                         if (sugg.action) {
@@ -861,7 +846,7 @@
         window.sendMessage = sendMessage;
 
         // Expose session info for suggestion clicks
-        window.getChatSessionInfo = function() {
+        window.getChatSessionInfo = function () {
             return {
                 ws: ws,
                 currentBotId: currentBotId,
@@ -986,10 +971,10 @@
             var botName = window.__INITIAL_BOT_NAME__ || "default";
 
             fetch("/api/bot/config?bot_name=" + encodeURIComponent(botName))
-                .then(function(response) {
+                .then(function (response) {
                     return response.json();
                 })
-                .then(function(config) {
+                .then(function (config) {
                     if (!config) return;
 
                     // Get the theme manager's theme for this bot to check if user selected a different theme
@@ -997,7 +982,7 @@
                     var botTheme = window.ThemeManager ? (
                         // Get bot-specific theme from theme manager's mapping
                         (window.ThemeManager.getAvailableThemes &&
-                         window.ThemeManager.getAvailableThemes().find(t => t.id === botId)) ||
+                            window.ThemeManager.getAvailableThemes().find(t => t.id === botId)) ||
                         // Fallback to localStorage
                         localStorage.getItem("gb-theme")
                     ) : localStorage.getItem("gb-theme");
@@ -1010,8 +995,8 @@
                     // 2. AND the bot config's theme-base matches the current theme
                     var localStorageTheme = localStorage.getItem("gb-theme");
                     var useBotConfigColors = !localStorageTheme ||
-                                             localStorageTheme === "default" ||
-                                             localStorageTheme === configThemeBase;
+                        localStorageTheme === "default" ||
+                        localStorageTheme === configThemeBase;
 
                     // Apply colors from config (API returns snake_case)
                     var color1 = config.theme_color1 || config["theme-color1"] || config["Theme Color"] || "#3b82f6";
@@ -1029,7 +1014,7 @@
                         document.documentElement.style.setProperty("--color2", color2);
                         document.documentElement.style.setProperty("--primary", color1);
                         document.documentElement.style.setProperty("--accent", color1);
-                        console.log("Bot config colors applied:", {color1: color1, color2: color2});
+                        console.log("Bot config colors applied:", { color1: color1, color2: color2 });
                     } else {
                         console.log("Bot config colors skipped - user selected custom theme:", localStorageTheme);
                     }
@@ -1051,7 +1036,7 @@
 
                     console.log("Bot config loaded:", { color1: color1, color2: color2, title: title, logo: logo });
                 })
-                .catch(function(e) {
+                .catch(function (e) {
                     console.log("Could not load bot config:", e);
                 });
         }
