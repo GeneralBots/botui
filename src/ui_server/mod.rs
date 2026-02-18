@@ -289,7 +289,7 @@ pub async fn serve_minimal() -> impl IntoResponse {
     };
 
     match html_res {
-        Ok(html) => (StatusCode::OK, [("content-type", "text/html")], Html(html)),
+        Ok(html) => (StatusCode::OK, [("content-type", "text/html; charset=utf-8")], Html(html)),
         Err(e) => {
             error!("Failed to load minimal UI: {e}");
             (
@@ -530,7 +530,7 @@ pub async fn serve_suite(bot_name: Option<String>) -> impl IntoResponse {
                 html = remove_section(&html, "settings");
             }
 
-            (StatusCode::OK, [("content-type", "text/html")], Html(html))
+            (StatusCode::OK, [("content-type", "text/html; charset=utf-8")], Html(html))
         }
         Err(e) => {
             error!("Failed to load suite UI: {e}");
