@@ -73,6 +73,7 @@
         opacity: 0;
         transform: translateX(20px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -97,11 +98,13 @@
 /* Connection Status - use shared styles from app.css */
 
 @keyframes pulse {
+
     0%,
     100% {
         opacity: 1;
         transform: scale(1);
     }
+
     50% {
         opacity: 0.5;
         transform: scale(1.2);
@@ -216,6 +219,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -551,9 +555,9 @@ footer {
 .suggestion-button {
     padding: 6px 12px;
     border-radius: 20px;
-    border: 2px solid var(--chat-color1, var(--suggestion-color, #4a9eff));
-    background: var(--chat-color2, rgba(255, 255, 255, 0.15));
-    color: var(--chat-color1, #ffffff);
+    border: 2px solid var(--chat-color2, #002147);
+    background: var(--chat-color2, #002147);
+    color: #ffffff;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -615,8 +619,8 @@ form.input-container {
 }
 
 .input-container:focus-within {
-    border-color: var(--accent, var(--accent-color, #3b82f6));
-    box-shadow: 0 0 0 3px var(--accent-glow, rgba(59, 130, 246, 0.1));
+    border-color: var(--chat-color1, var(--accent, #3b82f6));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--chat-color1, var(--accent, #3b82f6)) 20%, transparent);
 }
 
 #messageInput {
@@ -637,10 +641,14 @@ form.input-container {
 }
 
 @keyframes cursor-blink {
-    0%, 50% {
+
+    0%,
+    50% {
         caret-color: var(--accent, #3b82f6);
     }
-    51%, 100% {
+
+    51%,
+    100% {
         caret-color: transparent;
     }
 }
@@ -673,7 +681,7 @@ form.input-container {
 }
 
 #sendBtn {
-    background: var(--accent, var(--accent-color, #3b82f6));
+    background: var(--chat-color1, var(--accent, #3b82f6));
 }
 
 #voiceBtn {
@@ -689,7 +697,7 @@ form.input-container {
 }
 
 #sendBtn:hover {
-    background: var(--accent-hover, var(--accent, #2563eb));
+    background: var(--chat-color1, var(--accent-hover, #2563eb));
 }
 
 #voiceBtn:active,
@@ -700,8 +708,8 @@ form.input-container {
 /* Dark/Sentient theme overrides */
 [data-theme="dark"] #sendBtn,
 [data-theme="sentient"] #sendBtn {
-    background: var(--accent, #d4f505);
-    color: #000000;
+    background: var(--chat-color1, #d4f505);
+    color: #ffffff;
 }
 
 [data-theme="dark"] #voiceBtn,
@@ -784,6 +792,7 @@ form.input-container {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -1271,10 +1280,14 @@ form.input-container {
 }
 
 @keyframes thinkingBounce {
-    0%, 80%, 100% {
+
+    0%,
+    80%,
+    100% {
         transform: scale(0.8);
         opacity: 0.5;
     }
+
     40% {
         transform: scale(1);
         opacity: 1;
@@ -1331,6 +1344,7 @@ form.input-container {
         opacity: 0;
         transform: translateY(20px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -1396,9 +1410,12 @@ form.input-container {
 }
 
 @keyframes bounce {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateX(-50%) translateY(0);
     }
+
     50% {
         transform: translateX(-50%) translateY(-5px);
     }
@@ -1432,9 +1449,13 @@ form.input-container {
 }
 
 @keyframes typing {
-    0%, 60%, 100% {
+
+    0%,
+    60%,
+    100% {
         transform: translateY(0);
     }
+
     30% {
         transform: translateY(-8px);
     }

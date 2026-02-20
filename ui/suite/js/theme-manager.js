@@ -67,7 +67,8 @@ const ThemeManager = (() => {
 
     if (!theme.file) {
       currentThemeId = "default";
-      localStorage.setItem("gb-theme", "default");
+      const botId = getCurrentBotId();
+      localStorage.setItem(`gb-theme-${botId}`, "default");
       // Re-enable sentient theme for default
       document.documentElement.setAttribute("data-theme", "sentient");
       updateDropdown();
@@ -81,7 +82,8 @@ const ThemeManager = (() => {
     link.onload = () => {
       console.log("✓ Theme loaded:", theme.name);
       currentThemeId = id;
-      localStorage.setItem("gb-theme", id);
+      const botId = getCurrentBotId();
+      localStorage.setItem(`gb-theme-${botId}`, id);
 
       // Keep data-theme="sentient" on html so CSS selectors work
       // The inline styles will override the colors
@@ -150,14 +152,16 @@ const ThemeManager = (() => {
           document.documentElement.style.setProperty("--border", borderHex);
         }
 
-        // Update ALL color-related CSS variables to match the theme
-        // This overrides any bot config colors
-        document.documentElement.style.setProperty("--chat-color1", `hsl(${primary})`);
-        document.documentElement.style.setProperty("--chat-color2", `hsl(${card})`);
-        document.documentElement.style.setProperty("--suggestion-color", `hsl(${primary})`);
-        document.documentElement.style.setProperty("--suggestion-bg", `hsl(${card})`);
-        document.documentElement.style.setProperty("--color1", `hsl(${primary})`);
-        document.documentElement.style.setProperty("--color2", `hsl(${card})`);
+        // Check if config.csv already set the primary color, we shouldn't wipe it
+        // Only update color and suggestion variables if they aren't marked as bot-config
+        if (document.documentElement.getAttribute("data-has-bot-colors") !== "true") {
+          document.documentElement.style.setProperty("--chat-color1", `hsl(${primary})`);
+          document.documentElement.style.setProperty("--chat-color2", `hsl(${card})`);
+          document.documentElement.style.setProperty("--suggestion-color", `hsl(${primary})`);
+          document.documentElement.style.setProperty("--suggestion-bg", `hsl(${card})`);
+          document.documentElement.style.setProperty("--color1", `hsl(${primary})`);
+          document.documentElement.style.setProperty("--color2", `hsl(${card})`);
+        }
 
         console.log("✓ Theme colors applied:", { bg: background, primary: primary });
         updateDropdown();
@@ -198,13 +202,13 @@ const ThemeManager = (() => {
 
     // Then load the UI theme (CSS theme)
     // Priority: 1) localStorage user preference, 2) bot-specific theme, 3) default
-    let saved = localStorage.getItem("gb-theme");
+    const botId = getCurrentBotId();
+    let saved = localStorage.getItem(`gb-theme-${botId}`);
     if (!saved || !themes.find((t) => t.id === saved)) {
       // No user preference, try bot-specific theme
-      const botId = getCurrentBotId();
       saved = botThemeMap[botId] || "light";
       // Save to localStorage so it persists
-      localStorage.setItem("gb-theme", saved);
+      localStorage.setItem(`gb-theme-${botId}`, saved);
     }
     if (!themes.find((t) => t.id === saved)) saved = "default";
     currentThemeId = saved;
@@ -219,7 +223,8 @@ const ThemeManager = (() => {
 
   function setThemeFromServer(data) {
     // Save theme to localStorage for persistence across page loads
-    localStorage.setItem("gb-theme-data", JSON.stringify(data));
+    const botId = getCurrentBotId();
+    localStorage.setItem(`gb-theme-data-${botId}`, JSON.stringify(data));
 
     // Load base theme if specified
     if (data.theme_base) {
@@ -263,12 +268,13 @@ const ThemeManager = (() => {
 
   // Load saved theme from localStorage on page load
   function loadSavedTheme() {
-    const savedTheme = localStorage.getItem("gb-theme-data");
+    const botId = getCurrentBotId();
+    const savedTheme = localStorage.getItem(`gb-theme-data-${botId}`);
     if (savedTheme) {
       try {
         const data = JSON.parse(savedTheme);
         setThemeFromServer(data);
-        console.log("✓ Theme loaded from localStorage");
+        console.log(`✓ Theme loaded from localStorage for ${botId}`);
       } catch (e) {
         console.warn("Failed to load saved theme:", e);
       }
