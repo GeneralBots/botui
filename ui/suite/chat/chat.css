@@ -555,9 +555,9 @@ footer {
 .suggestion-button {
     padding: 6px 12px;
     border-radius: 20px;
-    border: 2px solid var(--chat-color2, #002147);
+    border: 2px solid var(--chat-color1, #002147);
     background: var(--chat-color2, #002147);
-    color: var(--chat-fg2, #ffffff);
+    color: var(--chat-fg2, var(--text, #ffffff));
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;

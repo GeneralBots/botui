@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="/suite/chat/chat.css" />
+<link rel="stylesheet" href="/suite/chat/chat.css?v=3" />
 <link rel="stylesheet" href="/suite/css/markdown-message.css" />
 
 <div class="chat-layout" id="chat-app">
@@ -944,7 +944,7 @@
         function getContrastYIQ(hexcolor) {
             if (!hexcolor || typeof hexcolor !== 'string') return '#ffffff';
             hexcolor = hexcolor.replace("#", "");
-            if (hexcolor.length === 3) hexcolor = hexcolor.split('').map(function(c) { return c + c; }).join('');
+            if (hexcolor.length === 3) hexcolor = hexcolor.split('').map(function (c) { return c + c; }).join('');
             if (hexcolor.length !== 6) return '#ffffff';
             var r = parseInt(hexcolor.substr(0, 2), 16);
             var g = parseInt(hexcolor.substr(2, 2), 16);
