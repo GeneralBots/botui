@@ -246,14 +246,14 @@
 
 .user-message {
     background: var(--chat-color1, var(--accent, var(--primary, #3b82f6)));
-    color: #ffffff !important;
+    color: var(--chat-fg1, #ffffff) !important;
     border-bottom-right-radius: 4px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .bot-message {
     background: var(--chat-color2, var(--surface, var(--card, #2a2a2a)));
-    color: #ffffff !important;
+    color: var(--chat-fg2, var(--text)) !important;
     border-bottom-left-radius: 4px;
     border: 1px solid var(--chat-color1, rgba(0, 0, 0, 0.2));
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -270,7 +270,7 @@
 .bot-message h2,
 .bot-message h3,
 .bot-message h4 {
-    color: #ffffff !important;
+    color: var(--chat-fg2, var(--text)) !important;
 }
 
 /* Markdown content in bot messages */
@@ -557,7 +557,7 @@ footer {
     border-radius: 20px;
     border: 2px solid var(--chat-color2, #002147);
     background: var(--chat-color2, #002147);
-    color: #ffffff;
+    color: var(--chat-fg2, #ffffff);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -587,7 +587,7 @@ footer {
 .suggestion-chip:hover,
 .suggestion-button:hover {
     background: var(--chat-color1, var(--suggestion-color, #4a9eff));
-    color: #ffffff;
+    color: var(--chat-fg1, #ffffff);
     border-color: var(--chat-color1, var(--suggestion-color, #6bb3ff));
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
@@ -629,7 +629,7 @@ form.input-container {
     border-radius: 20px;
     border: none;
     background: transparent;
-    color: #ffffff;
+    color: var(--text, inherit);
     font-size: 15px;
     outline: none;
     transition: all 0.2s;
