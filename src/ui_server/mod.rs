@@ -922,17 +922,12 @@ async fn handle_task_progress_ws_proxy(
                     // Log manifest_update messages for debugging
                     let is_manifest = text.contains("manifest_update");
                     if is_manifest {
-                        info!(
-                            "[WS_PROXY] Forwarding manifest_update to client: {}...",
-                            &text[..text.len().min(200)]
-                        );
                     } else if text.contains("task_progress") {
                         debug!("[WS_PROXY] Forwarding task_progress to client");
                     }
                     match client_tx.send(AxumMessage::Text(text)).await {
                         Ok(()) => {
                             if is_manifest {
-                                info!("[WS_PROXY] manifest_update SENT successfully to client");
                             }
                         }
                         Err(e) => {

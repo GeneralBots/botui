@@ -253,7 +253,7 @@
 
 .bot-message {
     background: var(--chat-color2, var(--surface, var(--card, #2a2a2a)));
-    color: #000000 !important;
+    color: #ffffff !important;
     border-bottom-left-radius: 4px;
     border: 1px solid var(--chat-color1, rgba(0, 0, 0, 0.2));
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -270,7 +270,7 @@
 .bot-message h2,
 .bot-message h3,
 .bot-message h4 {
-    color: #000000 !important;
+    color: #ffffff !important;
 }
 
 /* Markdown content in bot messages */
