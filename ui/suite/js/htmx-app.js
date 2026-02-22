@@ -208,6 +208,11 @@
     // Debug logging
     console.log("handleWebSocketMessage called with:", { messageType, message });
 
+    // Hide initial loading overlay when first bot message arrives
+    if (window.hideLoadingOverlay) {
+      setTimeout(window.hideLoadingOverlay, 300);
+    }
+
     // Handle suggestions array from BotResponse
     if (message.suggestions && Array.isArray(message.suggestions) && message.suggestions.length > 0) {
       clearSuggestions();

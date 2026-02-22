@@ -751,13 +751,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // Check bot public status early
   checkBotPublicStatus();
 
-  // Hide loading overlay
-  setTimeout(() => {
+  // Provide a global function to hide the loading overlay
+  window.hideLoadingOverlay = function() {
     const loadingOverlay = document.getElementById("loadingOverlay");
-    if (loadingOverlay) {
+    if (loadingOverlay && !loadingOverlay.classList.contains("hidden")) {
       loadingOverlay.classList.add("hidden");
     }
-  }, 500);
+  };
+
+  // Failsafe: hide after 10 seconds if no message arrives
+  setTimeout(window.hideLoadingOverlay, 10000);
 
   // Simple apps menu handling
   const appsBtn = document.getElementById("appsButton");
