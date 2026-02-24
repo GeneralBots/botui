@@ -4,11 +4,16 @@ if (typeof window.WindowManager === 'undefined') {
             this.openWindows = [];
             this.activeWindowId = null;
             this.zIndexCounter = 100;
-            this.workspace = document.getElementById('desktop-content') || document.body;
-            this.taskbarApps = document.getElementById('taskbar-apps');
+            // Will fetch dynamically in open() since script runs before DOM is ready
+            this.workspace = null;
+            this.taskbarApps = null;
         }
 
         open(id, title, htmlContent) {
+            // Lazy load the container elements to avoid head script loading issues
+            if (!this.workspace) this.workspace = document.getElementById('desktop-content') || document.body;
+            if (!this.taskbarApps) this.taskbarApps = document.getElementById('taskbar-apps');
+
             // If window already exists, focus it
             const existingWindow = this.openWindows.find(w => w.id === id);
             if (existingWindow) {
