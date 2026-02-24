@@ -67,7 +67,7 @@
 
         var WS_BASE_URL =
             window.location.protocol === "https:" ? "wss://" : "ws://";
-        var WS_URL = WS_BASE_URL + window.location.host + "/ws";
+        var WS_URL = WS_BASE_URL + window.location.host + "/ws/chat";
 
         var MessageType = {
             EXTERNAL: 0,
@@ -871,12 +871,10 @@
                 currentUserId +
                 "&bot_name=" +
                 currentBotName;
-            
-            console.log("Connecting WebSocket to:", url);
             ws = new WebSocket(url);
 
             ws.onopen = function () {
-                console.log("WebSocket connected to:", url);
+                console.log("WebSocket connected");
                 reconnectAttempts = 0;
                 disconnectNotified = false;
                 updateConnectionStatus("connected");
@@ -950,9 +948,9 @@
             var temp = document.createElement("div");
             temp.style.color = hexcolor;
             temp.style.display = "none";
-            document.body.appendChild(temp);
+            document.div.appendChild(temp);
             var style = window.getComputedStyle(temp).color;
-            document.body.removeChild(temp);
+            document.div.removeChild(temp);
             
             var rgb = style.match(/\d+/g);
             if (!rgb || rgb.length < 3) return '#ffffff';

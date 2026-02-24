@@ -126,6 +126,7 @@ const ROOT_FILES: &[&str] = &[
     "base.html",
     "base-layout.html",
     "base-layout.css",
+    "desktop.html",
     "default.gbui",
     "single.gbui",
 ];
@@ -305,11 +306,11 @@ pub async fn serve_suite(bot_name: Option<String>) -> impl IntoResponse {
     let raw_html_res = {
         #[cfg(feature = "embed-ui")]
         {
-            match Assets::get("suite/index.html") {
+            match Assets::get("suite/desktop.html") {
                 Some(f) => String::from_utf8(f.data.into_owned()).map_err(|e| e.to_string()),
                 None => {
-                    let path = get_ui_root().join("suite/index.html");
-                    log::warn!("Asset 'suite/index.html' not found in embedded binary, falling back to filesystem: {:?}", path);
+                    let path = get_ui_root().join("suite/desktop.html");
+                    log::warn!("Asset .suite/desktop.html. not found in embedded binary, falling back to filesystem: {:?}", path);
                     fs::read_to_string(&path).map_err(|e| {
                         format!(
                             "Asset not found in binary AND failed to read {:?} (CWD: {:?}): {}",
@@ -323,7 +324,7 @@ pub async fn serve_suite(bot_name: Option<String>) -> impl IntoResponse {
         }
         #[cfg(not(feature = "embed-ui"))]
         {
-            let path = get_ui_root().join("suite/index.html");
+            let path = get_ui_root().join("suite/desktop.html");
             fs::read_to_string(&path).map_err(|e| {
                 format!(
                     "Failed to read {:?} (CWD: {:?}): {}",

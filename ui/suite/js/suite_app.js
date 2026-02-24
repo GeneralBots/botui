@@ -59,10 +59,19 @@ const Omnibox = {
     this.chatInput = document.getElementById("omniboxChatInput");
     this.modeToggle = document.getElementById("omniboxModeToggle");
 
-    this.bindEvents();
+    // Only bind events if all required elements exist
+    if (this.input && this.backdrop) {
+      this.bindEvents();
+    }
   },
 
   bindEvents() {
+    // Defensive: ensure elements exist before binding
+    if (!this.input || !this.backdrop) {
+      console.warn("[Omnibox] Required elements not found, skipping event binding");
+      return;
+    }
+
     // Input focus/blur
     this.input.addEventListener("focus", () => this.open());
     this.backdrop.addEventListener("click", () => this.close());
@@ -1032,9 +1041,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Skip SPA initialization on auth pages (login, register, etc.)
+  // Skip SPA initialization on auth pages (login, register, etc.) and desktop
   if (window.location.pathname.startsWith("/auth/")) {
     console.log("[SPA] Skipping initialization on auth page");
+  } else if (document.getElementById('desktop-content')) {
+    console.log("[SPA] Skipping initialization on desktop page");
   } else if (document.readyState === "complete") {
     setTimeout(initialLoad, 50);
   } else {
