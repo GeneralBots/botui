@@ -1101,6 +1101,7 @@
                     const r = JSON.parse(e.data);
                     if (r.type === "connected") {
                         console.log("WebSocket welcome message:", r);
+                        reconnectAttempts = 0;
                         return;
                     }
                     if (r.bot_id) {
@@ -1154,7 +1155,6 @@
                     ws.readyState,
                 );
                 updateConnectionStatus("connected");
-                reconnectAttempts = 0;
                 hasReceivedInitialMessage = false;
             };
             ws.onclose = function (e) {

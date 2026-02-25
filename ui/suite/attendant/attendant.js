@@ -1322,7 +1322,6 @@
                             "WebSocket connected for attendant:",
                             currentAttendantId,
                         );
-                        reconnectAttempts = 0;
                         showToast(
                             "Connected to notification service",
                             "success",
@@ -1367,6 +1366,7 @@
                 switch (msgType) {
                     case "connected":
                         console.log("WebSocket connected:", data.message);
+                        reconnectAttempts = 0;
                         break;
                     case "new_conversation":
                         showToast("New conversation in queue", "info");

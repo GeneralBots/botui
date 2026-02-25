@@ -192,7 +192,6 @@
 
     document.body.addEventListener("htmx:wsOpen", () => {
       updateConnectionStatus("connected");
-      reconnectAttempts = 0;
     });
 
     document.body.addEventListener("htmx:wsClose", () => {
@@ -204,6 +203,10 @@
   // Handle WebSocket messages
   function handleWebSocketMessage(message) {
     const messageType = message.type || message.event;
+
+    if (messageType === "connected") {
+      reconnectAttempts = 0;
+    }
 
     // Debug logging
     console.log("handleWebSocketMessage called with:", { messageType, message });

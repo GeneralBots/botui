@@ -14,6 +14,7 @@
     <!-- Local JS requirements per AGENTS.md / UI.md -->
     <script src="/suite/js/vendor/htmx.min.js"></script>
     <script src="/suite/js/window-manager.js"></script>
+    <script src="/suite/js/theme-manager.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -214,9 +215,12 @@
                 <div id="taskbar-apps">
                     <!-- Taskbar items populated automatically by window-manager.js -->
                 </div>
-                <div class="toolbar-time">
-                    <div id="clock-time">00:00</div>
-                    <div id="clock-date">01/01/2026</div>
+                <div class="toolbar-time" style="display: flex; align-items: center; gap: 15px;">
+                    <div id="themeSelectorContainer"></div>
+                    <div style="text-align: right;">
+                        <div id="clock-time">00:00</div>
+                        <div id="clock-date">01/01/2026</div>
+                    </div>
                 </div>
             </footer>
         </div>
@@ -230,6 +234,11 @@
                 window.wm = window.WindowManager;
             } else {
                 console.error("WindowManager class not loaded from window-manager.js");
+            }
+            
+            // Initialize ThemeManager
+            if (typeof window.ThemeManager !== 'undefined') {
+                window.ThemeManager.init();
             }
         });
 
@@ -246,6 +255,15 @@
                 // Tell WindowManager to open it
                 if (window.wm) {
                     window.wm.open(appId, title, htmlContent);
+                }
+            }
+            
+            // Ensure Theme dropdown is re-injected if wiped
+            if (window.ThemeManager) {
+                const container = document.getElementById('themeSelectorContainer');
+                if (container && !container.hasChildNodes()) {
+                    // Quick and dirty way to re-init
+                    window.ThemeManager.init();
                 }
             }
         });

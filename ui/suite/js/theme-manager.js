@@ -173,7 +173,8 @@ const ThemeManager = (() => {
   }
 
   function updateDropdown() {
-    // Dropdown removed
+    const select = document.getElementById("themeDropdown");
+    if (select) select.value = currentThemeId;
   }
 
   function createDropdown() {
@@ -214,9 +215,12 @@ const ThemeManager = (() => {
     currentThemeId = saved;
     loadTheme(saved);
 
-    // Dropdown injection removed
-    // const container = document.getElementById("themeSelectorContainer");
-    // if (container) container.appendChild(createDropdown());
+    // Dropdown injection restored for the window manager
+    const container = document.getElementById("themeSelectorContainer");
+    if (container) {
+      container.innerHTML = '';
+      container.appendChild(createDropdown());
+    }
 
     console.log("✓ Theme Manager initialized");
   }

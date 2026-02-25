@@ -886,7 +886,6 @@
             ws.onopen = function () {
                 clearTimeout(connectionTimeout);
                 console.log("WebSocket connected to:", url);
-                reconnectAttempts = 0;
                 disconnectNotified = false;
                 updateConnectionStatus("connected");
             };
@@ -897,7 +896,10 @@
                     console.log("Chat WebSocket received:", data);
 
                     // Ignore connection confirmation
-                    if (data.type === "connected") return;
+                    if (data.type === "connected") {
+                        reconnectAttempts = 0;
+                        return;
+                    }
 
                     // Process system events (theme changes, etc)
                     if (data.event) {
