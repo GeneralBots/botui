@@ -871,11 +871,20 @@
                 currentUserId +
                 "&bot_name=" +
                 currentBotName;
-            
+
             console.log("Connecting WebSocket to:", url);
             ws = new WebSocket(url);
 
+            // Add connection timeout to detect silent failures
+            var connectionTimeout = setTimeout(function() {
+                if (ws.readyState !== WebSocket.OPEN) {
+                    console.error("WebSocket connection timeout");
+                    ws.close();
+                }
+            }, 5000);
+
             ws.onopen = function () {
+                clearTimeout(connectionTimeout);
                 console.log("WebSocket connected to:", url);
                 reconnectAttempts = 0;
                 disconnectNotified = false;
@@ -923,7 +932,9 @@
                 }
             };
 
-            ws.onclose = function () {
+            ws.onclose = function (event) {
+                clearTimeout(connectionTimeout);
+                console.log("WebSocket closed:", event.code, event.reason);
                 updateConnectionStatus("disconnected");
                 if (!disconnectNotified) {
                     notify("Disconnected from chat server", "error");
@@ -933,6 +944,9 @@
                     reconnectAttempts++;
                     updateConnectionStatus("connecting");
                     setTimeout(connectWebSocket, 1000 * reconnectAttempts);
+                } else {
+                    console.error("Max reconnection attempts reached. Stopping reconnection.");
+                    notify("Could not reconnect to chat server after multiple attempts", "error");
                 }
             };
 
