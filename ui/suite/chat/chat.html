@@ -1100,8 +1100,18 @@
                 })
                 .catch(function (e) {
                     console.error("Auth failed:", e);
-                    notify("Failed to connect to chat server", "error");
-                    setTimeout(proceedWithChatInit, 3000);
+                    // Proceed with anonymous connection - WebSocket handler supports it
+                    currentUserId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+                    currentSessionId = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+                    currentBotId = botName;
+                    currentBotName = botName;
+                    console.log("Anonymous chat:", {
+                        currentUserId: currentUserId,
+                        currentSessionId: currentSessionId,
+                        currentBotId: currentBotId,
+                        currentBotName: currentBotName,
+                    });
+                    connectWebSocket();
                 });
         }
 
