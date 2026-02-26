@@ -113,6 +113,7 @@ const SUITE_DIRS: &[&str] = &[
     "project",
     #[cfg(feature = "goals")]
     "goals",
+    "vibe",
 ];
 
 const ROOT_FILES: &[&str] = &[
@@ -163,7 +164,7 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
         let path_parts: Vec<&str> = path.split('/').collect();
         let fs_path = if path_parts.len() > 1 {
             let mut start_idx = 1;
-            let known_dirs = ["suite", "js", "css", "vendor", "assets", "public", "partials", "settings", "auth", "about", "drive", "chat", "tasks", "admin", "mail", "calendar", "meet", "docs", "sheet", "slides", "paper", "research", "sources", "learn", "analytics", "dashboards", "monitoring", "people", "crm", "tickets", "billing", "products", "video", "player", "canvas", "social", "project", "goals", "workspace", "designer"];
+            let known_dirs = ["suite", "js", "css", "vendor", "assets", "public", "partials", "settings", "auth", "about", "drive", "chat", "tasks", "admin", "mail", "calendar", "meet", "docs", "sheet", "slides", "paper", "research", "sources", "learn", "analytics", "dashboards", "monitoring", "people", "crm", "tickets", "billing", "products", "video", "player", "canvas", "social", "project", "goals", "workspace", "designer", "vibe"];
 
             // Special case: /auth/suite/* should map to suite/* (auth is a route, not a directory)
             if path_parts.get(1) == Some(&"auth") && path_parts.get(2) == Some(&"suite") {

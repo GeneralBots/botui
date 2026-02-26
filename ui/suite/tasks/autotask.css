@@ -1,7 +1,7 @@
 /* =============================================================================
    AUTOTASK - SENTIENT THEME
    Dark UI with Neon Yellow/Lime Accents (#CDFE00)
-   Pixel-perfect match to Mantis Farm Dashboard
+   Pixel-perfect match to Agent Dashboard
    ============================================================================= */
 
 /* =============================================================================
@@ -1166,10 +1166,12 @@ body:has(.autotask-container) {
 }
 
 @keyframes blink {
+
     0%,
     100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0;
     }
@@ -1224,10 +1226,12 @@ body:has(.autotask-container) {
 }
 
 @keyframes pulse-glow {
+
     0%,
     100% {
         filter: drop-shadow(0 0 4px var(--sentient-accent-glow));
     }
+
     50% {
         filter: drop-shadow(0 0 12px var(--sentient-accent));
     }
@@ -1335,6 +1339,7 @@ body:has(.autotask-container) {
         opacity: 0;
         transform: translateY(-4px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -1596,6 +1601,7 @@ body:has(.autotask-container) {
         opacity: 0;
         transform: translateX(20px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);

@@ -1,0 +1,73 @@
+<!-- Minibar Component — Top-left navigation -->
+<style>
+    .minibar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 28px;
+        background: #f8f8f8;
+        border-bottom: 1px solid #f0f1f2;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        z-index: 9999;
+        font-family: 'Fira Code', monospace;
+    }
+
+    .minibar-brand {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #3b3b3b;
+    }
+
+    .minibar-brand-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .minibar-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: auto;
+    }
+
+    .minibar-btn {
+        width: 24px;
+        height: 24px;
+        border: none;
+        border-radius: 4px;
+        background: transparent;
+        color: #888;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        font-size: 13px;
+        padding: 0;
+    }
+
+    .minibar-btn:hover {
+        background: #e0e0e0;
+        color: #3b3b3b;
+    }
+</style>
+
+<div class="minibar" id="minibar">
+    <div class="minibar-brand">
+        <svg class="minibar-brand-icon" viewBox="0 0 24 24" fill="none" stroke="#84d669" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M8 12l3 3 5-5" />
+        </svg>
+        <span>Agent Farm</span>
+    </div>
+    <div class="minibar-actions">
+        <button class="minibar-btn" title="Settings" type="button">⚙</button>
+        <button class="minibar-btn" title="Account" type="button">👤</button>
+    </div>
+</div>

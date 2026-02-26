@@ -70,20 +70,20 @@
         }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex flex-col bg-white text-gray-800 font-sans selection:bg-brand-200">
+<body class="h-screen w-screen overflow-hidden flex flex-col bg-[var(--bg,#ffffff)] text-[var(--text,#1f2937)] font-sans selection:bg-brand-200">
 
     <div class="flex-1 flex overflow-hidden relative">
         
         <!-- LEFT SIDEBAR -->
-        <aside class="w-14 shrink-0 bg-white border-r border-gray-100 flex flex-col items-center py-6 z-20 relative">
-            <div class="flex flex-col space-y-8 text-gray-500">
-                <button class="hover:text-brand-600 transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
-                <button class="hover:text-brand-600 transition-colors text-xl"><i class="fa-solid fa-house"></i></button>
-                <button class="hover:text-brand-600 transition-colors text-xl"><i class="fa-solid fa-magnifying-glass"></i></button>
-                <button class="hover:text-brand-600 transition-colors text-xl"><i class="fa-solid fa-border-all"></i></button>
-                <button class="hover:text-brand-600 transition-colors text-xl"><i class="fa-regular fa-user"></i></button>
-                <button class="hover:text-brand-600 transition-colors text-xl"><i class="fa-solid fa-layer-group"></i></button>
-                <button class="hover:text-brand-600 transition-colors text-xl"><i class="fa-solid fa-gear"></i></button>
+        <aside class="w-14 shrink-0 bg-[var(--bg-secondary,#ffffff)] border-r border-[var(--border-color,#f3f4f6)] flex flex-col items-center py-6 z-20 relative">
+            <div class="flex flex-col space-y-8 text-[var(--text-secondary,#6b7280)]">
+                <button class="hover:text-[var(--primary,#16a34a)] transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
+                <button class="hover:text-[var(--primary,#16a34a)] transition-colors text-xl"><i class="fa-solid fa-house"></i></button>
+                <button class="hover:text-[var(--primary,#16a34a)] transition-colors text-xl"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <button class="hover:text-[var(--primary,#16a34a)] transition-colors text-xl"><i class="fa-solid fa-border-all"></i></button>
+                <button class="hover:text-[var(--primary,#16a34a)] transition-colors text-xl"><i class="fa-regular fa-user"></i></button>
+                <button class="hover:text-[var(--primary,#16a34a)] transition-colors text-xl"><i class="fa-solid fa-layer-group"></i></button>
+                <button class="hover:text-[var(--primary,#16a34a)] transition-colors text-xl"><i class="fa-solid fa-gear"></i></button>
             </div>
         </aside>
 
@@ -91,29 +91,29 @@
         <main class="flex-1 flex flex-col min-w-0 relative z-10">
             
             <!-- TOP NAVIGATION PATH -->
-            <header class="h-12 shrink-0 bg-white border-b border-gray-100 flex items-center px-6">
+            <header class="h-12 shrink-0 bg-[var(--bg,#ffffff)] border-b border-[var(--border-color,#f3f4f6)] flex items-center px-6">
                 <div class="font-mono text-xs font-semibold tracking-wider flex space-x-3 items-center">
-                    <span class="text-gray-400">// DASHBOARD</span>
-                    <span class="text-gray-300">&gt;</span>
-                    <span class="text-gray-800">// E-COMMERCE APP DEVELOPMENT</span>
+                    <span class="text-[var(--text-secondary,#9ca3af)]">// DASHBOARD</span>
+                    <span class="text-[var(--text-muted,#d1d5db)]">&gt;</span>
+                    <span class="text-[var(--text,#1f2937)]">// E-COMMERCE APP DEVELOPMENT</span>
                 </div>
             </header>
 
             <!-- STAGE NAVIGATION -->
-            <nav class="h-12 shrink-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 flex items-center font-mono text-xs font-semibold z-10">
-                <div class="flex-1 flex justify-center border-r border-gray-100 py-3 hover:bg-gray-50 cursor-pointer text-gray-400 transition-colors">
+            <nav class="h-12 shrink-0 bg-[var(--bg,#ffffff)] border-b border-[var(--border-color,#f3f4f6)] flex items-center font-mono text-xs font-semibold z-10">
+                <div class="flex-1 flex justify-center border-r border-[var(--border-color,#f3f4f6)] py-3 hover:bg-[var(--bg-hover,#f9fafb)] cursor-pointer text-[var(--text-secondary,#9ca3af)] transition-colors">
                     // PLAN
                 </div>
-                <div class="flex-1 flex justify-center border-r border-gray-100 py-3 bg-brand-50 text-brand-600 cursor-pointer border-b-2 border-b-brand-500 transition-colors shadow-[inset_0_2px_4px_rgba(34,197,94,0.05)]">
+                <div class="flex-1 flex justify-center border-r border-[var(--border-color,#f3f4f6)] py-3 bg-[var(--primary-bg,#f0fdf4)] text-[var(--primary,#16a34a)] cursor-pointer border-b-2 border-b-[var(--primary,#22c55e)] transition-colors shadow-[inset_0_2px_4px_rgba(34,197,94,0.05)]">
                     // BUILD
                 </div>
-                <div class="flex-1 flex justify-center border-r border-gray-100 py-3 hover:bg-gray-50 cursor-pointer text-gray-400 transition-colors">
+                <div class="flex-1 flex justify-center border-r border-[var(--border-color,#f3f4f6)] py-3 hover:bg-[var(--bg-hover,#f9fafb)] cursor-pointer text-[var(--text-secondary,#9ca3af)] transition-colors">
                     // REVIEW
                 </div>
-                <div class="flex-1 flex justify-center border-r border-gray-100 py-3 hover:bg-gray-50 cursor-pointer text-gray-400 transition-colors">
+                <div class="flex-1 flex justify-center border-r border-[var(--border-color,#f3f4f6)] py-3 hover:bg-[var(--bg-hover,#f9fafb)] cursor-pointer text-[var(--text-secondary,#9ca3af)] transition-colors">
                     // DEPLOY
                 </div>
-                <div class="flex-1 flex justify-center py-3 hover:bg-gray-50 cursor-pointer text-gray-400 transition-colors">
+                <div class="flex-1 flex justify-center py-3 hover:bg-[var(--bg-hover,#f9fafb)] cursor-pointer text-[var(--text-secondary,#9ca3af)] transition-colors">
                     // MONITOR
                 </div>
             </nav>
