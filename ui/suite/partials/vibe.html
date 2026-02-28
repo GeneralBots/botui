@@ -15,9 +15,9 @@
     <div class="vibe-body">
 
         <!-- Agents & Workspaces Sidebar (Fixed to left as in image) -->
-        <aside class="agents-sidebar" id="agentsSidebar" style="background: var(--surface, #fcfcfc);">
+        <aside class="agents-sidebar" id="agentsSidebar" style="background: var(--surface);">
             <div class="as-logo-section"
-                style="padding: 16px; border-bottom: 1px solid var(--border, #f0f1f2); display: flex; align-items: center; justify-content: space-between;">
+                style="padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
                 <h2
                     style="margin:0; font-size: 15px; color: var(--text, #3b3b3b); font-weight: 800; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px; color: var(--accent, #84d669);">🌱</span> mantis farm
@@ -139,7 +139,7 @@
             style="background: var(--bg, #fdfdfd); background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px; position:relative;">
 
             <div
-                style="padding: 16px 24px; font-size: 11px; color: var(--text-muted, #888); font-weight: 600; letter-spacing: 0.5px; border-bottom: 1px solid var(--border, #f0f1f2); background: rgba(255,255,255,0.8); backdrop-filter: blur(4px);">
+                style="padding: 16px 24px; font-size: 11px; color: var(--text-muted, #888); font-weight: 600; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.8); backdrop-filter: blur(4px);">
                 // DASHBOARD <span style="color: var(--text-secondary, #ccc); margin:0 6px;">&gt;</span> // E-COMMERCE APP DEVELOPMENT
                 <div style="float: right;">
                     <button
@@ -380,7 +380,7 @@
 
             var subTasksHtml = "";
             if (fileList.length > 0) {
-                subTasksHtml = '<div id="' + nodeId + '-files" style="display:none;padding:8px 16px;border-top:1px solid var(--border, #f0f1f2);font-size:10px;color:var(--text-muted, #555);">';
+                subTasksHtml = '<div id="' + nodeId + '-files" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:10px;color:var(--text-muted, #555);">';
                 for (var fi = 0; fi < fileList.length; fi++) {
                     subTasksHtml += '<div style="padding:2px 0;display:flex;align-items:center;gap:4px;"><span style="color: var(--accent, #84d669);">📄</span> ' + esc(fileList[fi]) + '</div>';
                 }
@@ -389,17 +389,17 @@
 
             var node = document.createElement("div");
             node.className = "vibe-task-node";
-            node.style.cssText = "background: var(--bg, #fff);border:" + (isFirst ? "2px solid var(--accent, #84d669)" : "1px solid var(--border, #f0f1f2)") + ";border-radius:8px;width:280px;box-shadow:0 " + (isFirst ? "4" : "2") + "px 12px rgba(" + (isFirst ? "132,214,105,0.15" : "0,0,0,0.05") + ");position:relative;flex-shrink:0;animation:nodeIn 0.4s ease;";
+            node.style.cssText = "background: var(--bg, #fff);border:" + (isFirst ? "2px solid var(--accent, #84d669)" : "1px solid var(--border)") + ";border-radius:8px;width:280px;box-shadow:0 " + (isFirst ? "4" : "2") + "px 12px rgba(" + (isFirst ? "132,214,105,0.15" : "0,0,0,0.05") + ");position:relative;flex-shrink:0;animation:nodeIn 0.4s ease;";
 
             node.innerHTML =
-                '<div style="padding:12px 16px;border-bottom: 1px solid var(--border, #f0f1f2);">' +
+                '<div style="padding:12px 16px;border-bottom: 1px solid var(--border);">' +
                 '<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:10px;color: var(--text-muted, #888);">' +
                 '<span>' + fileCount + ' files</span><span>' + time + '</span><span>' + tokens + '</span>' +
                 '</div>' +
                 '<h4 style="margin:0 0 8px 0;font-size:14px;color: var(--text, #3b3b3b);font-weight:700;">' + esc(title) + '</h4>' +
                 '<p style="margin:0;font-size:11px;color: var(--text-muted, #666);line-height:1.4;">' + esc(description) + '</p>' +
                 '</div>' +
-                '<div style="padding:10px 16px;background: var(--surface, #fcfcfc);border-bottom: 1px solid var(--border, #f0f1f2);font-size:11px;">' +
+                '<div style="padding:10px 16px;background: var(--surface);border-bottom: 1px solid var(--border);font-size:11px;">' +
                 '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
                 '<span style="color: var(--text-muted, #888);">Status</span>' +
                 '<span style="background:' + statusBg + ';color:' + statusColor + ';padding:2px 8px;border-radius:12px;font-weight:600;">' + esc(status) + '</span>' +

@@ -39,7 +39,7 @@ if (typeof window.WindowManager === 'undefined') {
             const top = 100 + offset;
             const left = 150 + offset;
 
-            windowEl.className = 'absolute w-[700px] h-[500px] bg-white rounded-lg shadow-2xl flex flex-col border border-gray-200 overflow-hidden window-element';
+            windowEl.className = 'absolute w-[700px] h-[500px]  rounded-lg shadow-2xl flex flex-col border border-gray-200 overflow-hidden window-element';
             windowEl.style.top = `${top}px`;
             windowEl.style.left = `${left}px`;
             windowEl.style.zIndex = this.zIndexCounter++;
