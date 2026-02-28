@@ -10,7 +10,7 @@
         margin: 0 !important;
         padding: 0 !important;
         font-family: 'Fira Code', 'Fira Sans', Arial, sans-serif !important;
-        background: var(--bg, white) !important;
+        background: var(--bg) !important;
         overflow: hidden !important;
         height: 100% !important;
         width: 100% !important;
@@ -25,7 +25,7 @@
         position: absolute;
         inset: 0;
         z-index: 1000;
-        background: var(--bg, white);
+        background: var(--bg);
     }
 
     /* Left Sidebar */
@@ -134,7 +134,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        background: var(--bg, white);
+        background: var(--bg);
         position: relative;
         z-index: 10;
     }
@@ -160,7 +160,7 @@
 
     /* Interactive Desktop Icons triggering HTMX */
     .desktop-icon {
-        background: var(--bg, white);
+        background: var(--bg);
         border: 1px solid var(--border, #f0f1f2);
         border-radius: 8px;
         height: 67px;
@@ -201,7 +201,7 @@
     .bg-grid {
         position: absolute;
         inset: 0;
-        background-image: linear-gradient(to right, var(--surface-hover, #f0fdf4) 1px, transparent 1px), linear-gradient(to bottom, var(--surface-hover, #f0fdf4) 1px, transparent 1px);
+        background-image: linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px);
         background-size: 40px 40px;
         z-index: 0;
         pointer-events: none;
@@ -235,7 +235,7 @@
     /* Bottom Taskbar */
     .toolbar {
         height: 50px;
-        background: var(--bg, white);
+        background: var(--bg);
         border-top: 1px solid var(--border, #f0f1f2);
         display: flex;
         align-items: center;
