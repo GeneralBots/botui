@@ -136,7 +136,7 @@
 
         <!-- Canvas Area -->
         <div class="vibe-canvas" id="vibeCanvas"
-            style="background: var(--bg, #fdfdfd); background-image: radial-gradient(var(--border, #e0e0e0) 1px, transparent 1px); background-size: 20px 20px; position:relative;">
+            style="background: var(--bg, #fdfdfd); background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px; position:relative;">
 
             <div
                 style="padding: 16px 24px; font-size: 11px; color: var(--text-muted, #888); font-weight: 600; letter-spacing: 0.5px; border-bottom: 1px solid var(--border, #f0f1f2); background: rgba(255,255,255,0.8); backdrop-filter: blur(4px);">
@@ -187,12 +187,12 @@
 
             <!-- Vibe Chat Overlay (LIVE) -->
             <div id="vibeChatOverlay"
-                style="position: absolute; bottom: 24px; right: 24px; width: 380px; background: var(--surface, #1a1a24); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border, #2a2a35); color: var(--bg, #fff); z-index: 100;">
+                style="position: absolute; bottom: 24px; right: 24px; width: 380px; background: var(--surface); border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--border); color: var(--bg, #fff); z-index: 100;">
                 <div
-                    style="padding: 12px 16px; background: var(--surface-hover, #23232f); border-bottom: 1px solid var(--border, #2a2a35); display: flex; justify-content: space-between; align-items: center;">
+                    style="padding: 12px 16px; background: var(--surface-hover); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="as-status-dot green" id="vibeChatStatusDot"
-                            style="box-shadow: 0 0 8px #84d669;"></span>
+                            style="box-shadow: 0 0 8px var(--accent, #84d669);"></span>
                         <span style="font-size: 12px; font-weight: 600;">Mantis #1</span>
                     </div>
                     <span id="vibeChatStatusBadge"
@@ -208,14 +208,14 @@
                     </div>
                 </div>
 
-                <div style="padding: 12px; border-top: 1px solid #2a2a35; background: var(--surface, #1a1a24);">
+                <div style="padding: 12px; border-top: 1px solid var(--border); background: var(--surface);">
                     <form id="vibeChatForm" autocomplete="off"
-                        style="display: flex; align-items: center; gap: 8px; background: var(--surface-hover, #23232f); padding: 8px 12px; border-radius: 20px; border: 1px solid #333;">
+                        style="display: flex; align-items: center; gap: 8px; background: var(--surface-hover); padding: 8px 12px; border-radius: 20px; border: 1px solid #333;">
                         <span style="color: var(--text-muted, #888); cursor: pointer; transform: rotate(-45deg);">📎</span>
                         <input type="text" id="vibeChatInput" placeholder="Describe your project…"
                             style="flex: 1; background: transparent; border: none; color: var(--bg, #fff); font-size: 13px; outline: none; font-family: 'Segoe UI', system-ui, sans-serif;" />
                         <button type="submit" id="vibeChatSend"
-                            style="background: #84d669; color: #1a1a24; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: bold; border: none;">↑</button>
+                            style="background: var(--accent, #84d669); color: var(--surface); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; font-weight: bold; border: none;">↑</button>
                     </form>
                 </div>
             </div>
@@ -262,13 +262,13 @@
             if (!box) return;
             var div = document.createElement("div");
             if (role === "user") {
-                div.style.cssText = "align-self:flex-end;background:#84d669;color:#1a1a24;font-weight:500;padding:10px 14px;border-radius:12px 12px 0 12px;max-width:85%;word-wrap:break-word;";
+                div.style.cssText = "align-self:flex-end;background:var(--accent, #84d669);color:var(--surface);font-weight:500;padding:10px 14px;border-radius:12px 12px 0 12px;max-width:85%;word-wrap:break-word;";
                 div.textContent = text;
             } else if (role === "system") {
                 div.style.cssText = "align-self:center;background:rgba(132,214,105,0.12);color: var(--accent, #84d669);padding:6px 12px;border-radius:8px;font-size:11px;text-align:center;";
                 div.innerHTML = text;
             } else {
-                div.style.cssText = "align-self:flex-start;background: var(--border, #2a2a35);color:#ececec;padding:10px 14px;border-radius:12px 12px 12px 0;max-width:85%;word-wrap:break-word;";
+                div.style.cssText = "align-self:flex-start;background: var(--border);color:#ececec;padding:10px 14px;border-radius:12px 12px 12px 0;max-width:85%;word-wrap:break-word;";
                 div.className = "vibe-bot-msg";
                 if (typeof marked !== "undefined" && marked.parse) {
                     div.innerHTML = marked.parse(text);
@@ -322,14 +322,14 @@
             var dot = document.getElementById("vibeChatStatusDot");
             var badge = document.getElementById("vibeChatStatusBadge");
             if (status === "connected") {
-                if (dot) { dot.className = "as-status-dot green"; dot.style.boxShadow = "0 0 8px #84d669"; }
-                if (badge) { badge.textContent = "EVOLVED"; badge.style.background = "#84d669"; badge.style.color = "#fff"; }
+                if (dot) { dot.className = "as-status-dot green"; dot.style.boxShadow = "0 0 8px var(--accent, #84d669)"; }
+                if (badge) { badge.textContent = "EVOLVED"; badge.style.background = "var(--accent, #84d669)"; badge.style.color = "var(--bg, #fff)"; }
             } else if (status === "connecting") {
                 if (dot) { dot.className = "as-status-dot yellow"; dot.style.boxShadow = "0 0 8px #f59e0b"; }
-                if (badge) { badge.textContent = "CONNECTING…"; badge.style.background = "#333"; badge.style.color = "#888"; }
+                if (badge) { badge.textContent = "CONNECTING…"; badge.style.background = "#333"; badge.style.color = "var(--text-muted, #888)"; }
             } else {
                 if (dot) { dot.className = "as-status-dot red"; dot.style.boxShadow = "0 0 8px #ef4444"; }
-                if (badge) { badge.textContent = "OFFLINE"; badge.style.background = "#333"; badge.style.color = "#888"; }
+                if (badge) { badge.textContent = "OFFLINE"; badge.style.background = "#333"; badge.style.color = "var(--text-muted, #888)"; }
             }
         }
 
@@ -347,7 +347,7 @@
                     card.appendChild(barWrapper);
                 }
             } else if (status === "done") {
-                card.style.borderLeftColor = "#84d669";
+                card.style.borderLeftColor = "var(--accent, #84d669)";
                 bar = card.querySelector(".as-bar-fill");
                 if (bar) bar.style.width = "100%";
                 setTimeout(function () {
@@ -375,12 +375,12 @@
             var isFirst = stepsContainer.children.length === 0;
             var nodeId = "vibe-node-" + nodeIdCounter;
 
-            var statusBg = status === "Done" ? "#84d669" : (status === "Planning" ? "#eef8eb" : "#fff3cd");
-            var statusColor = status === "Done" ? "#fff" : (status === "Planning" ? "#84d669" : "#856404");
+            var statusBg = status === "Done" ? "var(--accent, #84d669)" : (status === "Planning" ? "var(--success-light, #eef8eb)" : "var(--warning-light, var(--bg, #fff)3cd)");
+            var statusColor = status === "Done" ? "var(--bg, #fff)" : (status === "Planning" ? "var(--accent, #84d669)" : "var(--warning, #856404)");
 
             var subTasksHtml = "";
             if (fileList.length > 0) {
-                subTasksHtml = '<div id="' + nodeId + '-files" style="display:none;padding:8px 16px;border-top:1px solid #f0f1f2;font-size:10px;color:#555;">';
+                subTasksHtml = '<div id="' + nodeId + '-files" style="display:none;padding:8px 16px;border-top:1px solid var(--border, #f0f1f2);font-size:10px;color:var(--text-muted, #555);">';
                 for (var fi = 0; fi < fileList.length; fi++) {
                     subTasksHtml += '<div style="padding:2px 0;display:flex;align-items:center;gap:4px;"><span style="color: var(--accent, #84d669);">📄</span> ' + esc(fileList[fi]) + '</div>';
                 }
@@ -389,7 +389,7 @@
 
             var node = document.createElement("div");
             node.className = "vibe-task-node";
-            node.style.cssText = "background: var(--bg, #fff);border:" + (isFirst ? "2px solid #84d669" : "1px solid #f0f1f2") + ";border-radius:8px;width:280px;box-shadow:0 " + (isFirst ? "4" : "2") + "px 12px rgba(" + (isFirst ? "132,214,105,0.15" : "0,0,0,0.05") + ");position:relative;flex-shrink:0;animation:nodeIn 0.4s ease;";
+            node.style.cssText = "background: var(--bg, #fff);border:" + (isFirst ? "2px solid var(--accent, #84d669)" : "1px solid var(--border, #f0f1f2)") + ";border-radius:8px;width:280px;box-shadow:0 " + (isFirst ? "4" : "2") + "px 12px rgba(" + (isFirst ? "132,214,105,0.15" : "0,0,0,0.05") + ");position:relative;flex-shrink:0;animation:nodeIn 0.4s ease;";
 
             node.innerHTML =
                 '<div style="padding:12px 16px;border-bottom: 1px solid var(--border, #f0f1f2);">' +
@@ -417,11 +417,11 @@
 
             if (isFirst || stepsContainer.children.length > 0) {
                 var line = document.createElement("div");
-                line.style.cssText = "position:absolute;right:-60px;top:50%;width:60px;height:2px;background:#84d669;z-index:10;";
+                line.style.cssText = "position:absolute;right:-60px;top:50%;width:60px;height:2px;background:var(--accent, #84d669);z-index:10;";
                 node.appendChild(line);
                 if (!isFirst) {
                     var dot = document.createElement("div");
-                    dot.style.cssText = "position:absolute;left:-5px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:#84d669;z-index:20;";
+                    dot.style.cssText = "position:absolute;left:-5px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:50%;background:var(--accent, #84d669);z-index:20;";
                     node.appendChild(dot);
                 }
             }
@@ -725,7 +725,7 @@
                     card.appendChild(barWrapper);
                 }
             } else if (status === "EVOLVED" || status === "DONE") {
-                card.style.borderLeft = "3px solid #84d669";
+                card.style.borderLeft = "3px solid var(--accent, #84d669)";
                 if (dot) { dot.className = "as-status-dot green"; }
                 if (badge) { badge.textContent = "EVOLVED"; badge.className = "as-badge badge-evolved"; }
                 var agBar = card.querySelector(".as-bar-fill");
