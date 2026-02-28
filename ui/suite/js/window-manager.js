@@ -39,14 +39,14 @@ if (typeof window.WindowManager === 'undefined') {
             const top = 100 + offset;
             const left = 150 + offset;
 
-            windowEl.className = 'absolute w-[700px] h-[500px]  rounded-lg shadow-2xl flex flex-col border  overflow-hidden window-element';
+            windowEl.className = 'window-element';
             windowEl.style.top = `${top}px`;
             windowEl.style.left = `${left}px`;
             windowEl.style.zIndex = this.zIndexCounter++;
 
             windowEl.innerHTML = `
                 <!-- Header (Draggable) -->
-                <div class="window-header h-10  backdrop-blur flex items-center justify-between px-4 border-b  select-none cursor-move">
+                <div class="window-header">
                     <div class="font-mono text-xs font-bold text-brand-600 tracking-wide">${title}</div>
                     <div class="flex space-x-3 text-gray-400">
                         <button class="btn-minimize hover:text-gray-600" onclick="window.WindowManager.toggleMinimize('${id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
@@ -70,7 +70,7 @@ if (typeof window.WindowManager === 'undefined') {
             if (this.taskbarApps) {
                 const taskbarIcon = document.createElement('div');
                 taskbarIcon.id = `taskbar-item-${id}`;
-                taskbarIcon.className = 'h-10 w-12 flex items-center justify-center cursor-pointer  rounded border-b-2  transition-all taskbar-icon';
+                taskbarIcon.className = 'taskbar-item taskbar-icon';
                 taskbarIcon.onclick = () => this.toggleMinimize(id);
                 
                 let iconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>';
@@ -284,7 +284,7 @@ if (typeof window.WindowManager === 'undefined') {
 
         makeResizable(windowEl) {
             // Implement simple bottom-right resize for now
-            // In a full implementation, you'd add invisible border handles
+            // In a full implementation, you'd add invisible handles
             windowEl.style.resize = 'both';
             // Note: CSS resize creates conflicts with custom dragging/resizing if not careful.
             // For a true "WinBox" feel, custom handles (divs) on all 8 edges/corners are needed.
