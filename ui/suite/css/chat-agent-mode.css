@@ -25,18 +25,18 @@
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     background: transparent;
-    color: var(--text-secondary, #888);
+    color: var(--text-secondary, var(--text-muted));
     letter-spacing: 0.3px;
 }
 
 .chat-mode-btn.active {
-    background: #84d669;
-    color: #fff;
+    background: var(--accent);
+    color: var(--bg);
     box-shadow: 0 2px 8px rgba(132, 214, 105, 0.3);
 }
 
 .chat-mode-btn:not(.active):hover {
-    color: var(--text, #fff);
+    color: var(--text, var(--bg));
     background: var(--hover, rgba(255, 255, 255, 0.05));
 }
 
@@ -66,7 +66,7 @@
     border: 1px solid var(--border, #2a2a2a);
     border-radius: 24px;
     background: var(--surface, #1a1a24);
-    color: var(--text, #fff);
+    color: var(--text, var(--bg));
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 500;
@@ -76,7 +76,7 @@
 }
 
 .quick-action-chip:hover {
-    border-color: #84d669;
+    border-color: var(--accent);
     background: rgba(132, 214, 105, 0.08);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(132, 214, 105, 0.15);
@@ -109,7 +109,7 @@
     grid-row: 1 / -1;
     grid-column: 1;
     background: #f8f8f8;
-    border-right: 1px solid #f0f1f2;
+    border-right: 1px solid var(--border);
     flex-direction: column;
     z-index: 50;
 }
@@ -127,23 +127,23 @@
     cursor: pointer;
     transition: all 0.15s ease;
     position: relative;
-    border-bottom: 1px solid #f0f1f2;
+    border-bottom: 1px solid var(--border);
     background: transparent;
     border-left: none;
     border-right: none;
     border-top: none;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .agent-sidebar-item:hover {
-    background: #fff;
-    color: #3b3b3b;
+    background: var(--bg);
+    color: var(--text);
 }
 
 .agent-sidebar-item.active {
-    background: #fff;
-    border-left: 3px solid #84d669;
-    color: #3b3b3b;
+    background: var(--bg);
+    border-left: 3px solid var(--accent);
+    color: var(--text);
 }
 
 .agent-sidebar-badge {
@@ -154,8 +154,8 @@
     height: 16px;
     padding: 0 4px;
     border-radius: 8px;
-    background: #84d669;
-    color: #fff;
+    background: var(--accent);
+    color: var(--bg);
     font-size: 9px;
     font-weight: 700;
     display: flex;
@@ -172,7 +172,7 @@
 .agent-mode footer {
     grid-column: 2 / -1;
     padding: 8px 16px;
-    border-top: 1px solid #f0f1f2;
+    border-top: 1px solid var(--border);
 }
 
 /* ============================================
@@ -181,7 +181,7 @@
 
 .thought-process {
     margin: 12px 0;
-    border: 1px solid var(--border, #e0e0e0);
+    border: 1px solid var(--border, var(--border));
     border-radius: 8px;
     overflow: hidden;
     background: var(--surface, #f8f9fa);
@@ -196,8 +196,8 @@
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 600;
-    color: var(--text, #3b3b3b);
-    background: var(--surface, #f0f1f2);
+    color: var(--text, var(--text));
+    background: var(--surface, var(--border));
     transition: background 0.15s;
     border: none;
     width: 100%;
@@ -222,8 +222,8 @@
     padding: 12px 14px;
     font-size: 13px;
     line-height: 1.6;
-    color: var(--text-secondary, #666);
-    border-top: 1px solid var(--border, #e0e0e0);
+    color: var(--text-secondary, var(--text-muted));
+    border-top: 1px solid var(--border, var(--border));
 }
 
 .thought-process.expanded .thought-process-body {
@@ -238,9 +238,9 @@
     display: none;
     grid-column: 3;
     grid-row: 1;
-    border-left: 1px solid #f0f1f2;
+    border-left: 1px solid var(--border);
     flex-direction: column;
-    background: #fff;
+    background: var(--bg);
 }
 
 .agent-mode .agent-browser-panel {
@@ -253,27 +253,27 @@
     gap: 8px;
     padding: 8px 12px;
     background: #f8f8f8;
-    border-bottom: 1px solid #f0f1f2;
+    border-bottom: 1px solid var(--border);
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 600;
-    color: #3b3b3b;
+    color: var(--text);
 }
 
 .browser-url-bar {
     flex: 1;
     padding: 4px 10px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: var(--bg);
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-family: 'Fira Code', monospace;
     font-size: 11px;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .browser-panel-content {
     flex: 1;
-    background: #fff;
+    background: var(--bg);
 }
 
 .browser-panel-content iframe {
@@ -300,7 +300,7 @@
     display: none;
     grid-column: 2;
     grid-row: 2;
-    border-top: 1px solid #f0f1f2;
+    border-top: 1px solid var(--border);
     flex-direction: column;
     max-height: 200px;
     min-height: 120px;
@@ -320,7 +320,7 @@
     font-family: 'Fira Code', monospace;
     font-size: 11px;
     font-weight: 600;
-    color: #84d669;
+    color: var(--accent);
 }
 
 .terminal-panel-content {
@@ -355,8 +355,8 @@
     display: none;
     grid-column: 3;
     grid-row: 2;
-    border-top: 1px solid #f0f1f2;
-    border-left: 1px solid #f0f1f2;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
     padding: 12px 16px;
     background: #f8f8f8;
     flex-direction: column;
@@ -374,14 +374,14 @@
     font-family: 'Fira Code', monospace;
     font-size: 13px;
     font-weight: 600;
-    color: #3b3b3b;
+    color: var(--text);
 }
 
 .agent-info-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #84d669;
+    background: var(--accent);
 }
 
 .agent-level-badge {
@@ -396,24 +396,24 @@
 }
 
 .badge-evolved {
-    background: #84d669;
-    color: #fff;
+    background: var(--accent);
+    color: var(--bg);
 }
 
 .badge-bred {
     background: #f59e0b;
-    color: #fff;
+    color: var(--bg);
 }
 
 .badge-wild {
     background: #ef4444;
-    color: #fff;
+    color: var(--bg);
 }
 
 .agent-info-model {
     font-family: 'Fira Code', monospace;
     font-size: 11px;
-    color: #888;
+    color: var(--text-muted);
 }
 
 .agent-info-toggles {
@@ -428,7 +428,7 @@
     gap: 4px;
     font-family: 'Fira Code', monospace;
     font-size: 11px;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .agent-toggle-switch {
@@ -444,7 +444,7 @@
 }
 
 .agent-toggle-switch.on {
-    background: #84d669;
+    background: var(--accent);
 }
 
 .agent-toggle-switch::after {
@@ -455,7 +455,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    background: #fff;
+    background: var(--bg);
     transition: transform 0.2s;
 }
 
@@ -475,7 +475,7 @@
     justify-content: space-between;
     padding: 8px 16px;
     background: #f8f8f8;
-    border-top: 1px solid #f0f1f2;
+    border-top: 1px solid var(--border);
 }
 
 .agent-mode .agent-step-bar {
@@ -488,16 +488,16 @@
     gap: 12px;
     font-family: 'Fira Code', monospace;
     font-size: 13px;
-    color: #3b3b3b;
+    color: var(--text);
 }
 
 .step-nav-btn {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 1px solid #e0e0e0;
-    background: #fff;
-    color: #666;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -508,8 +508,8 @@
 }
 
 .step-nav-btn:hover {
-    border-color: #84d669;
-    color: #84d669;
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .step-action-btns {
@@ -522,8 +522,8 @@
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: #84d669;
-    color: #fff;
+    background: var(--accent);
+    color: var(--bg);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -544,7 +544,7 @@
 
 .agent-todo-list {
     margin: 12px 0;
-    border: 1px solid var(--border, #e0e0e0);
+    border: 1px solid var(--border, var(--border));
     border-radius: 8px;
     overflow: hidden;
 }
@@ -554,16 +554,16 @@
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background: var(--surface, #f0f1f2);
+    background: var(--surface, var(--border));
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 600;
-    color: var(--text, #3b3b3b);
+    color: var(--text, var(--text));
 }
 
 .agent-todo-count {
-    background: #84d669;
-    color: #fff;
+    background: var(--accent);
+    color: var(--bg);
     padding: 1px 6px;
     border-radius: 10px;
     font-size: 10px;
@@ -574,9 +574,9 @@
     align-items: center;
     gap: 10px;
     padding: 8px 14px;
-    border-top: 1px solid var(--border, #e0e0e0);
+    border-top: 1px solid var(--border, var(--border));
     font-size: 13px;
-    color: var(--text, #3b3b3b);
+    color: var(--text, var(--text));
     transition: opacity 0.2s;
 }
 
@@ -597,8 +597,8 @@
 }
 
 .agent-todo-item.done .agent-todo-check {
-    background: #84d669;
-    border-color: #84d669;
-    color: #fff;
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
     font-size: 10px;
 }

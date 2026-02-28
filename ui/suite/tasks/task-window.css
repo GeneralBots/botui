@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--bg, #fff);
+    background: var(--bg);
     font-family: 'Fira Code', monospace;
 }
 
@@ -14,8 +14,8 @@
 
 .tw-tabs-header {
     display: flex;
-    background: var(--surface, #f8f8f8);
-    border-bottom: 1px solid var(--border, #f0f1f2);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     min-height: 34px;
     overflow-x: auto;
 }
@@ -25,12 +25,12 @@
     min-width: 140px;
     padding: 0 18px;
     border: none;
-    border-right: 1px solid var(--border, #f0f1f2);
+    border-right: 1px solid var(--border);
     background: transparent;
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 600;
-    color: var(--text, #3b3b3b);
+    color: var(--text);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -40,12 +40,12 @@
 }
 
 .tw-tab:hover {
-    background: var(--bg, #fff);
+    background: var(--bg);
 }
 
 .tw-tab.active {
-    background: var(--accent, #84d669);
-    color: var(--bg, #fff);
+    background: var(--accent);
+    color: var(--bg);
 }
 
 .tw-tab-prefix {
@@ -69,20 +69,20 @@
 
 .tw-pipeline-tabs {
     display: flex;
-    background: var(--surface, #f8f8f8);
-    border-bottom: 1px solid var(--border, #f0f1f2);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
 }
 
 .tw-pipeline-tab {
     flex: 1;
     height: 32px;
     border: none;
-    border-right: 1px solid var(--border, #f0f1f2);
+    border-right: 1px solid var(--border);
     background: transparent;
     font-family: 'Fira Code', monospace;
     font-size: 11px;
     font-weight: 500;
-    color: var(--text-muted, #888);
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s;
 }
@@ -92,13 +92,13 @@
 }
 
 .tw-pipeline-tab:hover {
-    background: var(--bg, #fff);
-    color: var(--text, #3b3b3b);
+    background: var(--bg);
+    color: var(--text);
 }
 
 .tw-pipeline-tab.active {
-    background: var(--accent, #84d669);
-    color: var(--bg, #fff);
+    background: var(--accent);
+    color: var(--bg);
 }
 
 /* ============================================
@@ -109,7 +109,7 @@
     display: flex;
     gap: 8px;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--border, #f0f1f2);
+    border-bottom: 1px solid var(--border);
 }
 
 .tw-filter-chip {
@@ -117,26 +117,26 @@
     align-items: center;
     gap: 4px;
     padding: 5px 12px;
-    border: 1px solid var(--border, #e0e0e0);
+    border: 1px solid var(--border);
     border-radius: 16px;
-    background: var(--bg, #fff);
+    background: var(--bg);
     font-family: 'Fira Code', monospace;
     font-size: 11px;
     font-weight: 500;
-    color: var(--text-muted, #666);
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .tw-filter-chip:hover {
-    border-color: var(--accent, #84d669);
-    color: var(--text, #3b3b3b);
+    border-color: var(--accent);
+    color: var(--text);
 }
 
 .tw-filter-chip.active {
-    background: var(--accent, #84d669);
-    color: var(--bg, #fff);
-    border-color: var(--accent, #84d669);
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
 }
 
 .tw-filter-icon {
@@ -151,37 +151,37 @@
     display: flex;
     gap: 8px;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--border, #f0f1f2);
+    border-bottom: 1px solid var(--border);
 }
 
 .tw-intent-input {
     flex: 1;
     padding: 8px 14px;
-    border: 1px solid var(--border, #e0e0e0);
+    border: 1px solid var(--border);
     border-radius: 6px;
     font-family: 'Fira Code', monospace;
     font-size: 13px;
-    color: var(--text, #3b3b3b);
+    color: var(--text);
     outline: none;
     transition: border-color 0.15s;
-    background: var(--bg, #fff);
+    background: var(--bg);
 }
 
 .tw-intent-input:focus {
-    border-color: var(--accent, #84d669);
+    border-color: var(--accent);
     box-shadow: 0 0 0 3px var(--accent-light, rgba(132, 214, 105, 0.15));
 }
 
 .tw-intent-input::placeholder {
-    color: var(--text-muted, #bbb);
+    color: var(--text-muted);
 }
 
 .tw-intent-run {
     padding: 8px 20px;
     border: none;
     border-radius: 6px;
-    background: var(--accent, #84d669);
-    color: var(--bg, #fff);
+    background: var(--accent);
+    color: var(--bg);
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 700;
@@ -215,14 +215,14 @@
 .tw-task-list {
     width: 280px;
     min-width: 200px;
-    border-right: 1px solid var(--border, #f0f1f2);
+    border-right: 1px solid var(--border);
     overflow-y: auto;
 }
 
 .tw-task-list-empty {
     padding: 24px 16px;
     text-align: center;
-    color: var(--text-muted, #bbb);
+    color: var(--text-muted);
     font-size: 13px;
 }
 
@@ -239,7 +239,7 @@
     justify-content: center;
     height: 100%;
     text-align: center;
-    color: var(--text-muted, #888);
+    color: var(--text-muted);
     gap: 8px;
 }
 
@@ -250,7 +250,7 @@
 
 .tw-hint {
     font-size: 12px;
-    color: var(--text-muted, #bbb);
+    color: var(--text-muted);
 }
 
 /* ============================================
@@ -262,18 +262,18 @@
     align-items: center;
     gap: 10px;
     padding: 10px 16px;
-    border-bottom: 1px solid var(--border, #f0f1f2);
+    border-bottom: 1px solid var(--border);
     cursor: pointer;
     transition: background 0.15s;
 }
 
 .tw-task-item:hover {
-    background: var(--surface, #f8f8f8);
+    background: var(--surface);
 }
 
 .tw-task-item.active {
     background: var(--accent-light, rgba(132, 214, 105, 0.08));
-    border-left: 3px solid var(--accent, #84d669);
+    border-left: 3px solid var(--accent);
 }
 
 .tw-task-status-dot {
@@ -284,7 +284,7 @@
 }
 
 .tw-task-status-dot.running {
-    background: var(--accent, #84d669);
+    background: var(--accent);
 }
 
 .tw-task-status-dot.pending {
@@ -300,7 +300,7 @@
 }
 
 .tw-task-status-dot.paused {
-    background: var(--text-muted, #888);
+    background: var(--text-muted);
 }
 
 .tw-task-item-info {
@@ -311,7 +311,7 @@
 .tw-task-item-name {
     font-size: 12px;
     font-weight: 600;
-    color: var(--text, #3b3b3b);
+    color: var(--text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -319,7 +319,7 @@
 
 .tw-task-item-type {
     font-size: 10px;
-    color: var(--text-muted, #888);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -338,18 +338,18 @@
     gap: 16px;
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 1px solid var(--border, #f0f1f2);
+    border-bottom: 1px solid var(--border);
 }
 
 .tw-agent-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: var(--accent, #84d669);
+    background: var(--accent);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--bg, #fff);
+    color: var(--bg);
     font-size: 20px;
     font-weight: 700;
 }
@@ -361,13 +361,13 @@
 .tw-agent-title {
     font-size: 16px;
     font-weight: 700;
-    color: var(--text, #3b3b3b);
+    color: var(--text);
     margin: 0 0 4px 0;
 }
 
 .tw-agent-subtitle {
     font-size: 12px;
-    color: var(--text-muted, #888);
+    color: var(--text-muted);
 }
 
 .tw-section {
@@ -377,7 +377,7 @@
 .tw-section-title {
     font-size: 11px;
     font-weight: 700;
-    color: var(--text-muted, #888);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
@@ -391,20 +391,20 @@
 
 .tw-stat-card {
     padding: 12px;
-    background: var(--surface, #f8f8f8);
+    background: var(--surface);
     border-radius: 8px;
-    border: 1px solid #f0f1f2;
+    border: 1px solid var(--border);
 }
 
 .tw-stat-value {
     font-size: 18px;
     font-weight: 700;
-    color: var(--text, #3b3b3b);
+    color: var(--text);
 }
 
 .tw-stat-label {
     font-size: 10px;
-    color: var(--text-muted, #888);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.3px;
     margin-top: 2px;
