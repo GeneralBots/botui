@@ -25,7 +25,7 @@
     --sentient-text-primary: var(--text, #ffffff);
     --sentient-text-secondary: var(--text-secondary, #a0a0a0);
     --sentient-text-muted: var(--text-tertiary, #666666);
-    --sentient-text-dark: #000000;
+    --sentient-text-dark: var(--bg-invert, #000000);
 
     --sentient-border: var(--border, #2a2a2a);
     --sentient-border-light: var(--border-light, #333333);

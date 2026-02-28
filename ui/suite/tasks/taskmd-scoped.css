@@ -108,19 +108,19 @@
 
 .taskmd-status-badge.status-running {
     background: var(--primary, #c5f82a);
-    color: #000;
+    color: var(--bg, #000);
 }
 
 .taskmd-status-badge.status-completed,
 .taskmd-status-badge.status-complete {
-    background: var(--success, #22c55e);
-    color: #fff;
+    background: var(--success, var(--success, #22c55e));
+    color: var(--text, #fff);
 }
 
 .taskmd-status-badge.status-error,
 .taskmd-status-badge.status-failed {
-    background: var(--error, #ef4444);
-    color: #fff;
+    background: var(--error, var(--error, #ef4444));
+    color: var(--text, #fff);
 }
 
 .taskmd-status-badge.status-pending {
@@ -430,7 +430,7 @@
 }
 
 .tree-section-dot.failed {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
 }
 
 .tree-status.completed {
@@ -442,7 +442,7 @@
 }
 
 .tree-status.failed {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
 }
 
 /* Tree Children - visible when expanded (default state) */
@@ -525,7 +525,7 @@
 }
 
 .tree-item-dot.failed {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
 }
 
 @keyframes dot-pulse {
@@ -567,7 +567,7 @@
 }
 
 .tree-item-check.completed {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .tree-item-check.running {
@@ -584,7 +584,7 @@
 }
 
 .tree-item.completed .tree-item-dot {
-    background: var(--success, #22c55e);
+    background: var(--success, var(--success, #22c55e));
 }
 
 /* Parent section completed when all children done */
@@ -757,8 +757,8 @@
 }
 
 .taskmd-terminal-output .markdown-content pre {
-    background: #151515;
-    border: 1px solid #252525;
+    background: var(--surface-hover, #151515);
+    border: 1px solid var(--border-hover, #252525);
     border-radius: 6px;
     padding: 12px 16px;
     margin: 12px 0;
@@ -769,7 +769,7 @@
 }
 
 .taskmd-terminal-output .markdown-content code {
-    background: #1a1a1a;
+    background: var(--surface-active, #1a1a1a);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: "JetBrains Mono", "Fira Code", monospace;
@@ -780,7 +780,7 @@
 .taskmd-terminal-output .markdown-content pre code {
     background: transparent;
     padding: 0;
-    color: #aaa;
+    color: var(--text-secondary, #aaa);
 }
 
 .taskmd-terminal-output .markdown-content blockquote {
@@ -799,13 +799,13 @@
 
 .taskmd-terminal-output .markdown-content th,
 .taskmd-terminal-output .markdown-content td {
-    border: 1px solid #252525;
+    border: 1px solid var(--border-hover, #252525);
     padding: 8px 12px;
     text-align: left;
 }
 
 .taskmd-terminal-output .markdown-content th {
-    background: #151515;
+    background: var(--surface-hover, #151515);
     font-weight: 600;
     color: var(--text, #fff);
 }
@@ -826,11 +826,11 @@
 }
 
 .taskmd-terminal-output .terminal-line.success {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .taskmd-terminal-output .terminal-line.error {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
 }
 
 .taskmd-terminal-output .terminal-line.progress {
@@ -841,7 +841,7 @@
 /* Markdown-like header styling */
 .taskmd-terminal-output .terminal-line:has-text("##"),
 .taskmd-terminal-output .terminal-line[data-type="header"] {
-    color: #fff;
+    color: var(--text, #fff);
     font-weight: 600;
     margin-top: 12px;
     margin-bottom: 4px;
@@ -850,13 +850,13 @@
 
 /* Code block styling */
 .taskmd-terminal-output .terminal-code {
-    background: #151515;
-    border: 1px solid #252525;
+    background: var(--surface-hover, #151515);
+    border: 1px solid var(--border-hover, #252525);
     border-radius: 6px;
     padding: 12px 16px;
     margin: 8px 0;
     font-size: 12px;
-    color: #aaa;
+    color: var(--text-secondary, #aaa);
     overflow-x: auto;
     white-space: pre-wrap;
     word-break: break-word;
@@ -869,28 +869,28 @@
 
 /* List items */
 .taskmd-terminal-output .terminal-line.info {
-    color: #888;
+    color: var(--text-muted, #888);
 }
 
 /* Bold text in terminal (markdown **text**) */
 .taskmd-terminal-output strong,
 .taskmd-terminal-output b {
-    color: #fff;
+    color: var(--text, #fff);
     font-weight: 600;
 }
 
 /* Inline code (markdown `code`) */
 .taskmd-terminal-output code {
-    background: #1a1a1a;
+    background: var(--surface-active, #1a1a1a);
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 12px;
-    color: #c5f82a;
+    color: var(--accent, #c5f82a);
 }
 
 /* Timestamp styling */
 .taskmd-terminal-output .terminal-timestamp {
-    color: #444;
+    color: var(--text-tertiary, #444);
     font-size: 11px;
     margin-right: 8px;
 }
@@ -950,7 +950,7 @@
 }
 
 .taskmd-terminal-output .terminal-inline-code {
-    background: #1a1a1a;
+    background: var(--surface-active, #1a1a1a);
     padding: 2px 6px;
     border-radius: 4px;
     font-family: "JetBrains Mono", "Fira Code", monospace;
@@ -973,7 +973,7 @@
 }
 
 .taskmd-terminal-output .check-mark {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
     font-weight: 600;
 }
 
@@ -1016,17 +1016,17 @@
 }
 
 .taskmd-actions .btn-open-app {
-    background: var(--success, #22c55e);
-    color: #fff;
+    background: var(--success, var(--success, #22c55e));
+    color: var(--text, #fff);
     font-weight: 600;
     padding: 8px 18px;
     font-size: 13px;
-    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    box-shadow: 0 2px 8px var(--success-light, rgba(34, 197, 94, 0.3));
 }
 
 .taskmd-actions .btn-open-app:hover {
-    background: #16a34a;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    background: var(--success-hover, #16a34a);
+    box-shadow: 0 4px 12px var(--success-light, rgba(34, 197, 94, 0.4));
     transform: translateY(-1px);
 }
 
@@ -1039,15 +1039,15 @@
 }
 
 .taskmd-actions .btn-cancel:hover {
-    border-color: var(--error, #ef4444);
-    color: var(--error, #ef4444);
+    border-color: var(--error, var(--error, #ef4444));
+    color: var(--error, var(--error, #ef4444));
 }
 
 /* Empty State */
 .progress-empty {
     padding: 40px 24px;
     text-align: center;
-    color: #555;
+    color: var(--text-muted, #555);
     font-size: 14px;
 }
 
@@ -1057,19 +1057,19 @@
     align-items: center;
     gap: 12px;
     padding: 16px 24px;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid #ef4444;
+    background: var(--error-light, rgba(239, 68, 68, 0.1));
+    border: 1px solid var(--error, #ef4444);
     border-radius: 6px;
     margin: 16px 24px;
 }
 
 .error-alert .error-icon {
-    color: #ef4444;
+    color: var(--error, #ef4444);
     font-size: 18px;
 }
 
 .error-alert .error-text {
-    color: #ef4444;
+    color: var(--error, #ef4444);
     font-size: 14px;
 }
 
@@ -1117,14 +1117,14 @@
     left: 20px;
     right: 70px;
     height: 3px;
-    background: #1a1a1a;
+    background: var(--surface-active, #1a1a1a);
     border-radius: 2px;
 }
 
 .tree-progress-bar {
     flex: 1;
     height: 3px;
-    background: #c5f82a;
+    background: var(--accent, #c5f82a);
     border-radius: 2px;
     transition: width 0.3s ease-out;
     position: relative;
@@ -1134,7 +1134,7 @@
 .tree-progress-percent {
     font-size: 11px;
     font-weight: 600;
-    color: #c5f82a;
+    color: var(--accent, #c5f82a);
     min-width: 36px;
     text-align: right;
 }

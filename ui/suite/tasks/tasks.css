@@ -162,22 +162,22 @@ body:has(.tasks-app) {
     justify-content: center;
     gap: 8px;
     padding: 14px 28px;
-    background: #22c55e !important;
+    background: var(--success, #22c55e) !important;
     border: none;
     border-radius: 10px;
-    color: #fff !important;
+    color: var(--text, #fff) !important;
     font-family: inherit;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    box-shadow: 0 4px 12px var(--success-light, rgba(34, 197, 94, 0.4));
 }
 
 .btn-create-run:hover {
-    background: #16a34a !important;
-    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+    background: var(--success-hover, #16a34a) !important;
+    box-shadow: 0 6px 20px var(--success-light, rgba(34, 197, 94, 0.5));
     transform: translateY(-1px);
 }
 
@@ -190,7 +190,7 @@ body:has(.tasks-app) {
     width: 16px;
     height: 16px;
     border: 2px solid rgba(0, 0, 0, 0.3);
-    border-top-color: #000;
+    border-top-color: var(--bg, #000);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -234,33 +234,33 @@ body:has(.tasks-app) {
 }
 
 .intent-result .result-success {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .intent-result .result-error {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
 }
 
 .intent-result .intent-success {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
     font-size: 14px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 8px 12px;
-    background: rgba(34, 197, 94, 0.1);
+    background: var(--success-light, rgba(34, 197, 94, 0.1));
     border-radius: 6px;
     animation: fadeIn 0.3s ease;
 }
 
 .intent-result .intent-error {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
     font-size: 14px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 8px 12px;
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--error-light, rgba(239, 68, 68, 0.1));
     border-radius: 6px;
 }
 
@@ -449,19 +449,19 @@ body:has(.tasks-app) {
 }
 
 .task-card.status-awaiting::before {
-    background: var(--warning, #f59e0b);
+    background: var(--warning, var(--warning, #f59e0b));
 }
 
 .task-card.status-paused::before {
-    background: var(--info, #8b5cf6);
+    background: var(--info, var(--info, #8b5cf6));
 }
 
 .task-card.status-complete::before {
-    background: var(--success, #22c55e);
+    background: var(--success, var(--success, #22c55e));
 }
 
 .task-card.status-error::before {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
 }
 
 .task-card.status-pending::before {
@@ -518,23 +518,23 @@ body:has(.tasks-app) {
 }
 
 .task-card-status.status-complete {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--success, #22c55e);
+    background: var(--success-light, rgba(34, 197, 94, 0.15));
+    color: var(--success, var(--success, #22c55e));
 }
 
 .task-card-status.status-error {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--error, #ef4444);
+    background: var(--error-light, rgba(239, 68, 68, 0.15));
+    color: var(--error, var(--error, #ef4444));
 }
 
 .task-card-status.status-awaiting {
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--warning, #f59e0b);
+    background: var(--warning-light, rgba(245, 158, 11, 0.15));
+    color: var(--warning, var(--warning, #f59e0b));
 }
 
 .task-card-status.status-paused {
-    background: rgba(139, 92, 246, 0.15);
-    color: var(--info, #8b5cf6);
+    background: var(--info-light, rgba(139, 92, 246, 0.15));
+    color: var(--info, var(--info, #8b5cf6));
 }
 
 .task-card-body {
@@ -551,8 +551,8 @@ body:has(.tasks-app) {
 
 .priority-badge.priority-high,
 .priority-badge.priority-urgent {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--error, #ef4444);
+    background: var(--error-light, rgba(239, 68, 68, 0.15));
+    color: var(--error, var(--error, #ef4444));
 }
 
 .priority-badge.priority-medium {
@@ -561,8 +561,8 @@ body:has(.tasks-app) {
 }
 
 .priority-badge.priority-low {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--success, #22c55e);
+    background: var(--success-light, rgba(34, 197, 94, 0.15));
+    color: var(--success, var(--success, #22c55e));
 }
 
 .task-card-footer {
@@ -611,7 +611,7 @@ body:has(.tasks-app) {
 }
 
 .task-card.awaiting .progress-fill {
-    background: var(--warning, #f59e0b);
+    background: var(--warning, var(--warning, #f59e0b));
 }
 
 .progress-info {
@@ -637,7 +637,7 @@ body:has(.tasks-app) {
 }
 
 .task-card.awaiting .progress-percent {
-    color: var(--warning, #f59e0b);
+    color: var(--warning, var(--warning, #f59e0b));
     background: transparent;
 }
 
@@ -667,15 +667,15 @@ body:has(.tasks-app) {
 }
 
 .status-value.status-awaiting {
-    color: var(--warning, #f59e0b);
+    color: var(--warning, var(--warning, #f59e0b));
 }
 
 .status-value.status-paused {
-    color: var(--info, #8b5cf6);
+    color: var(--info, var(--info, #8b5cf6));
 }
 
 .status-value.status-complete {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 /* Task Card Detail */
@@ -784,14 +784,14 @@ body:has(.tasks-app) {
 
 .task-status.task-status-completed,
 .task-status.task-status-done {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--success, #22c55e);
+    background: var(--success-light, rgba(34, 197, 94, 0.15));
+    color: var(--success, var(--success, #22c55e));
 }
 
 .task-status.task-status-error,
 .task-status.task-status-failed {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--error, #ef4444);
+    background: var(--error-light, rgba(239, 68, 68, 0.15));
+    color: var(--error, var(--error, #ef4444));
 }
 
 .task-detail-meta {
@@ -872,13 +872,13 @@ body:has(.tasks-app) {
 }
 
 .task-detail-section.error-section {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: var(--error-light, rgba(239, 68, 68, 0.1));
+    border: 1px solid var(--error-light, rgba(239, 68, 68, 0.2));
 }
 
 .task-detail-section .error-text {
     font-size: 13px;
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
     line-height: 1.5;
     margin: 0;
     font-family: monospace;
@@ -909,12 +909,12 @@ body:has(.tasks-app) {
 .btn-review-decision {
     background: var(--primary, #c5f82a);
     border-color: var(--primary, #c5f82a);
-    color: #000;
+    color: var(--bg, #000);
 }
 
 .btn-review-decision:hover {
     background: #d4ff4a;
-    color: #000;
+    color: var(--bg, #000);
 }
 
 /* =============================================================================
@@ -994,8 +994,8 @@ body:has(.tasks-app) {
 }
 
 .status-badge.awaiting {
-    background: rgba(245, 158, 11, 0.15);
-    color: var(--warning, #f59e0b);
+    background: var(--warning-light, rgba(245, 158, 11, 0.15));
+    color: var(--warning, var(--warning, #f59e0b));
 }
 
 .status-badge.active {
@@ -1012,7 +1012,7 @@ body:has(.tasks-app) {
     background: var(--primary, #c5f82a);
     border: none;
     border-radius: 6px;
-    color: #000;
+    color: var(--bg, #000);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1036,8 +1036,8 @@ body:has(.tasks-app) {
 /* Decision Alert */
 .decision-alert {
     margin: 20px 24px;
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.25);
+    background: var(--warning-light, rgba(245, 158, 11, 0.08));
+    border: 1px solid var(--warning-light, rgba(245, 158, 11, 0.25));
     border-radius: 16px;
     padding: 20px;
 }
@@ -1059,7 +1059,7 @@ body:has(.tasks-app) {
 .decision-title {
     font-size: 14px;
     font-weight: 600;
-    color: var(--warning, #f59e0b);
+    color: var(--warning, var(--warning, #f59e0b));
     margin: 0 0 4px 0;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1095,7 +1095,7 @@ body:has(.tasks-app) {
     background: var(--primary, #c5f82a);
     border: none;
     border-radius: 6px;
-    color: #000;
+    color: var(--bg, #000);
     font-family: inherit;
     font-size: 14px;
     font-weight: 600;
@@ -1278,13 +1278,13 @@ body:has(.tasks-app) {
 }
 
 .log-step.completed {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--success, #22c55e);
+    background: var(--success-light, rgba(34, 197, 94, 0.15));
+    color: var(--success, var(--success, #22c55e));
 }
 
 .log-status {
     font-size: 12px;
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .log-subitems {
@@ -1307,7 +1307,7 @@ body:has(.tasks-app) {
 }
 
 .log-dot.completed {
-    background: var(--success, #22c55e);
+    background: var(--success, var(--success, #22c55e));
 }
 
 .log-subname {
@@ -1669,11 +1669,11 @@ body:has(.tasks-app) {
 }
 
 .toast.success {
-    border-color: var(--success, #22c55e);
+    border-color: var(--success, var(--success, #22c55e));
 }
 
 .toast.error {
-    border-color: var(--error, #ef4444);
+    border-color: var(--error, var(--error, #ef4444));
 }
 
 @keyframes slideIn {
@@ -1896,12 +1896,12 @@ body:has(.tasks-app) {
 }
 
 .floating-progress-title .progress-dot.completed {
-    background: var(--success, #22c55e);
+    background: var(--success, var(--success, #22c55e));
     animation: none;
 }
 
 .floating-progress-title .progress-dot.error {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
     animation: none;
 }
 
@@ -2079,7 +2079,7 @@ body:has(.tasks-app) {
 }
 
 .metric-value.phase-analyzing {
-    color: var(--warning, #f59e0b);
+    color: var(--warning, var(--warning, #f59e0b));
 }
 
 .metric-value.phase-parsing {
@@ -2087,7 +2087,7 @@ body:has(.tasks-app) {
 }
 
 .metric-value.phase-database {
-    color: var(--accent, #8b5cf6);
+    color: var(--accent, var(--info, #8b5cf6));
 }
 
 .metric-value.phase-writing {
@@ -2099,19 +2099,19 @@ body:has(.tasks-app) {
 }
 
 .metric-value.phase-tools {
-    color: var(--warning, #f59e0b);
+    color: var(--warning, var(--warning, #f59e0b));
 }
 
 .metric-value.phase-schedulers {
-    color: var(--accent, #8b5cf6);
+    color: var(--accent, var(--info, #8b5cf6));
 }
 
 .metric-value.phase-syncing {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .metric-value.phase-completed {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 /* =============================================================================
@@ -2154,7 +2154,7 @@ body:has(.tasks-app) {
 }
 
 .terminal-status.completed {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
     animation: none;
 }
 
@@ -2328,23 +2328,23 @@ body:has(.tasks-app) {
 .status-badge-rich.status-running,
 .status-badge-rich.status-pending {
     background: var(--primary, #c5f82a);
-    color: #000;
+    color: var(--bg, #000);
 }
 
 .status-badge-rich.status-completed {
-    background: var(--success, #22c55e);
-    color: #fff;
+    background: var(--success, var(--success, #22c55e));
+    color: var(--text, #fff);
 }
 
 .status-badge-rich.status-error,
 .status-badge-rich.status-failed {
-    background: var(--error, #ef4444);
-    color: #fff;
+    background: var(--error, var(--error, #ef4444));
+    color: var(--text, #fff);
 }
 
 .status-badge-rich.status-paused {
-    background: var(--warning, #f59e0b);
-    color: #000;
+    background: var(--warning, var(--warning, #f59e0b));
+    color: var(--bg, #000);
 }
 
 /* Section Boxes */
@@ -2393,11 +2393,11 @@ body:has(.tasks-app) {
 }
 
 .status-dot.status-completed {
-    background: var(--success, #22c55e);
+    background: var(--success, var(--success, #22c55e));
 }
 
 .status-dot.status-error {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
 }
 
 @keyframes pulse-status-dot {
@@ -2432,19 +2432,19 @@ body:has(.tasks-app) {
     align-items: center;
     gap: 10px;
     padding: 14px 18px;
-    background: rgba(239, 68, 68, 0.15);
-    border: 2px solid var(--error, #ef4444);
+    background: var(--error-light, rgba(239, 68, 68, 0.15));
+    border: 2px solid var(--error, var(--error, #ef4444));
     border-radius: 10px;
     margin-bottom: 16px;
 }
 
 .error-icon {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
     font-size: 1.1rem;
 }
 
 .error-text {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
     font-size: 0.85rem;
 }
 
@@ -2573,7 +2573,7 @@ body:has(.tasks-app) {
 .log-step-badge {
     padding: 4px 12px;
     background: var(--primary, #c5f82a);
-    color: #000;
+    color: var(--bg, #000);
     font-size: 0.75rem;
     font-weight: 700;
     border-radius: 6px;
@@ -2589,8 +2589,8 @@ body:has(.tasks-app) {
 }
 
 .log-status-badge.completed {
-    background: rgba(34, 197, 94, 0.15);
-    color: var(--success, #22c55e);
+    background: var(--success-light, rgba(34, 197, 94, 0.15));
+    color: var(--success, var(--success, #22c55e));
 }
 
 .log-group-items {
@@ -2619,7 +2619,7 @@ body:has(.tasks-app) {
 }
 
 .log-dot.completed {
-    background: var(--success, #22c55e);
+    background: var(--success, var(--success, #22c55e));
 }
 
 .log-dot.running {
@@ -2628,7 +2628,7 @@ body:has(.tasks-app) {
 }
 
 .log-dot.failed {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
 }
 
 .log-dot.pending {
@@ -2656,7 +2656,7 @@ body:has(.tasks-app) {
 
 .log-item-status {
     font-size: 0.75rem;
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .log-subitem {
@@ -2684,7 +2684,7 @@ body:has(.tasks-app) {
 }
 
 .log-subdot.failed {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
 }
 
 .log-subdot.pending {
@@ -2769,11 +2769,11 @@ body:has(.tasks-app) {
 }
 
 .terminal-line.error {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
 }
 
 .terminal-line.success {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .terminal-line.llm-stream {
@@ -2850,41 +2850,41 @@ body:has(.tasks-app) {
 }
 
 .btn-action-rich.btn-pause {
-    border-color: var(--warning, #f59e0b);
+    border-color: var(--warning, var(--warning, #f59e0b));
     border-width: 2px;
-    color: var(--warning, #f59e0b);
-    background: rgba(245, 158, 11, 0.08);
+    color: var(--warning, var(--warning, #f59e0b));
+    background: var(--warning-light, rgba(245, 158, 11, 0.08));
 }
 
 .btn-action-rich.btn-pause:hover {
-    background: rgba(245, 158, 11, 0.2);
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+    background: var(--warning-light, rgba(245, 158, 11, 0.2));
+    box-shadow: 0 0 12px var(--warning-light, rgba(245, 158, 11, 0.3));
 }
 
 .btn-action-rich.btn-cancel {
-    border-color: var(--error, #ef4444);
+    border-color: var(--error, var(--error, #ef4444));
     border-width: 2px;
-    color: var(--error, #ef4444);
-    background: rgba(239, 68, 68, 0.08);
+    color: var(--error, var(--error, #ef4444));
+    background: var(--error-light, rgba(239, 68, 68, 0.08));
 }
 
 .btn-action-rich.btn-cancel:hover {
-    background: rgba(239, 68, 68, 0.2);
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
+    background: var(--error-light, rgba(239, 68, 68, 0.2));
+    box-shadow: 0 0 12px var(--error-light, rgba(239, 68, 68, 0.3));
 }
 
 .btn-action-rich.btn-open-app {
-    border-color: var(--success, #22c55e);
+    border-color: var(--success, var(--success, #22c55e));
     border-width: 2px;
-    color: var(--success, #22c55e);
-    background: rgba(34, 197, 94, 0.1);
+    color: var(--success, var(--success, #22c55e));
+    background: var(--success-light, rgba(34, 197, 94, 0.1));
     text-decoration: none;
 }
 
 .btn-action-rich.btn-open-app:hover {
-    background: rgba(34, 197, 94, 0.25);
-    box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-    color: #fff;
+    background: var(--success-light, rgba(34, 197, 94, 0.25));
+    box-shadow: 0 0 12px var(--success-light, rgba(34, 197, 94, 0.4));
+    color: var(--text, #fff);
 }
 
 /* =============================================================================
@@ -2915,8 +2915,8 @@ body:has(.tasks-app) {
 }
 
 .log-item-done {
-    background: rgba(34, 197, 94, 0.08);
-    border-left: 3px solid var(--success, #22c55e);
+    background: var(--success-light, rgba(34, 197, 94, 0.08));
+    border-left: 3px solid var(--success, var(--success, #22c55e));
 }
 
 .log-item-current {
@@ -2930,7 +2930,7 @@ body:has(.tasks-app) {
 }
 
 .log-check {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
     font-weight: bold;
 }
 
@@ -2976,19 +2976,19 @@ body:has(.tasks-app) {
     align-items: center;
     gap: 10px;
     padding: 10px 14px;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid var(--error, #ef4444);
+    background: var(--error-light, rgba(239, 68, 68, 0.1));
+    border: 1px solid var(--error, var(--error, #ef4444));
     border-radius: 6px;
     margin-top: 10px;
 }
 
 .summary-alert .alert-icon {
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
 }
 
 .summary-alert .alert-text {
     font-size: 0.8rem;
-    color: var(--error, #ef4444);
+    color: var(--error, var(--error, #ef4444));
 }
 
 .progress-summary-content {
@@ -3075,7 +3075,7 @@ body:has(.tasks-app) {
 }
 
 .section-indicator.failed {
-    background: var(--error, #ef4444);
+    background: var(--error, var(--error, #ef4444));
 }
 
 .section-name {
@@ -3244,7 +3244,7 @@ body:has(.tasks-app) {
 }
 
 .item-check.completed {
-    color: var(--success, #22c55e);
+    color: var(--success, var(--success, #22c55e));
 }
 
 .item-check.running {
@@ -3444,7 +3444,7 @@ body:has(.tasks-app) {
 }
 
 .task-card.completed .task-status-badge {
-    background: var(--success, #22c55e);
+    background: var(--success, var(--success, #22c55e));
 }
 
 /* Status section in detail panel */

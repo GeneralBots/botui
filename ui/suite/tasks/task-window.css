@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: #fff;
+    background: var(--bg, #fff);
     font-family: 'Fira Code', monospace;
 }
 
@@ -14,8 +14,8 @@
 
 .tw-tabs-header {
     display: flex;
-    background: #f8f8f8;
-    border-bottom: 1px solid #f0f1f2;
+    background: var(--surface, #f8f8f8);
+    border-bottom: 1px solid var(--border, #f0f1f2);
     min-height: 34px;
     overflow-x: auto;
 }
@@ -25,12 +25,12 @@
     min-width: 140px;
     padding: 0 18px;
     border: none;
-    border-right: 1px solid #f0f1f2;
+    border-right: 1px solid var(--border, #f0f1f2);
     background: transparent;
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 600;
-    color: #3b3b3b;
+    color: var(--text, #3b3b3b);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -40,12 +40,12 @@
 }
 
 .tw-tab:hover {
-    background: #fff;
+    background: var(--bg, #fff);
 }
 
 .tw-tab.active {
-    background: #84d669;
-    color: #fff;
+    background: var(--accent, #84d669);
+    color: var(--bg, #fff);
 }
 
 .tw-tab-prefix {
@@ -69,20 +69,20 @@
 
 .tw-pipeline-tabs {
     display: flex;
-    background: #f8f8f8;
-    border-bottom: 1px solid #f0f1f2;
+    background: var(--surface, #f8f8f8);
+    border-bottom: 1px solid var(--border, #f0f1f2);
 }
 
 .tw-pipeline-tab {
     flex: 1;
     height: 32px;
     border: none;
-    border-right: 1px solid #f0f1f2;
+    border-right: 1px solid var(--border, #f0f1f2);
     background: transparent;
     font-family: 'Fira Code', monospace;
     font-size: 11px;
     font-weight: 500;
-    color: #888;
+    color: var(--text-muted, #888);
     cursor: pointer;
     transition: all 0.15s;
 }
@@ -92,13 +92,13 @@
 }
 
 .tw-pipeline-tab:hover {
-    background: #fff;
-    color: #3b3b3b;
+    background: var(--bg, #fff);
+    color: var(--text, #3b3b3b);
 }
 
 .tw-pipeline-tab.active {
-    background: #84d669;
-    color: #fff;
+    background: var(--accent, #84d669);
+    color: var(--bg, #fff);
 }
 
 /* ============================================
@@ -109,7 +109,7 @@
     display: flex;
     gap: 8px;
     padding: 12px 16px;
-    border-bottom: 1px solid #f0f1f2;
+    border-bottom: 1px solid var(--border, #f0f1f2);
 }
 
 .tw-filter-chip {
@@ -117,26 +117,26 @@
     align-items: center;
     gap: 4px;
     padding: 5px 12px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--border, #e0e0e0);
     border-radius: 16px;
-    background: #fff;
+    background: var(--bg, #fff);
     font-family: 'Fira Code', monospace;
     font-size: 11px;
     font-weight: 500;
-    color: #666;
+    color: var(--text-muted, #666);
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .tw-filter-chip:hover {
-    border-color: #84d669;
-    color: #3b3b3b;
+    border-color: var(--accent, #84d669);
+    color: var(--text, #3b3b3b);
 }
 
 .tw-filter-chip.active {
-    background: #84d669;
-    color: #fff;
-    border-color: #84d669;
+    background: var(--accent, #84d669);
+    color: var(--bg, #fff);
+    border-color: var(--accent, #84d669);
 }
 
 .tw-filter-icon {
@@ -151,37 +151,37 @@
     display: flex;
     gap: 8px;
     padding: 12px 16px;
-    border-bottom: 1px solid #f0f1f2;
+    border-bottom: 1px solid var(--border, #f0f1f2);
 }
 
 .tw-intent-input {
     flex: 1;
     padding: 8px 14px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--border, #e0e0e0);
     border-radius: 6px;
     font-family: 'Fira Code', monospace;
     font-size: 13px;
-    color: #3b3b3b;
+    color: var(--text, #3b3b3b);
     outline: none;
     transition: border-color 0.15s;
-    background: #fff;
+    background: var(--bg, #fff);
 }
 
 .tw-intent-input:focus {
-    border-color: #84d669;
-    box-shadow: 0 0 0 3px rgba(132, 214, 105, 0.15);
+    border-color: var(--accent, #84d669);
+    box-shadow: 0 0 0 3px var(--accent-light, rgba(132, 214, 105, 0.15));
 }
 
 .tw-intent-input::placeholder {
-    color: #bbb;
+    color: var(--text-muted, #bbb);
 }
 
 .tw-intent-run {
     padding: 8px 20px;
     border: none;
     border-radius: 6px;
-    background: #84d669;
-    color: #fff;
+    background: var(--accent, #84d669);
+    color: var(--bg, #fff);
     font-family: 'Fira Code', monospace;
     font-size: 12px;
     font-weight: 700;
@@ -191,9 +191,9 @@
 }
 
 .tw-intent-run:hover {
-    background: #72c458;
+    background: var(--accent-hover, #72c458);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(132, 214, 105, 0.3);
+    box-shadow: 0 2px 8px var(--accent-light, rgba(132, 214, 105, 0.3));
 }
 
 .tw-intent-run:disabled {
@@ -215,14 +215,14 @@
 .tw-task-list {
     width: 280px;
     min-width: 200px;
-    border-right: 1px solid #f0f1f2;
+    border-right: 1px solid var(--border, #f0f1f2);
     overflow-y: auto;
 }
 
 .tw-task-list-empty {
     padding: 24px 16px;
     text-align: center;
-    color: #bbb;
+    color: var(--text-muted, #bbb);
     font-size: 13px;
 }
 
@@ -239,7 +239,7 @@
     justify-content: center;
     height: 100%;
     text-align: center;
-    color: #888;
+    color: var(--text-muted, #888);
     gap: 8px;
 }
 
@@ -250,7 +250,7 @@
 
 .tw-hint {
     font-size: 12px;
-    color: #bbb;
+    color: var(--text-muted, #bbb);
 }
 
 /* ============================================
@@ -262,18 +262,18 @@
     align-items: center;
     gap: 10px;
     padding: 10px 16px;
-    border-bottom: 1px solid #f0f1f2;
+    border-bottom: 1px solid var(--border, #f0f1f2);
     cursor: pointer;
     transition: background 0.15s;
 }
 
 .tw-task-item:hover {
-    background: #f8f8f8;
+    background: var(--surface, #f8f8f8);
 }
 
 .tw-task-item.active {
-    background: rgba(132, 214, 105, 0.08);
-    border-left: 3px solid #84d669;
+    background: var(--accent-light, rgba(132, 214, 105, 0.08));
+    border-left: 3px solid var(--accent, #84d669);
 }
 
 .tw-task-status-dot {
@@ -284,23 +284,23 @@
 }
 
 .tw-task-status-dot.running {
-    background: #84d669;
+    background: var(--accent, #84d669);
 }
 
 .tw-task-status-dot.pending {
-    background: #f59e0b;
+    background: var(--warning, #f59e0b);
 }
 
 .tw-task-status-dot.completed {
-    background: #3b82f6;
+    background: var(--success, #3b82f6);
 }
 
 .tw-task-status-dot.failed {
-    background: #ef4444;
+    background: var(--error, #ef4444);
 }
 
 .tw-task-status-dot.paused {
-    background: #888;
+    background: var(--text-muted, #888);
 }
 
 .tw-task-item-info {
@@ -311,7 +311,7 @@
 .tw-task-item-name {
     font-size: 12px;
     font-weight: 600;
-    color: #3b3b3b;
+    color: var(--text, #3b3b3b);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -319,7 +319,7 @@
 
 .tw-task-item-type {
     font-size: 10px;
-    color: #888;
+    color: var(--text-muted, #888);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -338,18 +338,18 @@
     gap: 16px;
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #f0f1f2;
+    border-bottom: 1px solid var(--border, #f0f1f2);
 }
 
 .tw-agent-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #84d669;
+    background: var(--accent, #84d669);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--bg, #fff);
     font-size: 20px;
     font-weight: 700;
 }
@@ -361,13 +361,13 @@
 .tw-agent-title {
     font-size: 16px;
     font-weight: 700;
-    color: #3b3b3b;
+    color: var(--text, #3b3b3b);
     margin: 0 0 4px 0;
 }
 
 .tw-agent-subtitle {
     font-size: 12px;
-    color: #888;
+    color: var(--text-muted, #888);
 }
 
 .tw-section {
@@ -377,7 +377,7 @@
 .tw-section-title {
     font-size: 11px;
     font-weight: 700;
-    color: #888;
+    color: var(--text-muted, #888);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
@@ -391,7 +391,7 @@
 
 .tw-stat-card {
     padding: 12px;
-    background: #f8f8f8;
+    background: var(--surface, #f8f8f8);
     border-radius: 8px;
     border: 1px solid #f0f1f2;
 }
@@ -399,12 +399,12 @@
 .tw-stat-value {
     font-size: 18px;
     font-weight: 700;
-    color: #3b3b3b;
+    color: var(--text, #3b3b3b);
 }
 
 .tw-stat-label {
     font-size: 10px;
-    color: #888;
+    color: var(--text-muted, #888);
     text-transform: uppercase;
     letter-spacing: 0.3px;
     margin-top: 2px;
