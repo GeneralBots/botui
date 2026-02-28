@@ -6,11 +6,11 @@ const ThemeManager = (() => {
   // Bot ID to theme mapping (configured via config.csv theme-base field)
   const botThemeMap = {
     // Default bot uses light theme with brown accents
-    "default": "light",
+    default: "light",
     // Cristo bot uses typewriter theme (classic typewriter style)
-    "cristo": "typewriter",
+    cristo: "typewriter",
     // Salesianos bot uses light theme with blue accents
-    "salesianos": "light",
+    salesianos: "light",
   };
 
   // Detect current bot from URL path
@@ -98,30 +98,60 @@ const ThemeManager = (() => {
       setTimeout(() => {
         // Get the theme's colors from CSS variables
         const rootStyle = getComputedStyle(document.documentElement);
-        const primary = rootStyle.getPropertyValue("--primary")?.trim() || "#3b82f6";
-        const background = rootStyle.getPropertyValue("--background")?.trim() || "0 0% 100%";
-        const foreground = rootStyle.getPropertyValue("--foreground")?.trim() || "222 47% 11%";
+        const primary =
+          rootStyle.getPropertyValue("--primary")?.trim() || "#3b82f6";
+        const background =
+          rootStyle.getPropertyValue("--background")?.trim() || "0 0% 100%";
+        const foreground =
+          rootStyle.getPropertyValue("--foreground")?.trim() || "222 47% 11%";
         const card = rootStyle.getPropertyValue("--card")?.trim() || "0 0% 98%";
-        const border = rootStyle.getPropertyValue("--border")?.trim() || "214 32% 91%";
+        const border =
+          rootStyle.getPropertyValue("--border")?.trim() || "214 32% 91%";
 
         // Convert HSL values to hex format for app compatibility
         const hslToHex = (h, s, l) => {
           l /= 100;
-          const a = s * Math.min(l, 1 - l) / 100;
-          const f = n => {
+          const a = (s * Math.min(l, 1 - l)) / 100;
+          const f = (n) => {
             const k = (n + h / 30) % 12;
             const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-            return Math.round(255 * color).toString(16).padStart(2, '0');
+            return Math.round(255 * color)
+              .toString(16)
+              .padStart(2, "0");
           };
           return `#${f(0)}${f(8)}${f(4)}`;
         };
 
         const parseHsl = (hslStr) => {
-          const match = hslStr.match(/(\d+)\s+(\d+)%\s+(\d+)%/);
+          if (!hslStr) return null;
+          const match = hslStr
+            .trim()
+            .match(/([0-9.]+)\s+([0-9.]+)%\s+([0-9.]+)%/);
           if (match) {
-            return [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
+            return [
+              parseFloat(match[1]),
+              parseFloat(match[2]),
+              parseFloat(match[3]),
+            ];
           }
           return null;
+        };
+
+        const getContrastYIQ = (hexcolor) => {
+          if (!hexcolor) return "#ffffff";
+          hexcolor = hexcolor.replace("#", "");
+          if (hexcolor.length === 3) {
+            hexcolor = hexcolor
+              .split("")
+              .map((c) => c + c)
+              .join("");
+          }
+          if (hexcolor.length !== 6) return "#ffffff";
+          var r = parseInt(hexcolor.substr(0, 2), 16);
+          var g = parseInt(hexcolor.substr(2, 2), 16);
+          var b = parseInt(hexcolor.substr(4, 2), 16);
+          var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+          return yiq >= 128 ? "#000000" : "#ffffff";
         };
 
         const bgHsl = parseHsl(background);
@@ -129,41 +159,109 @@ const ThemeManager = (() => {
         const cardHsl = parseHsl(card);
         const borderHsl = parseHsl(border);
 
-        // Update the app's CSS variables with the theme colors
-        // These inline styles override the theme-sentient.css values
+        let calculatedTextHex = "#ffffff";
+
         if (bgHsl) {
           const bgHex = hslToHex(...bgHsl);
           document.documentElement.style.setProperty("--bg", bgHex);
-          document.documentElement.style.setProperty("--primary-bg", `hsl(${background})`);
+          document.documentElement.style.setProperty("--bg-secondary", bgHex);
+          document.documentElement.style.setProperty(
+            "--primary-bg",
+            `hsl(${background})`,
+          );
           document.documentElement.style.setProperty("--header-bg", bgHex);
+          document.documentElement.style.setProperty("--glass-bg", bgHex);
+          document.documentElement.style.setProperty("--sidebar-bg", bgHex);
+          calculatedTextHex = getContrastYIQ(bgHex);
         }
         if (fgHsl) {
           const textHex = hslToHex(...fgHsl);
           document.documentElement.style.setProperty("--text", textHex);
-          document.documentElement.style.setProperty("--primary-fg", `hsl(${foreground})`);
+          document.documentElement.style.setProperty("--text-primary", textHex);
+          document.documentElement.style.setProperty(
+            "--text-secondary",
+            textHex,
+          );
+          document.documentElement.style.setProperty("--text-muted", textHex);
+          document.documentElement.style.setProperty(
+            "--primary-fg",
+            `hsl(${foreground})`,
+          );
+        } else if (bgHsl) {
+          document.documentElement.style.setProperty(
+            "--text",
+            calculatedTextHex,
+          );
+          document.documentElement.style.setProperty(
+            "--text-primary",
+            calculatedTextHex,
+          );
+          document.documentElement.style.setProperty(
+            "--text-secondary",
+            calculatedTextHex,
+          );
+          document.documentElement.style.setProperty(
+            "--text-muted",
+            calculatedTextHex,
+          );
         }
         if (cardHsl) {
           const surfaceHex = hslToHex(...cardHsl);
           document.documentElement.style.setProperty("--surface", surfaceHex);
+          document.documentElement.style.setProperty(
+            "--surface-hover",
+            surfaceHex,
+          );
+          document.documentElement.style.setProperty(
+            "--surface-active",
+            surfaceHex,
+          );
           document.documentElement.style.setProperty("--card-bg", surfaceHex);
         }
         if (borderHsl) {
           const borderHex = hslToHex(...borderHsl);
           document.documentElement.style.setProperty("--border", borderHex);
+          document.documentElement.style.setProperty(
+            "--border-light",
+            borderHex,
+          );
         }
-
         // Check if config.csv already set the primary color, we shouldn't wipe it
         // Only update color and suggestion variables if they aren't marked as bot-config
-        if (document.documentElement.getAttribute("data-has-bot-colors") !== "true") {
-          document.documentElement.style.setProperty("--chat-color1", `hsl(${primary})`);
-          document.documentElement.style.setProperty("--chat-color2", `hsl(${card})`);
-          document.documentElement.style.setProperty("--suggestion-color", `hsl(${primary})`);
-          document.documentElement.style.setProperty("--suggestion-bg", `hsl(${card})`);
-          document.documentElement.style.setProperty("--color1", `hsl(${primary})`);
-          document.documentElement.style.setProperty("--color2", `hsl(${card})`);
+        if (
+          document.documentElement.getAttribute("data-has-bot-colors") !==
+          "true"
+        ) {
+          document.documentElement.style.setProperty(
+            "--chat-color1",
+            `hsl(${primary})`,
+          );
+          document.documentElement.style.setProperty(
+            "--chat-color2",
+            `hsl(${card})`,
+          );
+          document.documentElement.style.setProperty(
+            "--suggestion-color",
+            `hsl(${primary})`,
+          );
+          document.documentElement.style.setProperty(
+            "--suggestion-bg",
+            `hsl(${card})`,
+          );
+          document.documentElement.style.setProperty(
+            "--color1",
+            `hsl(${primary})`,
+          );
+          document.documentElement.style.setProperty(
+            "--color2",
+            `hsl(${card})`,
+          );
         }
 
-        console.log("✓ Theme colors applied:", { bg: background, primary: primary });
+        console.log("✓ Theme colors applied:", {
+          bg: background,
+          primary: primary,
+        });
         updateDropdown();
         subscribers.forEach((cb) => cb({ themeId: id, themeName: theme.name }));
       }, 50);
@@ -218,7 +316,7 @@ const ThemeManager = (() => {
     // Dropdown injection restored for the window manager
     const container = document.getElementById("themeSelectorContainer");
     if (container) {
-      container.innerHTML = '';
+      container.innerHTML = "";
       container.appendChild(createDropdown());
     }
 
@@ -237,24 +335,22 @@ const ThemeManager = (() => {
 
     if (data.logo_url) {
       // For img elements - set src and show, hide SVG
-      const logoImg = document.querySelector('.logo-icon-img');
-      const logoSvg = document.querySelector('.logo-icon-svg');
+      const logoImg = document.querySelector(".logo-icon-img");
+      const logoSvg = document.querySelector(".logo-icon-svg");
       if (logoImg && logoSvg) {
         logoImg.src = data.logo_url;
-        logoImg.alt = data.title || 'Logo';
-        logoImg.style.display = 'block';
-        logoSvg.style.display = 'none';
+        logoImg.alt = data.title || "Logo";
+        logoImg.style.display = "block";
+        logoSvg.style.display = "none";
       }
 
       // For elements that use background image
-      document
-        .querySelectorAll(".assistant-avatar")
-        .forEach((el) => {
-          el.style.backgroundImage = `url("${data.logo_url}")`;
-          el.style.backgroundSize = "contain";
-          el.style.backgroundRepeat = "no-repeat";
-          el.style.backgroundPosition = "center";
-        });
+      document.querySelectorAll(".assistant-avatar").forEach((el) => {
+        el.style.backgroundImage = `url("${data.logo_url}")`;
+        el.style.backgroundSize = "contain";
+        el.style.backgroundRepeat = "no-repeat";
+        el.style.backgroundPosition = "center";
+      });
     }
     if (data.color1) {
       document.documentElement.style.setProperty("--color1", data.color1);
