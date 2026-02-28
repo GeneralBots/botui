@@ -187,8 +187,9 @@
             width: 64px;
             height: 64px;
             border-radius: 16px;
-            background: linear-gradient(135deg, #4ade80 0%, #15803d 100%);
-            box-shadow: inset 0px 2px 4px rgba(255, 255, 255, 0.4), inset 0px -3px 0 rgba(20, 83, 45, 0.8), 0px 6px 12px rgba(0, 0, 0, 0.15);
+            background: var(--surface-hover, #ffffff);
+            border: 1px solid var(--border, #e5e7eb);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -197,12 +198,19 @@
 
         .desktop-icon:hover .app-icon {
             transform: scale(1.05);
+            border-color: var(--accent, #84d669);
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
         }
 
         .app-icon svg {
             width: 32px;
             height: 32px;
-            stroke: white;
+            stroke: var(--text, #374151);
+            transition: stroke 0.15s ease;
+        }
+
+        .desktop-icon:hover .app-icon svg {
+            stroke: var(--accent, #84d669);
         }
 
         .desktop-icon-label {
@@ -210,7 +218,7 @@
             font-size: 12px;
             font-weight: 600;
             color: var(--text-secondary, #374151);
-            background: var(--bg-alpha-70, rgba(255, 255, 255, 0.7));
+            background: transparent;
             backdrop-filter: blur(4px);
             padding: 2px 8px;
             border-radius: 4px;
