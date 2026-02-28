@@ -12,8 +12,8 @@
         font-family: 'Fira Code', 'Fira Sans', Arial, sans-serif !important;
         background: var(--bg) !important;
         overflow: hidden !important;
-        height: 100% !important;
-        width: 100% !important;
+        height: 100vh !important;
+        width: 100vw !important;
         display: flex !important;
     }
 
@@ -31,7 +31,7 @@
     /* Left Sidebar */
     .sidebar {
         width: 51px;
-        height: 100%;
+        height: 100vh;
         background: var(--surface);
         border-right: 1px solid var(--border);
         display: flex;
@@ -197,40 +197,13 @@
         margin-top: auto;
     }
 
-    /* The background abstract pattern from BUILD V3 */
-    .bg-grid {
-        position: absolute;
-        inset: 0;
-        background-image: linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px);
-        background-size: 40px 40px;
-        z-index: 0;
-        pointer-events: none;
-    }
+    .bg-grid { display: none; }
 
-    .bg-svg {
-        position: absolute;
-        top: -10%;
-        left: -10%;
-        width: 120%;
-        height: 120%;
-        z-index: 0;
-        opacity: 0.6;
-        pointer-events: none;
-        display: block !important;
-    }
+    .bg-svg { display: none !important; }
 
-    .bg-svg path {
-        fill: none;
-        stroke: var(--surface-hover, #e6f2eb);
-        stroke-width: 45;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-    }
+    
 
-    .bg-svg path.inner {
-        stroke: var(--surface, #f7faf9);
-        stroke-width: 41;
-    }
+    
 
     /* Bottom Taskbar */
     .toolbar {
@@ -330,15 +303,8 @@
         <div class="workspace" id="desktop-content-inner">
 
             <!-- Background Pattern -->
-            <div class="bg-grid"></div>
-            <svg class="bg-svg" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1000 600">
-                <path d="M-50,200 Q200,100 400,250 T800,50 T1100,250" />
-                <path d="M100,-50 Q250,200 150,450 T400,650" />
-                <path d="M500,-50 Q450,250 800,350 T750,700" />
-                <path class="inner" d="M-50,200 Q200,100 400,250 T800,50 T1100,250" />
-                <path class="inner" d="M100,-50 Q250,200 150,450 T400,650" />
-                <path class="inner" d="M500,-50 Q450,250 800,350 T750,700" />
-            </svg>
+            
+            
 
             <div class="panel-section">
                 <div class="panel-grid">
