@@ -1,0 +1,631 @@
+<!-- Vibe Code Editor Component -->
+<div class="vibe-editor-container" id="vibeEditorContainer" style="display: none; height: 100%; flex-direction: column;">
+    <!-- Editor Header -->
+    <div class="editor-header" style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 16px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        min-height: 48px;
+    ">
+        <div class="editor-title" style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        ">
+            <span style="font-size: 18px">📝</span>
+            <span>Code Editor</span>
+        </div>
+
+        <div class="editor-actions" style="display: flex; gap: 8px;">
+            <button id="editorSaveBtn" class="editor-btn" onclick="editorSave()" style="
+                padding: 6px 16px;
+                background: var(--accent);</span>
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 13px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            ">
+                <span>💾</span> Save
+            </button>
+            <button id="editorPublishBtn" class="editor-btn" onclick="editorPublish()" style="</span>
+                padding: 6px 16px;
+                background: var(--bg);
+                color: var(--text);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                font-size: 13px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            ">
+                <span>🚀</span> Publish
+            </button</span>>
+            <button id="editorCloseBtn" class="editor-btn" onclick="closeEditor()" style="
+                padding: 6px 12px;
+                background: transparent;
+                color: var(--text-muted);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                font-size: 13px;
+                cursor: pointer;
+            ">
+                ✕
+            </button>
+        </div>
+    </div>
+
+    <!-- Editor Body -->
+    <div class="editor-body" style="display: flex; flex: 1; overflow: hidden;">
+        <!-- File Tree Sidebar -->
+        <div class="file-tree-sidebar" id="fileTreeSidebar" style="
+            width: 240px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        ">
+            <div class="file-tree-header" style="
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--border);
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            ">
+                <span>📁 Files</span>
+                <button onclick="createNewFile()" style="
+                    background: transparent;
+                    border: none;
+                    color: var(--accent);
+                    cursor: pointer;
+                    font-size: 18px;
+                    padding: 0;
+                ">+</button>
+            </div>
+            <div class="file-tree-content" id="fileTreeContent" style</span>="flex: 1; overflow-y: auto;">
+                <!-- File tree items will be populated here -->
+            </div>
+        </div>
+
+        <!-- Main Editor Area -->
+        <div class="editor-main" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+            <!-- Tab Bar -->
+            <div class="editor-tab-bar" id="editorTabBar" style="
+                display: flex;
+                background: var(--surface);
+                border-bottom: 1px solid var(--border);
+                overflow-x: auto;
+                min-height: 36px;
+            ">
+                <!-- Tabs will be populated here -->
+            </div>
+
+            <!-- Monaco Editor Container -->
+            <div id="monacoEditorContainer" style="flex: 1; overflow: hidden;"></div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="editor-status-bar" style="
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 4px 16px;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        font-size: 12px;
+        color: var(--text-muted);
+        min-height: 28px;
+    ">
+        <div class="status-left" style="display: flex; gap: 16px;">
+            <span id="editorLanguage">HTML</span>
+            <span id="editorEncoding">UTF-8</span>
+        </div>
+        <div class="status-right" style="display: flex; gap: 16px;">
+            <span id="editorPosition">Ln 1, Col 1</span>
+            <span id="editorStatus">Ready</span>
+        </div>
+    </div>
+</div>
+
+<!-- Monaco Editor Loader -->
+<script src="/js/vendor/vs/loader.js"></script>
+<script>
+    // Monaco Editor Configuration
+    let monacoEditor = null;
+    let openFiles = new Map(); // file path -> { content, language, modified }
+    let activeFile = null;
+    let fileTree =</script> [];
+
+    // Initialize Monaco Editor
+    require.config({ paths: { vs: '/js/vendor/vs' } });
+
+    require(['vs/editor/editor.main'], function () {
+        initializeMonacoEditor();
+    });
+
+    function initializeMonacoEditor() {
+        const container = document.getElementById('monacoEditorContainer');
+        if (!container) return;
+
+        // Create Monaco editor
+        monacoEditor = monaco.editor.create(container, {
+            value: '',
+            language: 'html',
+            theme: 'vs-dark',
+            automaticLayout: true,
+            fontSize: 14,
+            lineNumbers: 'on',
+            roundedSelection: true,
+            scrollBeyondLastLine: false,
+            readOnly: false,
+            minimap: { enabled: true },
+            wordWrap: 'on',
+            formatOnPaste: true,
+            formatOnType: true,
+        });
+
+        // Add event listeners
+        monacoEditor.onDidChangeModelContent(() => {
+            if (activeFile) {
+                const fileData = openFiles.get(activeFile);
+                if (fileData) {
+                    fileData.modified = true;
+                    fileData.content = monacoEditor.getValue();
+                    updateTabLabel(activeFile, true);
+                    updateEditorStatus('Modified');
+                }
+            }
+        });
+
+        monacoEditor.onDidChangeCursorPosition((e) => {
+            const position = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
+            document.getElementById('editorPosition').textContent = position;
+        });
+
+        // Define custom theme based on app theme
+        monaco.editor.defineTheme('gb-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [],
+            colors: {
+                'editor.background': '#1e1e1e',
+                'editor.foreground': '#d4d4d4',
+                'editor.lineHighlightBackground': '#2d2d2d',
+            }
+        });
+
+        monaco.editor.setTheme('gb-dark');
+
+        console.log('Monaco Editor initialized successfully');
+        updateEditorStatus('Ready');
+    }
+
+    // Language detection based on file extension
+    function detectLanguage(filePath) {
+        const ext = filePath.split('.').pop().toLowerCase();
+        const languageMap = {
+            'html': 'html',
+            'htm': 'html',
+            'css': 'css',
+            'js': 'javascript',
+            'json': 'json',
+            'ts': 'typescript',
+            'bas': 'basic',
+            'py': 'python',
+            'rs': 'rust',
+            'md': 'markdown',
+            'xml': 'xml',
+            'yaml': 'yaml',
+            'yml': 'yaml',
+            'sql': 'sql',
+        };
+        return languageMap[ext] || 'plaintext';
+    }
+
+    // Open file in editor
+    function openFile(filePath, content = '') {
+        if (!monacoEditor) {
+            console.error('Monaco Editor not initialized');
+            return;
+        }
+
+        // If file not already open, add it
+        if (!openFiles.has(filePath)) {
+            const language = detectLanguage(filePath);
+            openFiles.set(filePath, {
+                content: content,
+                language: language,
+                modified: false
+            });
+            addTab(filePath, language);
+        }
+
+        // Switch to file
+        activeFile = filePath;
+        const fileData = openFiles.get(filePath);
+
+        // Update editor
+        monacoEditor.setValue(fileData.content);
+        monaco.editor.setModelLanguage(monacoEditor.getModel(), fileData.language);
+
+        // Update UI
+        document.getElementById('editorLanguage').textContent = fileData.language.toUpperCase();
+        highlightActiveTab(filePath);
+        updateEditorStatus('Ready');
+    }
+
+    // Add tab to tab bar
+    function addTab(filePath, language) {
+        const tabBar = document.getElementById('editorTabBar');
+        const fileName = filePath.split('/').pop();
+
+        const tab = document.createElement('div');
+        tab.className = 'editor-tab';
+        tab.id = `tab-${filePath.replace(/\//g, '-')}`;
+        tab.setAttribute('data-filepath', filePath);
+        tab.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg);
+            border-right: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text);
+            min-width: 120px;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        `;
+
+        const icon = getFileIcon(language);
+        tab.innerHTML = `
+            <span>${icon}</span>
+            <span class="tab-name" style="flex: 1; overflow: hidden; text-overflow: ellipsis;">${fileName}</span>
+            <button class="tab-close" onclick="event.stopPropagation(); closeTab('${filePath}')" style="
+                background: transparent;
+                border: none;
+                color: var(--text-muted);
+                cursor: pointer;
+                font-size: 16px;
+                padding: 0;
+                width: 16px;
+                height: 16px;
+                line-height: 1;
+            ">×</button>
+        `;
+
+        tab.addEventListener('click', () => openFile(filePath));
+        tabBar.appendChild(tab);
+    }
+
+    // Update tab label to show modified state
+    function updateTabLabel(filePath, modified) {
+        const tab = document.getElementById(`tab-${filePath.replace(/\//g, '-')}`);
+        if (tab) {
+            const tabName = tab.querySelector('.tab-name');
+            const fileName = filePath.split('/').pop();
+            tabName.textContent = modified ? `● ${fileName}` : fileName;
+        }
+    }
+
+    // Highlight active tab
+    function highlightActiveTab(filePath) {
+        const tabs = document.querySelectorAll('.editor-tab');
+        tabs.forEach(tab => {
+            if (tab.getAttribute('data-filepath') === filePath) {
+                tab.style.background = 'var(--surface)';
+                tab.style.borderBottom = '2px solid var(--accent)';
+            } else {
+                tab.style.background = 'var(--bg)';
+                tab.style.borderBottom = 'none';
+            }
+        });
+    }
+
+    // Close tab
+    function closeTab(filePath) {
+        const fileData = openFiles.get(filePath);
+
+        if (fileData && fileData.modified) {
+            if (!confirm(`Save changes to ${filePath}?`)) {
+                return;
+            }
+            saveFile(filePath);
+        }
+
+        // Remove tab
+        const tab = document.getElementById(`tab-${filePath.replace(/\//g, '-')}`);
+        if (tab) tab.remove();
+
+        // Remove from open files
+        openFiles.delete(filePath);
+
+        // If this was the active file, switch to another
+        if (activeFile === filePath) {
+            const remaining = Array.from(openFiles.keys());
+            if (remaining.length > 0) {
+                openFile(remaining[0]);
+            } else {
+                activeFile = null;
+                monacoEditor.setValue('');
+                updateEditorStatus('No file open');
+            }
+        }
+    }
+
+    // Get file icon based on language
+    function getFileIcon(language) {
+        const icons = {
+            'html': '🌐',
+            'css': '🎨',
+            'javascript': '⚡',
+            'json': '📋',
+            'typescript': '💠',
+            'basic': '📊',
+            'python': '🐍',
+            'rust': '🦀',
+            'markdown': '📝',
+            'xml': '📄',
+            'yaml': '⚙️',
+            'sql': '🗃️',
+        };
+        return icons[language] || '📄';
+    }
+
+    // Save file
+    function editorSave() {
+        if (!activeFile) {
+            alert('No file open');
+            return;
+        }
+
+        saveFile(activeFile);
+    }
+
+    function saveFile(filePath) {
+        const fileData = openFiles.get(filePath);
+        if (!fileData) return;
+
+        // Here you would typically save to backend
+        console.log('Saving file:', filePath, fileData.content);
+
+        // Simulate save
+        fetch('/api/editor/file/' + encodeURIComponent(filePath), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                content: fileData.content,
+                language: fileData.language
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                fileData.modified = false;
+                updateTabLabel(filePath, false);
+                updateEditorStatus('Saved');
+                setTimeout(() => updateEditorStatus('Ready'), 2000);
+            } else {
+                alert('Failed to save file: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(err => {
+            console.error('Save error:', err);
+            // For now, just mark as saved locally
+            fileData.modified = false;
+            updateTabLabel(filePath, false);
+            updateEditorStatus('Saved (local)');
+        });
+    }
+
+    // Publish file
+    function editorPublish() {
+        if (!activeFile) {
+            alert('No file open');
+            return;
+        }
+
+        // Save first
+        editorSave();
+
+        // Show deployment modal
+        if (typeof showDeploymentModal === 'function') {
+            showDeploymentModal();
+        } else {
+            alert('Publish feature coming soon!');
+        }
+    }
+
+    // Close editor
+    function closeEditor() {
+        const container = document.getElementById('vibeEditorContainer');
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+
+    // Show editor
+    function showEditor() {
+        const container = document.getElementById('vibeEditorContainer');
+        if (container) {
+            container.style.display = 'flex';
+        }
+    }
+
+    // Update editor status
+    function updateEditorStatus(status) {
+        const statusEl = document.getElementById('editorStatus');
+        if (statusEl) {
+            statusEl.textContent = status;
+        }
+    }
+
+    // Create new file
+    function createNewFile() {
+        const fileName = prompt('Enter file name:', 'untitled.html');
+        if (fileName) {
+            openFile(fileName, '');
+        }
+    }
+
+    // Load file tree
+    function loadFileTree(files) {
+        fileTree = files;
+        renderFileTree();
+    }
+
+    // Render file tree
+    function renderFileTree() {
+        const container = document.getElementById('fileTreeContent');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        fileTree.forEach(file => {
+            const item = document.createElement('div');
+            item.className = 'file-tree-item';
+            item.style.cssText = `
+                padding: 8px 16px;
+                cursor: pointer;
+                font-size: 13px;
+                color: var(--text);
+                border-left: 3px solid transparent;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            `;
+
+            const icon = getFileIcon(detectLanguage(file.path));
+            item.innerHTML = `<span>${icon}</span><span>${file.name}</span>`;
+
+            item.addEventListener('click', () => {
+                // Highlight selected
+                document.querySelectorAll('.file-tree-item').forEach(i => {
+                    i.style.borderLeftColor = 'transparent';
+                    i.style.background = 'transparent';
+                });
+                item.style.borderLeftColor = 'var(--accent)';
+                item.style.background = 'rgba(132, 214, 105, 0.06)';
+
+                // Load file
+                loadFile(file.path);
+            });
+
+            item.addEventListener('mouseenter', () => {
+                if (item.style.borderLeftColor === 'transparent') {
+                    item.style.background = 'var(--surface-hover)';
+                }
+            });
+
+            item.addEventListener('mouseleave', () => {
+                if (item.style.borderLeftColor === 'transparent') {
+                    item.style.background = 'transparent';
+                }
+            });
+
+            container.appendChild(item);
+        });
+    }
+
+    // Load file from server
+    function loadFile(filePath) {
+        fetch('/api/editor/file/' + encodeURIComponent(filePath))
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    openFile(filePath, data.content);
+                } else {
+                    console.error('Failed to load file:', data.error);
+                }
+            })
+            .catch(err => {
+                console.error('Load error:', err);
+                // Open with empty content
+                openFile(filePath, '');
+            });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            switch (e.key) {
+                case 's':
+                    e.preventDefault();
+                    editorSave();
+                    break;
+                case 'p':
+                    e.preventDefault();
+                    // Quick open
+                    const file = prompt('Open file:');
+                    if (file) openFile(file);
+                    break;
+            }
+        }
+    });
+
+    // Initialize with sample files
+    loadFileTree([
+        { name: 'index.html', path: 'index.html' },
+        { name: 'styles.css', path: 'styles.css' },
+        { name: 'app.js', path: 'app.js' },
+    ]);
+</script>
+
+<style>
+    /* Editor specific styles */
+    .editor-btn:hover {
+        opacity: 0</style>.9;
+        transform: translateY(-1px);
+    }
+
+    .editor-tab:hover {
+        background: var(--surface-hover) !important;
+    }
+
+    .file-tree-item:hover {
+        background: var(--surface-hover);
+    }
+
+    /* Scrollbar styling */
+    .file-tree-content::-webkit-scrollbar,
+    .editor-tab-bar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .file-tree-content::-webkit-scrollbar-track,
+    .editor-tab-bar::-webkit-scrollbar-track {
+        background: var(--bg);
+    }
+
+    .file-tree-content::-webkit-scrollbar-thumb,
+    .editor-tab-bar::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+    }
+
+    .file-tree-content::-webkit-scrollbar-thumb:hover,
+    .editor-tab-bar::-webkit-scrollbar-thumb:hover {
+        background: var(--text-muted);
+    }
+</style>
