@@ -134,28 +134,28 @@ const ROOT_FILES: &[&str] = &[
 
 pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
     let path = uri.path();
-    
+
     // Check if path contains static asset directories - serve them directly
     let path_lower = path.to_lowercase();
-    if path_lower.contains("/js/") 
+    if path_lower.contains("/js/")
         || path_lower.contains("/css/")
         || path_lower.contains("/vendor/")
         || path_lower.contains("/assets/")
         || path_lower.contains("/public/")
         || path_lower.contains("/partials/")
-        || path_lower.ends_with(".js") 
-        || path_lower.ends_with(".css") 
-        || path_lower.ends_with(".png") 
-        || path_lower.ends_with(".jpg") 
-        || path_lower.ends_with(".jpeg") 
-        || path_lower.ends_with(".gif") 
-        || path_lower.ends_with(".svg") 
-        || path_lower.ends_with(".ico") 
-        || path_lower.ends_with(".woff") 
-        || path_lower.ends_with(".woff2") 
-        || path_lower.ends_with(".ttf") 
+        || path_lower.ends_with(".js")
+        || path_lower.ends_with(".css")
+        || path_lower.ends_with(".png")
+        || path_lower.ends_with(".jpg")
+        || path_lower.ends_with(".jpeg")
+        || path_lower.ends_with(".gif")
+        || path_lower.ends_with(".svg")
+        || path_lower.ends_with(".ico")
+        || path_lower.ends_with(".woff")
+        || path_lower.ends_with(".woff2")
+        || path_lower.ends_with(".ttf")
         || path_lower.ends_with(".eot")
-        || path_lower.ends_with(".mp4") 
+        || path_lower.ends_with(".mp4")
         || path_lower.ends_with(".webm")
         || path_lower.ends_with(".mp3")
         || path_lower.ends_with(".wav")
@@ -182,11 +182,11 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
         } else {
             path.to_string()
         };
-        
+
         let full_path = get_ui_root().join(&fs_path);
-        
+
         info!("index: Serving static file: {} -> {:?} (fs_path: {})", path, full_path, fs_path);
-        
+
         #[cfg(feature = "embed-ui")]
         {
             let asset_path = fs_path.trim_start_matches('/');
@@ -195,7 +195,7 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
                 return ([(axum::http::header::CONTENT_TYPE, mime.as_ref())], content.data).into_response();
             }
         }
-        
+
         #[cfg(not(feature = "embed-ui"))]
         {
             if let Ok(bytes) = tokio::fs::read(&full_path).await {
@@ -203,11 +203,11 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
                 return (StatusCode::OK, [("content-type", mime.as_ref())], bytes).into_response();
             }
         }
-        
+
         warn!("index: Static file not found: {} -> {:?}", path, full_path);
         return StatusCode::NOT_FOUND.into_response();
     }
-    
+
     let path_parts: Vec<&str> = path.split('/').collect();
     let bot_name = path_parts
         .iter()
@@ -770,20 +770,20 @@ struct ClientError {
 
 async fn handle_client_error(Json(error): Json<ClientError>) -> impl IntoResponse {
     warn!(
-        "CLIENT:{}: {} at {} ({}) - {}", 
+        "CLIENT:{}: {} at {} ({}) - {}",
         error.source.to_uppercase(),
         error.message,
         error.url,
         error.timestamp,
         error.user_agent
     );
-    
+
     if let Some(stack) = &error.stack {
         if !stack.is_empty() {
             warn!("CLIENT:STACK: {}", stack);
         }
     }
-    
+
     StatusCode::OK
 }
 
@@ -1182,6 +1182,76 @@ async fn handle_auth_asset(axum::extract::Path(path): axum::extract::Path<String
     }
 }
 
+/// Serve login page at clean /login route (hides physical path /suite/auth/login.html)
+async fn serve_login() -> impl IntoResponse {
+    #[cfg(feature = "embed-ui")]
+    {
+        let asset_path = "suite/auth/login.html";
+        match Assets::get(asset_path) {
+            Some(content) => {
+                let mime = mime_guess::from_path(asset_path).first_or_octet_stream();
+                (
+                    [(axum::http::header::CONTENT_TYPE, mime.as_ref())],
+                    content.data,
+                )
+                    .into_response()
+            }
+            None => StatusCode::NOT_FOUND.into_response(),
+        }
+    }
+
+    #[cfg(not(feature = "embed-ui"))]
+    {
+        let login_path = get_ui_root().join("suite/auth/login.html");
+        match tokio::fs::read(&login_path).await {
+            Ok(content) => {
+                let mime = mime_guess::from_path(&login_path).first_or_octet_stream();
+                (
+                    [(axum::http::header::CONTENT_TYPE, mime.as_ref())],
+                    content,
+                )
+                    .into_response()
+            }
+            Err(_) => StatusCode::NOT_FOUND.into_response(),
+        }
+    }
+}
+
+/// Serve logout page at clean /logout route (hides physical path /suite/auth/logout.html)
+async fn serve_logout() -> impl IntoResponse {
+    #[cfg(feature = "embed-ui")]
+    {
+        let asset_path = "suite/auth/logout.html";
+        match Assets::get(asset_path) {
+            Some(content) => {
+                let mime = mime_guess::from_path(asset_path).first_or_octet_stream();
+                (
+                    [(axum::http::header::CONTENT_TYPE, mime.as_ref())],
+                    content.data,
+                )
+                    .into_response()
+            }
+            None => StatusCode::NOT_FOUND.into_response(),
+        }
+    }
+
+    #[cfg(not(feature = "embed-ui"))]
+    {
+        let logout_path = get_ui_root().join("suite/auth/logout.html");
+        match tokio::fs::read(&logout_path).await {
+            Ok(content) => {
+                let mime = mime_guess::from_path(&logout_path).first_or_octet_stream();
+                (
+                    [(axum::http::header::CONTENT_TYPE, mime.as_ref())],
+                    content,
+                )
+                    .into_response()
+            }
+            Err(_) => StatusCode::NOT_FOUND.into_response(),
+        }
+    }
+}
+
 fn add_static_routes(router: Router<AppState>, _suite_path: &Path) -> Router<AppState> {
     #[cfg(feature = "embed-ui")]
     {
@@ -1219,6 +1289,8 @@ pub fn configure_router() -> Router {
     let mut router = Router::new()
         .route("/health", get(health))
         .route("/favicon.ico", get(serve_favicon))
+        .route("/login", get(serve_login))
+        .route("/logout", get(serve_logout))
         .nest("/api", create_api_router())
         .nest("/ui", create_ui_router())
         .nest("/ws", create_ws_router())

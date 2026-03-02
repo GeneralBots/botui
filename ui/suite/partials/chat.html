@@ -1075,9 +1075,9 @@
             var temp = document.createElement("div");
             temp.style.color = hexcolor;
             temp.style.display = "none";
-            document.div.appendChild(temp);
+            document.body.appendChild(temp);
             var style = window.getComputedStyle(temp).color;
-            document.div.removeChild(temp);
+            document.body.removeChild(temp);
 
             var rgb = style.match(/\d+/g);
             if (!rgb || rgb.length < 3) return '#ffffff';
