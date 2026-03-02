@@ -598,6 +598,433 @@
                 </div>
                 <div class="vibe-preview-content" id="vibePreviewContent"></div>
             </div>
+
+            <!-- Deployment Panel (hidden by default) -->
+            <div
+                class="vibe-deployment-modal"
+                id="vibeDeploymentModal"
+                style="display: none"
+            >
+                <div
+                    class="vibe-deployment-overlay"
+                    onclick="closeDeploymentModal()"
+                ></div>
+                <div
+                    class="vibe-deployment-panel"
+                    style="
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: var(--surface);
+                        border-radius: 16px;
+                        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+                        width: 600px;
+                        max-width: 90%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                        border: 1px solid var(--border);
+                        z-index: 1000;
+                    "
+                >
+                    <div
+                        style="
+                            padding: 24px;
+                            border-bottom: 1px solid var(--border);
+                        "
+                    >
+                        <h2
+                            style="
+                                margin: 0;
+                                font-size: 20px;
+                                color: var(--text);
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                            "
+                        >
+                            <span style="font-size: 24px">🚀</span>
+                            Deploy Your App
+                        </h2>
+                        <p
+                            style="
+                                margin: 8px 0 0;
+                                font-size: 14px;
+                                color: var(--text-muted);
+                            "
+                        >
+                            Choose where to deploy your application
+                        </p>
+                    </div>
+
+                    <div style="padding: 24px">
+                        <!-- Deployment Options -->
+                        <div
+                            style="
+                                display: grid;
+                                grid-template-columns: 1fr 1fr;
+                                gap: 16px;
+                                margin-bottom: 24px;
+                            "
+                        >
+                            <!-- Internal Deployment -->
+                            <div
+                                class="deployment-option"
+                                id="deploymentInternal"
+                                onclick="selectDeploymentTarget('internal')"
+                                style="
+                                    padding: 20px;
+                                    border: 2px solid var(--border);
+                                    border-radius: 12px;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                "
+                            >
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 12px;
+                                        margin-bottom: 12px;
+                                    "
+                                >
+                                    <span style="font-size: 32px">📱</span>
+                                    <div>
+                                        <h3
+                                            style="
+                                                margin: 0;
+                                                font-size: 16px;
+                                                color: var(--text);
+                                            "
+                                        >
+                                            GB Platform
+                                        </h3>
+                                        <span
+                                            style="
+                                                font-size: 12px;
+                                                color: var(--text-muted);
+                                            "
+                                            >Internal</span
+                                        >
+                                    </div>
+                                </div>
+                                <ul
+                                    style="
+                                        margin: 0;
+                                        padding-left: 20px;
+                                        font-size: 13px;
+                                        color: var(--text-muted);
+                                        line-height: 1.6;
+                                    "
+                                >
+                                    <li>Serve from /apps/{name}</li>
+                                    <li>Use GB API endpoints</li>
+                                    <li>Fast iteration cycles</li>
+                                    <li>Shared platform resources</li>
+                                </ul>
+                            </div>
+
+                            <!-- External Deployment -->
+                            <div
+                                class="deployment-option"
+                                id="deploymentExternal"
+                                onclick="selectDeploymentTarget('external')"
+                                style="
+                                    padding: 20px;
+                                    border: 2px solid var(--border);
+                                    border-radius: 12px;
+                                    cursor: pointer;
+                                    transition: all 0.2s;
+                                "
+                            >
+                                <div
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 12px;
+                                        margin-bottom: 12px;
+                                    "
+                                >
+                                    <span style="font-size: 32px">🌐</span>
+                                    <div>
+                                        <h3
+                                            style="
+                                                margin: 0;
+                                                font-size: 16px;
+                                                color: var(--text);
+                                            "
+                                        >
+                                            Forgejo ALM
+                                        </h3>
+                                        <span
+                                            style="
+                                                font-size: 12px;
+                                                color: var(--text-muted);
+                                            "
+                                            >External</span
+                                        >
+                                    </div>
+                                </div>
+                                <ul
+                                    style="
+                                        margin: 0;
+                                        padding-left: 20px;
+                                        font-size: 13px;
+                                        color: var(--text-muted);
+                                        line-height: 1.6;
+                                    "
+                                >
+                                    <li>Push to Git repository</li>
+                                    <li>CI/CD pipeline automation</li>
+                                    <li>Custom domain support</li>
+                                    <li>Independent deployment</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Internal Configuration (shown by default) -->
+                        <div
+                            id="deploymentInternalConfig"
+                            style="margin-bottom: 24px"
+                        >
+                            <h3
+                                style="
+                                    margin: 0 0 16px;
+                                    font-size: 14px;
+                                    color: var(--text);
+                                "
+                            >
+                                Internal Deployment Settings
+                            </h3>
+                            <form id="internalDeployForm">
+                                <div style="margin-bottom: 16px">
+                                    <label
+                                        style="
+                                            display: block;
+                                            margin-bottom: 8px;
+                                            font-size: 13px;
+                                            color: var(--text-muted);
+                                        "
+                                        >App Route</label
+                                    >
+                                    <input
+                                        type="text"
+                                        id="deployRoute"
+                                        placeholder="my-app"
+                                        style="
+                                            width: 100%;
+                                            padding: 10px 12px;
+                                            border: 1px solid var(--border);
+                                            border-radius: 8px;
+                                            background: var(--bg);
+                                            color: var(--text);
+                                            font-size: 14px;
+                                        "
+                                    />
+                                    <span
+                                        style="
+                                            font-size: 12px;
+                                            color: var(--text-muted);
+                                            margin-top: 4px;
+                                            display: block;
+                                        "
+                                    >
+                                        App will be available at: /apps/<span
+                                            id="deployRoutePreview"
+                                            >my-app</span
+                                        >/
+                                    </span>
+                                </div>
+                                <div style="margin-bottom: 16px">
+                                    <label
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                            font-size: 13px;
+                                            color: var(--text);
+                                            cursor: pointer;
+                                        "
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            id="deploySharedResources"
+                                            checked
+                                            style="margin: 0"
+                                        />
+                                        Use shared platform resources (database,
+                                        cache, storage)
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- External Configuration (hidden by default) -->
+                        <div
+                            id="deploymentExternalConfig"
+                            style="display: none; margin-bottom: 24px"
+                        >
+                            <h3
+                                style="
+                                    margin: 0 0 16px;
+                                    font-size: 14px;
+                                    color: var(--text);
+                                "
+                            >
+                                Forgejo Repository Settings
+                            </h3>
+                            <form id="externalDeployForm">
+                                <div style="margin-bottom: 16px">
+                                    <label
+                                        style="
+                                            display: block;
+                                            margin-bottom: 8px;
+                                            font-size: 13px;
+                                            color: var(--text-muted);
+                                        "
+                                        >Repository Name</label
+                                    >
+                                    <input
+                                        type="text"
+                                        id="deployRepoName"
+                                        placeholder="my-app"
+                                        style="
+                                            width: 100%;
+                                            padding: 10px 12px;
+                                            border: 1px solid var(--border);
+                                            border-radius: 8px;
+                                            background: var(--bg);
+                                            color: var(--text);
+                                            font-size: 14px;
+                                        "
+                                    />
+                                </div>
+                                <div style="margin-bottom: 16px">
+                                    <label
+                                        style="
+                                            display: block;
+                                            margin-bottom: 8px;
+                                            font-size: 13px;
+                                            color: var(--text-muted);
+                                        "
+                                        >Custom Domain (optional)</label
+                                    >
+                                    <input
+                                        type="text"
+                                        id="deployCustomDomain"
+                                        placeholder="myapp.example.com"
+                                        style="
+                                            width: 100%;
+                                            padding: 10px 12px;
+                                            border: 1px solid var(--border);
+                                            border-radius: 8px;
+                                            background: var(--bg);
+                                            color: var(--text);
+                                            font-size: 14px;
+                                        "
+                                    />
+                                </div>
+                                <div style="margin-bottom: 16px">
+                                    <label
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                            font-size: 13px;
+                                            color: var(--text);
+                                            cursor: pointer;
+                                        "
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            id="deployCiCd"
+                                            checked
+                                            style="margin: 0"
+                                        />
+                                        Enable CI/CD pipeline (automatic builds
+                                        and deployments)
+                                    </label>
+                                </div>
+                                <div style="margin-bottom: 16px">
+                                    <label
+                                        style="
+                                            display: block;
+                                            margin-bottom: 8px;
+                                            font-size: 13px;
+                                            color: var(--text-muted);
+                                        "
+                                        >App Type</label
+                                    >
+                                    <select
+                                        id="deployAppType"
+                                        style="
+                                            width: 100%;
+                                            padding: 10px 12px;
+                                            border: 1px solid var(--border);
+                                            border-radius: 8px;
+                                            background: var(--bg);
+                                            color: var(--text);
+                                            font-size: 14px;
+                                        "
+                                    >
+                                        <option value="htmx">
+                                            HTMX App (Server-side rendering)
+                                        </option>
+                                        <option value="react">
+                                            React App (SPA)
+                                        </option>
+                                        <option value="vue">
+                                            Vue App (SPA)
+                                        </option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div
+                            style="
+                                display: flex;
+                                gap: 12px;
+                                justify-content: flex-end;
+                            "
+                        >
+                            <button
+                                type="button"
+                                onclick="closeDeploymentModal()"
+                                style="
+                                    padding: 10px 20px;
+                                    border: 1px solid var(--border);
+                                    border-radius: 8px;
+                                    background: transparent;
+                                    color: var(--text);
+                                    font-size: 14px;
+                                    cursor: pointer;
+                                "
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                id="deployButton"
+                                onclick="executeDeployment()"
+                                style="
+                                    padding: 10px 20px;
+                                    border: none;
+                                    border-radius: 8px;
+                                    background: var(--accent);
+                                    color: white;
+                                    font-size: 14px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                "
+                            >
+                                Deploy Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1471,6 +1898,139 @@
                     }
                 });
             });
+        }
+
+        /* ── Deployment Modal Functions ── */
+        var selectedDeploymentTarget = "internal";
+
+        function selectDeploymentTarget(target) {
+            selectedDeploymentTarget = target;
+
+            // Update visual selection
+            var internalOption = document.getElementById("deploymentInternal");
+            var externalOption = document.getElementById("deploymentExternal");
+            var internalConfig = document.getElementById(
+                "deploymentInternalConfig",
+            );
+            var externalConfig = document.getElementById(
+                "deploymentExternalConfig",
+            );
+
+            if (target === "internal") {
+                internalOption.style.borderColor = "var(--accent)";
+                internalOption.style.background = "rgba(132, 214, 105, 0.06)";
+                externalOption.style.borderColor = "var(--border)";
+                externalOption.style.background = "transparent";
+                internalConfig.style.display = "block";
+                externalConfig.style.display = "none";
+            } else {
+                externalOption.style.borderColor = "var(--accent)";
+                externalOption.style.background = "rgba(132, 214, 105, 0.06)";
+                internalOption.style.borderColor = "var(--border)";
+                internalOption.style.background = "transparent";
+                internalConfig.style.display = "none";
+                externalConfig.style.display = "block";
+            }
+        }
+
+        function showDeploymentModal() {
+            var modal = document.getElementById("vibeDeploymentModal");
+            if (modal) {
+                modal.style.display = "block";
+                selectDeploymentTarget("internal");
+            }
+        }
+
+        function closeDeploymentModal() {
+            var modal = document.getElementById("vibeDeploymentModal");
+            if (modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function executeDeployment() {
+            var deployButton = document.getElementById("deployButton");
+            if (deployButton) {
+                deployButton.textContent = "Deploying...";
+                deployButton.disabled = true;
+            }
+
+            if (selectedDeploymentTarget === "internal") {
+                var route =
+                    document.getElementById("deployRoute").value || "my-app";
+                var sharedResources = document.getElementById(
+                    "deploySharedResources",
+                ).checked;
+
+                vibeAddMsg(
+                    "system",
+                    "🚀 Deploying to GB Platform at /apps/" + route + "/...",
+                );
+
+                // Simulate deployment (in real implementation, this would call the backend API)
+                setTimeout(function () {
+                    closeDeploymentModal();
+                    vibeAddMsg(
+                        "system",
+                        "✅ App deployed successfully to /apps/" + route + "/",
+                    );
+
+                    // Show preview
+                    var previewUrl = document.getElementById("vibePreviewUrl");
+                    var previewPanel = document.getElementById("vibePreview");
+                    if (previewUrl && previewPanel) {
+                        previewUrl.value =
+                            window.location.origin + "/apps/" + route + "/";
+                        previewPanel.style.display = "block";
+                    }
+
+                    if (deployButton) {
+                        deployButton.textContent = "Deploy Now";
+                        deployButton.disabled = false;
+                    }
+                }, 2000);
+            } else {
+                var repoName =
+                    document.getElementById("deployRepoName").value || "my-app";
+                var customDomain =
+                    document.getElementById("deployCustomDomain").value;
+                var ciCd = document.getElementById("deployCiCd").checked;
+                var appType = document.getElementById("deployAppType").value;
+
+                vibeAddMsg(
+                    "system",
+                    "🌐 Creating Forgejo repository: " + repoName,
+                );
+
+                // Simulate deployment (in real implementation, this would call the backend API)
+                setTimeout(function () {
+                    closeDeploymentModal();
+                    var message =
+                        "✅ Repository created and deployed to Forgejo";
+                    if (customDomain) {
+                        message += " (custom domain: " + customDomain + ")";
+                    }
+                    vibeAddMsg("system", message);
+
+                    if (deployButton) {
+                        deployButton.textContent = "Deploy Now";
+                        deployButton.disabled = false;
+                    }
+                }, 3000);
+            }
+        }
+
+        // Update route preview in real-time
+        if (document.readyState !== "loading") {
+            var routeInput = document.getElementById("deployRoute");
+            if (routeInput) {
+                routeInput.addEventListener("input", function () {
+                    var preview = document.getElementById("deployRoutePreview");
+                    if (preview) {
+                        preview.textContent = this.value || "my-app";
+                    }
+                });
+            }
         }
 
         if (document.readyState === "loading") {
