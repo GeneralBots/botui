@@ -196,6 +196,12 @@ if (typeof window.WindowManager === "undefined") {
         windowEl.style.top = windowObj.previousState.top;
         windowEl.style.left = windowObj.previousState.left;
         windowObj.isMaximized = false;
+
+        // Check if any other windows are still maximized
+        const anyMaximized = this.openWindows.some((w) => w.isMaximized);
+        if (!anyMaximized) {
+          document.body.classList.remove("window-maximized");
+        }
       } else {
         // Maximize
         windowObj.previousState = {
@@ -210,11 +216,17 @@ if (typeof window.WindowManager === "undefined") {
           ? document.getElementById("taskbar").offsetHeight
           : 0;
 
+        // Adjust for minibar height (fixed 28px at top)
+        const minibarHeight = 28;
+
         windowEl.style.width = "100%";
-        windowEl.style.height = `calc(100% - ${taskbarHeight}px)`;
-        windowEl.style.top = "0px";
+        windowEl.style.height = `calc(100% - ${taskbarHeight}px - ${minibarHeight}px)`;
+        windowEl.style.top = `${minibarHeight}px`;
         windowEl.style.left = "0px";
         windowObj.isMaximized = true;
+
+        // Add CSS class to body to hide background content
+        document.body.classList.add("window-maximized");
       }
       this.focus(id);
     }

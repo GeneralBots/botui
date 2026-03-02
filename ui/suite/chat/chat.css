@@ -84,21 +84,21 @@
 .chat-layout {
     display: flex;
     flex-direction: column;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 80px 20px 20px 20px;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
 /* Connection Status - use shared styles from app.css */
 
 @keyframes pulse {
-
     0%,
     100% {
         opacity: 1;
@@ -116,7 +116,7 @@
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px 0;
+    padding: 16px;
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -305,7 +305,7 @@
 
 /* Footer */
 footer {
-    padding: 16px 0;
+    padding: 16px 20px;
     border-top: 1px solid var(--border, var(--border-color, #2a2a2a));
     background: transparent;
     position: relative;
@@ -605,6 +605,11 @@ footer {
     box-shadow: 0 2px 6px rgba(59, 130, 246, 0.2);
 }
 
+/* Hide initial suggestion buttons when dynamic suggestions are displayed */
+footer.has-suggestions .quick-action-chip {
+    display: none !important;
+}
+
 /* Input Container */
 .input-container,
 form.input-container {
@@ -620,7 +625,12 @@ form.input-container {
 
 .input-container:focus-within {
     border-color: var(--chat-color1, var(--accent, #3b82f6));
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--chat-color1, var(--accent, #3b82f6)) 20%, transparent);
+    box-shadow: 0 0 0 3px
+        color-mix(
+            in srgb,
+            var(--chat-color1, var(--accent, #3b82f6)) 20%,
+            transparent
+        );
 }
 
 #messageInput {
@@ -641,7 +651,6 @@ form.input-container {
 }
 
 @keyframes cursor-blink {
-
     0%,
     50% {
         caret-color: var(--accent, #3b82f6);
@@ -761,7 +770,7 @@ form.input-container {
 /* Responsive */
 @media (max-width: 768px) {
     .chat-layout {
-        padding: 0 12px;
+        padding: 0;
     }
 
     .message-content {
@@ -1280,7 +1289,6 @@ form.input-container {
 }
 
 @keyframes thinkingBounce {
-
     0%,
     80%,
     100% {
@@ -1361,7 +1369,7 @@ form.input-container {
 }
 
 .message.bot .message-content::before {
-    content: '';
+    content: "";
     position: absolute;
     inset: -2px;
     background: var(--accent-glow, rgba(59, 130, 246, 0.1));
@@ -1410,7 +1418,6 @@ form.input-container {
 }
 
 @keyframes bounce {
-
     0%,
     100% {
         transform: translateX(-50%) translateY(0);
@@ -1449,7 +1456,6 @@ form.input-container {
 }
 
 @keyframes typing {
-
     0%,
     60%,
     100% {
