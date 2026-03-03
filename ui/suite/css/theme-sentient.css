@@ -876,12 +876,18 @@
 [data-theme="sentient"] input,
 [data-theme="sentient"] textarea,
 [data-theme="sentient"] select {
-    background: var(--input-bg);
+    background: var(--surface);
     border: 1px solid var(--input-border);
     color: var(--text);
     border-radius: 8px;
     padding: 10px 14px;
     transition: all 0.2s ease;
+}
+
+/* Ensure theme dropdown uses surface color in all themes */
+[data-theme="sentient"] select.theme-dropdown,
+[data-theme="sentient"] #themeDropdown {
+    background: var(--surface) !important;
 }
 
 [data-theme="sentient"] input:focus,

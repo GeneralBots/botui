@@ -283,3 +283,10 @@ body.window-maximized .window-element {
     background-color: var(--surface, #ffffff) !important;
     opacity: 1 !important;
 }
+
+/* Fix theme dropdown background - use surface color to adapt to theme */
+/* This overrides hardcoded black background from other CSS files */
+#themeDropdown,
+select.theme-dropdown {
+    background: var(--surface) !important;
+}

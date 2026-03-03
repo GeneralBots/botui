@@ -263,6 +263,22 @@ const ThemeManager = (() => {
           primary: primary,
         });
         updateDropdown();
+
+        // Fix theme dropdown background to use surface color
+        const themeDropdown = document.getElementById("themeDropdown");
+        if (themeDropdown) {
+          const surfaceColor = getComputedStyle(document.documentElement)
+            .getPropertyValue("--surface")
+            .trim();
+          if (surfaceColor) {
+            themeDropdown.style.setProperty(
+              "background",
+              surfaceColor,
+              "important",
+            );
+          }
+        }
+
         subscribers.forEach((cb) => cb({ themeId: id, themeName: theme.name }));
       }, 50);
     };
