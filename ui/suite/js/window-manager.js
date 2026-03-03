@@ -131,6 +131,12 @@ if (typeof window.WindowManager === "undefined") {
         windowEl.style.zIndex = this.zIndexCounter++;
       }
 
+      // Update document title
+      const windowObj = this.openWindows.find((w) => w.id === id);
+      if (windowObj) {
+        document.title = `${windowObj.title} - General Bots`;
+      }
+
       // Highlight taskbar icon
       if (this.taskbarApps) {
         const icons = this.taskbarApps.querySelectorAll(".taskbar-icon");
@@ -156,7 +162,10 @@ if (typeof window.WindowManager === "undefined") {
       this.openWindows = this.openWindows.filter((w) => w.id !== id);
       if (this.activeWindowId === id) {
         this.activeWindowId = null;
-        // Optionally focus the next highest z-index window
+        // Reset title to default when all windows are closed
+        if (this.openWindows.length === 0) {
+          document.title = "General Bots Desktop";
+        }
       }
     }
 
@@ -220,7 +229,7 @@ if (typeof window.WindowManager === "undefined") {
         const minibarHeight = 28;
 
         windowEl.style.width = "100%";
-        windowEl.style.height = `calc(100% - ${taskbarHeight}px - ${minibarHeight}px)`;
+        windowEl.style.height = `calc(100% - ${minibarHeight}px)`;
         windowEl.style.top = `${minibarHeight}px`;
         windowEl.style.left = "0px";
         windowObj.isMaximized = true;
