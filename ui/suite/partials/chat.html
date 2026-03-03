@@ -4,48 +4,124 @@
 
 <div class="chat-layout" id="chat-app">
     <!-- Connection Status -->
-    <div class="connection-status connecting" id="connectionStatus" style="display: none;">
+    <div
+        class="connection-status connecting"
+        id="connectionStatus"
+        style="display: none"
+    >
         <span class="connection-status-dot"></span>
         <span class="connection-text">Connecting...</span>
     </div>
 
     <!-- Agent Mode: Left Sidebar -->
     <aside class="agent-sidebar" id="agentSidebar">
-        <button class="agent-sidebar-item active" data-panel="chat" title="Chat">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        <button
+            class="agent-sidebar-item active"
+            data-panel="chat"
+            title="Chat"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                />
             </svg>
         </button>
         <button class="agent-sidebar-item" data-panel="tasks" title="Tasks">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <path d="M9 11l3 3L22 4" />
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                <path
+                    d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                />
             </svg>
         </button>
-        <button class="agent-sidebar-item" data-panel="terminal" title="Terminal">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button
+            class="agent-sidebar-item"
+            data-panel="terminal"
+            title="Terminal"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <polyline points="4 17 10 11 4 5" />
                 <line x1="12" y1="19" x2="20" y2="19" />
             </svg>
-            <span class="agent-sidebar-badge" id="terminalBadge" style="display:none;">0</span>
+            <span
+                class="agent-sidebar-badge"
+                id="terminalBadge"
+                style="display: none"
+                >0</span
+            >
         </button>
-        <button class="agent-sidebar-item" data-panel="explorer" title="Explorer">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        <button
+            class="agent-sidebar-item"
+            data-panel="explorer"
+            title="Explorer"
+        >
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                />
             </svg>
-            <span class="agent-sidebar-badge" id="explorerBadge" style="display:none;">0</span>
+            <span
+                class="agent-sidebar-badge"
+                id="explorerBadge"
+                style="display: none"
+                >0</span
+            >
         </button>
         <button class="agent-sidebar-item" data-panel="editor" title="Editor">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <polyline points="16 18 22 12 16 6" />
                 <polyline points="8 6 2 12 8 18" />
             </svg>
         </button>
         <button class="agent-sidebar-item" data-panel="browser" title="Browser">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
                 <circle cx="12" cy="12" r="10" />
                 <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                <path
+                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                />
             </svg>
         </button>
     </aside>
@@ -56,8 +132,14 @@
     <div class="agent-browser-panel" id="agentBrowserPanel">
         <div class="browser-panel-header">
             <span>// BROWSER</span>
-            <input type="text" class="browser-url-bar" id="browserUrlBar" value="" readonly
-                placeholder="No preview active" />
+            <input
+                type="text"
+                class="browser-url-bar"
+                id="browserUrlBar"
+                value=""
+                readonly
+                placeholder="No preview active"
+            />
         </div>
         <div class="browser-panel-content" id="browserPanelContent">
             <div class="browser-panel-empty">Waiting for app preview...</div>
@@ -78,16 +160,28 @@
             <span class="agent-info-dot"></span>
             <span id="agentNameDisplay">Agent #1</span>
         </div>
-        <span class="agent-level-badge badge-evolved" id="agentLevelBadge">EVOLVED</span>
-        <div class="agent-info-model" id="agentModelDisplay">Claude Opus 4.5 &mdash; 99%</div>
+        <span class="agent-level-badge badge-evolved" id="agentLevelBadge"
+            >EVOLVED</span
+        >
+        <div class="agent-info-model" id="agentModelDisplay">
+            Claude Opus 4.5 &mdash; 99%
+        </div>
         <div class="agent-info-toggles">
             <div class="agent-toggle">
                 <span>Plan</span>
-                <button class="agent-toggle-switch on" id="togglePlan" type="button"></button>
+                <button
+                    class="agent-toggle-switch on"
+                    id="togglePlan"
+                    type="button"
+                ></button>
             </div>
             <div class="agent-toggle">
                 <span>YOLO</span>
-                <button class="agent-toggle-switch" id="toggleYolo" type="button"></button>
+                <button
+                    class="agent-toggle-switch"
+                    id="toggleYolo"
+                    type="button"
+                ></button>
             </div>
         </div>
     </div>
@@ -100,51 +194,82 @@
             <button class="step-nav-btn" id="stepNext" type="button">►</button>
         </div>
         <div class="step-action-btns">
-            <button class="step-action-btn" title="Chat" type="button">💬</button>
-            <button class="step-action-btn" title="Edit" type="button">✏️</button>
-            <button class="step-action-btn" title="Code" type="button">&lt;/&gt;</button>
+            <button class="step-action-btn" title="Chat" type="button">
+                💬
+            </button>
+            <button class="step-action-btn" title="Edit" type="button">
+                ✏️
+            </button>
+            <button class="step-action-btn" title="Code" type="button">
+                &lt;/&gt;
+            </button>
         </div>
     </div>
 
     <footer>
-        <!-- Quick Action Chips (visible in chat mode) -->
-        <div class="quick-actions-container" id="quickActions">
-            <button class="quick-action-chip" type="button" data-action="full-stack">
-                <span class="quick-action-icon">🔧</span> Full-Stack
-            </button>
-            <button class="quick-action-chip" type="button" data-action="writing">
-                <span class="quick-action-icon">✏️</span> Writing
-            </button>
-            <button class="quick-action-chip" type="button" data-action="data-insight">
-                <span class="quick-action-icon">📊</span> Data Insight
-            </button>
-            <button class="quick-action-chip" type="button" data-action="magic-design">
-                <span class="quick-action-icon">✨</span> Magic Design
-            </button>
-        </div>
         <div class="suggestions-container" id="suggestions"></div>
         <div class="mention-dropdown" id="mentionDropdown">
             <div class="mention-header">
-                <span class="mention-title" data-i18n="chat-mention-title">Reference Entity</span>
+                <span class="mention-title" data-i18n="chat-mention-title"
+                    >Reference Entity</span
+                >
             </div>
             <div class="mention-results" id="mentionResults"></div>
         </div>
         <form class="input-container" id="chatForm">
             <!-- Agent/Chat Mode Toggle (Z.ai style) -->
             <div class="chat-mode-toggle" id="chatModeToggle">
-                <button type="button" class="chat-mode-btn active" data-mode="agent" id="modeAgentBtn">Agent</button>
-                <button type="button" class="chat-mode-btn" data-mode="chat" id="modeChatBtn">Chat</button>
+                <button
+                    type="button"
+                    class="chat-mode-btn active"
+                    data-mode="agent"
+                    id="modeAgentBtn"
+                >
+                    Agent
+                </button>
+                <button
+                    type="button"
+                    class="chat-mode-btn"
+                    data-mode="chat"
+                    id="modeChatBtn"
+                >
+                    Chat
+                </button>
             </div>
-            <input name="content" id="messageInput" type="text" placeholder="Message... (type @ to mention)"
-                data-i18n-placeholder="chat-placeholder" autofocus autocomplete="off" />
-            <button type="submit" id="sendBtn" title="Send" data-i18n-title="chat-send">
+            <input
+                name="content"
+                id="messageInput"
+                type="text"
+                placeholder="Message... (type @ to mention)"
+                data-i18n-placeholder="chat-placeholder"
+                autofocus
+                autocomplete="off"
+            />
+            <button
+                type="submit"
+                id="sendBtn"
+                title="Send"
+                data-i18n-title="chat-send"
+            >
                 ↑
             </button>
         </form>
     </footer>
-    <button class="scroll-to-bottom" id="scrollToBottom" title="Scroll to bottom">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
+    <button
+        class="scroll-to-bottom"
+        id="scrollToBottom"
+        title="Scroll to bottom"
+    >
+        <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
             <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
     </button>
@@ -158,7 +283,11 @@
     <div class="entity-card-title"></div>
     <div class="entity-card-details"></div>
     <div class="entity-card-actions">
-        <button class="entity-card-btn" data-action="view" data-i18n="action-view">
+        <button
+            class="entity-card-btn"
+            data-action="view"
+            data-i18n="action-view"
+        >
             View
         </button>
     </div>
@@ -294,7 +423,9 @@
             if (!messages || !scrollBtn) return;
 
             var isNearBottom =
-                messages.scrollHeight - messages.scrollTop - messages.clientHeight <
+                messages.scrollHeight -
+                    messages.scrollTop -
+                    messages.clientHeight <
                 100;
 
             if (isNearBottom) {
@@ -471,9 +602,9 @@
         function fetchEntityDetails(type, name) {
             return fetch(
                 "/api/search/entity?type=" +
-                encodeURIComponent(type) +
-                "&name=" +
-                encodeURIComponent(name),
+                    encodeURIComponent(type) +
+                    "&name=" +
+                    encodeURIComponent(name),
             )
                 .then(function (r) {
                     return r.json();
@@ -559,9 +690,9 @@
         function fetchEntitiesOfType(type, searchTerm) {
             fetch(
                 "/api/search/entities?type=" +
-                encodeURIComponent(type) +
-                "&q=" +
-                encodeURIComponent(searchTerm || ""),
+                    encodeURIComponent(type) +
+                    "&q=" +
+                    encodeURIComponent(searchTerm || ""),
             )
                 .then(function (r) {
                     return r.json();
@@ -621,8 +752,8 @@
 
                     var subtitle = item.subtitle
                         ? '<span class="mention-item-subtitle">' +
-                        escapeHtml(item.subtitle) +
-                        "</span>"
+                          escapeHtml(item.subtitle) +
+                          "</span>"
                         : "";
                     var hint = item.isTypeHint
                         ? '<span class="mention-item-hint">Type : to search</span>'
@@ -843,7 +974,11 @@
                 isStreaming = false;
 
                 // Render suggestions when message is complete
-                if (data.suggestions && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+                if (
+                    data.suggestions &&
+                    Array.isArray(data.suggestions) &&
+                    data.suggestions.length > 0
+                ) {
                     renderSuggestions(data.suggestions);
                 }
             } else {
@@ -888,9 +1023,10 @@
                         // Check if there's an action to parse
                         if (sugg.action) {
                             try {
-                                var action = typeof sugg.action === "string"
-                                    ? JSON.parse(sugg.action)
-                                    : sugg.action;
+                                var action =
+                                    typeof sugg.action === "string"
+                                        ? JSON.parse(sugg.action)
+                                        : sugg.action;
 
                                 console.log("Parsed action:", action);
 
@@ -899,14 +1035,20 @@
                                     // The backend will recognize this as a tool request
                                     window.sendMessage(sugg.text);
                                 } else if (action.type === "send_message") {
-                                    window.sendMessage(action.message || sugg.text);
+                                    window.sendMessage(
+                                        action.message || sugg.text,
+                                    );
                                 } else if (action.type === "select_context") {
                                     window.sendMessage(action.context);
                                 } else {
                                     window.sendMessage(sugg.text);
                                 }
                             } catch (e) {
-                                console.error("Failed to parse action:", e, "falling back to text");
+                                console.error(
+                                    "Failed to parse action:",
+                                    e,
+                                    "falling back to text",
+                                );
                                 window.sendMessage(sugg.text);
                             }
                         } else {
@@ -968,7 +1110,7 @@
                 currentBotId: currentBotId,
                 currentUserId: currentUserId,
                 currentSessionId: currentSessionId,
-                currentBotName: currentBotName
+                currentBotName: currentBotName,
             };
         };
 
@@ -1028,11 +1170,20 @@
                     }
 
                     // Route agent-type messages to AgentMode handler
-                    if (window.AgentMode && data.type && [
-                        "thought_process", "terminal_output", "browser_ready",
-                        "step_progress", "step_complete", "todo_update",
-                        "agent_status", "file_created"
-                    ].indexOf(data.type) !== -1) {
+                    if (
+                        window.AgentMode &&
+                        data.type &&
+                        [
+                            "thought_process",
+                            "terminal_output",
+                            "browser_ready",
+                            "step_progress",
+                            "step_complete",
+                            "todo_update",
+                            "agent_status",
+                            "file_created",
+                        ].indexOf(data.type) !== -1
+                    ) {
                         window.AgentMode.handleMessage(data);
                     }
 
@@ -1069,7 +1220,7 @@
 
         // Apply theme data from WebSocket events
         function getContrastYIQ(hexcolor) {
-            if (!hexcolor) return '#ffffff';
+            if (!hexcolor) return "#ffffff";
 
             // Handle named colors and variables by letting the browser resolve them
             var temp = document.createElement("div");
@@ -1080,14 +1231,14 @@
             document.body.removeChild(temp);
 
             var rgb = style.match(/\d+/g);
-            if (!rgb || rgb.length < 3) return '#ffffff';
+            if (!rgb || rgb.length < 3) return "#ffffff";
 
             var r = parseInt(rgb[0]);
             var g = parseInt(rgb[1]);
             var b = parseInt(rgb[2]);
 
-            var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-            return (yiq >= 128) ? '#000000' : '#ffffff';
+            var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+            return yiq >= 128 ? "#000000" : "#ffffff";
         }
 
         function applyThemeData(themeData) {
@@ -1096,13 +1247,23 @@
             var color1 = themeData.color1 || themeData.data?.color1 || "black";
             var color2 = themeData.color2 || themeData.data?.color2 || "white";
             var logo = themeData.logo_url || themeData.data?.logo_url || "";
-            var title = themeData.title || themeData.data?.title || window.__INITIAL_BOT_NAME__ || "Chat";
+            var title =
+                themeData.title ||
+                themeData.data?.title ||
+                window.__INITIAL_BOT_NAME__ ||
+                "Chat";
 
             // Set CSS variables for colors on document element
             document.documentElement.style.setProperty("--chat-color1", color1);
             document.documentElement.style.setProperty("--chat-color2", color2);
-            document.documentElement.style.setProperty("--suggestion-color", color1);
-            document.documentElement.style.setProperty("--suggestion-bg", color2);
+            document.documentElement.style.setProperty(
+                "--suggestion-color",
+                color1,
+            );
+            document.documentElement.style.setProperty(
+                "--suggestion-bg",
+                color2,
+            );
 
             // Also set on root for better cascading
             document.documentElement.style.setProperty("--color1", color1);
@@ -1112,10 +1273,21 @@
             document.documentElement.style.setProperty("--primary", color1);
             document.documentElement.style.setProperty("--accent", color1);
 
-            document.documentElement.style.setProperty("--chat-fg1", getContrastYIQ(color1));
-            document.documentElement.style.setProperty("--chat-fg2", getContrastYIQ(color2));
+            document.documentElement.style.setProperty(
+                "--chat-fg1",
+                getContrastYIQ(color1),
+            );
+            document.documentElement.style.setProperty(
+                "--chat-fg2",
+                getContrastYIQ(color2),
+            );
 
-            console.log("Theme applied:", { color1: color1, color2: color2, logo: logo, title: title });
+            console.log("Theme applied:", {
+                color1: color1,
+                color2: color2,
+                logo: logo,
+                title: title,
+            });
         }
 
         // Load bot config and apply colors/logo
@@ -1132,47 +1304,98 @@
                     // Get the theme manager's theme for this bot to check if user selected a different theme
                     var botId = botName.toLowerCase();
                     var botThemeKey = "gb-theme-" + botId;
-                    var botTheme = window.ThemeManager ? (
-                        // Get bot-specific theme from theme manager's mapping
-                        (window.ThemeManager.getAvailableThemes &&
-                            window.ThemeManager.getAvailableThemes().find(t => t.id === botId)) ||
-                        // Fallback to localStorage
-                        localStorage.getItem(botThemeKey)
-                    ) : localStorage.getItem(botThemeKey);
+                    var botTheme = window.ThemeManager
+                        ? // Get bot-specific theme from theme manager's mapping
+                          (window.ThemeManager.getAvailableThemes &&
+                              window.ThemeManager.getAvailableThemes().find(
+                                  (t) => t.id === botId,
+                              )) ||
+                          // Fallback to localStorage
+                          localStorage.getItem(botThemeKey)
+                        : localStorage.getItem(botThemeKey);
 
                     // Check if bot config has a theme-base setting
-                    var configThemeBase = config.theme_base || config["theme-base"] || "light";
+                    var configThemeBase =
+                        config.theme_base || config["theme-base"] || "light";
 
                     // Only use bot config colors if:
                     // 1. No theme has been explicitly selected by user (localStorage empty or default)
                     // 2. AND the bot config's theme-base matches the current theme
                     var localStorageTheme = localStorage.getItem(botThemeKey);
-                    var useBotConfigColors = !localStorageTheme ||
+                    var useBotConfigColors =
+                        !localStorageTheme ||
                         localStorageTheme === "default" ||
                         localStorageTheme === configThemeBase;
 
                     // Apply colors from config (API returns snake_case)
-                    var color1 = config.theme_color1 || config["theme-color1"] || config["Theme Color"] || "#3b82f6";
-                    var color2 = config.theme_color2 || config["theme-color2"] || "#f5deb3";
-                    var title = config.theme_title || config["theme-title"] || botName;
+                    var color1 =
+                        config.theme_color1 ||
+                        config["theme-color1"] ||
+                        config["Theme Color"] ||
+                        "#3b82f6";
+                    var color2 =
+                        config.theme_color2 ||
+                        config["theme-color2"] ||
+                        "#f5deb3";
+                    var title =
+                        config.theme_title || config["theme-title"] || botName;
                     var logo = config.theme_logo || config["theme-logo"] || "";
 
                     // Only set bot config colors if user hasn't selected a different theme
                     if (useBotConfigColors) {
-                        document.documentElement.setAttribute("data-has-bot-colors", "true");
-                        document.documentElement.style.setProperty("--chat-color1", color1);
-                        document.documentElement.style.setProperty("--chat-color2", color2);
-                        document.documentElement.style.setProperty("--suggestion-color", color1);
-                        document.documentElement.style.setProperty("--suggestion-bg", color2);
-                        document.documentElement.style.setProperty("--color1", color1);
-                        document.documentElement.style.setProperty("--color2", color2);
-                        document.documentElement.style.setProperty("--primary", color1);
-                        document.documentElement.style.setProperty("--accent", color1);
-                        document.documentElement.style.setProperty("--chat-fg1", getContrastYIQ(color1));
-                        document.documentElement.style.setProperty("--chat-fg2", getContrastYIQ(color2));
-                        console.log("Bot config colors applied:", { color1: color1, color2: color2 });
+                        document.documentElement.setAttribute(
+                            "data-has-bot-colors",
+                            "true",
+                        );
+                        document.documentElement.style.setProperty(
+                            "--chat-color1",
+                            color1,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--chat-color2",
+                            color2,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--suggestion-color",
+                            color1,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--suggestion-bg",
+                            color2,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--color1",
+                            color1,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--color2",
+                            color2,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--primary",
+                            color1,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--accent",
+                            color1,
+                        );
+                        document.documentElement.style.setProperty(
+                            "--chat-fg1",
+                            getContrastYIQ(color1),
+                        );
+                        document.documentElement.style.setProperty(
+                            "--chat-fg2",
+                            getContrastYIQ(color2),
+                        );
+                        console.log("Bot config colors applied:", {
+                            color1: color1,
+                            color2: color2,
+                        });
                     } else {
-                        console.log("Bot config colors skipped - user selected custom theme:", localStorageTheme);
+                        console.log(
+                            "Bot config colors skipped - user selected custom theme:",
+                            localStorageTheme,
+                        );
                     }
 
                     // Update logo if provided
@@ -1190,7 +1413,12 @@
                         }
                     }
 
-                    console.log("Bot config loaded:", { color1: color1, color2: color2, title: title, logo: logo });
+                    console.log("Bot config loaded:", {
+                        color1: color1,
+                        color2: color2,
+                        title: title,
+                        logo: logo,
+                    });
                 })
                 .catch(function (e) {
                     console.log("Could not load bot config:", e);
