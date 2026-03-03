@@ -255,6 +255,7 @@
 
 /* Hide background content when window is maximized */
 body.window-maximized .sidebar,
+body.window-maximized .toolbar,
 body.window-maximized .sidebar-item,
 body.window-maximized .desktop-icon,
 body.window-maximized .panel-grid,
