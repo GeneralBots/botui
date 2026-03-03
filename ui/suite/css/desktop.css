@@ -267,10 +267,10 @@ body.window-maximized .bg-svg {
     opacity: 0 !important;
 }
 
-/* Ensure maximized window is below minibar (28px height) */
+/* Ensure maximized window fills the screen without minibar offset */
 body.window-maximized .window-element {
     z-index: 9998 !important; /* Lower than minibar's 9999 */
-    top: 28px !important; /* Below the minibar */
+    top: 0 !important; /* No minibar offset - start at top */
 }
 
 /* Ensure window body is opaque */
