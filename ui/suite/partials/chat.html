@@ -1009,6 +1009,16 @@
             // Clear existing suggestions
             suggestionsEl.innerHTML = "";
 
+            // Remove any default/quick action suggestions that might be present
+            var defaultSuggestions =
+                suggestionsEl.querySelectorAll(".suggestion-chip");
+            defaultSuggestions.forEach(function (chip) {
+                chip.remove();
+            });
+
+            // Add has-bot-suggestions class to make suggestions visible
+            suggestionsEl.classList.add("has-bot-suggestions");
+
             console.log("Rendering " + suggestions.length + " suggestions");
 
             suggestions.forEach(function (suggestion) {

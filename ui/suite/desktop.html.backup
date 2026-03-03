@@ -244,49 +244,6 @@
 
 
 
-    
-            /* Fullscreen Mode Styles */
-            body.fullscreen .sidebar {
-                display: none !important;
-            }
-
-            body.fullscreen .toolbar {
-                display: none !important;
-            }
-
-            body.fullscreen .panel-section {
-                display: none !important;
-            }
-
-            body.fullscreen .workspace {
-                height: 100vh !important;
-            }
-
-            body.fullscreen .main-wrapper {
-                height: 100vh !important;
-            }
-
-            body.fullscreen .window-titlebar {
-                display: none !important;
-            }
-
-            body.fullscreen .window {
-                border: none !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-            }
-        
-            /* Hide window title bar and controls in fullscreen */
-            body.fullscreen .window > div:first-child {
-                display: none !important;
-            }
-
-            body.fullscreen .window > div:nth-child(2) {
-                display: none !important;
-            }
-
-        </style>
-
     </head>
 
     <body>
@@ -621,16 +578,6 @@
 
         <!-- HTMX Intercepts and WindowManager Init as described in UI.md Phase 3 -->
         <script>
-            // Check for fullscreen mode
-            (function() {
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.get('fullscreen') === 'true') {
-                    document.body.classList.add('fullscreen');
-                    console.log('Fullscreen mode activated');
-                }
-            })();
-
-
             document.addEventListener("DOMContentLoaded", async () => {
                 // Initialize WindowManager
                 if (typeof window.WindowManager !== "undefined") {

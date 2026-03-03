@@ -539,11 +539,12 @@ footer {
 /* Suggestions */
 .suggestions-container {
     display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 12px;
     padding-bottom: 4px;
+    max-height: 100px;
+    overflow-y: auto;
 }
 
 .suggestion-chip,
@@ -1430,4 +1431,22 @@ form.input-container {
         transform: translateY(-4px);
         opacity: 1;
     }
+}
+
+
+/* Hide default/initial suggestions - only show bot suggestions */
+.suggestions-container:not(.has-bot-suggestions) .suggestion-chip {
+    display: none !important;
+}
+
+/* Show suggestions when bot has responded */
+.suggestions-container.has-bot-suggestions .suggestion-chip {
+    display: inline-flex !important;
+}
+
+
+/* Hide default quick action suggestions - only show bot suggestions */
+#quickActions,
+.quick-actions-container {
+    display: none !important;
 }
