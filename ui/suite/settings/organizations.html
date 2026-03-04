@@ -437,6 +437,34 @@
                 </div>
             </div>
 
+            <!-- Website Crawling -->
+            <div class="config-section">
+                <h3>Website Crawling</h3>
+                <p class="config-note">
+                    Force an immediate recrawl of a specific website configured for this bot.
+                </p>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1">
+                        <label for="recrawl-url">Website URL</label>
+                        <div style="display: flex; gap: 0.5rem">
+                            <input
+                                type="url"
+                                id="recrawl-url"
+                                placeholder="https://example.com"
+                                style="flex: 1"
+                            />
+                            <button
+                                type="button"
+                                class="btn-secondary"
+                                onclick="forceRecrawlWebsite()"
+                            >
+                                Force Recrawl
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Inherit from Parent Toggle -->
             <div
                 class="config-section"
@@ -1063,6 +1091,41 @@
         document.querySelectorAll(".bot-tree-item").forEach((item) => {
             item.classList.remove("selected");
         });
+    }
+
+    async function forceRecrawlWebsite() {
+        const botId = document.getElementById("bot-id").value;
+        const url = document.getElementById("recrawl-url").value;
+
+        if (!url) {
+            if (window.showToast) window.showToast("Please enter a website URL", "error");
+            else alert("Please enter a website URL");
+            return;
+        }
+
+        try {
+            const response = await fetch("/api/website/force-recrawl", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bot_id: botId, url: url }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                if (window.showToast) window.showToast("Recrawl started successfully", "success");
+                else alert("Recrawl started successfully");
+                document.getElementById("recrawl-url").value = "";
+            } else {
+                const error = data.error || "Failed to start recrawl";
+                if (window.showToast) window.showToast(error, "error");
+                else alert(error);
+            }
+        } catch (error) {
+            console.error("Error triggering recrawl:", error);
+            if (window.showToast) window.showToast("Network error triggering recrawl", "error");
+            else alert("Network error triggering recrawl");
+        }
     }
 
     function toggleBotChildren(element) {
