@@ -14,7 +14,8 @@
  */
 
 (function (window, document) {
-  "use strict";
+   "use strict";
+   console.log("[GBSecurity] Loading...");
 
   var AUTH_KEYS = {
     ACCESS_TOKEN: "gb-access-token",

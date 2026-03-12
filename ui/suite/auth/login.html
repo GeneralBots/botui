@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Login - General Bots</title>
         <script src="/suite/js/vendor/htmx.min.js"></script>
+        <script src="/suite/js/security-bootstrap.js"></script>
         <script src="/suite/js/vendor/htmx-json-enc.js"></script>
         <style>
             :root {
@@ -1300,25 +1301,37 @@
 
                             // Save token before redirect
                             // ALWAYS use localStorage - sessionStorage doesn't persist across redirects properly
-                            if (response.access_token) {
-                                localStorage.setItem(
-                                    "gb-access-token",
-                                    response.access_token,
-                                );
-                                if (response.refresh_token) {
-                                    localStorage.setItem(
-                                        "gb-refresh-token",
-                                        response.refresh_token,
-                                    );
-                                }
-                                if (response.expires_in) {
-                                    const expiresAt =
-                                        Date.now() + response.expires_in * 1000;
-                                    localStorage.setItem(
-                                        "gb-token-expires",
-                                        expiresAt.toString(),
-                                    );
-                                }
+                   if (response.access_token) {
+                       localStorage.setItem(
+                           "gb-access-token",
+                           response.access_token,
+                       );
+                       sessionStorage.setItem(
+                           "gb-access-token",
+                           response.access_token,
+                       );
+                       if (response.refresh_token) {
+                           localStorage.setItem(
+                               "gb-refresh-token",
+                               response.refresh_token,
+                           );
+                           sessionStorage.setItem(
+                               "gb-refresh-token",
+                               response.refresh_token,
+                           );
+                       }
+                       if (response.expires_in) {
+                           const expiresAt =
+                               Date.now() + response.expires_in * 1000;
+                           localStorage.setItem(
+                               "gb-token-expires",
+                               expiresAt.toString(),
+                           );
+                           sessionStorage.setItem(
+                               "gb-token-expires",
+                               expiresAt.toString(),
+                           );
+                       }
                                 console.log(
                                     "[LOGIN] Token saved to localStorage:",
                                     response.access_token.substring(0, 20) +

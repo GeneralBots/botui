@@ -143,8 +143,15 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
         || path_lower.contains("/assets/")
         || path_lower.contains("/public/")
         || path_lower.contains("/partials/")
+        || path_lower.contains("/crm/")
+        || path_lower.contains("/tasks/")
+        || path_lower.contains("/drive/")
+        || path_lower.contains("/terminal/")
+        || path_lower.contains("/browser/")
+        || path_lower.contains("/editor/")
         || path_lower.ends_with(".js")
         || path_lower.ends_with(".css")
+        || path_lower.ends_with(".html")
         || path_lower.ends_with(".png")
         || path_lower.ends_with(".jpg")
         || path_lower.ends_with(".jpeg")
@@ -165,20 +172,31 @@ pub async fn index(OriginalUri(uri): OriginalUri) -> Response {
         let fs_path = if path_parts.len() > 1 {
             let mut start_idx = 1;
             let known_dirs = ["suite", "js", "css", "vendor", "assets", "public", "partials", "settings", "auth", "about", "drive", "chat", "tasks", "admin", "mail", "calendar", "meet", "docs", "sheet", "slides", "paper", "research", "sources", "learn", "analytics", "dashboards", "monitoring", "people", "crm", "tickets", "billing", "products", "video", "player", "canvas", "social", "project", "goals", "workspace", "designer", "vibe"];
+            let suite_dirs = ["drive", "chat", "tasks", "admin", "mail", "calendar", "meet", "docs", "sheet", "slides", "paper", "research", "sources", "learn", "analytics", "dashboards", "monitoring", "people", "crm", "tickets", "billing", "products", "video", "player", "canvas", "social", "project", "goals", "workspace", "designer", "vibe"];
 
-            // Special case: /auth/suite/* should map to suite/* (auth is a route, not a directory)
-            if path_parts.get(1) == Some(&"auth") && path_parts.get(2) == Some(&"suite") {
-                start_idx = 2;
-            }
-            // Skip bot name if present (first segment is not a known dir, second segment is)
-            else if path_parts.len() > start_idx + 1
-                && !known_dirs.contains(&path_parts[start_idx])
-                && known_dirs.contains(&path_parts[start_idx + 1])
-            {
-                start_idx += 1;
-            }
+            // If the first segment is already a known dir (suite subdirectory), prepend "suite/"
+            if known_dirs.contains(&path_parts[1]) {
+                if suite_dirs.contains(&path_parts[1]) {
+                    // e.g., /crm/crm.css -> suite/crm/crm.css
+                    format!("suite/{}", path_parts[1..].join("/"))
+                } else {
+                    // e.g., /js/..., /suite/..., /css/...
+                    path_parts[1..].join("/")
+                }
+            } else {
+                // Special case: /auth/suite/* should map to suite/* (auth is a route, not a directory)
+                if path_parts.get(1) == Some(&"auth") && path_parts.get(2) == Some(&"suite") {
+                    start_idx = 2;
+                }
+                // Skip bot name if present (first segment is not a known dir, second segment is)
+                else if path_parts.len() > start_idx + 1
+                    && known_dirs.contains(&path_parts[start_idx + 1])
+                {
+                    start_idx += 1;
+                }
 
-            path_parts[start_idx..].join("/")
+                path_parts[start_idx..].join("/")
+            }
         } else {
             path.to_string()
         };

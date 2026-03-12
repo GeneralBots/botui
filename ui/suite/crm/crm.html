@@ -1,7 +1,44 @@
 <!-- CRM - Customer Relationship Management -->
 <!-- Dynamics nomenclature: Lead → Opportunity → Account/Contact -->
 
-<link rel="stylesheet" href="crm/crm.css">
+<style>
+    [data-theme="sentient"] {
+        --bg: #0a0a0a;
+        --surface: #161616;
+        --surface-hover: #1e1e1e;
+        --border: #2a2a2a;
+        --text: #ffffff;
+        --text-secondary: #888888;
+        --text-muted: #444444;
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --primary-light: rgba(59, 130, 246, 0.1);
+        --error: #ef4444;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --bg-primary: #0a0a0a;
+    }
+    :root {
+        --bg: #0a0a0a;
+        --surface: #161616;
+        --surface-hover: #1e1e1e;
+        --border: #2a2a2a;
+        --text: #ffffff;
+        --text-secondary: #888888;
+        --text-muted: #444444;
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --primary-light: rgba(59, 130, 246, 0.1);
+        --error: #ef4444;
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --bg-primary: #0a0a0a;
+    }
+</style>
+<link rel="stylesheet" href="/suite/crm/crm.css">
+<script src="/suite/js/vendor/htmx.min.js"></script>
+<script src="/suite/js/vendor/htmx-json-enc.js"></script>
+<script src="/suite/js/security-bootstrap.js"></script>
 
 <div class="crm-container">
     <!-- Header -->
@@ -24,7 +61,7 @@
                 <input type="text"
                        placeholder="Search leads, opportunities, accounts..."
                        data-i18n-placeholder="crm-search-placeholder"
-                       hx-get="/api/crm/search"
+                       hx-get="/api/ui/crm/search"
                        hx-trigger="keyup changed delay:300ms"
                        hx-target="#crm-search-results">
             </div>
@@ -44,13 +81,13 @@
     <div id="crm-pipeline-view" class="crm-view active">
         <div class="pipeline-container">
             <!-- Lead Stage -->
-            <div class="pipeline-column" data-stage="lead">
+            <div class="pipeline-column" data-stage="new">
                 <div class="pipeline-header">
                     <span class="pipeline-title" data-i18n="crm-stage-lead">Lead</span>
-                    <span class="pipeline-count" hx-get="/api/crm/count?stage=lead" hx-trigger="load">0</span>
+                    <span class="pipeline-count" hx-get="/api/ui/crm/count?stage=new" hx-trigger="load">0</span>
                 </div>
                 <div class="pipeline-cards"
-                     hx-get="/api/crm/pipeline?stage=lead"
+                     hx-get="/api/ui/crm/pipeline?stage=new"
                      hx-trigger="load"
                      hx-swap="innerHTML">
                     <!-- Lead cards loaded via HTMX -->
@@ -133,19 +170,19 @@
         <div class="pipeline-summary">
             <div class="summary-card">
                 <span class="summary-label" data-i18n="crm-total-value">Total Pipeline Value</span>
-                <span class="summary-value" hx-get="/api/crm/stats/pipeline-value" hx-trigger="load">$0</span>
+                <span class="summary-value" hx-get="/api/ui/crm/stats/pipeline-value" hx-trigger="load">$0</span>
             </div>
             <div class="summary-card">
                 <span class="summary-label" data-i18n="crm-conversion-rate">Conversion Rate</span>
-                <span class="summary-value" hx-get="/api/crm/stats/conversion-rate" hx-trigger="load">0%</span>
+                <span class="summary-value" hx-get="/api/ui/crm/stats/conversion-rate" hx-trigger="load">0%</span>
             </div>
             <div class="summary-card">
                 <span class="summary-label" data-i18n="crm-avg-deal">Avg Deal Size</span>
-                <span class="summary-value" hx-get="/api/crm/stats/avg-deal" hx-trigger="load">$0</span>
+                <span class="summary-value" hx-get="/api/ui/crm/stats/avg-deal" hx-trigger="load">$0</span>
             </div>
             <div class="summary-card">
                 <span class="summary-label" data-i18n="crm-this-month">Won This Month</span>
-                <span class="summary-value success" hx-get="/api/crm/stats/won-month" hx-trigger="load">$0</span>
+                <span class="summary-value success" hx-get="/api/ui/crm/stats/won-month" hx-trigger="load">$0</span>
             </div>
         </div>
     </div>
@@ -175,7 +212,7 @@
                     <th data-i18n="crm-col-actions">Actions</th>
                 </tr>
             </thead>
-            <tbody id="leads-table-body" hx-get="/api/crm/leads" hx-trigger="load">
+            <tbody id="leads-table-body" hx-get="/api/ui/crm/leads" hx-trigger="load">
                 <!-- Leads loaded via HTMX -->
             </tbody>
         </table>
@@ -196,7 +233,7 @@
                     <th data-i18n="crm-col-actions">Actions</th>
                 </tr>
             </thead>
-            <tbody id="opportunities-table-body" hx-get="/api/crm/opportunities" hx-trigger="load">
+            <tbody id="opportunities-table-body" hx-get="/api/ui/crm/opportunities" hx-trigger="load">
             </tbody>
         </table>
     </div>
@@ -215,7 +252,7 @@
                     <th data-i18n="crm-col-actions">Actions</th>
                 </tr>
             </thead>
-            <tbody id="accounts-table-body" hx-get="/api/crm/accounts" hx-trigger="load">
+            <tbody id="accounts-table-body" hx-get="/api/ui/crm/accounts" hx-trigger="load">
             </tbody>
         </table>
     </div>
@@ -233,7 +270,7 @@
                     <th data-i18n="crm-col-actions">Actions</th>
                 </tr>
             </thead>
-            <tbody id="contacts-table-body" hx-get="/api/crm/contacts" hx-trigger="load">
+            <tbody id="contacts-table-body" hx-get="/api/ui/crm/contacts" hx-trigger="load">
             </tbody>
         </table>
     </div>
@@ -246,6 +283,9 @@
         <!-- Form content loaded via HTMX -->
     </div>
 </div>
+
+<!-- Detail Panel -->
+<div id="detail-panel" class="crm-detail-panel"></div>
 
 <script>
 (function() {
@@ -307,5 +347,50 @@
     if (window.i18n && window.i18n.translatePage) {
         window.i18n.translatePage();
     }
+
+    // Submit lead form manually to ensure JSON is sent correctly
+    window.submitLeadForm = async function(event) {
+        const form = document.getElementById('leadForm');
+        const formData = new FormData(form);
+        const data = {};
+        const numericFields = ['value'];
+        
+        for (let [key, value] of formData.entries()) {
+            if (numericFields.includes(key)) {
+                // Convert to number or null
+                data[key] = value ? parseFloat(value) : null;
+            } else if (value) {
+                // Only include non-empty strings
+                data[key] = value;
+            }
+        }
+        
+        console.log('Submitting lead data:', data);
+        
+        const token = localStorage.getItem('gb_token');
+        
+        try {
+            const response = await fetch('/api/crm/leads', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                closeCrmModal();
+                htmx.ajax('GET', '/api/ui/crm/pipeline?stage=new', {
+                    target: '#crm-pipeline-view',
+                    swap: 'innerHTML'
+                });
+            } else {
+                console.error('Lead creation failed:', response.status, await response.text());
+            }
+        } catch (err) {
+            console.error('Error creating lead:', err);
+        }
+    };
 })();
 </script>

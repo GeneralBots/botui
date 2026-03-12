@@ -165,6 +165,13 @@
             </div>
         </aside>
 
+        <!-- MCP Servers (Added via Phase 3) -->
+        <div style="width: 280px; margin-left: 280px; position: absolute; left: 0; bottom: 0; top: 60px; pointer-events: none; z-index: 50;">
+            <div style="pointer-events: auto; position: absolute; bottom: 24px; left: 24px; right: 24px;">
+                <div hx-get="/suite/partials/vibe-mcp-panel.html" hx-trigger="load"></div>
+            </div>
+        </div>
+
         <!-- Canvas Area -->
         <div class="vibe-canvas" id="vibeCanvas" style="
                 background: var(--bg, #fdfdfd);
@@ -190,6 +197,78 @@
                 <span style="color: var(--text-secondary); margin: 0 6px">&gt;</span>
                 // E-COMMERCE APP DEVELOPMENT
                 <div style="float: right">
+                     <button class="vibe-db-btn" onclick="document.getElementById('vibeDbModal').style.display='flex'" style="
+                            border: 1px solid var(--accent);
+                            background: transparent;
+                            color: var(--text);
+                            border-radius: 4px;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            margin-right: 12px;
+                            font-weight: 600;
+                        ">
+                        🗄️ Schema
+                    </button>
+                    <button class="vibe-git-btn" onclick="document.getElementById('vibeGitModal').style.display='flex'" style="
+                            border: 1px solid var(--accent);
+                            background: transparent;
+                            color: var(--text);
+                            border-radius: 4px;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            margin-right: 12px;
+                            font-weight: 600;
+                        ">
+                        🌱 Source Control
+                    </button>
+                    <button class="vibe-browser-btn" onclick="document.getElementById('vibeBrowserModal').style.display='flex'" style="
+                            border: 1px solid var(--accent);
+                            background: transparent;
+                            color: var(--text);
+                            border-radius: 4px;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            margin-right: 12px;
+                            font-weight: 600;
+                        ">
+                        🌐 Base
+                    </button>
+                    <button class="vibe-terminal-btn" onclick="document.getElementById('vibeTerminalModal').style.display='flex'" style="
+                            border: 1px solid var(--accent);
+                            background: transparent;
+                            color: var(--text);
+                            border-radius: 4px;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            margin-right: 12px;
+                            font-weight: 600;
+                        ">
+                        ⌨️ Shell
+                    </button>
+                     <button class="vibe-code-btn" onclick="document.getElementById('vibeEditorModal').style.display='flex'" style="
+                            border: 1px solid var(--accent);
+                            background: transparent;
+                            color: var(--text);
+                            border-radius: 4px;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            margin-right: 12px;
+                            font-weight: 600;
+                        ">
+                        💻 Code
+                    </button>
+                    <button class="vibe-deploy-btn" onclick="showDeploymentModal()" style="
+                            border: 1px solid var(--accent);
+                            background: var(--accent);
+                            color: var(--bg);
+                            border-radius: 4px;
+                            padding: 2px 8px;
+                            cursor: pointer;
+                            margin-right: 12px;
+                            font-weight: 600;
+                        ">
+                        🚀 Deploy
+                    </button>
                     <button style="
                             border: 1px solid var(--border);
                             background: var(--bg);
@@ -430,6 +509,36 @@
                         </button>
                     </form>
                 </div>
+            </div>
+
+            <!-- Editor Panel (hidden by default) -->
+            <div class="vibe-editor-modal" id="vibeEditorModal" style="display: none; position: absolute; inset: 24px; z-index: 50; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.5);">
+                <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 8px; right: 16px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; z-index: 100;">&times;</button>
+                <div hx-get="/suite/partials/editor.html" hx-trigger="load" style="width: 100%; height: 100%;"></div>
+            </div>
+
+            <!-- Database Panel (hidden by default) -->
+            <div class="vibe-db-modal" id="vibeDbModal" style="display: none; position: absolute; inset: 24px; z-index: 50; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.5);">
+                <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 8px; right: 16px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; z-index: 100;">&times;</button>
+                <div hx-get="/suite/partials/database.html" hx-trigger="load" style="width: 100%; height: 100%;"></div>
+            </div>
+
+            <!-- Git Panel (hidden by default) -->
+            <div class="vibe-git-modal" id="vibeGitModal" style="display: none; position: absolute; inset: 24px; z-index: 50; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.5);">
+                <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 8px; right: 16px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; z-index: 100;">&times;</button>
+                <div hx-get="/suite/partials/git-status.html" hx-trigger="load" style="width: 100%; height: 100%;"></div>
+            </div>
+
+            <!-- Browser Panel (hidden by default) -->
+            <div class="vibe-browser-modal" id="vibeBrowserModal" style="display: none; position: absolute; inset: 24px; z-index: 50; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.5);">
+                <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 8px; right: 16px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; z-index: 100;">&times;</button>
+                <div hx-get="/suite/partials/browser-controls.html" hx-trigger="load" style="width: 100%; height: 100%;"></div>
+            </div>
+
+            <!-- Terminal Panel (hidden by default) -->
+            <div class="vibe-terminal-modal" id="vibeTerminalModal" style="display: none; position: absolute; bottom: 24px; left: 300px; right: 24px; height: 350px; z-index: 50; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 16px 48px rgba(0,0,0,0.5);">
+                <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 4px; right: 8px; background: none; border: none; color: white; font-size: 20px; cursor: pointer; z-index: 100;">&times;</button>
+                <div hx-get="/suite/partials/terminal.html" hx-trigger="load" style="width: 100%; height: 100%;"></div>
             </div>
 
             <!-- Preview Panel (hidden by default) -->
@@ -1668,75 +1777,70 @@
             }
         }
 
-        function executeDeployment() {
+        async function executeDeployment() {
             var deployButton = document.getElementById("deployButton");
             if (deployButton) {
                 deployButton.textContent = "Deploying...";
                 deployButton.disabled = true;
             }
 
-            if (selectedDeploymentTarget === "internal") {
-                var route =
-                    document.getElementById("deployRoute").value || "my-app";
-                var sharedResources = document.getElementById(
-                    "deploySharedResources",
-                ).checked;
+            let payload = {
+                app_name: document.getElementById('deployRepoName')?.value || document.getElementById('deployRoute')?.value || "my-app",
+                target: {},
+                environment: "production",
+                manifest: {} // Get from Vibe canvas
+            };
 
-                vibeAddMsg(
-                    "system",
-                    "🚀 Deploying to GB Platform at /apps/" + route + "/...",
-                );
+            if (selectedDeploymentTarget === 'external') {
+                payload.target = {
+                    External: {
+                        repo_url: "https://alm.pragmatismo.com.br/" + payload.app_name,
+                        custom_domain: document.getElementById('deployCustomDomain')?.value || null,
+                        ci_cd_enabled: document.getElementById('deployCiCd')?.checked ?? true
+                    }
+                };
+                payload.app_type = document.getElementById('deployAppType')?.value || "htmx";
+            } else {
+                let route = document.getElementById('deployRoute')?.value || "my-app";
+                payload.target = {
+                    Internal: {
+                        route: "/apps/" + route,
+                        shared_resources: document.getElementById('deploySharedResources')?.checked ?? true
+                    }
+                };
+                payload.app_type = "gb-native";
+            }
 
-                // Simulate deployment (in real implementation, this would call the backend API)
-                setTimeout(function () {
+            try {
+                vibeAddMsg("system", "🚀 Initiating deployment API call...");
+                const response = await fetch('/api/deployment/deploy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && (result.success || result.status === 'Deployed' || result.status === 'Building')) {
                     closeDeploymentModal();
-                    vibeAddMsg(
-                        "system",
-                        "✅ App deployed successfully to /apps/" + route + "/",
-                    );
-
-                    // Show preview
+                    vibeAddMsg("system", "✅ Deployment Successful! " + (result.url ? result.url : ""));
+                    
                     var previewUrl = document.getElementById("vibePreviewUrl");
                     var previewPanel = document.getElementById("vibePreview");
-                    if (previewUrl && previewPanel) {
-                        previewUrl.value =
-                            window.location.origin + "/apps/" + route + "/";
+                    if (previewUrl && previewPanel && result.url) {
+                        previewUrl.value = result.url;
                         previewPanel.style.display = "block";
                     }
-
-                    if (deployButton) {
-                        deployButton.textContent = "Deploy Now";
-                        deployButton.disabled = false;
-                    }
-                }, 2000);
-            } else {
-                var repoName =
-                    document.getElementById("deployRepoName").value || "my-app";
-                var customDomain =
-                    document.getElementById("deployCustomDomain").value;
-                var ciCd = document.getElementById("deployCiCd").checked;
-                var appType = document.getElementById("deployAppType").value;
-
-                vibeAddMsg(
-                    "system",
-                    "🌐 Creating Forgejo repository: " + repoName,
-                );
-
-                // Simulate deployment (in real implementation, this would call the backend API)
-                setTimeout(function () {
-                    closeDeploymentModal();
-                    var message =
-                        "✅ Repository created and deployed to Forgejo";
-                    if (customDomain) {
-                        message += " (custom domain: " + customDomain + ")";
-                    }
-                    vibeAddMsg("system", message);
-
-                    if (deployButton) {
-                        deployButton.textContent = "Deploy Now";
-                        deployButton.disabled = false;
-                    }
-                }, 3000);
+                } else {
+                    vibeAddMsg("system", "❌ Deployment failed: " + (result.error || result.status));
+                }
+            } catch (e) {
+                vibeAddMsg("system", "❌ Deployment error: " + e.message);
+            } finally {
+                if (deployButton) {
+                    deployButton.textContent = "Deploy Now";
+                    deployButton.disabled = false;
+                }
             }
         }
 

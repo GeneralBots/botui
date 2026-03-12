@@ -584,15 +584,22 @@
 
 <!-- HTMX Intercepts and WindowManager Init as described in UI.md Phase 3 -->
 <script>
-    // Auto-open Chat window maximized on desktop load
+    // Auto-open Chat window maximized on desktop load (only for certain bots)
     document.addEventListener("DOMContentLoaded", async () => {
         // Initialize WindowManager reference
         if (typeof window.WindowManager !== "undefined") {
             window.wm = window.WindowManager;
         }
 
-        // Auto-open Chat window maximized
-        if (window.wm) {
+        // Get bot name from URL path
+        const pathParts = window.location.pathname.split('/');
+        const botName = pathParts[1] || 'default';
+        
+        // Bots where chat should be maximized by default
+        const botsWithMaximizedChat = ['cristo', 'salesianos'];
+
+        // Auto-open Chat window maximized (only for configured bots)
+        if (window.wm && botsWithMaximizedChat.includes(botName)) {
             try {
                 const response = await fetch("/suite/partials/chat.html");
                 if (response.ok) {

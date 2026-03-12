@@ -13,6 +13,7 @@
 
         <!-- Local JS requirements per AGENTS.md / UI.md -->
         <script src="/suite/js/vendor/htmx.min.js"></script>
+        <script src="/suite/js/security-bootstrap.js"></script>
         <script src="/suite/js/vendor/marked.min.js"></script>
         <script src="/suite/js/window-manager.js?v=2"></script>
         <script src="/suite/js/theme-manager.js"></script>
@@ -438,6 +439,31 @@
 
                             <div
                                 class="desktop-icon"
+                                data-app-id="crm"
+                                data-app-title="CRM"
+                                hx-get="/suite/crm/crm.html"
+                                hx-swap="none"
+                            >
+                                <div class="app-icon">
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                </div>
+                                <span class="desktop-icon-label">CRM</span>
+                            </div>
+
+                            <div
+                                class="desktop-icon"
                                 data-app-id="tasks"
                                 data-app-title="Tasks"
                                 hx-get="/suite/tasks/task-window.html"
@@ -646,8 +672,15 @@
                     window.ThemeManager.init();
                 }
 
-                // Auto-open Chat window maximized on desktop load
-                if (window.wm) {
+                // Get bot name from URL path
+                const pathParts = window.location.pathname.split('/');
+                const botName = pathParts[1] || 'default';
+                
+                // Bots where chat should be maximized by default
+                const botsWithMaximizedChat = ['cristo', 'salesianos'];
+
+                // Auto-open Chat window maximized (only for configured bots)
+                if (window.wm && botsWithMaximizedChat.includes(botName)) {
                     try {
                         const response = await fetch(
                             "/suite/partials/chat.html",
