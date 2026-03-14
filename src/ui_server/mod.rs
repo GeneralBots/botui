@@ -357,8 +357,8 @@ pub async fn serve_suite(bot_name: Option<String>) -> impl IntoResponse {
 
     match raw_html_res {
         Ok(raw_html) => {
-            #[allow(unused_mut)] // Mutable required for feature-gated blocks
             let mut html = raw_html;
+            let _ = &mut html; // Suppress unused_mut if no features are disabled
 
             // Inject base tag and bot_name into the page
             if let Some(head_end) = html.find("</head>") {
@@ -563,7 +563,6 @@ pub async fn serve_suite(bot_name: Option<String>) -> impl IntoResponse {
     }
 }
 
-#[allow(dead_code)]
 pub fn remove_section(html: &str, section: &str) -> String {
     let start_marker = format!("<!-- SECTION:{} -->", section);
     let end_marker = format!("<!-- ENDSECTION:{} -->", section);
@@ -840,6 +839,116 @@ async fn ws_proxy(
     ws.on_upgrade(move |socket| handle_ws_proxy(socket, state, params_with_bot))
 }
 
+async fn handle_ws_proxy(
+    client_socket: WebSocket,
+    state: AppState,
+    params: WsQuery,
+) {
+    let bot_name = params.bot_name.unwrap_or_else(|| "default".to_string());
+    let backend_url = format!(
+        "{}/ws/{}",
+        state
+            .client
+            .base_url()
+            .replace("https://", "wss://")
+            .replace("http://", "ws://"),
+        bot_name
+    );
+
+    info!("Proxying WebSocket to: {backend_url}");
+
+    let Ok(tls_connector) = native_tls::TlsConnector::builder()
+        .danger_accept_invalid_certs(true)
+        .danger_accept_invalid_hostnames(true)
+        .build()
+    else {
+        error!("Failed to build TLS connector for WebSocket proxy");
+        return;
+    };
+
+    let connector = tokio_tungstenite::Connector::NativeTls(tls_connector);
+
+    let backend_result =
+        connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
+
+    let backend_socket: tokio_tungstenite::WebSocketStream<
+        tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>,
+    > = match backend_result {
+        Ok((socket, _)) => socket,
+        Err(e) => {
+            error!("Failed to connect to backend WebSocket: {e}");
+            return;
+        }
+    };
+
+    info!("Connected to backend WebSocket");
+
+    let (mut client_tx, mut client_rx) = client_socket.split();
+    let (mut backend_tx, mut backend_rx) = backend_socket.split();
+
+    let client_to_backend = async {
+        while let Some(msg) = client_rx.next().await {
+            match msg {
+                Ok(AxumMessage::Text(text)) => {
+                    if backend_tx.send(TungsteniteMessage::Text(text)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Binary(data)) => {
+                    if backend_tx.send(TungsteniteMessage::Binary(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Ping(data)) => {
+                    if backend_tx.send(TungsteniteMessage::Ping(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Pong(data)) => {
+                    if backend_tx.send(TungsteniteMessage::Pong(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(AxumMessage::Close(_)) | Err(_) => break,
+            }
+        }
+    };
+
+    let backend_to_client = async {
+        while let Some(msg) = backend_rx.next().await {
+            match msg {
+                Ok(TungsteniteMessage::Text(text)) => {
+                    if client_tx.send(AxumMessage::Text(text)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Binary(data)) => {
+                    if client_tx.send(AxumMessage::Binary(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Ping(data)) => {
+                    if client_tx.send(AxumMessage::Ping(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Pong(data)) => {
+                    if client_tx.send(AxumMessage::Pong(data)).await.is_err() {
+                        break;
+                    }
+                }
+                Ok(TungsteniteMessage::Close(_)) | Err(_) => break,
+                Ok(_) => {}
+            }
+        }
+    };
+
+    tokio::select! {
+        () = client_to_backend => info!("Client connection closed"),
+        () = backend_to_client => info!("Backend connection closed"),
+    }
+}
+
 async fn ws_task_progress_proxy(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
@@ -983,119 +1092,66 @@ async fn handle_task_progress_ws_proxy(
     }
 }
 
-#[allow(clippy::too_many_lines)]
-async fn handle_ws_proxy(client_socket: WebSocket, state: AppState, params: WsQuery) {
-    let backend_url = format!(
-        "{}/ws?session_id={}&user_id={}&bot_name={}",
-        state
-            .client
-            .base_url()
-            .replace("https://", "wss://")
-            .replace("http://", "ws://"),
-        params.session_id,
-        params.user_id,
-        params.bot_name.unwrap_or_else(|| "default".to_string())
-    );
-
-    info!("Proxying WebSocket to: {backend_url}");
-
-    let Ok(tls_connector) = native_tls::TlsConnector::builder()
-        .danger_accept_invalid_certs(true)
-        .danger_accept_invalid_hostnames(true)
-        .build()
-    else {
-        error!("Failed to build TLS connector");
-        return;
-    };
-
-    let connector = tokio_tungstenite::Connector::NativeTls(tls_connector);
-
-    let backend_result =
-        connect_async_tls_with_config(&backend_url, None, false, Some(connector)).await;
-
-    let backend_socket: tokio_tungstenite::WebSocketStream<
-        tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>,
-    > = match backend_result {
-        Ok((socket, _)) => socket,
-        Err(e) => {
-            error!("Failed to connect to backend WebSocket: {e}");
-            return;
-        }
-    };
-
-    info!("Connected to backend WebSocket");
-
-    let (mut client_tx, mut client_rx) = client_socket.split();
-    let (mut backend_tx, mut backend_rx) = backend_socket.split();
-
-    let client_to_backend = async {
-        while let Some(msg) = client_rx.next().await {
-            match msg {
-                Ok(AxumMessage::Text(text)) => {
-                    let res: Result<(), tungstenite::Error> =
-                        backend_tx.send(TungsteniteMessage::Text(text)).await;
-                    if res.is_err() {
-                        break;
-                    }
+async fn forward_client_to_backend(
+    client_rx: &mut futures_util::stream::SplitStream<WebSocket>,
+    backend_tx: &mut futures_util::stream::SplitSink<tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, TungsteniteMessage>,
+) {
+    while let Some(msg) = client_rx.next().await {
+        match msg {
+            Ok(AxumMessage::Text(text)) => {
+                if backend_tx.send(TungsteniteMessage::Text(text)).await.is_err() {
+                    break;
                 }
-                Ok(AxumMessage::Binary(data)) => {
-                    let res: Result<(), tungstenite::Error> =
-                        backend_tx.send(TungsteniteMessage::Binary(data)).await;
-                    if res.is_err() {
-                        break;
-                    }
-                }
-                Ok(AxumMessage::Ping(data)) => {
-                    let res: Result<(), tungstenite::Error> =
-                        backend_tx.send(TungsteniteMessage::Ping(data)).await;
-                    if res.is_err() {
-                        break;
-                    }
-                }
-                Ok(AxumMessage::Pong(data)) => {
-                    let res: Result<(), tungstenite::Error> =
-                        backend_tx.send(TungsteniteMessage::Pong(data)).await;
-                    if res.is_err() {
-                        break;
-                    }
-                }
-                Ok(AxumMessage::Close(_)) | Err(_) => break,
             }
-        }
-    };
-
-    let backend_to_client = async {
-        while let Some(msg) = backend_rx.next().await {
-            match msg {
-                Ok(TungsteniteMessage::Text(text)) => {
-                    if client_tx.send(AxumMessage::Text(text)).await.is_err() {
-                        break;
-                    }
+            Ok(AxumMessage::Binary(data)) => {
+                if backend_tx.send(TungsteniteMessage::Binary(data)).await.is_err() {
+                    break;
                 }
-                Ok(TungsteniteMessage::Binary(data)) => {
-                    if client_tx.send(AxumMessage::Binary(data)).await.is_err() {
-                        break;
-                    }
-                }
-                Ok(TungsteniteMessage::Ping(data)) => {
-                    if client_tx.send(AxumMessage::Ping(data)).await.is_err() {
-                        break;
-                    }
-                }
-                Ok(TungsteniteMessage::Pong(data)) => {
-                    if client_tx.send(AxumMessage::Pong(data)).await.is_err() {
-                        break;
-                    }
-                }
-                Ok(TungsteniteMessage::Close(_)) | Err(_) => break,
-                Ok(_) => {}
             }
+            Ok(AxumMessage::Ping(data)) => {
+                if backend_tx.send(TungsteniteMessage::Ping(data)).await.is_err() {
+                    break;
+                }
+            }
+            Ok(AxumMessage::Pong(data)) => {
+                if backend_tx.send(TungsteniteMessage::Pong(data)).await.is_err() {
+                    break;
+                }
+            }
+            Ok(AxumMessage::Close(_)) | Err(_) => break,
         }
-    };
+    }
+}
 
-    tokio::select! {
-        () = client_to_backend => info!("Client connection closed"),
-        () = backend_to_client => info!("Backend connection closed"),
+async fn forward_backend_to_client(
+    backend_rx: &mut futures_util::stream::SplitStream<tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>,
+    client_tx: &mut futures_util::stream::SplitSink<WebSocket, AxumMessage>,
+) {
+    while let Some(msg) = backend_rx.next().await {
+        match msg {
+            Ok(TungsteniteMessage::Text(text)) => {
+                if client_tx.send(AxumMessage::Text(text)).await.is_err() {
+                    break;
+                }
+            }
+            Ok(TungsteniteMessage::Binary(data)) => {
+                if client_tx.send(AxumMessage::Binary(data)).await.is_err() {
+                    break;
+                }
+            }
+            Ok(TungsteniteMessage::Ping(data)) => {
+                if client_tx.send(AxumMessage::Ping(data)).await.is_err() {
+                    break;
+                }
+            }
+            Ok(TungsteniteMessage::Pong(data)) => {
+                if client_tx.send(AxumMessage::Pong(data)).await.is_err() {
+                    break;
+                }
+            }
+            Ok(TungsteniteMessage::Close(_)) | Err(_) => break,
+            Ok(_) => {}
+        }
     }
 }
 

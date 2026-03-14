@@ -1,40 +1,6 @@
 <!-- CRM - Customer Relationship Management -->
 <!-- Dynamics nomenclature: Lead → Opportunity → Account/Contact -->
 
-<style>
-    [data-theme="sentient"] {
-        --bg: #0a0a0a;
-        --surface: #161616;
-        --surface-hover: #1e1e1e;
-        --border: #2a2a2a;
-        --text: #ffffff;
-        --text-secondary: #888888;
-        --text-muted: #444444;
-        --primary: #3b82f6;
-        --primary-hover: #2563eb;
-        --primary-light: rgba(59, 130, 246, 0.1);
-        --error: #ef4444;
-        --success: #22c55e;
-        --warning: #f59e0b;
-        --bg-primary: #0a0a0a;
-    }
-    :root {
-        --bg: #0a0a0a;
-        --surface: #161616;
-        --surface-hover: #1e1e1e;
-        --border: #2a2a2a;
-        --text: #ffffff;
-        --text-secondary: #888888;
-        --text-muted: #444444;
-        --primary: #3b82f6;
-        --primary-hover: #2563eb;
-        --primary-light: rgba(59, 130, 246, 0.1);
-        --error: #ef4444;
-        --success: #22c55e;
-        --warning: #f59e0b;
-        --bg-primary: #0a0a0a;
-    }
-</style>
 <link rel="stylesheet" href="/suite/crm/crm.css">
 <script src="/suite/js/vendor/htmx.min.js"></script>
 <script src="/suite/js/vendor/htmx-json-enc.js"></script>
@@ -51,6 +17,7 @@
                 <button class="crm-tab" data-view="opportunities" data-i18n="crm-opportunities">Opportunities</button>
                 <button class="crm-tab" data-view="accounts" data-i18n="crm-accounts">Accounts</button>
                 <button class="crm-tab" data-view="contacts" data-i18n="crm-contacts">Contacts</button>
+                <button class="crm-tab" data-view="campaigns" data-i18n="crm-campaigns">Campaigns</button>
             </nav>
         </div>
         <div class="crm-header-right">
@@ -273,6 +240,18 @@
             <tbody id="contacts-table-body" hx-get="/api/ui/crm/contacts" hx-trigger="load">
             </tbody>
         </table>
+    </div>
+
+    <!-- Campaigns View -->
+    <div id="crm-campaigns-view" class="crm-view">
+        <div class="campaigns-grid" id="crmCampaignsList" 
+             hx-get="/api/crm/campaigns"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+            <div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-secondary);">
+                Loading campaigns...
+            </div>
+        </div>
     </div>
 </div>
 
