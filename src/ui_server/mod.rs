@@ -770,7 +770,9 @@ fn create_api_router() -> Router<AppState> {
 
 #[derive(Debug, Deserialize)]
 struct WsQuery {
+    #[allow(dead_code)]
     session_id: String,
+    #[allow(dead_code)]
     user_id: String,
     bot_name: Option<String>,
 }
@@ -1089,69 +1091,6 @@ async fn handle_task_progress_ws_proxy(
     tokio::select! {
         () = client_to_backend => info!("Task-progress client connection closed"),
         () = backend_to_client => info!("Task-progress backend connection closed"),
-    }
-}
-
-async fn forward_client_to_backend(
-    client_rx: &mut futures_util::stream::SplitStream<WebSocket>,
-    backend_tx: &mut futures_util::stream::SplitSink<tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>, TungsteniteMessage>,
-) {
-    while let Some(msg) = client_rx.next().await {
-        match msg {
-            Ok(AxumMessage::Text(text)) => {
-                if backend_tx.send(TungsteniteMessage::Text(text)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(AxumMessage::Binary(data)) => {
-                if backend_tx.send(TungsteniteMessage::Binary(data)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(AxumMessage::Ping(data)) => {
-                if backend_tx.send(TungsteniteMessage::Ping(data)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(AxumMessage::Pong(data)) => {
-                if backend_tx.send(TungsteniteMessage::Pong(data)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(AxumMessage::Close(_)) | Err(_) => break,
-        }
-    }
-}
-
-async fn forward_backend_to_client(
-    backend_rx: &mut futures_util::stream::SplitStream<tokio_tungstenite::WebSocketStream<tokio_tungstenite::MaybeTlsStream<tokio::net::TcpStream>>>,
-    client_tx: &mut futures_util::stream::SplitSink<WebSocket, AxumMessage>,
-) {
-    while let Some(msg) = backend_rx.next().await {
-        match msg {
-            Ok(TungsteniteMessage::Text(text)) => {
-                if client_tx.send(AxumMessage::Text(text)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(TungsteniteMessage::Binary(data)) => {
-                if client_tx.send(AxumMessage::Binary(data)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(TungsteniteMessage::Ping(data)) => {
-                if client_tx.send(AxumMessage::Ping(data)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(TungsteniteMessage::Pong(data)) => {
-                if client_tx.send(AxumMessage::Pong(data)).await.is_err() {
-                    break;
-                }
-            }
-            Ok(TungsteniteMessage::Close(_)) | Err(_) => break,
-            Ok(_) => {}
-        }
     }
 }
 

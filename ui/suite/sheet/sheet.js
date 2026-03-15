@@ -13,7 +13,260 @@
     MAX_HISTORY: 50,
     AUTOSAVE_DELAY: 3000,
     WS_RECONNECT_DELAY: 3000,
+    VIRTUAL_SCROLL_THRESHOLD: 500,
+    BUFFER_SIZE: 10,
   };
+
+  let virtualGrid = null;
+  let useVirtualScroll = false;
+
+  class VirtualGrid {
+    constructor(container, options = {}) {
+      this.options = {
+        colCount: options.colCount || CONFIG.COLS,
+        rowCount: options.rowCount || CONFIG.ROWS,
+        colWidth: options.colWidth || CONFIG.COL_WIDTH,
+        rowHeight: options.rowHeight || CONFIG.ROW_HEIGHT,
+        bufferSize: options.bufferSize || CONFIG.BUFFER_SIZE,
+        ...options
+      };
+      
+      this.container = container;
+      this.cellCache = new Map();
+      this.renderedCells = new Map();
+      this.visibleStartRow = 0;
+      this.visibleEndRow = 0;
+      this.visibleStartCol = 0;
+      this.visibleEndCol = 0;
+      this.scrollLeft = 0;
+      this.scrollTop = 0;
+      this.isRendering = false;
+      
+      this.initialize();
+    }
+
+    initialize() {
+      this.viewport = document.createElement('div');
+      this.viewport.className = 'virtual-viewport';
+      this.viewport.style.cssText = 'position:relative; overflow:auto; width:100%; height:100%;';
+      
+      this.content = document.createElement('div');
+      this.content.className = 'virtual-content';
+      this.content.style.cssText = `position:absolute; top:0; left:0; width:${this.options.colCount * this.options.colWidth}px; height:${this.options.rowCount * this.options.rowHeight}px;`;
+      
+      this.viewport.appendChild(this.content);
+      this.container.appendChild(this.viewport);
+      
+      this.viewport.addEventListener('scroll', () => this.onScroll(), { passive: true });
+      
+      this.rowHeaders = document.createElement('div');
+      this.rowHeaders.className = 'virtual-row-headers';
+      this.rowHeaders.style.cssText = 'position:sticky; left:0; z-index:10; display:flex; flex-direction:column;';
+      
+      this.updateDimensions();
+      this.onScroll();
+    }
+
+    updateDimensions() {
+      this.content.style.width = `${this.options.colCount * this.options.colWidth}px`;
+      this.content.style.height = `${this.options.rowCount * this.options.rowHeight}px`;
+    }
+
+    onScroll() {
+      if (this.isRendering) return;
+      
+      const lastScrollTop = this.scrollTop;
+      const lastScrollLeft = this.scrollLeft;
+      
+      this.scrollTop = this.viewport.scrollTop;
+      this.scrollLeft = this.viewport.scrollLeft;
+      
+      if (this.scrollTop === lastScrollTop && this.scrollLeft === lastScrollLeft) return;
+      
+      requestAnimationFrame(() => this.renderVisibleCells());
+    }
+
+    renderVisibleCells() {
+      this.isRendering = true;
+      
+      const viewHeight = this.viewport.clientHeight;
+      const viewWidth = this.viewport.clientWidth;
+      const buffer = this.options.bufferSize;
+      
+      const newStartRow = Math.max(0, Math.floor(this.scrollTop / this.options.rowHeight) - buffer);
+      const newEndRow = Math.min(this.options.rowCount - 1, Math.ceil((this.scrollTop + viewHeight) / this.options.rowHeight) + buffer);
+      const newStartCol = Math.max(0, Math.floor(this.scrollLeft / this.options.colWidth) - buffer);
+      const newEndCol = Math.min(this.options.colCount - 1, Math.ceil((this.scrollLeft + viewWidth) / this.options.colWidth) + buffer);
+      
+      if (newStartRow === this.visibleStartRow && newEndRow === this.visibleEndRow &&
+          newStartCol === this.visibleStartCol && newEndCol === this.visibleEndCol) {
+        this.isRendering = false;
+        return;
+      }
+      
+      this.visibleStartRow = newStartRow;
+      this.visibleEndRow = newEndRow;
+      this.visibleStartCol = newStartCol;
+      this.visibleEndCol = newEndCol;
+      
+      for (const [key, el] of this.renderedCells) {
+        const [r, c] = key.split(',').map(Number);
+        if (r < this.visibleStartRow || r > this.visibleEndRow ||
+            c < this.visibleStartCol || c > this.visibleEndCol) {
+          el.remove();
+          this.renderedCells.delete(key);
+        }
+      }
+      
+      for (let row = this.visibleStartRow; row <= this.visibleEndRow; row++) {
+        for (let col = this.visibleStartCol; col <= this.visibleEndCol; col++) {
+          const key = `${row},${col}`;
+          const cellData = this.cellCache.get(key);
+          
+          if (!this.renderedCells.has(key)) {
+            const cell = this.createCellElement(row, col, cellData);
+            cell.style.position = 'absolute';
+            cell.style.top = `${row * this.options.rowHeight}px`;
+            cell.style.left = `${col * this.options.colWidth}px`;
+            cell.style.width = `${this.options.colWidth}px`;
+            cell.style.height = `${this.options.rowHeight}px`;
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            this.content.appendChild(cell);
+            this.renderedCells.set(key, cell);
+          }
+        }
+      }
+      
+      this.isRendering = false;
+    }
+
+    createCellElement(row, col, cellData) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      
+      if (cellData) {
+        if (cellData.formula) {
+          cell.textContent = evaluateFormula(cellData.formula, row, col);
+        } else if (cellData.value !== undefined) {
+          cell.textContent = cellData.value;
+        }
+        if (cellData.style) {
+          this.applyStyle(cell, cellData.style);
+        }
+        if (cellData.merged) {
+          const { rowSpan, colSpan } = cellData.merged;
+          if (rowSpan > 1) cell.style.gridRow = `span ${rowSpan}`;
+          if (colSpan > 1) cell.style.gridColumn = `span ${colSpan}`;
+        }
+      }
+      
+      return cell;
+    }
+
+    applyStyle(cell, style) {
+      if (!style) return;
+      if (style.fontFamily) cell.style.fontFamily = style.fontFamily;
+      if (style.fontSize) cell.style.fontSize = style.fontSize + 'px';
+      if (style.fontWeight) cell.style.fontWeight = style.fontWeight;
+      if (style.fontStyle) cell.style.fontStyle = style.fontStyle;
+      if (style.textDecoration) cell.style.textDecoration = style.textDecoration;
+      if (style.color) cell.style.color = style.color;
+      if (style.background) cell.style.backgroundColor = style.background;
+      if (style.textAlign) cell.style.textAlign = style.textAlign;
+    }
+
+    setCellValue(row, col, value) {
+      const key = `${row},${col}`;
+      
+      if (!value || (typeof value === 'object' && !value.value && !value.formula)) {
+        this.cellCache.delete(key);
+      } else {
+        if (typeof value === 'object') {
+          this.cellCache.set(key, value);
+        } else {
+          this.cellCache.set(key, { value: String(value) });
+        }
+      }
+      
+      if (row >= this.visibleStartRow && row <= this.visibleEndRow &&
+          col >= this.visibleStartCol && col <= this.visibleEndCol) {
+        const existing = this.renderedCells.get(key);
+        
+        if (!value || (typeof value === 'object' && !value.value && !value.formula)) {
+          if (existing) {
+            existing.remove();
+            this.renderedCells.delete(key);
+          }
+        } else if (existing) {
+          const cell = this.createCellElement(row, col, typeof value === 'object' ? value : { value });
+          existing.textContent = cell.textContent;
+          existing.style.cssText = cell.style.cssText;
+        } else {
+          const cell = this.createCellElement(row, col, typeof value === 'object' ? value : { value });
+          cell.style.position = 'absolute';
+          cell.style.top = `${row * this.options.rowHeight}px`;
+          cell.style.left = `${col * this.options.colWidth}px`;
+          cell.style.width = `${this.options.colWidth}px`;
+          cell.style.height = `${this.options.rowHeight}px`;
+          cell.dataset.row = row;
+          cell.dataset.col = col;
+          this.content.appendChild(cell);
+          this.renderedCells.set(key, cell);
+        }
+      }
+    }
+
+    getCellValue(row, col) {
+      return this.cellCache.get(`${row},${col}`);
+    }
+
+    scrollToCell(row, col) {
+      const targetTop = row * this.options.rowHeight;
+      const targetLeft = col * this.options.colWidth;
+      const viewHeight = this.viewport.clientHeight;
+      const viewWidth = this.viewport.clientWidth;
+      
+      this.viewport.scrollTo({
+        left: targetLeft - viewWidth / 2,
+        top: targetTop - viewHeight / 2,
+        behavior: 'smooth'
+      });
+    }
+
+    getVisibleRange() {
+      return {
+        startRow: this.visibleStartRow,
+        endRow: this.visibleEndRow,
+        startCol: this.visibleStartCol,
+        endCol: this.visibleEndCol
+      };
+    }
+
+    refresh() {
+      this.renderVisibleCells();
+    }
+
+    destroy() {
+      this.viewport.remove();
+      this.cellCache.clear();
+      this.renderedCells.clear();
+    }
+
+    loadData(data) {
+      this.cellCache.clear();
+      for (const [key, value] of Object.entries(data)) {
+        if (value && (value.value || value.formula || value.style)) {
+          this.cellCache.set(key, value);
+        }
+      }
+      this.refresh();
+    }
+
+    getViewportScroll() {
+      return { top: this.scrollTop, left: this.scrollLeft };
+    }
+  }
 
   const state = {
     sheetId: null,
@@ -43,6 +296,184 @@
   };
 
   const elements = {};
+
+  class AuditLog {
+    constructor() {
+      this.entries = [];
+      this.maxEntries = 1000;
+    }
+
+    log(action, details = {}) {
+      const entry = {
+        timestamp: new Date().toISOString(),
+        action,
+        details,
+        sheetId: state.sheetId
+      };
+      this.entries.push(entry);
+      if (this.entries.length > this.maxEntries) {
+        this.entries.shift();
+      }
+      this.persistEntry(entry);
+    }
+
+    async persistEntry(entry) {
+      if (!state.sheetId) return;
+      try {
+        await fetch('/api/sheet/audit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry)
+        });
+      } catch (e) {
+        console.warn('Audit log persist failed:', e);
+      }
+    }
+
+    getHistory(filter = {}) {
+      let filtered = this.entries;
+      if (filter.action) {
+        filtered = filtered.filter(e => e.action === filter.action);
+      }
+      if (filter.startTime) {
+        filtered = filtered.filter(e => new Date(e.timestamp) >= new Date(filter.startTime));
+      }
+      if (filter.endTime) {
+        filtered = filtered.filter(e => new Date(e.timestamp) <= new Date(filter.endTime));
+      }
+      return filtered;
+    }
+  }
+
+  class VersionManager {
+    constructor() {
+      this.versions = [];
+      this.currentVersion = -1;
+      this.maxVersions = 100;
+      this.autoSaveInterval = null;
+      this.lastSavedState = null;
+    }
+
+    createSnapshot(reason = 'manual') {
+      const snapshot = {
+        timestamp: new Date().toISOString(),
+        reason,
+        worksheets: JSON.parse(JSON.stringify(state.worksheets)),
+        sheetName: state.sheetName
+      };
+
+      if (this.lastSavedState && JSON.stringify(this.lastSavedState) === JSON.stringify(snapshot.worksheets)) {
+        return null;
+      }
+
+      this.versions.push(snapshot);
+      this.currentVersion = this.versions.length - 1;
+      this.lastSavedState = JSON.parse(JSON.stringify(snapshot.worksheets));
+
+      if (this.versions.length > this.maxVersions) {
+        this.versions.shift();
+        this.currentVersion--;
+      }
+
+      this.persistVersion(snapshot);
+      return this.versions.length - 1;
+    }
+
+    async persistVersion(snapshot) {
+      if (!state.sheetId) return;
+      try {
+        await fetch('/api/sheet/version', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sheetId: state.sheetId,
+            snapshot
+          })
+        });
+      } catch (e) {
+        console.warn('Version persist failed:', e);
+      }
+    }
+
+    restoreVersion(versionIndex) {
+      if (versionIndex < 0 || versionIndex >= this.versions.length) return false;
+
+      const version = this.versions[versionIndex];
+      state.worksheets = JSON.parse(JSON.stringify(version.worksheets));
+      state.sheetName = version.sheetName;
+
+      if (useVirtualScroll && virtualGrid) {
+        const ws = state.worksheets[state.activeWorksheet];
+        virtualGrid.loadData(ws?.data || {});
+      } else {
+        renderAllCells();
+      }
+      renderWorksheetTabs();
+
+      auditLog.log('version_restore', { versionIndex, timestamp: version.timestamp });
+      return true;
+    }
+
+    getVersionList() {
+      return this.versions.map((v, i) => ({
+        index: i,
+        timestamp: v.timestamp,
+        reason: v.reason,
+        sheetName: v.sheetName
+      })).reverse();
+    }
+
+    startAutoSave() {
+      if (this.autoSaveInterval) return;
+      this.autoSaveInterval = setInterval(() => {
+        if (state.isDirty) {
+          this.createSnapshot('auto');
+        }
+      }, 60000);
+    }
+
+    stopAutoSave() {
+      if (this.autoSaveInterval) {
+        clearInterval(this.autoSaveInterval);
+        this.autoSaveInterval = null;
+      }
+    }
+  }
+
+  class PermissionManager {
+    constructor() {
+      this.permissions = new Map();
+      this.currentUserLevel = 'edit';
+    }
+
+    setPermission(userId, level) {
+      this.permissions.set(userId, level);
+    }
+
+    setCurrentUserLevel(level) {
+      this.currentUserLevel = level;
+    }
+
+    canEdit() {
+      return this.currentUserLevel === 'edit' || this.currentUserLevel === 'admin';
+    }
+
+    canDelete() {
+      return this.currentUserLevel === 'admin';
+    }
+
+    canShare() {
+      return this.currentUserLevel === 'admin';
+    }
+
+    canExport() {
+      return this.currentUserLevel === 'view' || this.currentUserLevel === 'edit' || this.currentUserLevel === 'admin';
+    }
+  }
+
+  const auditLog = new AuditLog();
+  const versionManager = new VersionManager();
+  const permissions = new PermissionManager();
 
   function init() {
     cacheElements();
@@ -92,27 +523,85 @@
     elements.insertImageModal = document.getElementById("insertImageModal");
   }
 
+  function initVirtualGrid() {
+    const container = document.getElementById('cellsContainer');
+    if (!container || virtualGrid) return;
+    
+    virtualGrid = new VirtualGrid(container, {
+      colCount: CONFIG.COLS,
+      rowCount: CONFIG.ROWS,
+      colWidth: CONFIG.COL_WIDTH,
+      rowHeight: CONFIG.ROW_HEIGHT
+    });
+    
+    const ws = state.worksheets[state.activeWorksheet];
+    if (ws && ws.data) {
+      virtualGrid.loadData(ws.data);
+    }
+  }
+
+  function destroyVirtualGrid() {
+    if (virtualGrid) {
+      virtualGrid.destroy();
+      virtualGrid = null;
+    }
+  }
+
   function renderGrid() {
+    renderColumnHeaders();
+    renderRowHeaders();
+    
+    useVirtualScroll = CONFIG.ROWS > CONFIG.VIRTUAL_SCROLL_THRESHOLD;
+    
+    if (useVirtualScroll) {
+      elements.cells.style.display = 'none';
+      if (!virtualGrid) {
+        initVirtualGrid();
+      } else {
+        virtualGrid.refresh();
+      }
+    } else {
+      if (virtualGrid) {
+        destroyVirtualGrid();
+      }
+      elements.cells.style.display = '';
+      renderAllCellsLegacy();
+    }
+  }
+
+  function renderColumnHeaders() {
     elements.columnHeaders.innerHTML = "";
     for (let col = 0; col < CONFIG.COLS; col++) {
       const header = document.createElement("div");
       header.className = "column-header";
       header.textContent = getColName(col);
       header.dataset.col = col;
+      header.addEventListener('click', handleColumnHeaderClick);
       elements.columnHeaders.appendChild(header);
     }
+  }
 
+  function renderRowHeaders() {
     elements.rowHeaders.innerHTML = "";
-    for (let row = 0; row < CONFIG.ROWS; row++) {
+    const maxRows = useVirtualScroll ? Math.min(100, CONFIG.ROWS) : CONFIG.ROWS;
+    for (let row = 0; row < maxRows; row++) {
       const header = document.createElement("div");
       header.className = "row-header";
       header.textContent = row + 1;
       header.dataset.row = row;
+      header.addEventListener('click', handleRowHeaderClick);
       elements.rowHeaders.appendChild(header);
     }
+  }
+
+  function renderAllCellsLegacy() {
+    const ws = state.worksheets[state.activeWorksheet];
+    if (!ws) return;
 
     elements.cells.innerHTML = "";
     elements.cells.style.gridTemplateColumns = `repeat(${CONFIG.COLS}, ${CONFIG.COL_WIDTH}px)`;
+    elements.cells.style.gridTemplateRows = `repeat(${CONFIG.ROWS}, ${CONFIG.ROW_HEIGHT}px)`;
+    
     for (let row = 0; row < CONFIG.ROWS; row++) {
       for (let col = 0; col < CONFIG.COLS; col++) {
         const cell = document.createElement("div");
@@ -122,23 +611,37 @@
         elements.cells.appendChild(cell);
       }
     }
-
-    renderAllCells();
-  }
-
-  function renderAllCells() {
-    const ws = state.worksheets[state.activeWorksheet];
-    if (!ws) return;
-
+    
     const cells = elements.cells.querySelectorAll(".cell");
     cells.forEach((cell) => {
       const row = parseInt(cell.dataset.row);
       const col = parseInt(cell.dataset.col);
-      renderCell(row, col);
+      renderCellLegacy(row, col);
     });
   }
 
+  function renderAllCells() {
+    if (useVirtualScroll && virtualGrid) {
+      const ws = state.worksheets[state.activeWorksheet];
+      if (ws && ws.data) {
+        virtualGrid.loadData(ws.data);
+      }
+    } else {
+      renderAllCellsLegacy();
+    }
+  }
+
   function renderCell(row, col) {
+    if (useVirtualScroll && virtualGrid) {
+      const ws = state.worksheets[state.activeWorksheet];
+      const data = ws?.data?.[`${row},${col}`];
+      virtualGrid.setCellValue(row, col, data);
+    } else {
+      renderCellLegacy(row, col);
+    }
+  }
+
+  function renderCellLegacy(row, col) {
     const cell = elements.cells.querySelector(
       `[data-row="${row}"][data-col="${col}"]`,
     );
@@ -298,6 +801,22 @@
       ?.addEventListener("click", addWorksheet);
     document.getElementById("zoomInBtn")?.addEventListener("click", zoomIn);
     document.getElementById("zoomOutBtn")?.addEventListener("click", zoomOut);
+
+    document
+      .getElementById("importXlsxBtn")
+      ?.addEventListener("click", () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx,.xls,.csv,.ods';
+        input.onchange = async (e) => {
+          if (e.target.files[0]) {
+            await importXlsx(e.target.files[0]);
+          }
+        };
+        input.click();
+      });
+    document.getElementById("exportXlsxBtn")?.addEventListener("click", exportXlsx);
+    document.getElementById("exportCsvBtn")?.addEventListener("click", exportCsv);
 
     document
       .getElementById("findReplaceBtn")
@@ -520,17 +1039,30 @@
       end: { row, col },
     };
 
-    const cell = elements.cells.querySelector(
-      `[data-row="${row}"][data-col="${col}"]`,
-    );
-    if (cell) {
-      cell.classList.add("selected");
-      cell.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (useVirtualScroll && virtualGrid) {
+      virtualGrid.scrollToCell(row, col);
+      setTimeout(() => highlightVirtualCell(row, col), 50);
+    } else {
+      const cell = elements.cells.querySelector(
+        `[data-row="${row}"][data-col="${col}"]`,
+      );
+      if (cell) {
+        cell.classList.add("selected");
+        cell.scrollIntoView({ block: "nearest", inline: "nearest" });
+      }
     }
 
     updateCellAddress();
     updateFormulaBar();
     updateSelectionInfo();
+  }
+
+  function highlightVirtualCell(row, col) {
+    const cell = elements.cells.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+    if (cell && !cell.classList.contains('selected')) {
+      clearSelection();
+      cell.classList.add('selected');
+    }
   }
 
   function extendSelection(row, col) {
@@ -695,8 +1227,14 @@
   }
 
   function setCellValue(row, col, value) {
+    if (!permissions.canEdit()) {
+      addChatMessage("system", "You don't have permission to edit this sheet");
+      return;
+    }
+
     const ws = state.worksheets[state.activeWorksheet];
     const key = `${row},${col}`;
+    const oldValue = ws.data[key]?.value || ws.data[key]?.formula || '';
 
     saveToHistory();
 
@@ -708,6 +1246,12 @@
       ws.data[key] = { value };
     }
 
+    if (useVirtualScroll && virtualGrid) {
+      virtualGrid.setCellValue(row, col, ws.data[key]);
+    }
+
+    auditLog.log('cell_change', { row, col, oldValue, newValue: value, cellRef: getCellRef(row, col) });
+    
     state.isDirty = true;
     scheduleAutoSave();
     broadcastChange("cell", { row, col, value });
@@ -716,6 +1260,13 @@
   function getCellData(row, col) {
     const ws = state.worksheets[state.activeWorksheet];
     return ws?.data[`${row},${col}`];
+  }
+
+  function getCellValue(row, col) {
+    const data = getCellData(row, col);
+    if (!data) return "";
+    if (data.formula) return evaluateFormula(data.formula, row, col);
+    return data.value || "";
   }
 
   function getCellValue(row, col) {
@@ -1536,6 +2087,127 @@
       }
     } catch (e) {
       elements.saveStatus.textContent = "Save failed";
+    }
+  }
+
+  async function importXlsx(file) {
+    elements.saveStatus.textContent = "Importing...";
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const response = await fetch('/api/sheet/import', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        state.sheetId = data.id;
+        state.sheetName = data.name || file.name.replace(/\.[^/.]+$/, '');
+        state.worksheets = data.worksheets || [{ name: "Sheet1", data: {} }];
+        
+        if (elements.sheetName) elements.sheetName.value = state.sheetName;
+        
+        CONFIG.ROWS = Math.max(CONFIG.ROWS, state.worksheets.reduce((max, ws) => {
+          const maxRow = Object.keys(ws.data || {}).reduce((m, key) => {
+            const [r] = key.split(',').map(Number);
+            return Math.max(m, r);
+          }, 0);
+          return Math.max(max, maxRow + 1);
+        }, CONFIG.ROWS));
+        
+        window.history.replaceState({}, "", `#id=${state.sheetId}`);
+        
+        renderWorksheetTabs();
+        renderGrid();
+        
+        elements.saveStatus.textContent = "Imported";
+        addChatMessage("system", `Successfully imported ${file.name}`);
+      } else {
+        const err = await response.json();
+        elements.saveStatus.textContent = "Import failed";
+        addChatMessage("error", `Import failed: ${err.error || 'Unknown error'}`);
+      }
+    } catch (e) {
+      elements.saveStatus.textContent = "Import failed";
+      addChatMessage("error", `Import failed: ${e.message}`);
+    }
+  }
+
+  async function exportXlsx() {
+    elements.saveStatus.textContent = "Exporting...";
+    
+    try {
+      if (!state.sheetId) {
+        const response = await saveSheet();
+        if (!response.ok) throw new Error('Failed to save first');
+      }
+      
+      const response = await fetch('/api/sheet/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: state.sheetId,
+          format: 'xlsx'
+        })
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${state.sheetName || 'spreadsheet'}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        elements.saveStatus.textContent = "Exported";
+        addChatMessage("system", "Spreadsheet exported successfully");
+      } else {
+        const err = await response.json();
+        elements.saveStatus.textContent = "Export failed";
+        addChatMessage("error", `Export failed: ${err.error || 'Unknown error'}`);
+      }
+    } catch (e) {
+      elements.saveStatus.textContent = "Export failed";
+      addChatMessage("error", `Export failed: ${e.message}`);
+    }
+  }
+
+  async function exportCsv() {
+    elements.saveStatus.textContent = "Exporting...";
+    
+    try {
+      if (!state.sheetId) {
+        await saveSheet();
+      }
+      
+      const response = await fetch('/api/sheet/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: state.sheetId,
+          format: 'csv'
+        })
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${state.sheetName || 'spreadsheet'}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        elements.saveStatus.textContent = "Exported";
+      } else {
+        elements.saveStatus.textContent = "Export failed";
+      }
+    } catch (e) {
+      elements.saveStatus.textContent = "Export failed";
     }
   }
 

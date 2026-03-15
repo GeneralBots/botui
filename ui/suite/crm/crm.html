@@ -13,8 +13,7 @@
             <h1 data-i18n="crm-title">CRM</h1>
             <nav class="crm-tabs">
                 <button class="crm-tab active" data-view="pipeline" data-i18n="crm-pipeline">Pipeline</button>
-                <button class="crm-tab" data-view="leads" data-i18n="crm-leads">Leads</button>
-                <button class="crm-tab" data-view="opportunities" data-i18n="crm-opportunities">Opportunities</button>
+                <button class="crm-tab" data-view="deals" data-i18n="crm-deals">Deals</button>
                 <button class="crm-tab" data-view="accounts" data-i18n="crm-accounts">Accounts</button>
                 <button class="crm-tab" data-view="contacts" data-i18n="crm-contacts">Contacts</button>
                 <button class="crm-tab" data-view="campaigns" data-i18n="crm-campaigns">Campaigns</button>
@@ -26,8 +25,8 @@
                     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                 </svg>
                 <input type="text"
-                       placeholder="Search leads, opportunities, accounts..."
-                       data-i18n-placeholder="crm-search-placeholder"
+                       placeholder="Search deals, accounts..."
+                       data-i18n-placeholder="crm-search-placeholder-deals"
                        hx-get="/api/ui/crm/search"
                        hx-trigger="keyup changed delay:300ms"
                        hx-target="#crm-search-results">
@@ -154,53 +153,37 @@
         </div>
     </div>
 
-    <!-- Leads List View -->
-    <div id="crm-leads-view" class="crm-view">
+    <!-- Deals List View -->
+    <div id="crm-deals-view" class="crm-view">
         <div class="crm-list-header">
             <div class="list-filters">
-                <select hx-get="/api/crm/leads" hx-trigger="change" hx-target="#leads-table-body" hx-include="this">
-                    <option value="all" data-i18n="crm-filter-all">All Leads</option>
+                <select hx-get="/api/crm/deals" hx-trigger="change" hx-target="#deals-table-body" hx-include="this">
+                    <option value="all" data-i18n="crm-filter-all">All Deals</option>
                     <option value="new" data-i18n="crm-filter-new">New</option>
-                    <option value="contacted" data-i18n="crm-filter-contacted">Contacted</option>
                     <option value="qualified" data-i18n="crm-filter-qualified">Qualified</option>
+                    <option value="proposal" data-i18n="crm-filter-proposal">Proposal</option>
+                    <option value="negotiation" data-i18n="crm-filter-negotiation">Negotiation</option>
+                    <option value="won" data-i18n="crm-filter-won">Won</option>
+                    <option value="lost" data-i18n="crm-filter-lost">Lost</option>
                 </select>
             </div>
         </div>
         <table class="crm-table">
             <thead>
                 <tr>
-                    <th data-i18n="crm-col-name">Name</th>
-                    <th data-i18n="crm-col-company">Company</th>
-                    <th data-i18n="crm-col-email">Email</th>
-                    <th data-i18n="crm-col-phone">Phone</th>
-                    <th data-i18n="crm-col-source">Source</th>
-                    <th data-i18n="crm-col-status">Status</th>
-                    <th data-i18n="crm-col-created">Created</th>
-                    <th data-i18n="crm-col-actions">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="leads-table-body" hx-get="/api/ui/crm/leads" hx-trigger="load">
-                <!-- Leads loaded via HTMX -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Opportunities List View -->
-    <div id="crm-opportunities-view" class="crm-view">
-        <table class="crm-table">
-            <thead>
-                <tr>
-                    <th data-i18n="crm-col-opportunity">Opportunity</th>
-                    <th data-i18n="crm-col-account">Account</th>
+                    <th data-i18n="crm-col-title">Title</th>
                     <th data-i18n="crm-col-value">Value</th>
                     <th data-i18n="crm-col-stage">Stage</th>
+                    <th data-i18n="crm-col-contact">Contact</th>
+                    <th data-i18n="crm-col-account">Account</th>
                     <th data-i18n="crm-col-probability">Probability</th>
                     <th data-i18n="crm-col-close-date">Expected Close</th>
                     <th data-i18n="crm-col-owner">Owner</th>
                     <th data-i18n="crm-col-actions">Actions</th>
                 </tr>
             </thead>
-            <tbody id="opportunities-table-body" hx-get="/api/ui/crm/opportunities" hx-trigger="load">
+            <tbody id="deals-table-body" hx-get="/api/ui/crm/deals" hx-trigger="load">
+                <!-- Deals loaded via HTMX -->
             </tbody>
         </table>
     </div>

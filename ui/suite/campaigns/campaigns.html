@@ -11,6 +11,8 @@
             <h1 data-i18n="campaigns-title">Campaigns</h1>
             <nav class="crm-tabs">
                 <button class="crm-tab active" data-view="all" data-i18n="campaigns-all">All Campaigns</button>
+                <button class="crm-tab" data-view="lists" data-i18n="campaigns-lists">Lists</button>
+                <button class="crm-tab" data-view="templates" data-i18n="campaigns-templates">Templates</button>
                 <button class="crm-tab" data-view="email" data-i18n="campaigns-email">Email</button>
                 <button class="crm-tab" data-view="whatsapp" data-i18n="campaigns-whatsapp">WhatsApp</button>
                 <button class="crm-tab" data-view="social" data-i18n="campaigns-social">Social</button>
@@ -36,6 +38,44 @@
             <div class="pipeline-column" style="grid-column: 1 / -1;">
                 <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
                     Loading campaigns...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lists Grid -->
+    <div id="lists-view" class="crm-view">
+        <div class="crm-view-header" style="padding: 16px 24px; display: flex; justify-content: flex-end;">
+            <button class="btn-primary" onclick="showListModal()">
+                <span>New List</span>
+            </button>
+        </div>
+        <div class="campaigns-grid" id="listsList" 
+             hx-get="/api/crm/lists"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+            <div class="pipeline-column" style="grid-column: 1 / -1;">
+                <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
+                    Loading lists...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates Grid -->
+    <div id="templates-view" class="crm-view">
+        <div class="crm-view-header" style="padding: 16px 24px; display: flex; justify-content: flex-end;">
+            <button class="btn-primary" onclick="showTemplateModal()">
+                <span>New Template</span>
+            </button>
+        </div>
+        <div class="campaigns-grid" id="templatesList" 
+             hx-get="/api/crm/templates"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+            <div class="pipeline-column" style="grid-column: 1 / -1;">
+                <div style="padding: 40px; text-align: center; color: var(--text-secondary);">
+                    Loading templates...
                 </div>
             </div>
         </div>
@@ -256,6 +296,14 @@ function hideCampaignModal() {
     document.getElementById('campaign-form').reset();
 }
 
+function showListModal() {
+    alert('List creation coming soon!');
+}
+
+function showTemplateModal() {
+    alert('Template creation coming soon!');
+}
+
 document.getElementById('campaign-form').addEventListener('htmx:afterRequest', function(e) {
     if (e.detail.successful) {
         hideCampaignModal();
@@ -267,10 +315,21 @@ document.getElementById('campaign-form').addEventListener('htmx:afterRequest', f
 document.querySelectorAll('.crm-tab[data-view]').forEach(tab => {
     tab.addEventListener('click', function() {
         document.querySelectorAll('.crm-tab[data-view]').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.crm-view').forEach(v => v.classList.remove('active'));
         this.classList.add('active');
         
         const view = this.dataset.view;
-        filterCampaigns(view);
+        
+        // Show the appropriate view
+        const viewElement = document.getElementById(`${view}-view`);
+        if (viewElement) {
+            viewElement.classList.add('active');
+        }
+        
+        // For channel filters, use the existing filter function
+        if (['all', 'email', 'whatsapp', 'social'].includes(view)) {
+            filterCampaigns(view);
+        }
     });
 });
 
