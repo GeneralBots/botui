@@ -1444,7 +1444,14 @@
 
         function proceedWithChatInit() {
             var botName = window.__INITIAL_BOT_NAME__ || "default";
-            fetch("/api/auth?bot_name=" + encodeURIComponent(botName))
+            var storageKey = "gb_chat_" + botName;
+            var stored = {};
+            try { stored = JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch(e) {}
+
+            var authUrl = "/api/auth?bot_name=" + encodeURIComponent(botName);
+            if (stored.user_id) authUrl += "&user_id=" + encodeURIComponent(stored.user_id);
+
+            fetch(authUrl)
                 .then(function (response) {
                     return response.json();
                 })
@@ -1453,6 +1460,12 @@
                     currentSessionId = auth.session_id;
                     currentBotId = auth.bot_id || "default";
                     currentBotName = botName;
+                    try {
+                        localStorage.setItem(storageKey, JSON.stringify({
+                            user_id: currentUserId,
+                            session_id: currentSessionId
+                        }));
+                    } catch(e) {}
                     console.log("Auth:", {
                         currentUserId: currentUserId,
                         currentSessionId: currentSessionId,
