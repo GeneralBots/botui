@@ -848,13 +848,15 @@ async fn handle_ws_proxy(
 ) {
     let bot_name = params.bot_name.unwrap_or_else(|| "default".to_string());
     let backend_url = format!(
-        "{}/ws/{}",
+        "{}/ws/{}?session_id={}&user_id={}",
         state
             .client
             .base_url()
             .replace("https://", "wss://")
             .replace("http://", "ws://"),
-        bot_name
+        bot_name,
+        params.session_id,
+        params.user_id
     );
 
     info!("Proxying WebSocket to: {backend_url}");
