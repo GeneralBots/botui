@@ -923,6 +923,9 @@
 
             updateConnectionStatus("connecting");
 
+            // Always get the bot name from window.__INITIAL_BOT_NAME__ to ensure it's correct on reconnection
+            var botNameForWs = window.__INITIAL_BOT_NAME__ || currentBotName || "default";
+
             var url =
                 WS_URL +
                 "?session_id=" +
@@ -930,7 +933,7 @@
                 "&user_id=" +
                 currentUserId +
                 "&bot_name=" +
-                currentBotName;
+                botNameForWs;
 
             console.log("Connecting WebSocket to:", url);
             ws = new WebSocket(url);
