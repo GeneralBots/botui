@@ -951,6 +951,16 @@
                 console.log("WebSocket connected to:", url);
                 disconnectNotified = false;
                 updateConnectionStatus("connected");
+                // Send empty message to trigger start.bas and load suggestions
+                ws.send(JSON.stringify({
+                    bot_id: currentBotId,
+                    user_id: currentUserId,
+                    session_id: currentSessionId,
+                    channel: "web",
+                    content: "",
+                    message_type: MessageType.USER,
+                    timestamp: new Date().toISOString(),
+                }));
             };
 
             ws.onmessage = function (event) {
