@@ -1100,6 +1100,7 @@ fn create_ws_router() -> Router<AppState> {
     Router::new()
         .route("/task-progress", get(ws_task_progress_proxy))
         .route("/task-progress/:task_id", get(ws_task_progress_proxy))
+        .route("/autotask", get(ws_task_progress_proxy))
         .fallback(any(ws_proxy))
 }
 

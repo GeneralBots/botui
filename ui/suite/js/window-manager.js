@@ -295,6 +295,11 @@ if (typeof window.WindowManager === "undefined") {
 
       header.addEventListener("mousedown", onMouseDown);
 
+      header.addEventListener("dblclick", (e) => {
+        if (e.target.tagName.toLowerCase() === "button" || e.target.closest("button")) return;
+        this.toggleMaximize(windowEl.id.replace("window-", ""));
+      });
+
       // Add focus listener to the whole window
       windowEl.addEventListener("mousedown", () => {
         this.focus(windowEl.id.replace("window-", ""));
