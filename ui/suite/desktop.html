@@ -797,11 +797,8 @@
                 const pathParts = window.location.pathname.split('/');
                 const botName = pathParts[1] || 'default';
                 
-                // Bots where chat should be maximized by default
-                const botsWithMaximizedChat = ['cristo', 'salesianos'];
-
-                // Auto-open Chat window maximized (only for configured bots)
-                if (window.wm && botsWithMaximizedChat.includes(botName)) {
+                // Auto-open Chat window maximized for all bots
+                if (window.wm) {
                     try {
                         const response = await fetch(
                             "/suite/partials/chat.html",
