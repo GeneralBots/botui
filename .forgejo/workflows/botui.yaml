@@ -52,7 +52,9 @@ jobs:
             ${{ runner.os }}-cargo-v2-debug-
 
       - name: Clean old target
-        run: rm -rf workspace/target || true
+        run: |
+          rm -rf workspace/target || true
+          cargo clean || true
 
       - name: Install system dependencies
         run: |

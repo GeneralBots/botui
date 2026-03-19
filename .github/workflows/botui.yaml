@@ -46,10 +46,15 @@ jobs:
             ~/.cargo/git
             ~/.cache/sccache
             workspace/target
-          key: ${{ runner.os }}-cargo-v2-debug-ui-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-v2-debug-ui-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('ui/**/*.html', 'ui/**/*.js', 'ui/**/*.css') }}
           restore-keys: |
             ${{ runner.os }}-cargo-v2-debug-ui-
             ${{ runner.os }}-cargo-v2-debug-
+
+      - name: Clean old target
+        run: |
+          rm -rf workspace/target || true
+          cargo clean || true
 
       - name: Install system dependencies
         run: |
