@@ -86,13 +86,9 @@ jobs:
           sudo mkdir -p /opt/gbo/logs
           sudo cp /tmp/build.log /opt/gbo/logs/botui-$(date +%Y%m%d-%H%M%S).log || true
 
-      - name: Deploy
+      - name: Deploy via SSH
         working-directory: workspace
         run: |
-          lxc exec bot:pragmatismo-system -- systemctl stop ui || true
-
-          lxc exec bot:pragmatismo-system -- mkdir -p /opt/gbo/bin/system
-          lxc file push target/release/botui bot:pragmatismo-system/opt/gbo/bin/system/botui
-          lxc exec bot:pragmatismo-system -- chmod +x /opt/gbo/bin/system/botui
-
-          lxc exec bot:pragmatismo-system -- systemctl start ui || true# CI trigger: Fri Feb  6 10:57:04 AM -03 2026
+          ssh -o StrictHostKeyChecking=no pragmatismo-system "systemctl stop ui.service || true"
+          scp -o StrictHostKeyChecking=no target/release/botui pragmatismo-system:/opt/gbo/bin/botui
+          ssh -o StrictHostKeyChecking=no pragmatismo-system "chmod +x /opt/gbo/bin/botui && systemctl start ui.service"
