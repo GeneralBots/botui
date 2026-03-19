@@ -89,6 +89,6 @@ jobs:
       - name: Deploy via SSH
         working-directory: workspace
         run: |
-          ssh -o StrictHostKeyChecking=no pragmatismo-system "systemctl stop ui.service || true"
-          scp -o StrictHostKeyChecking=no target/release/botui pragmatismo-system:/opt/gbo/bin/botui
-          ssh -o StrictHostKeyChecking=no pragmatismo-system "chmod +x /opt/gbo/bin/botui && systemctl start ui.service"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@pragmatismo.com.br "lxc exec pragmatismo-system -- systemctl stop ui.service || true"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null target/release/botui root@pragmatismo.com.br:/tmp/botui
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@pragmatismo.com.br "lxc exec pragmatismo-system -- dd if=/tmp/botui of=/opt/gbo/bin/botui bs=4M && rm /tmp/botui && lxc exec pragmatismo-system -- systemctl start ui.service"
