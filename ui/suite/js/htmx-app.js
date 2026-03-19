@@ -259,6 +259,7 @@
     const suggestionsEl = document.getElementById("suggestions");
     if (suggestionsEl) {
       suggestionsEl.innerHTML = '';
+      suggestionsEl.classList.remove('has-bot-suggestions');
     }
   }
 
@@ -276,6 +277,7 @@
     chip.setAttribute("hx-swap", "beforeend");
 
     suggestionsEl.appendChild(chip);
+    suggestionsEl.classList.add('has-bot-suggestions');
     htmx.process(chip);
   }
 

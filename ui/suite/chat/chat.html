@@ -796,21 +796,17 @@
                 return;
             }
 
-            // Get the footer element
-            var footer = suggestionsEl.closest("footer");
-
             // Clear existing suggestions
             suggestionsEl.innerHTML = "";
 
             console.log("Rendering " + suggestions.length + " suggestions");
 
             // Add or remove CSS class based on whether suggestions are displayed
-            if (footer) {
-                if (suggestions.length > 0) {
-                    footer.classList.add("has-suggestions");
-                } else {
-                    footer.classList.remove("has-suggestions");
-                }
+            // Note: CSS uses .has-bot-suggestions on the suggestions-container
+            if (suggestions.length > 0) {
+                suggestionsEl.classList.add("has-bot-suggestions");
+            } else {
+                suggestionsEl.classList.remove("has-bot-suggestions");
             }
 
             suggestions.forEach(function (suggestion) {
@@ -1252,7 +1248,16 @@
 
         function proceedWithChatInit() {
             var botName = window.__INITIAL_BOT_NAME__ || "default";
-            fetch("/api/auth?bot_name=" + encodeURIComponent(botName))
+            var sessionIdKey = "gb_session_" + botName;
+            
+            // Try to restore session from localStorage
+            var storedSessionId = localStorage.getItem(sessionIdKey);
+            var authUrl = "/api/auth?bot_name=" + encodeURIComponent(botName);
+            if (storedSessionId) {
+                authUrl += "&session_id=" + encodeURIComponent(storedSessionId);
+            }
+            
+            fetch(authUrl)
                 .then(function (response) {
                     return response.json();
                 })
@@ -1261,6 +1266,10 @@
                     currentSessionId = auth.session_id;
                     currentBotId = auth.bot_id || "default";
                     currentBotName = botName;
+                    
+                    // Save session ID to localStorage for page refreshes
+                    localStorage.setItem(sessionIdKey, currentSessionId);
+                    
                     console.log("Auth:", {
                         currentUserId: currentUserId,
                         currentSessionId: currentSessionId,
@@ -1271,7 +1280,7 @@
                 })
                 .catch(function (e) {
                     console.error("Auth failed:", e);
-                    // Proceed with anonymous connection - WebSocket handler supports it
+                    // Proceed with anonymous connection
                     currentUserId = crypto.randomUUID
                         ? crypto.randomUUID()
                         : Date.now().toString();
