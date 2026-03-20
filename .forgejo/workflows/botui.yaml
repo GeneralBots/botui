@@ -54,7 +54,6 @@ jobs:
       - name: Clean old target
         run: |
           rm -rf workspace/target || true
-          cargo clean || true
 
       - name: Install system dependencies
         run: |
@@ -94,6 +93,6 @@ jobs:
       - name: Deploy via SSH
         working-directory: workspace
         run: |
-          ssh -o StrictHostKeyChecking=no pragmatismo-system "systemctl stop ui.service || true"
+          ssh -o StrictHostKeyChecking=no pragmatismo-system "pkill -f /opt/gbo/bin/botui || true; sleep 2"
           scp -o StrictHostKeyChecking=no target/release/botui pragmatismo-system:/opt/gbo/bin/botui
-          ssh -o StrictHostKeyChecking=no pragmatismo-system "chmod +x /opt/gbo/bin/botui && systemctl start ui.service"
+          ssh -o StrictHostKeyChecking=no pragmatismo-system "chmod +x /opt/gbo/bin/botui && cd /opt/gbo/bin && nohup sudo -u gbuser ./botui --noconsole >> /opt/gbo/logs/botui.log 2>&1 &"
