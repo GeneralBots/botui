@@ -90,9 +90,18 @@ jobs:
           sudo mkdir -p /opt/gbo/logs
           sudo cp /tmp/build.log /opt/gbo/logs/botui-$(date +%Y%m%d-%H%M%S).log || true
 
-      - name: Deploy via SSH
+      - name: Setup incus on host
+        run: |
+          # SSH to host and setup incus for pushing to containers
+          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo cp /opt/incus/bin/incus /usr/local/bin/ && sudo chmod +x /usr/local/bin/incus"
+
+      - name: Deploy via incus from host
         working-directory: workspace
         run: |
-          ssh -o StrictHostKeyChecking=no pragmatismo-system "pkill -f /opt/gbo/bin/botui || true; sleep 2"
-          scp -o StrictHostKeyChecking=no target/release/botui pragmatismo-system:/opt/gbo/bin/botui
-          ssh -o StrictHostKeyChecking=no pragmatismo-system "chmod +x /opt/gbo/bin/botui && cd /opt/gbo/bin && nohup sudo -u gbuser ./botui --noconsole >> /opt/gbo/logs/botui.log 2>&1 &"
+          # SSH to host and deploy via incus
+          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- pkill -f /opt/gbo/bin/botui || true"
+          sleep 2
+          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- rm -f /opt/gbo/bin/botui"
+          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus file push target/release/botui system/opt/gbo/bin/botui"
+          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- chmod +x /opt/gbo/bin/botui"
+          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- su - gbuser -c 'cd /opt/gbo/bin && nohup ./botui --noconsole >> /opt/gbo/logs/botui.log 2>&1 &'"
