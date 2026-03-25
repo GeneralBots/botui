@@ -9,6 +9,9 @@ on:
 env:
   CARGO_BUILD_JOBS: 6
   CARGO_NET_RETRY: 10
+  SCCACHE_DIR: /opt/gbo/cache/sccache
+  RUSTC_WRAPPER: sccache
+  CARGO_HOME: /opt/gbo/cache/cargo
 
 jobs:
   build:
@@ -20,9 +23,12 @@ jobs:
 
       - name: Setup Workspace
         run: |
+          mkdir -p /opt/gbo/ci/botui
+          mkdir -p $SCCACHE_DIR
+          mkdir -p $CARGO_HOME/registry
           # Clone the main gb repository
-          git clone --depth 1 --branch main https://alm.pragmatismo.com.br/GeneralBots/gb.git workspace
-          cd workspace
+          git clone --depth 1 --branch main https://alm.pragmatismo.com.br/GeneralBots/gb.git /opt/gbo/ci/botui/workspace
+          cd /opt/gbo/ci/botui/workspace
           git submodule update --init --depth 1 botlib
 
           # Clone botui separately
@@ -38,47 +44,26 @@ jobs:
           sed -i '/"botplugin",/d' Cargo.toml
           sed -i '/"bottemplates",/d' Cargo.toml
 
-      - name: Cache Cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cache/sccache
-            workspace/target
-          key: ${{ runner.os }}-cargo-v2-debug-ui-${{ hashFiles('**/Cargo.lock') }}-${{ hashFiles('ui/**/*.html', 'ui/**/*.js', 'ui/**/*.css') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-v2-debug-ui-
-            ${{ runner.os }}-cargo-v2-debug-
-
-      - name: Clean old target
+      - name: Setup PATH for globally installed tools
         run: |
-          rm -rf workspace/target || true
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          echo "/usr/local/bin" >> $GITHUB_PATH
+
+      - name: Start sccache server
+        run: |
+          sccache --start-server || true
+          sccache --show-stats || true
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libpq-dev libssl-dev liblzma-dev pkg-config
 
-      - name: Install Rust
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable --profile minimal
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-
-      - name: Install sccache
-        run: |
-          wget https://github.com/mozilla/sccache/releases/download/v0.8.2/sccache-v0.8.2-x86_64-unknown-linux-musl.tar.gz
-          tar xzf sccache-v0.8.2-x86_64-unknown-linux-musl.tar.gz
-          mv sccache-v0.8.2-x86_64-unknown-linux-musl/sccache $HOME/.cargo/bin/sccache
-          chmod +x $HOME/.cargo/bin/sccache
-          echo "RUSTC_WRAPPER=sccache" >> $GITHUB_ENV
-          $HOME/.cargo/bin/sccache --start-server || true
-
       - name: Setup environment
         run: sudo cp /opt/gbo/bin/system/.env . 2>/dev/null || true
 
       - name: Build BotUI
-        working-directory: workspace
+        working-directory: /opt/gbo/ci/botui/workspace
         run: |
           cargo build --release -p botui --features embed-ui -j 8 2>&1 | tee /tmp/build.log
           ls -lh target/release/botui
@@ -96,12 +81,11 @@ jobs:
           ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo cp /opt/incus/bin/incus /usr/local/bin/ && sudo chmod +x /usr/local/bin/incus"
 
       - name: Deploy via incus from host
-        working-directory: workspace
         run: |
           # SSH to host and deploy via incus
           ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- pkill -f /opt/gbo/bin/botui || true"
           sleep 2
           ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- rm -f /opt/gbo/bin/botui"
-          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus file push target/release/botui system/opt/gbo/bin/botui"
+          ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus file push /opt/gbo/ci/botui/workspace/target/release/botui system/opt/gbo/bin/botui"
           ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- chmod +x /opt/gbo/bin/botui"
           ssh -o StrictHostKeyChecking=no administrator@63.141.255.9 "sudo incus exec system -- su - gbuser -c 'cd /opt/gbo/bin && nohup ./botui --noconsole >> /opt/gbo/logs/botui.log 2>&1 &'"
