@@ -1041,9 +1041,14 @@
                                 console.log("Parsed action:", action);
 
                                 if (action.type === "invoke_tool") {
-                                    // Send the display text so it shows correctly in chat
-                                    // The backend will recognize this as a tool request
-                                    window.sendMessage(sugg.text);
+                                    // Check if tool needs parameters
+                                    if (action.prompt_for_params) {
+                                        // Need parameters, send text as message
+                                        window.sendMessage(sugg.text);
+                                    } else {
+                                        // No params needed - invoke tool directly
+                                        window.sendMessage("/tool " + action.tool);
+                                    }
                                 } else if (action.type === "send_message") {
                                     window.sendMessage(
                                         action.message || sugg.text,
