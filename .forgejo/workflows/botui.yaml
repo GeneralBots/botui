@@ -9,6 +9,7 @@ on:
 env:
   CARGO_BUILD_JOBS: 6
   CARGO_NET_RETRY: 10
+  PATH: /root/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 jobs:
   build:
