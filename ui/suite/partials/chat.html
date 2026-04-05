@@ -1041,14 +1041,17 @@
                                 console.log("Parsed action:", action);
 
                                 if (action.type === "invoke_tool") {
-                                    // Check if tool needs parameters
-                                    if (action.prompt_for_params) {
-                                        // Need parameters, send text as message
-                                        window.sendMessage(sugg.text);
-                                    } else {
-                                        // No params needed - invoke tool directly
-                                        window.sendMessage("/tool " + action.tool);
-                                    }
+                                    // Invoke tool directly via WebSocket - invisible to user
+                                    ws.send(JSON.stringify({
+                                        bot_id: currentBotId,
+                                        user_id: currentUserId,
+                                        session_id: currentSessionId,
+                                        channel: "web",
+                                        content: action.tool,
+                                        message_type: 6,  // TOOL_EXEC
+                                        timestamp: new Date().toISOString(),
+                                    }));
+                                    return;
                                 } else if (action.type === "send_message") {
                                     window.sendMessage(
                                         action.message || sugg.text,
