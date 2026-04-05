@@ -348,7 +348,8 @@
     const checked = selectedFiles.has(file.path) ? "checked" : "";
     const selected = selectedFiles.has(file.path) ? "selected" : "";
 
-    return `<div class="file-card ${selected}" data-path="${escapeHtml(file.path)}" data-name="${escapeHtml(file.name)}" data-type="${file.is_dir ? "folder" : "file"}" data-size="${file.size || 0}"><input type="checkbox" class="file-checkbox" ${checked} onchange="DriveModule.toggleSelection('${escapeJs(file.path)}')"><div class="file-card-preview ${iconClass}">${iconSvg}</div><div class="file-card-info"><div class="file-card-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div><div class="file-card-meta">${sizeText}</div></div></div>`;
+    const kbTag = file.is_kb ? `<span class="kb-tag ${file.is_public ? "public" : "private"}" title="${file.is_public ? "Public KB" : "Restricted KB"}">KB</span>` : "";
+    return `<div class="file-card ${selected}" data-path="${escapeHtml(file.path)}" data-name="${escapeHtml(file.name)}" data-type="${file.is_dir ? "folder" : "file"}" data-size="${file.size || 0}"><input type="checkbox" class="file-checkbox" ${checked} onchange="DriveModule.toggleSelection('${escapeJs(file.path)}')"><div class="file-card-preview ${iconClass}">${iconSvg}${kbTag}</div><div class="file-card-info"><div class="file-card-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div><div class="file-card-meta">${sizeText}</div></div></div>`;
   }
 
   function renderFileRow(file) {
@@ -365,7 +366,9 @@
       ? `<button class="btn-icon-sm" title="Download" onclick="event.stopPropagation(); DriveModule.downloadFile('${escapeJs(file.path)}')">${downloadIcon}</button>`
       : "";
 
-    return `<div class="drive-file-item ${file.is_dir ? "folder" : ""} ${selected}" data-path="${escapeHtml(file.path)}" data-name="${escapeHtml(file.name)}" data-type="${file.is_dir ? "folder" : "file"}" data-size="${file.size || 0}"><div class="file-col file-name-col"><input type="checkbox" class="file-checkbox" ${checked} onclick="event.stopPropagation()" onchange="DriveModule.toggleSelection('${escapeJs(file.path)}')">${iconSvg}<span>${escapeHtml(file.name)}</span></div><div class="file-col file-modified-col">${modifiedText}</div><div class="file-col file-size-col">${sizeText}</div><div class="file-col file-actions-col">${downloadBtn}<button class="btn-icon-sm" title="More" onclick="event.stopPropagation(); DriveModule.showContextMenuFor(event, '${escapeJs(file.path)}')">${moreIcon}</button></div></div>`;
+    const kbTag = file.is_kb ? `<span class="kb-tag ${file.is_public ? "public" : "private"}" title="${file.is_public ? "Public KB" : "Restricted KB"}">${file.is_public ? "🔓" : "🔒"} KB</span>` : "";
+
+    return `<div class="drive-file-item ${file.is_dir ? "folder" : ""} ${selected}" data-path="${escapeHtml(file.path)}" data-name="${escapeHtml(file.name)}" data-type="${file.is_dir ? "folder" : "file"}" data-size="${file.size || 0}"><div class="file-col file-name-col"><input type="checkbox" class="file-checkbox" ${checked} onclick="event.stopPropagation()" onchange="DriveModule.toggleSelection('${escapeJs(file.path)}')">${iconSvg}<span>${escapeHtml(file.name)}</span>${kbTag}</div><div class="file-col file-modified-col">${modifiedText}</div><div class="file-col file-size-col">${sizeText}</div><div class="file-col file-actions-col">${downloadBtn}<button class="btn-icon-sm" title="More" onclick="event.stopPropagation(); DriveModule.showContextMenuFor(event, '${escapeJs(file.path)}')">${moreIcon}</button></div></div>`;
   }
 
   function bindFileEvents() {
