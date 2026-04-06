@@ -1458,6 +1458,7 @@
 
             var authUrl = "/api/auth?bot_name=" + encodeURIComponent(botName);
             if (stored.user_id) authUrl += "&user_id=" + encodeURIComponent(stored.user_id);
+            if (stored.session_id) authUrl += "&session_id=" + encodeURIComponent(stored.session_id);
 
             fetch(authUrl)
                 .then(function (response) {
