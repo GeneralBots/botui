@@ -788,6 +788,9 @@
             }
         }
 
+        // Track last rendered suggestions to prevent duplicates
+        var lastRenderedSuggestions = null;
+
         // Render suggestion buttons
         function renderSuggestions(suggestions) {
             var suggestionsEl = document.getElementById("suggestions");
@@ -795,6 +798,18 @@
                 console.warn("Suggestions container not found");
                 return;
             }
+
+            // Prevent duplicate rendering - compare with last rendered suggestions
+            var currentSuggestionKeys = suggestions
+                .map(function (s) {
+                    return s.text || "";
+                })
+                .join("|");
+            if (lastRenderedSuggestions === currentSuggestionKeys) {
+                console.log("Skipping duplicate suggestions render");
+                return;
+            }
+            lastRenderedSuggestions = currentSuggestionKeys;
 
             // Clear existing suggestions
             suggestionsEl.innerHTML = "";
@@ -835,7 +850,9 @@
                                         window.sendMessage(sugg.text);
                                     } else {
                                         // No params needed - invoke tool directly
-                                        window.sendMessage("/tool " + action.tool);
+                                        window.sendMessage(
+                                            "/tool " + action.tool,
+                                        );
                                     }
                                 } else if (action.type === "send_message") {
                                     window.sendMessage(
@@ -925,7 +942,8 @@
             updateConnectionStatus("connecting");
 
             // Always get the bot name from window.__INITIAL_BOT_NAME__ to ensure it's correct on reconnection
-            var botNameForWs = window.__INITIAL_BOT_NAME__ || currentBotName || "default";
+            var botNameForWs =
+                window.__INITIAL_BOT_NAME__ || currentBotName || "default";
 
             var url =
                 WS_URL +
@@ -953,15 +971,17 @@
                 disconnectNotified = false;
                 updateConnectionStatus("connected");
                 // Send empty message to trigger start.bas and load suggestions
-                ws.send(JSON.stringify({
-                    bot_id: currentBotId,
-                    user_id: currentUserId,
-                    session_id: currentSessionId,
-                    channel: "web",
-                    content: "",
-                    message_type: MessageType.USER,
-                    timestamp: new Date().toISOString(),
-                }));
+                ws.send(
+                    JSON.stringify({
+                        bot_id: currentBotId,
+                        user_id: currentUserId,
+                        session_id: currentSessionId,
+                        channel: "web",
+                        content: "",
+                        message_type: MessageType.USER,
+                        timestamp: new Date().toISOString(),
+                    }),
+                );
             };
 
             ws.onmessage = function (event) {
@@ -1254,14 +1274,14 @@
         function proceedWithChatInit() {
             var botName = window.__INITIAL_BOT_NAME__ || "default";
             var sessionIdKey = "gb_session_" + botName;
-            
+
             // Try to restore session from localStorage
             var storedSessionId = localStorage.getItem(sessionIdKey);
             var authUrl = "/api/auth?bot_name=" + encodeURIComponent(botName);
             if (storedSessionId) {
                 authUrl += "&session_id=" + encodeURIComponent(storedSessionId);
             }
-            
+
             fetch(authUrl)
                 .then(function (response) {
                     return response.json();
@@ -1271,10 +1291,10 @@
                     currentSessionId = auth.session_id;
                     currentBotId = auth.bot_id || "default";
                     currentBotName = botName;
-                    
+
                     // Save session ID to localStorage for page refreshes
                     localStorage.setItem(sessionIdKey, currentSessionId);
-                    
+
                     console.log("Auth:", {
                         currentUserId: currentUserId,
                         currentSessionId: currentSessionId,
