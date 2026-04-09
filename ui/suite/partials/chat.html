@@ -504,10 +504,15 @@
                     processedContent +
                     "</div>";
             } else {
-                var parsed =
-                    typeof marked !== "undefined" && marked.parse
+                // Check if content has HTML (any tag, including comments)
+                var hasHtmlTags = /<\/?[a-z][^>]*>|<!--|-->/i.test(content);
+                console.log("Bot message - hasHtmlTags:", hasHtmlTags, "content length:", content.length);
+                
+                var parsed = hasHtmlTags 
+                    ? content  // Use HTML directly (no escaping!)
+                    : (typeof marked !== "undefined" && marked.parse
                         ? marked.parse(content)
-                        : escapeHtml(content);
+                        : escapeHtml(content));
                 parsed = renderMentionInMessage(parsed);
                 div.innerHTML =
                     '<div class="message-content bot-message">' +
@@ -937,10 +942,13 @@
         function updateStreaming(content) {
             var el = document.getElementById(streamingMessageId);
             if (el) {
-                var parsed =
-                    typeof marked !== "undefined" && marked.parse
+                // Check if content has HTML tags
+                var hasHtmlTags = /<\/?[a-z][^>]*>|<!--|-->/i.test(content);
+                var parsed = hasHtmlTags 
+                    ? content  // Use HTML directly
+                    : (typeof marked !== "undefined" && marked.parse
                         ? marked.parse(content)
-                        : escapeHtml(content);
+                        : escapeHtml(content));
                 parsed = renderMentionInMessage(parsed);
                 el.querySelector(".message-content").innerHTML = parsed;
             }
@@ -949,10 +957,13 @@
         function finalizeStreaming() {
             var el = document.getElementById(streamingMessageId);
             if (el) {
-                var parsed =
-                    typeof marked !== "undefined" && marked.parse
+                // Check if content has HTML tags
+                var hasHtmlTags = /<\/?[a-z][^>]*>|<!--|-->/i.test(currentStreamingContent);
+                var parsed = hasHtmlTags 
+                    ? currentStreamingContent  // Use HTML directly
+                    : (typeof marked !== "undefined" && marked.parse
                         ? marked.parse(currentStreamingContent)
-                        : escapeHtml(currentStreamingContent);
+                        : escapeHtml(currentStreamingContent));
                 parsed = renderMentionInMessage(parsed);
                 el.querySelector(".message-content").innerHTML = parsed;
                 el.removeAttribute("id");
